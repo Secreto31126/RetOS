@@ -45,6 +45,11 @@ struct vbe_mode_info_structure
 	uint8_t reserved1[206];
 } __attribute__((packed));
 
+typedef uint32_t (*shapeFunction)(int, int);
 void putPixel(uint32_t hexColor, uint64_t x, uint64_t y);
 void putPixelStd(char red, char green, char blue, uint64_t x, uint64_t y);
 void drawRectangle(uint32_t hexColor, uint64_t x, uint64_t y, int width, int height);
+/***
+ * shapeFunction receives coordinates (two integers), and returns a uint32_t of form 0xPPRRGGBB. Where PP is boolean for whether to draw that pixel, and RRGGBB a hexColor
+ */
+void drawShape(shapeFunction f, int x, int y, int xRange, int yRange);

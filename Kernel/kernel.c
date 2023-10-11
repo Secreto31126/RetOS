@@ -31,6 +31,22 @@ void *getStackBase()
 	);
 }
 
+uint32_t drawRedLine(int x, int y)
+{
+	if (x < 10 && y < 1)
+		return 0xFF000000 | HEX_RED;
+	return 0;
+}
+
+uint32_t drawRedCircle(int x, int y)
+{
+	x -= 100;
+	y -= 100;
+	if ((x * x + y * y) < 10000)
+		return 0xFF000000 | HEX_RED;
+	return 0;
+}
+
 void *initializeKernelBinary()
 {
 	char buffer[10];
@@ -95,7 +111,13 @@ int main()
 	ncPrint("  Sample data module contents: ");
 	ncPrint((char *)sampleDataModuleAddress);
 	ncNewline();
-	drawRectangle(0x0F0F0F, 100, 100,100,100);
 	ncPrint("[Finished]");
+
+	drawRectangle(0xFF0000, 10, 10, 10, 10);
+	drawRectangle(0x00FF00, 20, 10, 10, 10);
+	drawRectangle(0x0000FF, 30, 10, 10, 10);
+	for (int i = 0; i < 4; i++)
+		drawShape(drawRedCircle, 100 + i * 200, 100, 1000, 1000);
+
 	return 0;
 }

@@ -13,20 +13,22 @@ void ncPrint(const char * string)
 	int i;
 
 	for (i = 0; string[i] != 0; i++)
-		ncPrintChar(string[i]);
+		ncPrintChar(string[i], 0x1F);
 }
 
-void ncPrintChar(char character)
+void ncPrintChar(char character, char color)
 {
 	*currentVideo = character;
-	currentVideo += 2;
+	currentVideo++;
+	*currentVideo = color;
+	currentVideo++;
 }
 
 void ncNewline()
 {
 	do
 	{
-		ncPrintChar(' ');
+		ncPrintChar(' ', 0xFF);
 	}
 	while((uint64_t)(currentVideo - video) % (width * 2) != 0);
 }

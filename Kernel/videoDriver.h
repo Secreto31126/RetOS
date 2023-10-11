@@ -1,3 +1,4 @@
+#include <stdint.h>
 struct vbe_mode_info_structure
 {
 	uint16_t attributes;  // deprecated, only bit 7 should be of interest to you, and it indicates the mode supports a linear frame buffer.
@@ -38,4 +39,4 @@ struct vbe_mode_info_structure
 
 void putPixel(uint32_t hexColor, uint64_t x, uint64_t y);
 void putPixelStd(char red, char green, char blue, uint64_t x, uint64_t y);
-void drawRectangle();
+void drawRectangle(uint32_t hexColor, uint64_t x, uint64_t y, int width, int height);

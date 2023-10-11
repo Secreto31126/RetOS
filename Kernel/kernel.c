@@ -3,7 +3,7 @@
 #include <lib.h>
 #include <moduleLoader.h>
 #include <naiveConsole.h>
-#include "vidlib/videoDriver.h"
+#include "videoDriver.h"
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -95,7 +95,7 @@ int main()
 	ncPrint("  Sample data module contents: ");
 	ncPrint((char *)sampleDataModuleAddress);
 	ncNewline();
-
+	drawRectangle(0x0F0F0F, 100, 100,100,100);
 	ncPrint("[Finished]");
 	return 0;
 }

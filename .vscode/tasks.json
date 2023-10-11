@@ -6,7 +6,7 @@
         {
             "label": "Build and execute",
             "type": "shell",
-            "command": "sudo ./run.sh",
+            "command": "./run.sh",
             "group": "build"
         }
     ]

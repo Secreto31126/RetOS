@@ -2,13 +2,21 @@
 path="${PWD}"
 container="tpe-builder"
 
-docker build -t "$container" .
-docker run -d -v "/$path/Image:/root/Image" --rm "$container"
+make clean -CToolchain
+make clean
+clear
 
-danglings=$(docker images -f "dangling=true" -q)
-if [ ! -z "$danglings" ]
+docker build -t "$container" .
+if [ $1 -ne 0 ]
 then
-    docker rmi "$danglings"
+    exit 1
 fi
+
+id=$(docker run -d -v "/$path/Image:/root/Image" "$container")
+docker wait "$id"
+
+clear
+docker logs "$id"
+docker rm "$id"
 
 qemu-system-x86_64 -hda "$path/Image/x64BareBonesImage.qcow2" -m 512

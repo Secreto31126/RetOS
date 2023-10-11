@@ -7,7 +7,7 @@ make clean
 clear
 
 docker build -t "$container" .
-if [ $1 -ne 0 ]
+if [ $? -ne 0 ]
 then
     exit 1
 fi
@@ -17,6 +17,6 @@ docker wait "$id"
 
 clear
 docker logs "$id"
-docker rm "$id"
+docker rm "$id" > /dev/null
 
 qemu-system-x86_64 -hda "$path/Image/x64BareBonesImage.qcow2" -m 512

@@ -1,4 +1,12 @@
 #include <stdint.h>
+
+enum HEX_COLORS
+{
+	HEX_RED = 0xFF0000,
+	HEX_GREEN = 0x00FF00,
+	HEX_BLUE = 0x0000FF,
+};
+
 struct vbe_mode_info_structure
 {
 	uint16_t attributes;  // deprecated, only bit 7 should be of interest to you, and it indicates the mode supports a linear frame buffer.

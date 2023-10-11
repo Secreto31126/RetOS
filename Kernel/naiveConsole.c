@@ -28,7 +28,7 @@ void ncNewline()
 {
 	do
 	{
-		ncPrintChar(' ', 0xFF);
+		ncPrintChar(' ', 0x1F);
 	}
 	while((uint64_t)(currentVideo - video) % (width * 2) != 0);
 }

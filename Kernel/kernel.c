@@ -37,7 +37,6 @@ uint32_t drawRedLine(int x, int y)
 		return 0xFF000000 | HEX_RED;
 	return 0;
 }
-
 uint32_t drawRedCircle(int x, int y)
 {
 	x -= 100;
@@ -45,6 +44,22 @@ uint32_t drawRedCircle(int x, int y)
 	if ((x * x + y * y) < 10000)
 		return 0xFF000000 | HEX_RED;
 	return 0;
+}
+uint32_t drawAnEllipse(int x, int y)
+{
+	x -= 100;
+	y -= 25;
+	if ((x * x + 16 * (y * y)) < 10000)
+		return 0xFF000000 | ((0xFFFFFF * x * y) & 0x00FFFFFF);
+	return 0;
+}
+uint32_t drawACanvas(int x, int y)
+{
+	x -= 100;
+	y -= 25;
+	if ((x * x + 16 * (y * y)) < 10000)
+		return 0xFF000000 | ((0xFFFFFF * x * y) & 0x00FFFFFF);
+	return 0xFF000000 | (((0xFFFFFF * x * y) & 0x00FFFFFF)) ^ 0x00FFFFFF;
 }
 
 void *initializeKernelBinary()
@@ -116,8 +131,11 @@ int main()
 	drawRectangle(0xFF0000, 10, 10, 10, 10);
 	drawRectangle(0x00FF00, 20, 10, 10, 10);
 	drawRectangle(0x0000FF, 30, 10, 10, 10);
+	/*
 	for (int i = 0; i < 4; i++)
-		drawShape(drawRedCircle, 100 + i * 200, 100, 1000, 1000);
-
+		for (int j = 0; j < 4; j++)
+			drawShape(drawACanvas, 100 + i * 200, 100 + j * 50, 1000, 1000);
+			*/
+	drawShape(drawACanvas, 0, 0, 1024, 768);
 	return 0;
 }

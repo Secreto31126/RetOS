@@ -41,11 +41,16 @@ void drawRectangle(uint32_t hexColor, uint64_t x, uint64_t y, int width, int hei
 
 void drawShape(shapeFunction f, int x, int y, int xRange, int yRange)
 {
+    drawScaledShape(f, x, y, xRange, yRange, 1, 1);
+}
+
+void drawScaledShape(shapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor)
+{
     for (int i = 0; i < xRange; i++)
     {
         for (int j = 0; j < yRange; j++)
         {
-            uint32_t r = f(i, j);
+            uint32_t r = f(i / xScaleFactor, j / yScaleFactor);
             if (r & 0xFF000000)
                 putPixel(r & 0x00FFFFFF, i + x, j + y);
         }

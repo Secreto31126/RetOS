@@ -53,3 +53,4 @@ void drawRectangle(uint32_t hexColor, uint64_t x, uint64_t y, int width, int hei
  * shapeFunction receives coordinates (two integers), and returns a uint32_t of form 0xPPRRGGBB. Where PP is boolean for whether to draw that pixel, and RRGGBB a hexColor
  */
 void drawShape(shapeFunction f, int x, int y, int xRange, int yRange);
+void drawScaledShape(shapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor);

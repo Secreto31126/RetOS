@@ -55,10 +55,6 @@ uint32_t drawAnEllipse(int x, int y)
 }
 uint32_t drawACanvas(int x, int y)
 {
-	x -= 100;
-	y -= 25;
-	if ((x * x + 16 * (y * y)) < 10000)
-		return 0xFF000000 | ((0xFFFFFF * x * y) & 0x00FFFFFF);
 	return 0xFF000000 | (((0xFFFFFF * x * y) & 0x00FFFFFF)) ^ 0x00FFFFFF;
 }
 
@@ -136,6 +132,7 @@ int main()
 		for (int j = 0; j < 4; j++)
 			drawShape(drawACanvas, 100 + i * 200, 100 + j * 50, 1000, 1000);
 			*/
-	drawShape(drawACanvas, 0, 0, 1024, 768);
+	drawShape(drawAnEllipse, 0, 0, 1024, 768);
+	drawScaledShape(drawAnEllipse, 0, 0, 1024, 768, 2, 5);
 	return 0;
 }

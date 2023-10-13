@@ -28,12 +28,12 @@ cpuVendor:
 	pop rbp
 	ret
 
-; uint32_t inb(uint16_t port)
+; uint32_t inb(uint16_t port);
 inb:
 	inb	di, eax
 	ret
 
-; void outb(uint16_t port, uint32_t value)
+; void outb(uint16_t port, uint32_t value);
 outb:
 	outb	di, esi
 	ret

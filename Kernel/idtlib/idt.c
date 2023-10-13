@@ -17,5 +17,5 @@ void clearIDT()
 void *idtEntry(uint8_t interrupt_number, InterruptionHandler handler)
 {
     idtAddress[interrupt_number] = (uint64_t)handler;
-    return idtAddress + interrupt_number * 16;
+    return idtAddress + interrupt_number * sizeof(uint64_t);
 }

@@ -1,7 +1,7 @@
 include Makefile.inc
 
 KERNEL=kernel.bin
-SOURCES=$(wildcard *.c)# $(wildcard folder_name/*.c)
+SOURCES=$(wildcard *.c) $(wildcard idtlib/*.c) # $(wildcard folder_name/*.c)
 SOURCES_ASM=$(wildcard asm/*.asm)
 OBJECTS=$(SOURCES:.c=.o)
 OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
@@ -15,7 +15,7 @@ all: log $(KERNEL)
 log:
 	@echo
 	@echo "\033[0;36mMAKEFILE KERNEL\033[0m"
-	@echo "\tSOURCES=$(SOURCES)"
+	@echo "\tSOURCES=$(SOURCES) $(SOURCES_ASM)"
 	@echo
 
 $(KERNEL): $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM)

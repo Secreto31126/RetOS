@@ -88,7 +88,7 @@ void *initializeKernelBinary()
 	clearIDT();
 
 	ncPrint("  syscall: 0x");
-	ncPrintHex(idtEntry(0x80, syscall_hi));
+	ncPrintHex((uint64_t)idtEntry(0x80, syscall_hi));
 	ncNewline();
 
 	ncPrint("[Done]");

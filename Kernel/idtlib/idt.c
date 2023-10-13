@@ -1,11 +1,11 @@
 #include <idt.h>
 
-static void *const idtAddress = (void *)0x0;
-static void *const idtEndAddress = 0xFFF;
+static uint64_t *const idtAddress = (void *)0x0;
+static uint64_t *const idtEndAddress = (void *)0xFFF;
 
 void clearIDT()
 {
-    memset((void *)idtAddress, 0, idtEndAddress);
+    memset(idtAddress, 0, (uint64_t)idtEndAddress / 16);
 }
 
 /**
@@ -16,5 +16,6 @@ void clearIDT()
  */
 void *idtEntry(uint8_t interrupt_number, InterruptionHandler handler)
 {
-    *((uint32_t *)(idtAddress + interrupt_number * 16)) = (uint32_t)handler;
+    idtAddress[interrupt_number] = (uint64_t)handler;
+    return idtAddress + interrupt_number * 16;
 }

@@ -1,7 +1,9 @@
-GLOBAL cpuVendor
+	GLOBAL cpuVendor
+	GLOBAL inb
+	GLOBAL outb
 
-section .text
-	
+	section .text
+
 cpuVendor:
 	push rbp
 	mov rbp, rsp
@@ -24,4 +26,14 @@ cpuVendor:
 
 	mov rsp, rbp
 	pop rbp
+	ret
+
+; uint32_t inb(uint16_t port)
+inb:
+	inb	di, eax
+	ret
+
+; void outb(uint16_t port, uint32_t value)
+outb:
+	outb	di, esi
 	ret

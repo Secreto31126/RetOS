@@ -12,9 +12,32 @@ int strlen(char *s)
 	return i;
 }
 
+char *ulltoa(unsigned long long ll, char *buffer, int radix)
+{
+	while (ll > radix)
+	{
+		*buffer = (ll % radix) + '0';
+		if (*buffer > '9')
+			*buffer += 'A' - '9' - 1;
+		buffer++;
+		ll /= radix;
+	}
+
+	*buffer = ll + '0';
+	if (*buffer > '9')
+		*buffer += 'A' - '9' - 1;
+
+	buffer++;
+	*buffer = 0;
+	return buffer;
+}
+
 int main()
 {
-	print_sys("Hello World!\n", strlen("Hello World!\n"));
+	char buffer[100];
+	// ulltoa(buffer, buffer, 16);
+	// print_sys(buffer, strlen(buffer));
+	return buffer;
 	return 0xDEADC0DE;
 	return 0xDEADBEEF;
 }

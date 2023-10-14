@@ -1,6 +1,6 @@
-#include <nstdlib.h>
+#include "nstdlib.h"
 
-char *ulltoa(uint64_t ll, char *buffer, uint64_t radix)
+char *ulltoa(uint64_t ll, char *buffer, int radix)
 {
     while (ll > radix)
     {
@@ -11,12 +11,11 @@ char *ulltoa(uint64_t ll, char *buffer, uint64_t radix)
         ll /= radix;
     }
 
-    *buffer = (ll % radix) + '0';
+    *buffer = ll + '0';
     if (*buffer > '9')
         *buffer += 'A' - '9' - 1;
-    buffer++;
-    ll /= radix;
 
+    buffer++;
     *buffer = 0;
     return buffer;
 }
@@ -35,5 +34,5 @@ char *itoa(int n, char *buffer, int radix)
         n = -n;
     }
 
-    return utoa(n, buffer, radix);
+    return utoa(n, buffer, radix) - 1;
 }

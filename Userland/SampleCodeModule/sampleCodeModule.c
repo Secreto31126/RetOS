@@ -1,23 +1,20 @@
 /* sampleCodeModule.c */
 
-char *v = (char *)0xB8000 + 79 * 2;
+// char *v = (char *)0xB8000 + 79 * 2;
 
-static int var1 = 0;
-static int var2 = 0;
+extern int print_sys(char *, int);
 
-extern void syscall();
+int strlen(char *s)
+{
+	int i = 0;
+	while (*s++)
+		i++;
+	return i;
+}
 
 int main()
 {
-	// All the following code may be removed
-	*v = 'X';
-	*(v + 1) = 0x74;
-
-	syscall();
-
-	// Test if BSS is properly set up
-	if (var1 == 0 && var2 == 0)
-		return 0xDEADC0DE;
-
+	print_sys("Hello World!\n", strlen("Hello World!\n"));
+	return 0xDEADC0DE;
 	return 0xDEADBEEF;
 }

@@ -1,6 +1,11 @@
-	GLOBAL cpuVendor
-	GLOBAL inb
-	GLOBAL outb
+	extern syscall_manager
+
+	global cpuVendor
+	global input_dword
+	global output_dword
+	global input_byte
+	global output_byte
+	global syscall_handler
 
 	section .text
 
@@ -28,12 +33,36 @@ cpuVendor:
 	pop rbp
 	ret
 
-; uint32_t inb(uint16_t port);
-inb:
-	inb	di, eax
+; uint32_t input(uint16_t port);
+input_dword:
+	mov edx, edi
+	in	eax, dx
 	ret
 
-; void outb(uint16_t port, uint32_t value);
-outb:
-	outb	di, esi
+; void output(uint16_t port, uint32_t value);
+output_dword:
+	mov edx, edi
+	mov eax, esi
+	out dx, eax
 	ret
+
+; uint8_t input(uint16_t port);
+input_byte:
+	mov edx, edi
+	in	al, dx
+	ret
+
+; void output(uint16_t port, uint8_t value);
+output_byte:
+	mov edx, edi
+	mov eax, esi
+	out dx, al
+	ret
+
+; uint64_t syscall_handler(void);
+syscall_handler:
+	push	rcx
+	mov		rcx, rax
+	call	syscall_manager
+	pop		rcx
+	iretq

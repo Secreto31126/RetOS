@@ -18,6 +18,12 @@ void ncPrint(const char *string)
 
 void ncPrintChar(char character, char color)
 {
+	if (character == '\n')
+	{
+		ncNewline();
+		return;
+	}
+
 	*currentVideo = character;
 	currentVideo++;
 	*currentVideo = color;

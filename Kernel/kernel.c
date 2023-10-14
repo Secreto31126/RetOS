@@ -4,7 +4,6 @@
 #include <idt.h>
 #include <moduleLoader.h>
 #include <naiveConsole.h>
-#include <syscalls.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -30,12 +29,6 @@ void *getStackBase()
 	return (void *)((uint64_t)&endOfKernel + PageSize * 8 // The size of the stack itself, 32KiB
 					- sizeof(uint64_t)					  // Begin at the top of the stack
 	);
-}
-
-void hi()
-{
-	ncNewline();
-	ncPrint("hi");
 }
 
 void *initializeKernelBinary()
@@ -82,16 +75,10 @@ void *initializeKernelBinary()
 	ncNewline();
 	ncNewline();
 
-	ncPrint("[Initializing kernel's IDT]");
-	ncNewline();
+	ncPrint("Initializing kernel's IDT");
+	initialize_idt();
+	ncPrint(" [Done]");
 
-	clearIDT();
-
-	ncPrint("  syscall: 0x");
-	ncPrintHex((uint64_t)idtEntry(0x80, syscall_hi));
-	ncNewline();
-
-	ncPrint("[Done]");
 	ncNewline();
 	ncNewline();
 

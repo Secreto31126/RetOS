@@ -1,12 +1,10 @@
 #ifndef IDT_H
 #define IDT_H
 
-#include <stdint.h>
 #include <lib.h>
+#include <stdint.h>
 
 typedef void (*InterruptionHandler)();
-
-void clearIDT();
-void *idtEntry(uint8_t interrupt_number, InterruptionHandler handler);
+void initialize_idt();
 
 #endif

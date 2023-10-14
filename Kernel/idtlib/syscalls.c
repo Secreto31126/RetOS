@@ -1,16 +1,16 @@
+#include <lib.h>
 #include <stdint.h>
 #include <naiveConsole.h>
 
-uint64_t write(uint64_t fd, uint64_t buffer, uint64_t count);
+uint64_t read(uint64_t fd, char *buffer, uint64_t count);
+uint64_t write(uint64_t fd, const char *buffer, uint64_t count);
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 {
     switch (rax)
     {
     case 0:
-        /* code */
-        break;
-
+        return read(rdi, rsi, rdx);
     case 1:
         return write(rdi, rsi, rdx);
 
@@ -21,7 +21,13 @@ uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
     return -1;
 }
 
-uint64_t write(uint64_t fd, uint64_t buffer, uint64_t count)
+uint64_t read(uint64_t fd, char *buffer, uint64_t count)
+{
+    memcpy(buffer, "Hello World!\n", count);
+    return count;
+}
+
+uint64_t write(uint64_t fd, const char *buffer, uint64_t count)
 {
     if (fd != 1)
     {

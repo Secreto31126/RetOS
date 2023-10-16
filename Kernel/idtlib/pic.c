@@ -1,5 +1,5 @@
 #include <lib.h>
-#include <language.h>
+#include <localization.h>
 #include <naiveConsole.h>
 
 #define PRESSED_OR_RELEASED(x) ((x) & 0x7F)
@@ -47,6 +47,8 @@ static void tick_handler()
     set_interrupt_flag();
 
     char header[] = "\bRetOS\r00:00";
+
+    hour = get_hour_offset(hour);
 
     header[7] = '0' + hour / 16;
     header[8] = '0' + hour % 16;

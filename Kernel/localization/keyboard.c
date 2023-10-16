@@ -1,4 +1,15 @@
-#include "language.h"
+#include "localization.h"
+
+#define LAZY_KEYBOARD_LAYOUT_LIMIT 58
+
+/**
+ * @brief A table of conversion from scancode to UTF16 code for the selected
+ * keyboard layout
+ *
+ * @details keyboard_scancodes[scaned_code][modifier], where modifier is 0 for no
+ * modifier, 1 for shift and 2 for alt gr
+ */
+static uint16_t const (*keyboard_scancodes)[3];
 
 /**
  * @brief A table of conversion from scancode to UTF16 code for the spanish
@@ -164,11 +175,15 @@ void set_keyboard_language(Language lang)
 {
     switch (lang)
     {
-    case ENGLISH:
-        keyboard_scancodes = english_keyboard_layout;
-        break;
-    case SPANISH:
+    case ES_AR:
         keyboard_scancodes = spanish_keyboard_layout;
+        break;
+    case FR_FR:
+        // Nah, I'm too lazy to do France too
+        keyboard_scancodes = spanish_keyboard_layout;
+        break;
+    case EN_US_4:
+        keyboard_scancodes = english_keyboard_layout;
         break;
     default:
         break;

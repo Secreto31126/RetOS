@@ -18,9 +18,24 @@ void ncPrint(const char *string)
 
 void ncPrintChar(char character, char color)
 {
+	if (!character)
+		return;
+
 	if (character == '\n')
 	{
 		ncNewline();
+		return;
+	}
+
+	if (character == '\b')
+	{
+		ncDeleteChar();
+		return;
+	}
+
+	if (character == '\t')
+	{
+		ncTab();
 		return;
 	}
 
@@ -32,10 +47,30 @@ void ncPrintChar(char character, char color)
 
 void ncNewline()
 {
-	do
+	ncPrintChar(' ', 0x0F);
+	while ((uint64_t)(currentVideo - video) % (width * 2))
 	{
 		ncPrintChar(' ', 0x1F);
-	} while ((uint64_t)(currentVideo - video) % (width * 2) != 0);
+	}
+}
+
+void ncDeleteChar()
+{
+	if (currentVideo > video + 1)
+	{
+		currentVideo--;
+		*currentVideo = 0x1F;
+		currentVideo--;
+		*currentVideo = ' ';
+	}
+}
+
+void ncTab()
+{
+	do
+	{
+		ncPrintChar(' ', 0x0F);
+	} while ((uint64_t)(currentVideo - video) % (4 * 2));
 }
 
 void ncPrintDec(uint64_t value)
@@ -64,7 +99,10 @@ void ncClear()
 	int i;
 
 	for (i = 0; i < height * width; i++)
+	{
 		video[i * 2] = ' ';
+		video[i * 2 + 1] = 0x1F;
+	}
 	currentVideo = video;
 }
 

@@ -4,6 +4,7 @@
 #include <idt.h>
 #include <moduleLoader.h>
 #include <naiveConsole.h>
+#include <language.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -74,6 +75,10 @@ void *initializeKernelBinary()
 	ncPrint("[Done]");
 	ncNewline();
 	ncNewline();
+
+	ncPrint("Setting OS's language to SPANISH");
+	set_language(SPANISH);
+	ncPrint(" [Done]");
 
 	ncPrint("Initializing kernel's IDT");
 	initialize_idt();

@@ -3,9 +3,11 @@
 
 #include <stdint.h>
 
-void ncPrint(const char * string);
+void ncPrint(const char *string);
 void ncPrintChar(char character, char color);
 void ncNewline();
+void ncDeleteChar();
+void ncTab();
 void ncPrintDec(uint64_t value);
 void ncPrintHex(uint64_t value);
 void ncPrintBin(uint64_t value);

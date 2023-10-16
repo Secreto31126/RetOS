@@ -8,17 +8,96 @@ static uint32_t uintToBase(uint64_t value, char *buffer, uint32_t base);
 #define TEXT_COLOR 0x0F
 
 static char buffer[64] = {'0'};
-static uint8_t *const video = (uint8_t *)0xB8000;
-static uint8_t *currentVideo = (uint8_t *)0xB8000;
-static const uint32_t width = 80;
-static const uint32_t height = 25;
+static const uint32_t width = WIDTH;
+static const uint32_t height = 24;
+static uint8_t *const header = (uint8_t *)0xB8000;
+static uint8_t *const video = (uint8_t *)0xB8000 + WIDTH * 2; // 2 bytes per character
+static uint8_t *currentVideo = (uint8_t *)0xB8000 + WIDTH * 2;
+
+void ncPrintHeader(const char *string)
+{
+	struct column
+	{
+		const char *string;
+		int length;
+		char dir;
+	};
+
+	uint8_t cols = 0;
+	struct column columns[WIDTH] = {};
+
+	for (int i = 0; string[i]; i++)
+	{
+		if (string[i] == '\b' || string[i] == '\n' || string[i] == '\r')
+		{
+			if (cols + 1 >= WIDTH)
+			{
+				break;
+			}
+
+			columns[cols].string = string + i + 1;
+			columns[cols].length = 0;
+			columns[cols].dir = string[i];
+			cols++;
+		}
+		else if (cols)
+		{
+			columns[cols - 1].length++;
+		}
+	}
+
+	// If the user didn't specify any column
+	if (!cols)
+		return;
+
+	const int col_size = width / cols;
+
+	uint8_t *current;
+	for (int i = 0; i < cols; i++)
+	{
+		current = header + i * col_size * 2;
+
+		int from, to;
+		switch (columns[i].dir)
+		{
+		case '\b':
+			from = 0;
+			to = columns[i].length;
+			break;
+
+		case '\n':
+			from = (col_size - columns[i].length) / 2;
+			to = from + columns[i].length;
+			break;
+
+		case '\r':
+			from = col_size - columns[i].length;
+			to = col_size;
+			break;
+		}
+
+		char *str = columns[i].string;
+		for (int j = 0; current < video && j < col_size; j++)
+		{
+			*(current++) = from <= j && j < to ? *(str++) : ' ';
+			*(current++) = HEADER_COLOR;
+		}
+	}
+
+	// In case width is not divisible by cols
+	while (current < video)
+	{
+		*(current++) = ' ';
+		*(current++) = HEADER_COLOR;
+	}
+}
 
 void ncPrint(const char *string)
 {
-	int i;
-
-	for (i = 0; string[i] != 0; i++)
-		ncPrintChar(string[i], 0x1F);
+	for (int i = 0; string[i] != 0; i++)
+	{
+		ncPrintChar(string[i], TEXT_COLOR);
+	}
 }
 
 void ncPrintChar(char character, char color)

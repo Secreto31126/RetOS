@@ -3,6 +3,13 @@
 
 #include <stdint.h>
 
+/**
+ * @brief Prints a string in the screen as the header
+ *
+ * @param string The string to be printed with basic format,
+ * \\b for begining, \\n for in the middle, \\r for right
+ */
+void ncPrintHeader(const char *string);
 void ncPrint(const char *string);
 void ncPrintChar(char character, char color);
 void ncNewline();

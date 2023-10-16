@@ -12,7 +12,7 @@ id=
 if [ "$1" = "DEBUG" ]
 then
     echo "Debug mode"
-    id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all EGCCFLAGS="-g")
+    id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all EGCCFLAGS="-g -Wl,--oformat=elf64-x86-64" ELDFLAGS="--oformat=elf64-x86-64 -o kernel.elf")
 else
     id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all)
 fi
@@ -25,7 +25,8 @@ docker rm "$id" > /dev/null
 if [ "$1" = "DEBUG" ]
 then
     echo "Debug mode"
-    # qemu-system-x86_64 -s -S -hda "$path/Image/x64BareBonesImage.qcow2" -m 512 &
+    echo "Quick! Run the following command in another terminal:"
+    echo 'qemu-system-x86_64 -s -S -hda "./Image/x64BareBonesImage.qcow2" -m 512'
 else
     qemu-system-x86_64 -hda "$path/Image/x64BareBonesImage.qcow2" -m 512
     make clean -CToolchain > /dev/null

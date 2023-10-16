@@ -28,7 +28,7 @@ then
     echo "Quick! Run the following command in another terminal:"
     echo 'qemu-system-x86_64 -s -S -hda "./Image/x64BareBonesImage.qcow2" -m 512'
 else
-    qemu-system-x86_64 -hda "$path/Image/x64BareBonesImage.qcow2" -m 512
+    qemu-system-x86_64 -hda "$path/Image/x64BareBonesImage.qcow2" -m 512 -d int
     make clean -CToolchain > /dev/null
     make clean > /dev/null
 fi

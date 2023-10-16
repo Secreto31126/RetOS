@@ -56,21 +56,32 @@ void ncNewline()
 
 void ncDeleteChar()
 {
-	if (currentVideo > video + 1)
+	if (currentVideo <= video + 1)
 	{
-		currentVideo--;
-		*currentVideo = 0x1F;
-		currentVideo--;
 		*currentVideo = ' ';
+		currentVideo[1] = 0x1F;
+		return;
 	}
+
+	currentVideo--;
+	while (currentVideo > video + 1 && *currentVideo != 0x0F)
+	{
+		*currentVideo = 0x1F;
+		currentVideo -= 2;
+	}
+
+	*currentVideo = 0x1F;
+	currentVideo--;
+	*currentVideo = ' ';
 }
 
 void ncTab()
 {
-	do
+	ncPrintChar(' ', 0x0F);
+	while ((uint64_t)(currentVideo - video) % (4 * 2))
 	{
-		ncPrintChar(' ', 0x0F);
-	} while ((uint64_t)(currentVideo - video) % (4 * 2));
+		ncPrintChar(' ', 0x1F);
+	}
 }
 
 void ncPrintDec(uint64_t value)

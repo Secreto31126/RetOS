@@ -2,6 +2,11 @@
 
 static uint32_t uintToBase(uint64_t value, char *buffer, uint32_t base);
 
+#define WIDTH 80
+#define HEADER_COLOR 0x2F
+#define BODY_COLOR 0x1F
+#define TEXT_COLOR 0x0F
+
 static char buffer[64] = {'0'};
 static uint8_t *const video = (uint8_t *)0xB8000;
 static uint8_t *currentVideo = (uint8_t *)0xB8000;
@@ -47,10 +52,10 @@ void ncPrintChar(char character, char color)
 
 void ncNewline()
 {
-	ncPrintChar(' ', 0x0F);
+	ncPrintChar(' ', TEXT_COLOR);
 	while ((uint64_t)(currentVideo - video) % (width * 2))
 	{
-		ncPrintChar(' ', 0x1F);
+		ncPrintChar(' ', BODY_COLOR);
 	}
 }
 
@@ -59,28 +64,28 @@ void ncDeleteChar()
 	if (currentVideo <= video + 1)
 	{
 		*currentVideo = ' ';
-		currentVideo[1] = 0x1F;
+		currentVideo[1] = BODY_COLOR;
 		return;
 	}
 
 	currentVideo--;
-	while (currentVideo > video + 1 && *currentVideo != 0x0F)
+	while (currentVideo > video + 1 && *currentVideo != TEXT_COLOR)
 	{
-		*currentVideo = 0x1F;
+		*currentVideo = BODY_COLOR;
 		currentVideo -= 2;
 	}
 
-	*currentVideo = 0x1F;
+	*currentVideo = BODY_COLOR;
 	currentVideo--;
 	*currentVideo = ' ';
 }
 
 void ncTab()
 {
-	ncPrintChar(' ', 0x0F);
+	ncPrintChar(' ', TEXT_COLOR);
 	while ((uint64_t)(currentVideo - video) % (4 * 2))
 	{
-		ncPrintChar(' ', 0x1F);
+		ncPrintChar(' ', BODY_COLOR);
 	}
 }
 
@@ -112,7 +117,7 @@ void ncClear()
 	for (i = 0; i < height * width; i++)
 	{
 		video[i * 2] = ' ';
-		video[i * 2 + 1] = 0x1F;
+		video[i * 2 + 1] = BODY_COLOR;
 	}
 	currentVideo = video;
 }

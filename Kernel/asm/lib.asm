@@ -4,6 +4,7 @@
 	global input_byte
 	global output_byte
 	global set_interrupt_flag
+	global unset_interrupt_flag
 
 	section .text
 
@@ -60,4 +61,9 @@ output_byte:
 ; void set_interrupt_flag(void);
 set_interrupt_flag:
 	sti
+	ret
+
+; void unset_interrupt_flag(void);
+unset_interrupt_flag:
+	cli
 	ret

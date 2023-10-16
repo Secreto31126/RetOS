@@ -14,5 +14,6 @@ extern uint8_t input_byte(uint16_t port);
 extern void output_byte(uint16_t port, uint8_t value);
 
 extern void set_interrupt_flag(void);
+void unset_interrupt_flag(void);
 
 #endif

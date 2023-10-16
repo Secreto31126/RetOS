@@ -31,7 +31,30 @@ static unsigned long long tick;
 
 static void tick_handler()
 {
-    tick++;
+    if (tick++ % 18)
+    {
+        return;
+    }
+
+    unset_interrupt_flag();
+
+    output_byte(0x70, 0x04);
+    uint8_t hour = input_byte(0x71);
+
+    output_byte(0x70, 0x02);
+    uint8_t minute = input_byte(0x71);
+
+    set_interrupt_flag();
+
+    char header[] = "\bRetOS\r00:00";
+
+    header[7] = '0' + hour / 16;
+    header[8] = '0' + hour % 16;
+
+    header[10] = '0' + minute / 16;
+    header[11] = '0' + minute % 16;
+
+    ncPrintHeader(header);
 }
 
 static void keyboard_handler()

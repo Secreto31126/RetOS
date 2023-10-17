@@ -7,6 +7,18 @@
             "label": "Build and execute",
             "type": "shell",
             "command": "./run.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build and execute in debug mode",
+            "type": "shell",
+            "command": "./run.sh",
+            "args": [
+                "DEBUG"
+            ],
             "group": "build"
         }
     ]

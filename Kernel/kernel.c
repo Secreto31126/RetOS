@@ -1,8 +1,9 @@
 #include <stdint.h>
-#include <string.h>
 #include <lib.h>
-#include <moduleLoader.h>
-#include <naiveConsole.h>
+#include <interruptions.h>
+#include <modules.h>
+#include <console.h>
+#include <localization.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -73,6 +74,17 @@ void *initializeKernelBinary()
 	ncPrint("[Done]");
 	ncNewline();
 	ncNewline();
+
+	ncPrint("Setting OS's language to ES_AR");
+	set_language(ES_AR);
+	ncPrint(" [Done]");
+
+	ncPrint("Initializing kernel's IDT");
+	initialize_idt();
+	ncPrint(" [Done]");
+
+	ncClear();
+
 	return getStackBase();
 }
 
@@ -96,5 +108,8 @@ int main()
 	ncNewline();
 
 	ncPrint("[Finished]");
+
+	ncClear();
+
 	return 0;
 }

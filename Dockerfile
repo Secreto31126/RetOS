@@ -5,4 +5,4 @@ WORKDIR /root
 COPY . .
 
 RUN make all -CToolchain
-CMD [ "make", "all" ]
+ENTRYPOINT [ "make" ]

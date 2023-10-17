@@ -1,6 +1,3 @@
 {
-    "files.associations": {
-        "naiveconsole.h": "c"
-    },
     "editor.formatOnSave": true
 }

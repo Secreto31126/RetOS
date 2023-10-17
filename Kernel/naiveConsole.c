@@ -30,7 +30,7 @@ void ncPrintHeader(const char *string)
 	{
 		if (string[i] == '\b' || string[i] == '\n' || string[i] == '\r')
 		{
-			if (cols + 1 >= WIDTH)
+			if (cols >= WIDTH)
 			{
 				break;
 			}

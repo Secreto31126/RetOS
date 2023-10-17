@@ -6,8 +6,9 @@
 /**
  * @brief Prints a string in the screen as the header
  *
- * @param string The string to be printed with basic format,
- * \\b for begining, \\n for in the middle, \\r for right
+ * @param string The string to be printed with custom format,
+ * \\b for begining, \\n for in the middle, \\e for end,
+ * \\t for trash
  */
 void ncPrintHeader(const char *string);
 void ncPrint(const char *string);

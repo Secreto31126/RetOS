@@ -1,4 +1,5 @@
 #include <lib.h>
+#include <header.h>
 #include <localization.h>
 #include <naiveConsole.h>
 
@@ -33,30 +34,8 @@ static void tick_handler()
 {
     if (tick++ % 18)
     {
-        return;
+        update_header();
     }
-
-    unset_interrupt_flag();
-
-    output_byte(0x70, 0x04);
-    uint8_t hour = input_byte(0x71);
-
-    output_byte(0x70, 0x02);
-    uint8_t minute = input_byte(0x71);
-
-    set_interrupt_flag();
-
-    char header[] = "\bRetOS\r00:00";
-
-    hour = get_hour_offset(hour);
-
-    header[7] = '0' + hour / 16;
-    header[8] = '0' + hour % 16;
-
-    header[10] = '0' + minute / 16;
-    header[11] = '0' + minute % 16;
-
-    ncPrintHeader(header);
 }
 
 static void keyboard_handler()

@@ -28,7 +28,7 @@ void ncPrintHeader(const char *string)
 
 	for (int i = 0; string[i]; i++)
 	{
-		if (string[i] == '\b' || string[i] == '\n' || string[i] == '\r')
+		if (string[i] == '\b' || string[i] == '\n' || string[i] == '\e')
 		{
 			if (cols >= WIDTH)
 			{
@@ -42,7 +42,11 @@ void ncPrintHeader(const char *string)
 		}
 		else if (cols)
 		{
-			columns[cols - 1].length++;
+			// If trash character, don't count it
+			if (string[i] != '\t')
+			{
+				columns[cols - 1].length++;
+			}
 		}
 	}
 
@@ -70,7 +74,7 @@ void ncPrintHeader(const char *string)
 			to = from + columns[i].length;
 			break;
 
-		case '\r':
+		case '\e':
 			from = col_size - columns[i].length;
 			to = col_size;
 			break;
@@ -79,6 +83,10 @@ void ncPrintHeader(const char *string)
 		char *str = columns[i].string;
 		for (int j = 0; current < video && j < col_size; j++)
 		{
+			// Skip trash characters
+			while (*str == '\t')
+				str++;
+
 			*(current++) = from <= j && j < to ? *(str++) : ' ';
 			*(current++) = HEADER_COLOR;
 		}

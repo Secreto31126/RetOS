@@ -3,7 +3,7 @@
 
 #include <video.h>
 
-struct vbe_mode_info_structure
+typedef struct
 {
     uint16_t attributes;  // deprecated, only bit 7 should be of interest to you, and it indicates the mode supports a linear frame buffer.
     uint8_t window_a;     // deprecated
@@ -39,6 +39,7 @@ struct vbe_mode_info_structure
     uint32_t off_screen_mem_off;
     uint16_t off_screen_mem_size; // size of memory in the framebuffer but not being displayed on the screen
     uint8_t reserved1[206];
-} __attribute__((packed));
+}
+__attribute__((packed)) VBEInfo;
 
 #endif

@@ -1,8 +1,6 @@
 #include "video.h"
 
-typedef struct vbe_mode_info_structure *VBEInfoPtr;
-
-VBEInfoPtr VBE_mode_info = 0x0000000000005C00; // hardcoded
+VBEInfo *VBE_mode_info = (VBEInfo *)0x0000000000005C00; // hardcoded
 
 /**
  * assume hexColor in rgb standard, array in rgb too some reason idk so we translate in function

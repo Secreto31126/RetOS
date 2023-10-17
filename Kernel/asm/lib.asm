@@ -1,4 +1,5 @@
 	extern memcpy
+	extern dump_regs_hex_magician
 
 	global cpuVendor
 	global input_dword
@@ -75,16 +76,17 @@ unset_interrupt_flag:
 	ret
 
 %macro save_hex_in_string 0
-	xor rdx, rdx
-	div bl
+	lea	rdi, [dump_reg_string + rcx]
+	mov rsi, rax
 
-	mov bh, [hextable + al]
-	mov [dump_reg_string + r8], bh
-	inc r8
+	push rax
+	push rcx
+	; void dump_regs_hex_magician(char *s, uint8_t r);
+	call dump_regs_hex_magician
+	pop rcx
+	pop rax
 
-	mov bh, [hextable + dl]
-	mov [dump_reg_string + r8], bh
-	inc r8
+	add rcx, 2
 %endmacro
 
 ; @source ./Bootloader/Pure64/src/pure64.asm
@@ -92,41 +94,33 @@ unset_interrupt_flag:
 dump_regs:
 	pushall
 
-	mov rbx, 0x10
-	mov rcx, rsp
-	mov r8, 0		; length
-	mov r9, 0		; stage
+	mov rbp, rsp
+	mov rbx, 0		; stage
+	mov rcx, 0		; length
 
 .dump_regs_again:
-	mov	rdi, dump_reg_string
-	add	rdi, r8
+	lea	rdi, [dump_reg_string + rcx]
 
 	mov rsi, dump_reg_string00
-	mov rax, r9
+	mov rax, rbx
 	shl rax, 2				; rax *= 2^2
 	add rsi, rax
 
 	mov rdx, 4 ; each string is 4 bytes
 
 	; void *memcpy(void *dest, const void *src, uint64_t length);
+	push rcx
 	call memcpy
-	add r8, 4
+	pop rcx
 
-	mov rax, [rcx]
-	add rcx, 8
+	add rcx, 4
+
+	mov rax, [rbp]
+	add rbp, 8
 
 ; rax
 	ror rax, 56
-	xor rdx, rdx
-	div bl
-
-	mov bh, [hextable + al]
-	mov [dump_reg_string + r8], bh
-	inc r8
-
-	mov bh, [hextable + dl]
-	mov [dump_reg_string + r8], bh
-	inc r8
+	save_hex_in_string
 	rol rax, 8
 	save_hex_in_string
 	rol rax, 8
@@ -147,20 +141,18 @@ dump_regs:
 	rol rax, 8
 	save_hex_in_string
 
-	mov byte [dump_reg_string + r8], 0x0A
-	inc r8
+	mov byte [dump_reg_string + rcx], 0x0A
+	inc rcx
 
-	inc r9
-	cmp r9, 0x10
+	inc rbx
+	cmp rbx, 0x10
 	jb .dump_regs_again
 
-	mov byte [dump_reg_string + r8], 0
-	; inc r8
+	mov byte [dump_reg_string + rcx], 0
 
 	popall
 	ret
 
-	section .data
 dump_reg_string00: db 'RAX:'
 dump_reg_string01: db 'RBX:'
 dump_reg_string02: db 'RCX:'
@@ -169,8 +161,8 @@ dump_reg_string04: db 'RSI:'
 dump_reg_string05: db 'RDI:'
 dump_reg_string06: db 'RBP:'
 dump_reg_string07: db 'RSP:'
-dump_reg_string08: db 'R8 :'
-dump_reg_string09: db 'R9 :'
+dump_reg_string08: db ' R8:'
+dump_reg_string09: db ' R9:'
 dump_reg_string0A: db 'R10:'
 dump_reg_string0B: db 'R11:'
 dump_reg_string0C: db 'R12:'

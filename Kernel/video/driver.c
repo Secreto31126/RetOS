@@ -1,5 +1,4 @@
-#include <stdint.h>
-#include <video.h>
+#include "video.h"
 
 typedef struct vbe_mode_info_structure *VBEInfoPtr;
 
@@ -39,12 +38,12 @@ void drawRectangle(uint32_t hexColor, uint64_t x, uint64_t y, int width, int hei
     }
 }
 
-void drawShape(shapeFunction f, int x, int y, int xRange, int yRange)
+void drawShape(ShapeFunction f, int x, int y, int xRange, int yRange)
 {
     drawScaledShape(f, x, y, xRange, yRange, 1, 1);
 }
 
-void drawScaledShape(shapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor)
+void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor)
 {
     for (int i = 0; i < xRange; i++)
     {

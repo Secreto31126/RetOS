@@ -1,8 +1,9 @@
 #include <stdint.h>
-#include <string.h>
 #include <lib.h>
-#include <moduleLoader.h>
-#include <naiveConsole.h>
+#include <interruptions.h>
+#include <modules.h>
+#include <console.h>
+#include <localization.h>
 #include <videoDriver.h>
 
 extern uint8_t text;
@@ -101,6 +102,17 @@ void *initializeKernelBinary()
 	ncPrint("[Done]");
 	ncNewline();
 	ncNewline();
+
+	ncPrint("Setting OS's language to ES_AR");
+	set_language(ES_AR);
+	ncPrint(" [Done]");
+
+	ncPrint("Initializing kernel's IDT");
+	initialize_idt();
+	ncPrint(" [Done]");
+
+	ncClear();
+
 	return getStackBase();
 }
 
@@ -134,5 +146,8 @@ int main()
 			*/
 	drawShape(drawAnEllipse, 0, 0, 1024, 768);
 	drawScaledShape(drawAnEllipse, 0, 0, 1024, 768, 2, 5);
+
+	ncClear();
+
 	return 0;
 }

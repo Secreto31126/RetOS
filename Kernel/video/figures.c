@@ -1,13 +1,13 @@
 #include "video.h"
 
-uint32_t drawRedLine(int x, int y)
+HexColor drawRedLine(int x, int y)
 {
     if (x < 10 && y < 1)
         return 0xFF000000 | HEX_RED;
     return 0;
 }
 
-uint32_t drawRedCircle(int x, int y)
+HexColor drawRedCircle(int x, int y)
 {
     x -= 100;
     y -= 100;
@@ -16,7 +16,7 @@ uint32_t drawRedCircle(int x, int y)
     return 0;
 }
 
-uint32_t drawAnEllipse(int x, int y)
+HexColor drawAnEllipse(int x, int y)
 {
     x -= 100;
     y -= 25;
@@ -25,7 +25,7 @@ uint32_t drawAnEllipse(int x, int y)
     return 0;
 }
 
-uint32_t drawACanvas(int x, int y)
+HexColor drawACanvas(int x, int y)
 {
     return (0xFF000000 | (((0xFFFFFF * x * y) & 0x00FFFFFF))) ^ 0x00FFFFFF;
 }

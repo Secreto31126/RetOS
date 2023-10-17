@@ -43,6 +43,9 @@ void drawShape(ShapeFunction f, int x, int y, int xRange, int yRange)
 
 void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor)
 {
+    if (!xScaleFactor || !yScaleFactor)
+        return;
+
     for (int i = 0; i < xRange; i++)
     {
         for (int j = 0; j < yRange; j++)

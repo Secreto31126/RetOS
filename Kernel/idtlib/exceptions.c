@@ -1,11 +1,15 @@
 #include <stdint.h>
 #include <naiveConsole.h>
 
+static uint64_t exceptions = 0;
+
 static void zero_division();
 static void invalid_opcode();
 
 void exception_manager(int exception)
 {
+    exceptions++;
+
     switch (exception)
     {
     case 0:
@@ -29,4 +33,9 @@ static void invalid_opcode()
 {
     ncPrint("I like your funny words, magic man\n");
     return;
+}
+
+uint64_t get_exceptions_count()
+{
+    return exceptions;
 }

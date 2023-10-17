@@ -1,5 +1,7 @@
 #include "interruptions.h"
 
+#include <handlers.h>
+
 #define ACS_PRESENT 0x80 /* segmento presente en memoria */
 #define ACS_CSEG 0x18    /* segmento de codigo */
 #define ACS_DSEG 0x10    /* segmento de datos */

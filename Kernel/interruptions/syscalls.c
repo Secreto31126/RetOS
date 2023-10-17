@@ -8,9 +8,9 @@ uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
     switch (rax)
     {
     case 0:
-        return read(rdi, rsi, rdx);
+        return read(rdi, (char *)rsi, rdx);
     case 1:
-        return write(rdi, rsi, rdx);
+        return write(rdi, (const char *)rsi, rdx);
 
     default:
         break;

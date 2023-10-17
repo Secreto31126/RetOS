@@ -1,5 +1,4 @@
-#include <stdint.h>
-#include <console.h>
+#include "interruptions.h"
 
 static uint64_t exceptions = 0;
 

@@ -4,6 +4,7 @@
 #include <modules.h>
 #include <console.h>
 #include <localization.h>
+#include <video.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -29,6 +30,33 @@ void *getStackBase()
 	return (void *)((uint64_t)&endOfKernel + PageSize * 8 // The size of the stack itself, 32KiB
 					- sizeof(uint64_t)					  // Begin at the top of the stack
 	);
+}
+
+uint32_t drawRedLine(int x, int y)
+{
+	if (x < 10 && y < 1)
+		return 0xFF000000 | HEX_RED;
+	return 0;
+}
+uint32_t drawRedCircle(int x, int y)
+{
+	x -= 100;
+	y -= 100;
+	if ((x * x + y * y) < 10000)
+		return 0xFF000000 | HEX_RED;
+	return 0;
+}
+uint32_t drawAnEllipse(int x, int y)
+{
+	x -= 100;
+	y -= 25;
+	if ((x * x + 16 * (y * y)) < 10000)
+		return 0xFF000000 | ((0xFFFFFF * x * y) & 0x00FFFFFF);
+	return 0;
+}
+uint32_t drawACanvas(int x, int y)
+{
+	return 0xFF000000 | (((0xFFFFFF * x * y) & 0x00FFFFFF)) ^ 0x00FFFFFF;
 }
 
 void *initializeKernelBinary()
@@ -106,10 +134,20 @@ int main()
 	ncPrint("  Sample data module contents: ");
 	ncPrint((char *)sampleDataModuleAddress);
 	ncNewline();
-
 	ncPrint("[Finished]");
 
 	ncClear();
+
+	drawRectangle(0xFF0000, 100, 10, 100, 100);
+	drawRectangle(0x00FF00, 200, 10, 100, 100);
+	drawRectangle(0x0000FF, 300, 10, 100, 100);
+
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 4; j++)
+			drawShape(drawACanvas, 100 + i * 200, 100 + j * 50, 1000, 1000);
+
+	drawShape(drawAnEllipse, 0, 0, 1024, 768);
+	drawScaledShape(drawAnEllipse, 0, 0, 1024, 768, 2, 5);
 
 	return 0;
 }

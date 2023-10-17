@@ -7,7 +7,6 @@
 #include <stdint.h>
 #include <header.h>
 #include <console.h>
-#include <handlers.h>
 #include <localization.h>
 
 #endif

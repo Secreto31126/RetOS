@@ -1,7 +1,8 @@
 include Makefile.inc
 
 KERNEL=kernel.bin
-SOURCES=$(wildcard *.c) $(wildcard idtlib/*.c) $(wildcard localization/*.c) $(wildcard header/*.c) # $(wildcard folder_name/*.c)
+KERNELSRC=kernel.c
+SOURCES=$(KERNELSRC) $(wildcard lib/*.c) $(wildcard console/*.c) $(wildcard modules/*.c) $(wildcard localization/*.c) $(wildcard interruptions/*.c) $(wildcard header/*.c) # $(wildcard folder_name/*.c)
 SOURCES_ASM=$(wildcard asm/*.asm)
 OBJECTS=$(SOURCES:.c=.o)
 OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)

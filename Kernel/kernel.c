@@ -4,7 +4,7 @@
 #include <modules.h>
 #include <console.h>
 #include <localization.h>
-#include <videoDriver.h>
+#include <video.h>
 
 extern uint8_t text;
 extern uint8_t rodata;

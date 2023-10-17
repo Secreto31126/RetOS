@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <videoDriver.h>
+#include <video.h>
 
 typedef struct vbe_mode_info_structure *VBEInfoPtr;
 

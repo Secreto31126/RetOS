@@ -1,7 +1,6 @@
-#ifndef IDT_H
-#define IDT_H
+#ifndef INT_H
+#define INT_H
 
-#include <lib.h>
 #include <stdint.h>
 
 typedef void (*InterruptionHandler)();

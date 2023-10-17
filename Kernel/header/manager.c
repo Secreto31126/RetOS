@@ -1,7 +1,7 @@
 #include <lib.h>
-#include <idt.h>
+#include <interruptions.h>
 #include <stdint.h>
-#include <naiveConsole.h>
+#include <console.h>
 #include <localization.h>
 
 static void update_header_clock(char *header);

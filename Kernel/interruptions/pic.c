@@ -1,7 +1,8 @@
 #include <lib.h>
 #include <header.h>
 #include <localization.h>
-#include <naiveConsole.h>
+#include <console.h>
+#include <stdint.h>
 
 #define PRESSED_OR_RELEASED(x) ((x) & 0x7F)
 #define IS_RELEASE(x) ((x) & 0x80)

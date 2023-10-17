@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <naiveConsole.h>
+#include <console.h>
 
 static uint64_t exceptions = 0;
 

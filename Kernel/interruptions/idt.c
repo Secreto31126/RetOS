@@ -1,4 +1,4 @@
-#include <idt.h>
+#include <interruptions.h>
 #include <handlers.h>
 
 #define ACS_PRESENT 0x80 /* segmento presente en memoria */

@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <lib.h>
-#include <idt.h>
-#include <moduleLoader.h>
-#include <naiveConsole.h>
+#include <interruptions.h>
+#include <modules.h>
+#include <console.h>
 #include <localization.h>
 
 extern uint8_t text;

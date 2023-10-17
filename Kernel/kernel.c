@@ -149,5 +149,8 @@ int main()
 	drawShape(drawAnEllipse, 0, 0, 1024, 768);
 	drawScaledShape(drawAnEllipse, 0, 0, 1024, 768, 2, 5);
 
+	dump_regs();
+	ncPrint(dump_reg_string);
+
 	return 0;
 }

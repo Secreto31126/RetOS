@@ -31,13 +31,13 @@ uint16_t get_hour_offset(uint16_t hour)
         if (!hour && step < 0)
         {
             hour = 0x23;
-            return;
+            continue;
         }
 
         if (hour >= 0x23 && step > 0)
         {
             hour = 0;
-            return;
+            continue;
         }
 
         hour += step;

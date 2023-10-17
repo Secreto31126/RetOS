@@ -54,3 +54,8 @@ void drawRectangle(uint32_t hexColor, uint64_t x, uint64_t y, int width, int hei
  */
 void drawShape(shapeFunction f, int x, int y, int xRange, int yRange);
 void drawScaledShape(shapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor);
+
+uint32_t drawRedLine(int x, int y);
+uint32_t drawRedCircle(int x, int y);
+uint32_t drawAnEllipse(int x, int y);
+uint32_t drawACanvas(int x, int y);

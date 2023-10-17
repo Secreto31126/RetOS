@@ -1,9 +1,7 @@
 /* sampleCodeModule.c */
 
 // char *v = (char *)0xB8000 + 79 * 2;
-
-extern int print_sys(char *, int);
-extern unsigned long long get_unix_time(void);
+#include "./tbd clib/nstdlib.h"
 
 int strlen(char *s)
 {

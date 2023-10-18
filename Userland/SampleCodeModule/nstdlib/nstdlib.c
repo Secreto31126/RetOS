@@ -89,6 +89,7 @@ char *ftoa(float n, char *buffer, int readLength)
 char putChar(char c)
 {
     print_sys(&c, 1);
+    return c;
 }
 /*
 char getChar()
@@ -137,7 +138,7 @@ uint64_t printf(char *format, ...)
         }
         else if (*format == '%')
         {
-            *format++;
+            format++;
             switch (*format)
             {
             case 'c':

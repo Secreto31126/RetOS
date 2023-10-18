@@ -32,33 +32,6 @@ void *getStackBase()
 	);
 }
 
-uint32_t drawRedLine(int x, int y)
-{
-	if (x < 10 && y < 1)
-		return 0xFF000000 | HEX_RED;
-	return 0;
-}
-uint32_t drawRedCircle(int x, int y)
-{
-	x -= 100;
-	y -= 100;
-	if ((x * x + y * y) < 10000)
-		return 0xFF000000 | HEX_RED;
-	return 0;
-}
-uint32_t drawAnEllipse(int x, int y)
-{
-	x -= 100;
-	y -= 25;
-	if ((x * x + 16 * (y * y)) < 10000)
-		return 0xFF000000 | ((0xFFFFFF * x * y) & 0x00FFFFFF);
-	return 0;
-}
-uint32_t drawACanvas(int x, int y)
-{
-	return 0xFF000000 | (((0xFFFFFF * x * y) & 0x00FFFFFF)) ^ 0x00FFFFFF;
-}
-
 void *initializeKernelBinary()
 {
 	char buffer[10];
@@ -138,16 +111,27 @@ int main()
 
 	ncClear();
 
-	drawRectangle(0xFF0000, 100, 10, 100, 100);
-	drawRectangle(0x00FF00, 200, 10, 100, 100);
-	drawRectangle(0x0000FF, 300, 10, 100, 100);
+	// drawShape(redRectangleFigure, 100, 10, 100, 100);
+	// drawShape(greenRectangleFigure, 200, 10, 100, 100);
+	// drawShape(blueRectangleFigure, 300, 10, 100, 100);
 
-	for (int i = 0; i < 4; i++)
-		for (int j = 0; j < 4; j++)
-			drawShape(drawACanvas, 100 + i * 200, 100 + j * 50, 1000, 1000);
+	drawScaledShape(RetOSbackground, 0, 0, get_width(), get_height(), 1, 1);
+	drawScaledShape(drawEllipse, 100, 100, 500, 500, 5, 5);
 
-	drawShape(drawAnEllipse, 0, 0, 1024, 768);
-	drawScaledShape(drawAnEllipse, 0, 0, 1024, 768, 2, 5);
+	// uint16_t w = get_width();
+	// uint16_t h = get_height();
+
+	// for (int i = 0; i < h / 1 % 10; i++)
+	// {
+	// 	if (i % 2)
+	// 	{
+	// 		drawShape(redRectangleFigure, i * 5, i % 5 * 10, 10, 10);
+	// 	}
+	// 	else
+	// 	{
+	// 		drawShape(greenRectangleFigure, i * 5, i % 5 * 10, 10, 10);
+	// 	}
+	// }
 
 	dump_regs();
 	ncPrint(dump_reg_string);

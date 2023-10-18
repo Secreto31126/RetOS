@@ -22,10 +22,11 @@ typedef HexColor (*ShapeFunction)(int, int);
  * putPixelStd(GET_OPACITY(hexColor), GET_RED(hexColor), GET_GREEN(hexColor), GET_BLUE(hexColor), x, y);
  *
  * @param hexColor 0xAARRGGBB
- * @param x
- * @param y
+ * @param x The x coordinate of the pixel
+ * @param y The y coordinate of the pixel
+ * @return int 1 on success, 0 if failed
  */
-void putPixel(HexColor hexColor, uint64_t x, uint64_t y);
+int putPixel(HexColor hexColor, uint64_t x, uint64_t y);
 /**
  * @brief Puts a pixel in the screen
  *
@@ -35,13 +36,12 @@ void putPixel(HexColor hexColor, uint64_t x, uint64_t y);
  * @param blue The blue component of the pixel
  * @param x The x coordinate of the pixel
  * @param y The y coordinate of the pixel
+ * @return int 1 on success, 0 if failed
  */
-void putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint64_t x, uint64_t y);
+int putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint64_t x, uint64_t y);
 /***
  * ShapeFunction receives coordinates (two integers), and returns a HexColor of form
  * 0xOORRGGBB. Where OO is the opacity for that pixel, and RRGGBB a hexColor
- *
- * @todo Opacity is not implemented yet
  */
 void drawShape(ShapeFunction f, int x, int y, int xRange, int yRange);
 void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor);
@@ -53,8 +53,9 @@ void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, doub
  * @param height The height of the array
  * @param x The x coordinate of the top-left corner
  * @param y The y coordinate of the top-left corner
+ * @return uint64_t 1 on success, 0 if failed
  */
-void drawFromArray(HexColor *array[], uint32_t width, uint32_t height, uint32_t x, uint32_t y);
+uint64_t drawFromArray(HexColor *array[], uint32_t width, uint32_t height, uint32_t x, uint32_t y);
 /**
  * @brief Get the width size
  *

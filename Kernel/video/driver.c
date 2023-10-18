@@ -8,15 +8,21 @@ VBEInfo *VBE_mode_info = (VBEInfo *)0x5C00; // hardcoded
 #define GET_GREEN(x) (((x) >> 8) & 0xFF)
 #define GET_BLUE(x) ((x) & 0xFF)
 
-void putPixel(HexColor hexColor, uint64_t x, uint64_t y)
+int putPixel(HexColor hexColor, uint64_t x, uint64_t y)
 {
-    putPixelStd(GET_OPACITY(hexColor), GET_RED(hexColor), GET_GREEN(hexColor), GET_BLUE(hexColor), x, y);
+    return putPixelStd(GET_OPACITY(hexColor), GET_RED(hexColor), GET_GREEN(hexColor), GET_BLUE(hexColor), x, y);
 }
 
-void putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint64_t x, uint64_t y)
+int putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint64_t x, uint64_t y)
 {
-    if (x >= VBE_mode_info->width || y >= VBE_mode_info->height || !opacity)
-        return;
+    if (x >= VBE_mode_info->width || y >= VBE_mode_info->height)
+        return 0;
+
+    // Gota go fast
+    if (!opacity)
+    {
+        return 1;
+    }
 
     uint8_t *framebuffer = (uint8_t *)VBE_mode_info->framebuffer; // tira warning. Pasas que pasan
     // En el array, cada pixel tiene tres valores (RGB), por lo que la posición en el array es x*3
@@ -24,6 +30,8 @@ void putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint
     framebuffer[offset] = mergeColor(framebuffer[offset], blue, opacity);
     framebuffer[offset + 1] = mergeColor(framebuffer[offset + 1], green, opacity);
     framebuffer[offset + 2] = mergeColor(framebuffer[offset + 2], red, opacity);
+
+    return 1;
 }
 
 uint8_t mergeColor(uint8_t background, uint8_t overlay, uint8_t opacity)
@@ -55,18 +63,21 @@ void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, doub
     }
 }
 
-void drawFromArray(HexColor *array[], uint32_t width, uint32_t height, uint32_t x, uint32_t y)
+uint64_t drawFromArray(HexColor *array[], uint32_t width, uint32_t height, uint32_t x, uint32_t y)
 {
     if (x >= VBE_mode_info->width || y >= VBE_mode_info->height)
-        return;
+        return 0;
 
+    uint64_t drawed = 0;
     for (uint32_t i = 0; i < height && i < VBE_mode_info->height; i++)
     {
         for (uint32_t j = 0; j < width && VBE_mode_info->height; j++)
         {
-            putPixel(array[i][j], x + j, y + i);
+            drawed += putPixel(array[i][j], x + j, y + i);
         }
     }
+
+    return drawed;
 }
 
 uint16_t get_width()

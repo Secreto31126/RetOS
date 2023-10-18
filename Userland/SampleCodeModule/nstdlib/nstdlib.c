@@ -63,7 +63,7 @@ uint64_t numLength(char *s)
 
 char *dtoa(double n, char *buffer, unsigned int decPoints)
 {
-    int count = itoa((int)n, buffer, 10);
+    int count = strlen(itoa((int)n, buffer, 10));
     if (n < 0)
         n *= -1;
     n = (n - ((int)n)); // handle 'integer' part of double
@@ -156,19 +156,19 @@ uint64_t printf(char *format, ...)
             case 'i':
             case 'd':
             {
-                char *aux[MAX_DIGITS_IN_LONG];
+                char aux[MAX_DIGITS_IN_LONG];
                 count += puts(itoa(va_arg(argp, int), aux, 10));
                 break;
             }
             case 'u':
             {
-                char *aux[MAX_DIGITS_IN_LONG];
-                count += puts(utoa(va_arg(argp, long), aux, 10));
+                char aux[MAX_DIGITS_IN_LONG];
+                count += puts(utoa(va_arg(argp, unsigned int), aux, 10));
                 break;
             }
             case 'l':
             {
-                char *aux[MAX_DIGITS_IN_LONG];
+                char aux[MAX_DIGITS_IN_LONG];
                 count += puts(ultoa(va_arg(argp, long), aux, 10));
                 break;
             }
@@ -176,13 +176,13 @@ uint64_t printf(char *format, ...)
             /*
             case 'f':
             {
-                char *aux[MAX_DOUBLE_LENGTH + 1];
+                char aux[MAX_DOUBLE_LENGTH + 1];
                 count += puts(ftoa(va_arg(argp, float), aux, MAX_DOUBLE_LENGTH));
                 break;
             }
             case 'g':
             {
-                char *aux[MAX_DOUBLE_LENGTH + 1];
+                char aux[MAX_DOUBLE_LENGTH + 1];
                 count += puts(dtoa(va_arg(argp, double), aux, MAX_DOUBLE_LENGTH));
                 break;
             }
@@ -196,13 +196,13 @@ uint64_t printf(char *format, ...)
                     char auxc = *(format + toSkip); // next char after number is found
                     if (auxc == 'f')
                     {
-                        char *aux[MAX_DOUBLE_LENGTH + 1];
+                        char aux[MAX_DOUBLE_LENGTH + 1];
                         count += puts(ftoa(va_arg(argp, float), aux, decs));
                         format += toSkip - 1;
                     }
                     else if (auxc == 'g')
                     {
-                        char *aux[MAX_DOUBLE_LENGTH + 1];
+                        char aux[MAX_DOUBLE_LENGTH + 1];
                         count += puts(dtoa(va_arg(argp, double), aux, decs));
                         format += toSkip - 1;
                     }

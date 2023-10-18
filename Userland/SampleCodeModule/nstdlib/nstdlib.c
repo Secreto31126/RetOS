@@ -142,7 +142,7 @@ uint64_t printf(char *format, ...)
             {
             case 'c':
             {
-                putChar(va_arg(argp, char));
+                putChar(va_arg(argp, int));
                 count++;
                 break;
             }

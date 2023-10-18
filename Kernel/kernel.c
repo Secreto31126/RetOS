@@ -115,7 +115,8 @@ int main()
 	// drawShape(greenRectangleFigure, 200, 10, 100, 100);
 	// drawShape(blueRectangleFigure, 300, 10, 100, 100);
 
-	drawShape(RetOSbackground, 0, 0, 1024, 768);
+	drawScaledShape(RetOSbackground, 0, 0, get_width(), get_height(), 1, 1);
+	drawScaledShape(drawEllipse, 100, 100, 500, 500, 5, 5);
 
 	// uint16_t w = get_width();
 	// uint16_t h = get_height();

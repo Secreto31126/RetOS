@@ -80,7 +80,7 @@ void ncPrintHeader(const char *string)
 			break;
 		}
 
-		char *str = columns[i].string;
+		const char *str = columns[i].string;
 		for (int j = 0; current < video && j < col_size; j++)
 		{
 			// Skip trash characters

@@ -33,10 +33,9 @@ uint64_t write(uint64_t fd, const char *buffer, uint64_t count)
     }
 
     uint64_t i;
-    char *buff = (char *)buffer;
     for (i = 0; i < count; i++)
     {
-        ncPrintChar(buff[i], 0x1F);
+        ncPrintChar(buffer[i], 0x0F);
     }
 
     return i;

@@ -9,14 +9,16 @@
 
 // syscalls
 extern int print_sys(char *, int);
+extern int read_sys(char *, int);
 extern unsigned long long get_unix_time(void);
 
 // library
 char *utoa(unsigned int n, char *buffer, int radix);
 char *itoa(int n, char *buffer, int radix);
-char *ulltoa(uint64_t ll, char *buffer, int radix);
+char *ultoa(uint64_t ll, char *buffer, int radix);
 char putchar(char c);
 uint64_t puts(char *string);
 uint64_t printf(char *format, ...);
+uint64_t strlen(char *s);
 
 #endif

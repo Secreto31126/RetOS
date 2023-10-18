@@ -1,18 +1,18 @@
 #include "nstdlib.h"
 #define MAX_DIGITS_IN_LONG 20
 
-char *ulltoa(uint64_t ll, char *buffer, int radix)
+char *ultoa(unsigned long l, char *buffer, int radix)
 {
-    while (ll > radix)
+    while (l > radix)
     {
-        *buffer = (ll % radix) + '0';
+        *buffer = (l % radix) + '0';
         if (*buffer > '9')
             *buffer += 'A' - '9' - 1;
         buffer++;
-        ll /= radix;
+        l /= radix;
     }
 
-    *buffer = ll + '0';
+    *buffer = l + '0';
     if (*buffer > '9')
         *buffer += 'A' - '9' - 1;
 
@@ -23,7 +23,7 @@ char *ulltoa(uint64_t ll, char *buffer, int radix)
 
 char *utoa(unsigned int n, char *buffer, int radix)
 {
-    return ulltoa(n, buffer, radix);
+    return ultoa(n, buffer, radix);
 }
 
 char *itoa(int n, char *buffer, int radix)
@@ -64,6 +64,8 @@ uint64_t numLength(char *s)
 char *dtoa(double n, char *buffer, unsigned int decPoints)
 {
     int count = itoa((int)n, buffer, 10);
+    if (n < 0)
+        n *= -1;
     n = (n - ((int)n)); // handle 'integer' part of double
     while ((int)n != 0 && count < decPoints && count <= MAX_DOUBLE_LENGTH)
     {
@@ -86,18 +88,21 @@ char *ftoa(float n, char *buffer, int readLength)
 
 char putChar(char c)
 {
-    sys_print(&c, 1);
+    print_sys(&c, 1);
 }
-
+/*
+char getChar()
+{
+    char c[1];
+    read_sys(c, 1);
+    return *c;
+}
+*/
 uint64_t puts(char *string)
 {
-    uint64_t count = 0;
-    while (*(string + count) != 0 && *string != EOF)
-    {
-        putChar(*(string + count));
-        count++;
-    }
-    return count;
+    uint64_t len = strlen(string);
+    print_sys(string, len);
+    return len;
 }
 
 static const char formatCharacters[] = {'%', '\\'}, formatCharacterCount = 2;
@@ -109,7 +114,9 @@ char isFormatCharacter(char c)
             return 1;
     return 0;
 }
-
+/**
+ * returns length of string printed
+ */
 uint64_t printf(char *format, ...)
 {
     va_list argp;
@@ -133,6 +140,20 @@ uint64_t printf(char *format, ...)
             *format++;
             switch (*format)
             {
+            case 'c':
+            {
+                putChar(va_arg(argp, char));
+                count++;
+                break;
+            }
+            case 's':
+            {
+                char *s = va_arg(argp, char *);
+                count += strlen(s);
+                puts(s);
+                break;
+            }
+            case 'i':
             case 'd':
             {
                 char *aux[MAX_DIGITS_IN_LONG];
@@ -148,9 +169,11 @@ uint64_t printf(char *format, ...)
             case 'l':
             {
                 char *aux[MAX_DIGITS_IN_LONG];
-                count += puts(ulltoa(va_arg(argp, long), aux, 10));
+                count += puts(ultoa(va_arg(argp, long), aux, 10));
                 break;
             }
+            // varargs and float values do not play well without SSE
+            /*
             case 'f':
             {
                 char *aux[MAX_DOUBLE_LENGTH + 1];
@@ -191,8 +214,10 @@ uint64_t printf(char *format, ...)
                 }
                 break;
             }
+            */
             default:
             {
+                format--;
                 puts("%");
                 break;
             }
@@ -206,4 +231,25 @@ uint64_t printf(char *format, ...)
         count++;
     }
     va_end(argp);
+    return count;
+}
+/**
+ * returns number of fields converted
+ */
+uint64_t scanf(char *format, ...)
+{
+    va_list argp;
+    va_start(argp, format);
+    uint64_t count = 0;
+
+    va_end(argp);
+    return count;
+}
+
+uint64_t strlen(char *s)
+{
+    uint64_t len = 0;
+    while (*(s + len))
+        len++;
+    return len;
 }

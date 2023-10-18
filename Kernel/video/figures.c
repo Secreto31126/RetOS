@@ -36,7 +36,7 @@ HexColor drawEllipse(int x, int y)
     x -= 100;
     y -= 25;
     if ((x * x + 16 * (y * y)) < 10000)
-        return 0xFF000000 | ((0xFFFFFF * x * y) & 0x00FFFFFF);
+        return 0x50000000 | ((0xFFFFFF * x * y) & 0x00FFFFFF);
     return 0;
 }
 

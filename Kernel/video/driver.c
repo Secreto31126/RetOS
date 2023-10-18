@@ -36,9 +36,9 @@ void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, doub
     if (!xScaleFactor || !yScaleFactor)
         return;
 
-    for (int i = 0; i < xRange; i++)
+    for (int i = 0; i < xRange && i < VBE_mode_info->width; i++)
     {
-        for (int j = 0; j < yRange; j++)
+        for (int j = 0; j < yRange && j < VBE_mode_info->height; j++)
         {
             uint32_t r = f(i / xScaleFactor, j / yScaleFactor);
             if (r & 0xFF000000)

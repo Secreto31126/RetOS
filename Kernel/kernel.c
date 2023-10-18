@@ -111,16 +111,26 @@ int main()
 
 	ncClear();
 
-	drawRectangle(0xFF0000, 100, 10, 100, 100);
-	drawRectangle(0x00FF00, 200, 10, 100, 100);
-	drawRectangle(0x0000FF, 300, 10, 100, 100);
+	// drawShape(redRectangleFigure, 100, 10, 100, 100);
+	// drawShape(greenRectangleFigure, 200, 10, 100, 100);
+	// drawShape(blueRectangleFigure, 300, 10, 100, 100);
 
-	for (int i = 0; i < 4; i++)
-		for (int j = 0; j < 4; j++)
-			drawShape(drawACanvas, 100 + i * 200, 100 + j * 50, 1000, 1000);
+	drawShape(RetOSbackground, 0, 0, 1024, 768);
 
-	drawShape(drawAnEllipse, 0, 0, 1024, 768);
-	drawScaledShape(drawAnEllipse, 0, 0, 1024, 768, 2, 5);
+	// uint16_t w = get_width();
+	// uint16_t h = get_height();
+
+	// for (int i = 0; i < h / 1 % 10; i++)
+	// {
+	// 	if (i % 2)
+	// 	{
+	// 		drawShape(redRectangleFigure, i * 5, i % 5 * 10, 10, 10);
+	// 	}
+	// 	else
+	// 	{
+	// 		drawShape(greenRectangleFigure, i * 5, i % 5 * 10, 10, 10);
+	// 	}
+	// }
 
 	dump_regs();
 	ncPrint(dump_reg_string);

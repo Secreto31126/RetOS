@@ -9,8 +9,7 @@ int main()
 	ultoa(get_unix_time(), buffer, 10);
 	print_sys(buffer, strlen(buffer));
 
-	printf("Pito: %i", 8);
-	printf("Pito");
+	printf("Miembro numero %d", 1234);
 
 	return 0xDEADC0DE;
 	return 0xDEADBEEF;

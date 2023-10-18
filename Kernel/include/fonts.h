@@ -3,11 +3,12 @@
 #define LETTER_WIDTH 8
 #define BORDER_THICKNESS 2
 #define TRUE_LETTER_WIDTH ((LETTER_WIDTH) + (BORDER_THICKNESS))
+#define TRUE_LETTER_HEIGHT ((LETTER_HEIGHT) + (BORDER_THICKNESS))
 #define LETTER_HEIGHT 13
 
 char ** getCharArray(char c); // return asciis[(int)c];
 
-char asciis[][LETTER_HEIGHT][TRUE_LETTER_WIDTH] = {
+char asciis[][LETTER_HEIGHT][TRUE_LETTER_HEIGHT] = {
 {{0, 0, 0, 0, 0, 0, 0, 0, },
 {0, 0, 0, 0, 0, 0, 0, 0, },
 {0, 0, 0, 0, 0, 0, 0, 0, },

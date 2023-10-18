@@ -55,7 +55,7 @@ void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, doub
  * @param y The y coordinate of the top-left corner
  * @return uint64_t 1 on success, 0 if failed
  */
-uint64_t drawFromArray(HexColor *array[], uint32_t width, uint32_t height, uint32_t x, uint32_t y);
+uint64_t drawFromArray(HexColor *array, uint32_t width, uint32_t height, uint32_t x, uint32_t y);
 /**
  * @brief Get the width size
  *

@@ -46,7 +46,13 @@ void putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint
 void drawShape(ShapeFunction f, int x, int y, int xRange, int yRange);
 void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor);
 /**
- * receives an array, its dimensions, and the position to draw the top-left corner from
+ * @brief Receives an array, its dimensions, and the position to draw the top-left corner from
+ *
+ * @param array The array to draw
+ * @param width The width of the array
+ * @param height The height of the array
+ * @param x The x coordinate of the top-left corner
+ * @param y The y coordinate of the top-left corner
  */
 void drawFromArray(HexColor *array[], uint32_t width, uint32_t height, uint32_t x, uint32_t y);
 /**

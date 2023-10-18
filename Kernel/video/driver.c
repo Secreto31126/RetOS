@@ -55,6 +55,20 @@ void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, doub
     }
 }
 
+void drawFromArray(HexColor *array[], uint32_t width, uint32_t height, uint32_t x, uint32_t y)
+{
+    if (x >= VBE_mode_info->width || y >= VBE_mode_info->height)
+        return;
+
+    for (uint32_t i = 0; i < height && i < VBE_mode_info->height; i++)
+    {
+        for (uint32_t j = 0; j < width && VBE_mode_info->height; j++)
+        {
+            putPixel(array[i][j], x + j, y + i);
+        }
+    }
+}
+
 uint16_t get_width()
 {
     return VBE_mode_info->width;
@@ -63,15 +77,4 @@ uint16_t get_width()
 uint16_t get_height()
 {
     return VBE_mode_info->height;
-}
-
-void drawFromArray(HexColor *array[], uint32_t width, uint32_t height, uint32_t x, uint32_t y)
-{
-    uint64_t endX = (width + x) < get_width() ? (width + x) : get_width();
-    uint64_t endY = (height + y) < get_height() ? (height + y) : get_height();
-    uint32_t indX = 0;
-    uint32_t indY = 0;
-    for (int i = x; i < endX; i++, indX++)
-        for (int j = y; j < endY; j++, indY++)
-            putPixel(array[indY][indX], j, i);
 }

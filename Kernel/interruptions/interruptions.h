@@ -4,6 +4,7 @@
 #include <interruptions.h>
 
 #include <lib.h>
+#include <video.h>
 #include <stdint.h>
 #include <header.h>
 #include <console.h>

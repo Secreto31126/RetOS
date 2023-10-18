@@ -13,20 +13,6 @@ enum HEX_COLORS
 	HEX_GREEN = 0x00FF00,
 	HEX_BLUE = 0x0000FF,
 };
-typedef enum L_R_ALIGNMENT
-{
-	ALIGN_LEFT = 0,
-	ALIGN_RIGHT,
-	ALIGN_CENTER,
-	FIT_SCREEN,
-} L_R_ALIGNMENT;
-typedef enum T_B_ALIGNMENT
-{
-	ALIGN_TOP = 0,
-	ALIGN_BOTTOM,
-	ALIGN_CENTER,
-	FIT_SCREEN,
-} T_B_ALIGNMENT;
 
 typedef uint32_t HexColor;
 typedef HexColor (*ShapeFunction)(int, int);
@@ -60,11 +46,9 @@ void putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint
 void drawShape(ShapeFunction f, int x, int y, int xRange, int yRange);
 void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor);
 /**
- * receives an array
- * position is of form 0xXXXXYYYY where XXXX represents width of array and YYYY represents height of array
- * alignments define where and how scaled array will be printed to screen
+ * receives an array, its dimensions, and the position to draw the top-left corner from
  */
-void drawFromArray(HexColor *array, uint64_t position, L_R_ALIGNMENT alignLR, T_B_ALIGNMENT alignTB);
+void drawFromArray(HexColor *array[], uint32_t width, uint32_t height, uint32_t x, uint32_t y);
 /**
  * @brief Get the width size
  *

@@ -65,17 +65,13 @@ uint16_t get_height()
     return VBE_mode_info->height;
 }
 
-void drawFromArray(HexColor *array, uint64_t position, L_R_ALIGNMENT alignLR, T_B_ALIGNMENT alignTB)
+void drawFromArray(HexColor *array[], uint32_t width, uint32_t height, uint32_t x, uint32_t y)
 {
-    uint32_t width = (position >> 16) & 0xFFFF;
-    uint32_t height = (position) & 0xFFFF;
-    double xStep = alignLR == FIT_SCREEN ? ((double)width / get_width()) : 1.0;
-    double yStep = alignTB == FIT_SCREEN ? ((double)height / get_height()) : 1.0;
-    double start, end, xStep = 1.0, yStep = 1.0;
-    switch (alignLR)
-    {
-    }
-    switch (alignTB)
-    {
-    }
+    uint64_t endX = (width + x) < get_width() ? (width + x) : get_width();
+    uint64_t endY = (height + y) < get_height() ? (height + y) : get_height();
+    uint32_t indX = 0;
+    uint32_t indY = 0;
+    for (int i = x; i < endX; i++, indX++)
+        for (int j = y; j < endY; j++, indY++)
+            putPixel(array[indY][indX], j, i);
 }

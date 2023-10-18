@@ -3,7 +3,8 @@
 
 char *ultoa(unsigned long l, char *buffer, int radix)
 {
-    while (l > radix)
+    char *toRet = buffer;
+    while (l >= radix)
     {
         *buffer = (l % radix) + '0';
         if (*buffer > '9')
@@ -15,15 +16,20 @@ char *ultoa(unsigned long l, char *buffer, int radix)
     *buffer = l + '0';
     if (*buffer > '9')
         *buffer += 'A' - '9' - 1;
-
-    buffer++;
-    *buffer = 0;
-    return buffer;
+    *(buffer + 1) = 0;
+    int halfLen = (buffer - toRet) / 2;
+    for (int i = 0; i <= halfLen; i++)
+    {
+        char aux = *(toRet + i);
+        *(toRet + i) = *(buffer - i);
+        *(buffer - i) = aux;
+    }
+    return toRet;
 }
 
 char *utoa(unsigned int n, char *buffer, int radix)
 {
-    return ultoa(n, buffer, radix);
+    return ultoa((unsigned long)n, buffer, radix);
 }
 
 char *itoa(int n, char *buffer, int radix)
@@ -35,7 +41,7 @@ char *itoa(int n, char *buffer, int radix)
         n = -n;
     }
 
-    return utoa(n, buffer, radix) - 1;
+    return utoa((unsigned int)n, buffer, radix) - (n < 0);
 }
 
 uint64_t atoi(char *s)
@@ -106,15 +112,6 @@ uint64_t puts(char *string)
     return len;
 }
 
-static const char formatCharacters[] = {'%', '\\'}, formatCharacterCount = 2;
-
-char isFormatCharacter(char c)
-{
-    for (int i = 0; i < formatCharacterCount; i++)
-        if (formatCharacters[i] == c)
-            return 1;
-    return 0;
-}
 /**
  * returns length of string printed
  */
@@ -125,18 +122,7 @@ uint64_t printf(char *format, ...)
     uint64_t count = 0;
     while (*format != 0 && *format != EOF)
     {
-        if (*format == '\\')
-        {
-            format++;
-            if (isFormatCharacter(*format))
-            {
-                putChar(*format);
-            }
-            else
-                putChar('\\');
-            count++;
-        }
-        else if (*format == '%')
+        if (*format == '%')
         {
             format++;
             switch (*format)

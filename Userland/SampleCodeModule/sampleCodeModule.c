@@ -5,12 +5,7 @@
 
 int main()
 {
-	char buffer[100];
-	ultoa(get_unix_time(), buffer, 10);
-	print_sys(buffer, strlen(buffer));
-	printf("\nMiembro numero %l letrasddsgfg\n", 1234);
-	puts(itoa(2000, buffer, 10));
-	printf("\npal%sra\n", "ab");
+	printf("\nThis %s a %s long %s. The number here is -4*2:%d and here is 10*10*10:%u and this one is 456:%l. You will see some percentages here: % % %o %% \n", "is", "kinda", "string", -4 * 2, 10 * 10 * 10, 456);
 
 	return 0xDEADC0DE;
 	return 0xDEADBEEF;

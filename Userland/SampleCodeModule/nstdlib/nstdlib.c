@@ -214,6 +214,7 @@ uint64_t printf(char *format, ...)
     va_end(argp);
     return count;
 }
+uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisManyChars);
 /**
  * returns number of fields converted
  */
@@ -251,7 +252,7 @@ uint64_t scanf(char *format, ...)
             {
                 char aux[MAX_STDIN_STRING];
                 char c;
-                for (char auxReader = 0; auxReader < MAX_STDIN_STRING && (c = readChar()) >= '0' && c <= '9'; auxReader++)
+                for (int auxReader = 0; auxReader < MAX_STDIN_STRING && (c = readChar()) >= '0' && c <= '9'; auxReader++)
                     aux[auxReader] = c;
                 replaceWith(format - 1, aux, 2);
                 break;
@@ -279,6 +280,7 @@ uint64_t insertString(char *startAddress, char *insertion)
 {
     return replaceWith(startAddress, insertion, 0);
 }
+uint64_t concatFrom(char *s1, char *s2);
 
 uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisManyChars)
 {

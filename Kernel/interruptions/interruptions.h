@@ -7,6 +7,7 @@
 #include <video.h>
 #include <stdint.h>
 #include <header.h>
+#include <memory.h>
 #include <console.h>
 #include <localization.h>
 

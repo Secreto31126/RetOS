@@ -30,6 +30,9 @@ void write_stdin(uint8_t *buf, uint16_t len)
     int i = 0;
     while (i < len)
     {
-        buf[i++] = getc();
+        if (buf[i])
+        {
+            putc(buf[i++]);
+        }
     }
 }

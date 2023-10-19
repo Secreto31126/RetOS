@@ -97,14 +97,7 @@ char putChar(char c)
     print_sys(&c, 1);
     return c;
 }
-/*
-char getChar()
-{
-    char c[1];
-    read_sys(c, 1);
-    return *c;
-}
-*/
+
 uint64_t puts(char *string)
 {
     uint64_t len = strlen(string);
@@ -239,4 +232,11 @@ uint64_t strlen(char *s)
     while (*(s + len))
         len++;
     return len;
+}
+
+char readChar()
+{
+    char c[1];
+    read_sys(c, 1);
+    return *c;
 }

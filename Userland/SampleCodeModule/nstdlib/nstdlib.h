@@ -17,6 +17,7 @@ char *utoa(unsigned int n, char *buffer, int radix);
 char *itoa(int n, char *buffer, int radix);
 char *ultoa(uint64_t ll, char *buffer, int radix);
 char putChar(char c);
+char readChar();
 uint64_t puts(char *string);
 uint64_t printf(char *format, ...);
 uint64_t strlen(char *s);

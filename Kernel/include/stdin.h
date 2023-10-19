@@ -8,14 +8,16 @@
  *
  * @param buf The direction to store the data
  * @param len The number of bytes to read
+ * @return uint16_t The number of bytes read
  */
-void read_stdin(uint8_t *buf, uint16_t len);
+uint16_t read_stdin(uint8_t *buf, uint16_t len);
 /**
  * @brief Write to stdin
  *
  * @param buf The data to write
  * @param len The number of bytes to write
+ * @return uint16_t The number of bytes written
  */
-void write_stdin(uint8_t *buf, uint16_t len);
+uint16_t write_stdin(uint8_t *buf, uint16_t len);
 
 #endif

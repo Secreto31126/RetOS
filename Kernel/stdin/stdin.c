@@ -1,31 +1,45 @@
 #include "stdin.h"
 
+static uint8_t on_your_left = 0;
 static uint64_t reader = 0;
 static uint64_t writer = 0;
+#define INC(x) ((x) = (x)++ % BUF_SIZE)
 
 char getc()
 {
     char c = buffer[reader];
-    reader = reader++ % BUF_SIZE;
+    INC(reader);
+    on_your_left = 0;
     return c;
 }
 
 void putc(uint8_t c)
 {
     buffer[writer] = c;
-    writer = writer++ % BUF_SIZE;
-}
+    INC(writer);
 
-void read_stdin(uint8_t *buf, uint16_t len)
-{
-    int i = 0;
-    while (i < len)
+    if (on_your_left)
     {
-        buf[i++] = getc();
+        INC(reader);
+    }
+    else if (reader == writer)
+    {
+        on_your_left = 1;
     }
 }
 
-void write_stdin(uint8_t *buf, uint16_t len)
+uint16_t read_stdin(uint8_t *buf, uint16_t len)
+{
+    int i = 0;
+    while (i < len && (reader != writer || on_your_left))
+    {
+        buf[i++] = getc();
+    }
+
+    return i;
+}
+
+uint16_t write_stdin(uint8_t *buf, uint16_t len)
 {
     int i = 0;
     while (i < len)
@@ -35,4 +49,6 @@ void write_stdin(uint8_t *buf, uint16_t len)
             putc(buf[i++]);
         }
     }
+
+    return i;
 }

@@ -1,7 +1,10 @@
 #include "nstdlib.h"
 #define MAX_DIGITS_IN_LONG 20
 #define MAX_STDIN_STRING 256
-
+read_sys(char *c, int i)
+{
+    return i;
+}
 char *ultoa(unsigned long l, char *buffer, int radix)
 {
     char *toRet = buffer;
@@ -333,4 +336,12 @@ char readChar()
     char c[1] = {0};
     read_sys(c, 1);
     return *c;
+}
+
+uint64_t pow(double base, uint64_t exponent)
+{
+    uint64_t ans = 1.0;
+    for (uint64_t i = 0; i < exponent; i++)
+        ans *= base;
+    return ans;
 }

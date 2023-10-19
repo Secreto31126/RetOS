@@ -23,5 +23,6 @@ uint64_t puts(char *string);
 uint64_t printf(char *format, ...);
 uint64_t strlen(char *s);
 static const double pi = 3.14159265359;
+uint64_t pow(double base, uint64_t exponent);
 
 #endif

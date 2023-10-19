@@ -5,6 +5,7 @@
 
 #include <lib.h>
 #include <video.h>
+#include <stdin.h>
 #include <stdint.h>
 #include <header.h>
 #include <console.h>

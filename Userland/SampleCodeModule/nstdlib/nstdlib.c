@@ -1,5 +1,6 @@
 #include "nstdlib.h"
 #define MAX_DIGITS_IN_LONG 20
+#define MAX_STDIN_STRING 256
 
 char *ultoa(unsigned long l, char *buffer, int radix)
 {
@@ -221,8 +222,99 @@ uint64_t scanf(char *format, ...)
     va_list argp;
     va_start(argp, format);
     uint64_t count = 0;
-
+    while (*format != 0 && *format != EOF)
+    {
+        if (*format == '%')
+        {
+            format++;
+            switch (*format)
+            {
+            case 'c':
+            {
+                char aux[1];
+                if (!read_sys(aux, 1))
+                    return count;
+                replaceWith(format - 1, aux, 2);
+                break;
+            }
+            case 's':
+            {
+                char aux[MAX_STDIN_STRING];
+                read_sys(aux, MAX_STDIN_STRING);
+                replaceWith(format - 1, aux, 2);
+                break;
+            }
+            case 'i':
+            case 'd':
+            case 'u':
+            case 'l':
+            {
+                char aux[MAX_STDIN_STRING];
+                char c;
+                for (char auxReader = 0; auxReader < MAX_STDIN_STRING && (c = readChar()) >= '0' && c <= '9'; auxReader++)
+                    aux[auxReader] = c;
+                replaceWith(format - 1, aux, 2);
+                break;
+            }
+            default:
+            {
+                count--; // this is slightly inefficient, prevents adding count++ to every other condition in switch statement
+                break;
+            }
+            }
+            count++;
+        }
+        format++;
+    }
     va_end(argp);
+    return count;
+}
+/**
+ * insertion is a string you want inserted into another
+ * startAddress is the location in a string where insertion should be placed
+ * return value is length of insertion string
+ * startAddress string should have enough space allocated to add insertion string
+ */
+uint64_t insertString(char *startAddress, char *insertion)
+{
+    return replaceWith(startAddress, insertion, 0);
+}
+
+uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisManyChars)
+{
+    uint64_t len = strlen(replacement) - eatThisManyChars;
+    if (len <= 0)
+        return 0;
+    char *aux = startAddress;
+    while (*aux != 0)
+        aux++;  // aux is now looking at null termination of string containing startAddress
+    aux += len; // aux is now looking at where new null termination will be
+    char *aux2 = startAddress + len;
+    while (aux >= aux2)
+    {
+        *(aux + len) = *aux;
+        aux--;
+    } // enough space has been made to add insertion string
+    concatFrom(startAddress, replacement);
+    return len;
+}
+
+uint64_t concat(char *s1, char *s2)
+{
+    while (*s1 != 0)
+        s1++;
+    return concatFrom(s1, s2);
+}
+uint64_t concatFrom(char *sEnd, char *sAdd)
+{
+    uint64_t count = 0;
+    while (*sAdd != 0)
+    {
+        *sEnd = *sAdd;
+        sEnd++;
+        sAdd++;
+        count++;
+    }
     return count;
 }
 
@@ -236,7 +328,7 @@ uint64_t strlen(char *s)
 
 char readChar()
 {
-    char c[1];
+    char c[1] = {0};
     read_sys(c, 1);
     return *c;
 }

@@ -3,7 +3,7 @@
 static uint8_t on_your_left = 0;
 static uint64_t reader = 0;
 static uint64_t writer = 0;
-#define INC(x) ((x) = (x)++ % BUF_SIZE)
+#define INC(x) ((x) = ((x) + 1) % BUF_SIZE)
 
 char getc()
 {

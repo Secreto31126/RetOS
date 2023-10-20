@@ -2,6 +2,16 @@
 
 uint64_t read(uint64_t fd, char *buffer, uint64_t count);
 uint64_t write(uint64_t fd, const char *buffer, uint64_t count);
+/**
+ * @brief Draw a pixel array to the screen via syscall
+ *
+ * @param figure Contiguous HexColor memory pointer to print
+ * @param dimensions 0xWWWWWWWWHHHHHHHH
+ * @param position 0xXXXXXXXXYYYYYYYY
+ */
+uint64_t draw(HexColor *figure, uint64_t dimensions, uint64_t position);
+uint64_t mloc(uint64_t size);
+uint64_t fre(uint64_t ptr);
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 {
@@ -11,6 +21,12 @@ uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
         return read(rdi, (char *)rsi, rdx);
     case 1:
         return write(rdi, (const char *)rsi, rdx);
+    case 333:
+        return draw((HexColor *)rdi, rsi, rdx);
+    case 334:
+        return mloc(rdi);
+    case 335:
+        return fre(rdi);
 
     default:
         break;
@@ -21,8 +37,12 @@ uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 
 uint64_t read(uint64_t fd, char *buffer, uint64_t count)
 {
-    memcpy(buffer, "Hello World!\n", count);
-    return count;
+    if (fd != 0)
+    {
+        return -1;
+    }
+
+    return read_stdin((uint8_t *)buffer, count);
 }
 
 uint64_t write(uint64_t fd, const char *buffer, uint64_t count)
@@ -39,4 +59,26 @@ uint64_t write(uint64_t fd, const char *buffer, uint64_t count)
     }
 
     return i;
+}
+
+uint64_t draw(HexColor *figure, uint64_t dimensions, uint64_t position)
+{
+    uint32_t width = dimensions >> 32 & 0xFFFFFFFF;
+    uint32_t height = dimensions & 0xFFFFFFFF;
+
+    uint32_t x = position >> 32 & 0xFFFFFFFF;
+    uint32_t y = position & 0xFFFFFFFF;
+
+    return drawFromArray(figure, width, height, x, y);
+}
+
+uint64_t mloc(uint64_t size)
+{
+    return (uint64_t)malloc(size);
+}
+
+uint64_t fre(uint64_t ptr)
+{
+    free((void *)ptr);
+    return 0;
 }

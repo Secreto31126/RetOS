@@ -17,7 +17,7 @@ HexColor blueRectangleFigure(int x, int y)
 
 HexColor redLine(int x, int y)
 {
-    if (x < 10 && y < 1)
+    if (y < 1)
         return 0xFF000000 | HEX_RED;
     return 0;
 }

@@ -37,8 +37,12 @@ uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 
 uint64_t read(uint64_t fd, char *buffer, uint64_t count)
 {
-    memcpy(buffer, "Hello World!\n", count);
-    return count;
+    if (fd != 0)
+    {
+        return -1;
+    }
+
+    return read_stdin((uint8_t *)buffer, count);
 }
 
 uint64_t write(uint64_t fd, const char *buffer, uint64_t count)

@@ -3,7 +3,7 @@
 
 #include <stdin.h>
 
-static uint8_t *const buffer = (uint8_t *)0xA0000; // stdin is stored in non color text mode
+static uint8_t *const buffer = (uint8_t *)0x50000;
 #define BUF_SIZE 0x10000
 
 #endif

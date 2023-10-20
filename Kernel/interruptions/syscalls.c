@@ -36,7 +36,7 @@ uint64_t read(uint64_t fd, char *buffer, uint64_t count)
         return -1;
     }
 
-    return read_stdin(buffer, count);
+    return read_stdin((uint8_t *)buffer, count);
 }
 
 uint64_t write(uint64_t fd, const char *buffer, uint64_t count)

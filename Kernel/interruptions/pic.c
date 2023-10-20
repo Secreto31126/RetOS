@@ -145,7 +145,8 @@ static void keyboard_handler()
     {
         if (pressed_keys[i])
         {
-            ncPrintChar(get_scancode_utf16(pressed_keys[i], modifier), 0x0F);
+            uint8_t letter = get_scancode_utf16(pressed_keys[i], modifier);
+            write_stdin(&letter, 1);
         }
     }
 }

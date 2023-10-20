@@ -330,8 +330,7 @@ uint64_t strlen(char *s)
 char readChar()
 {
     char c[1] = {0};
-    read_sys(c, 1);
-    return *c;
+    return read_sys(c, 1) ? *c : 0;
 }
 char getChar()
 {
@@ -339,6 +338,13 @@ char getChar()
     while (!(c = readChar()))
         ; // Arte.
     return c;
+}
+
+int read(int fd, char *buffer, int count)
+{
+    if (fd != 0)
+        return 0;
+    return read_sys(buffer, count);
 }
 
 uint64_t pow(double base, uint64_t exponent)

@@ -94,14 +94,14 @@ char *ftoa(float n, char *buffer, int readLength)
 
 char putChar(char c)
 {
-    print_sys(&c, 1);
+    print_sys(1, &c, 1);
     return c;
 }
 
 uint64_t puts(char *string)
 {
     uint64_t len = strlen(string);
-    print_sys(string, len);
+    print_sys(1, string, len);
     return len;
 }
 
@@ -232,7 +232,7 @@ uint64_t scanf(char *format, ...)
             case 'c':
             {
                 char aux[1];
-                if (!read_sys(aux, 1))
+                if (!read_sys(0, aux, 1))
                     return count;
                 replaceWith(format - 1, aux, 2);
                 break;
@@ -240,7 +240,7 @@ uint64_t scanf(char *format, ...)
             case 's':
             {
                 char aux[MAX_STDIN_STRING];
-                read_sys(aux, MAX_STDIN_STRING);
+                read_sys(0, aux, MAX_STDIN_STRING);
                 replaceWith(format - 1, aux, 2);
                 break;
             }
@@ -329,20 +329,21 @@ uint64_t strlen(char *s)
 
 char readChar()
 {
-    char c[1] = {0};
-    return read_sys(c, 1) ? *c : 0;
+    char c;
+    return read_sys(0, &c, 1) ? c : 0;
 }
+
 char getChar()
 {
     char c;
-    while (!(c = readChar()))
-        ; // Arte.
+    while (!read_sys(0, &c, 1))
+        ;
     return c;
 }
 
 int read(char *buffer, int count)
 {
-    return read_sys(buffer, count);
+    return read_sys(0, buffer, count);
 }
 
 uint64_t pow(double base, uint64_t exponent)

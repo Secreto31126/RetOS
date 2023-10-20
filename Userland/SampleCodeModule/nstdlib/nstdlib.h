@@ -8,8 +8,8 @@
 #define EOF -1
 
 // syscalls
-extern int print_sys(char *, int);
-extern int read_sys(char *, int);
+extern int print_sys(unsigned int fd, char *str, unsigned long long len);
+extern int read_sys(unsigned int fd, char *str, unsigned long long len);
 extern unsigned long long get_unix_time(void);
 
 // library

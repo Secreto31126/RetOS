@@ -1,10 +1,6 @@
 #include "nstdlib.h"
 #define MAX_DIGITS_IN_LONG 20
 #define MAX_STDIN_STRING 256
-read_sys(char *c, int i)
-{
-    return i;
-}
 char *ultoa(unsigned long l, char *buffer, int radix)
 {
     char *toRet = buffer;

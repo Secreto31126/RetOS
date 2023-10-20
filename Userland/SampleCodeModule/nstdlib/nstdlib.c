@@ -340,10 +340,8 @@ char getChar()
     return c;
 }
 
-int read(int fd, char *buffer, int count)
+int read(char *buffer, int count)
 {
-    if (fd != 0)
-        return 0;
     return read_sys(buffer, count);
 }
 

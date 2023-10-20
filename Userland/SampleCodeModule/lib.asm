@@ -1,5 +1,6 @@
     global print_sys
 	global get_unix_time
+    global read_sys
 
 ; int print_sys(char *str, int len)
 print_sys:

@@ -337,6 +337,13 @@ char readChar()
     read_sys(c, 1);
     return *c;
 }
+char getChar()
+{
+    char c;
+    while (!(c = readChar()))
+        ; // Arte.
+    return c;
+}
 
 uint64_t pow(double base, uint64_t exponent)
 {

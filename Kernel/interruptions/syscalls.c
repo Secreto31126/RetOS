@@ -8,10 +8,18 @@ uint64_t write(uint64_t fd, const char *buffer, uint64_t count);
  * @param figure Contiguous HexColor memory pointer to print
  * @param dimensions 0xWWWWWWWWHHHHHHHH
  * @param position 0xXXXXXXXXYYYYYYYY
+ * @return uint64_t number of pixels drawn
  */
 uint64_t draw(HexColor *figure, uint64_t dimensions, uint64_t position);
 uint64_t mloc(uint64_t size);
 uint64_t fre(uint64_t ptr);
+uint64_t get_time();
+/**
+ * @brief Get the screen size
+ *
+ * @return uint64_t 0xWWWWWWWWHHHHHHHH
+ */
+uint64_t get_screen_size();
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 {
@@ -27,6 +35,10 @@ uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
         return mloc(rdi);
     case 335:
         return fre(rdi);
+    case 336:
+        return get_time();
+    case 337:
+        return get_screen_size();
 
     default:
         break;
@@ -81,4 +93,24 @@ uint64_t fre(uint64_t ptr)
 {
     free((void *)ptr);
     return 0;
+}
+
+uint64_t get_time()
+{
+    unset_interrupt_flag();
+
+    output_byte(0x70, 0x04);
+    uint8_t hour = input_byte(0x71);
+
+    output_byte(0x70, 0x02);
+    uint8_t minute = input_byte(0x71);
+
+    set_interrupt_flag();
+
+    return hour << 8 + minute;
+}
+
+uint64_t get_screen_size()
+{
+    return get_width() << 16 + get_height();
 }

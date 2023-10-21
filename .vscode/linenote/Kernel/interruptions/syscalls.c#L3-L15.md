@@ -1,0 +1,1 @@
+Make them all static

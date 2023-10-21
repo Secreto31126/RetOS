@@ -68,16 +68,16 @@ uint64_t drawFromArray(HexColor *array, uint32_t width, uint32_t height, uint32_
     if (x >= VBE_mode_info->width || y >= VBE_mode_info->height)
         return 0;
 
-    uint64_t drawn = 0;
+    uint64_t drawed = 0;
     for (uint32_t i = 0; i < height && i < VBE_mode_info->height; i++)
     {
-        for (uint32_t j = 0; j < width && j < VBE_mode_info->height; j++)
+        for (uint32_t j = 0; j < width && VBE_mode_info->height; j++)
         {
-            drawn += putPixel(array[i * height + j], x + j, y + i);
+            drawed += putPixel(array[i * height + j], x + j, y + i);
         }
     }
 
-    return drawn;
+    return drawed;
 }
 
 uint16_t get_width()

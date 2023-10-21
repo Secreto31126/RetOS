@@ -91,49 +91,13 @@ void *initializeKernelBinary()
 
 int main()
 {
-	ncPrint("[Kernel Main]");
-	ncNewline();
-	ncPrint("  Sample code module at 0x");
-	ncPrintHex((uint64_t)sampleCodeModuleAddress);
-	ncNewline();
-	ncPrint("  Calling the sample code module returned: ");
-	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
-	ncNewline();
-	ncNewline();
-
-	ncPrint("  Sample data module at 0x");
-	ncPrintHex((uint64_t)sampleDataModuleAddress);
-	ncNewline();
-	ncPrint("  Sample data module contents: ");
-	ncPrint((char *)sampleDataModuleAddress);
-	ncNewline();
-	ncPrint("[Finished]");
-
-	ncClear();
-
-	// drawShape(redRectangleFigure, 100, 10, 100, 100);
-	// drawShape(greenRectangleFigure, 200, 10, 100, 100);
-	// drawShape(blueRectangleFigure, 300, 10, 100, 100);
-
 	drawShape(RetOSbackground, 0, 0, get_width(), get_height());
 
-	// uint16_t w = get_width();
-	// uint16_t h = get_height();
+	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
+	ncNewline();
 
-	// for (int i = 0; i < h / 1 % 10; i++)
-	// {
-	// 	if (i % 2)
-	// 	{
-	// 		drawShape(redRectangleFigure, i * 5, i % 5 * 10, 10, 10);
-	// 	}
-	// 	else
-	// 	{
-	// 		drawShape(greenRectangleFigure, i * 5, i % 5 * 10, 10, 10);
-	// 	}
-	// }
-
-	dump_regs();
-	ncPrint(dump_reg_string);
+	ncPrint((char *)sampleDataModuleAddress);
+	ncNewline();
 
 	return 0;
 }

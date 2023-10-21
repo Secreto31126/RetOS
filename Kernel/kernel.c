@@ -4,6 +4,7 @@
 #include <modules.h>
 #include <console.h>
 #include <localization.h>
+#include <audio.h>
 #include <video.h>
 
 extern uint8_t text;
@@ -91,6 +92,7 @@ void *initializeKernelBinary()
 
 int main()
 {
+	imperial_march();
 	drawShape(RetOSbackground, 0, 0, get_width(), get_height());
 
 	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());

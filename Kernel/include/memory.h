@@ -11,7 +11,7 @@
  * @param size The size of the block to reserve. Returns NULL if size is 0 or over 0x8000.
  * @return void* A pointer to the reserved block of memory. Returns NULL if there is not enough memory.
  */
-void *malloc(uint16_t size);
+void *malloc(uint32_t size);
 /**
  * @brief Free a block of memory.
  *

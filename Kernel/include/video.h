@@ -15,7 +15,7 @@ enum HEX_COLORS
 };
 
 typedef uint32_t HexColor;
-typedef HexColor (*ShapeFunction)(int, int);
+typedef HexColor (*ShapeFunction)(int, int, int, int);
 
 /**
  * @brief Shorthand for
@@ -69,11 +69,12 @@ uint16_t get_width();
  */
 uint16_t get_height();
 
-HexColor redRectangleFigure(int x, int y);
-HexColor greenRectangleFigure(int x, int y);
-HexColor blueRectangleFigure(int x, int y);
+HexColor redRectangleFigure();
+HexColor greenRectangleFigure();
+HexColor blueRectangleFigure();
 HexColor redLine(int x, int y);
-HexColor redCircle(int x, int y);
+HexColor drawCircle(int x, int y, int w, int h);
+HexColor redCircle(int x, int y, int w, int h);
 /**
  * @deprecated
  */

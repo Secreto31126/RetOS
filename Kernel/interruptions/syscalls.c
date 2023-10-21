@@ -39,6 +39,9 @@ uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
         return get_time();
     case 337:
         return get_screen_size();
+    case 338:
+        beep(rdi, rsi);
+        return rax;
 
     default:
         break;

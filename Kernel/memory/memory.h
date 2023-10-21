@@ -3,8 +3,8 @@
 
 #include <memory.h>
 
-typedef uint16_t heap_entry;
-typedef uint16_t map_entry;
+typedef uint32_t heap_entry;
+typedef uint32_t map_entry;
 
 // 256 MB
 #define MAP_START 0x10000000

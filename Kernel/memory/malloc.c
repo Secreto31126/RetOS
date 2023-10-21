@@ -1,9 +1,8 @@
 #include "memory.h"
 
-void *malloc(uint16_t size)
+void *malloc(uint32_t size)
 {
-    // Hardcoded limit to 32kb per call
-    if (!size || size & 0x8000)
+    if (!size || size > heap_size)
     {
         return NULL;
     }

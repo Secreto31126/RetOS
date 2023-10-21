@@ -33,11 +33,11 @@ static const uint64_t heap_size = HEAP_SIZE;
  */
 static const uint64_t map_size = HEAP_SIZE;
 /**
- * @brief Start of the heap's map.
+ * @brief Start of the heap's map memory.
  */
 static map_entry *const map_start = (map_entry *)MAP_START;
 /**
- * @brief The start of the heap.
+ * @brief Start of the heap memory.
  */
 static heap_entry *const heap_start = (heap_entry *)MAP_START + MAP_SIZE;
 

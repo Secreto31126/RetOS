@@ -5,7 +5,7 @@ uint64_t write(uint64_t fd, const char *buffer, uint64_t count);
 /**
  * @brief Draw a pixel array to the screen via syscall
  *
- * @param figure Contiguous HexColor memory pointer to print
+ * @param figure Contiguous HexColor memory pointer to draw
  * @param dimensions 0xWWWWWWWWHHHHHHHH
  * @param position 0xXXXXXXXXYYYYYYYY
  */

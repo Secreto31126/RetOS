@@ -1,9 +1,8 @@
 #include "memory.h"
 
-void *malloc(uint16_t size)
+void *malloc(uint32_t size)
 {
-    // Hardcoded limit to 32kb per call
-    if (!size || size & 0x8000)
+    if (!size || size > heap_size)
     {
         return NULL;
     }
@@ -17,17 +16,17 @@ void *malloc(uint16_t size)
             continue;
         }
 
-        map_entry *start = map;
+        map_entry *map_start = map;
         while (!*map)
         {
-            if (map - start + 1 < size)
+            if (map - map_start + sizeof(heap_entry) < size)
             {
                 map += sizeof(map_entry);
                 continue;
             }
 
-            *(start + map_size) = size * sizeof(map_entry);
-            return start + map_size;
+            *map_start = size * sizeof(map_entry);
+            return map_start + map_size;
         }
     }
 

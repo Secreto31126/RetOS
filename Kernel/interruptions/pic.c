@@ -25,14 +25,9 @@ void pic_manager(int interrupt)
     }
 }
 
-static unsigned long long tick;
-
 static void tick_handler()
 {
-    if (tick++ % 18)
-    {
-        update_header();
-    }
+    update_tick();
 }
 
 #define MAX_KEYS 17

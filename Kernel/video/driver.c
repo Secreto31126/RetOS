@@ -56,7 +56,7 @@ void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, doub
     {
         for (int j = 0; j < xRange && j < VBE_mode_info->width; j++)
         {
-            uint32_t r = f(j / xScaleFactor, i / yScaleFactor);
+            uint32_t r = f(j / xScaleFactor, i / yScaleFactor, xRange, yRange);
             if (r & 0xFF000000)
                 putPixel(r, x + j, y + i);
         }

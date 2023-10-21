@@ -1,16 +1,16 @@
 #include "video.h"
 
-HexColor redRectangleFigure(int x, int y)
+HexColor redRectangleFigure()
 {
     return 0xFFFF0000;
 }
 
-HexColor greenRectangleFigure(int x, int y)
+HexColor greenRectangleFigure()
 {
     return 0xFF00FF00;
 }
 
-HexColor blueRectangleFigure(int x, int y)
+HexColor blueRectangleFigure()
 {
     return 0xFF0000FF;
 }
@@ -22,13 +22,20 @@ HexColor redLine(int x, int y)
     return 0;
 }
 
-HexColor redCircle(int x, int y)
+HexColor drawCircle(int x, int y, int w, int h)
 {
-    x -= 100;
-    y -= 100;
-    if ((x * x + y * y) < 10000)
-        return 0xFF000000 | HEX_RED;
+    w /= 2;
+    h /= 2;
+    x -= w;
+    y -= h;
+    if (((double)(x * x) / (w * w)) + ((double)(y * y) / (h * h)) < 1)
+        return 0xFF000000;
     return 0;
+}
+
+HexColor redCircle(int x, int y, int w, int h)
+{
+    return drawCircle(x, y, w, h) | HEX_RED;
 }
 
 HexColor drawEllipse(int x, int y)

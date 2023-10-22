@@ -1,4 +1,5 @@
 #include "window.h"
+#include <stdarg.h>
 
 #define GET_HEX(a, r, g, b) (((a) << 24) + ((r) << 16) + ((g) << 8) + (b))
 #define GET_OPACITY(x) (((x) >> 24) & 0xFF)
@@ -61,4 +62,39 @@ void drawScaledShape(Window w, ShapeFunction f, int x, int y, int xRange, int yR
                 putPixel(w, r, x + j, y + i);
         }
     }
+}
+
+void drawFromHexArray(Window w, HexColor *source, int sourceWidth, int sourceHeight, int x, int y, double xScaleFactor, double yScaleFactor)
+{
+    if (!xScaleFactor || !yScaleFactor)
+        return;
+    xScaleFactor /= 1; // scaleFactor 2 means one pixel in source represents two pixels in window
+    yScaleFactor /= 1;
+    for (double i = 0; i < sourceHeight && i < w.height; i += yScaleFactor)
+    {
+        for (double j = 0; j < sourceWidth && j < w.width; j += xScaleFactor)
+        {
+            putPixel(w, source[((int)(i + 0.5)) * sourceWidth + ((int)(j + 0.5))], i, j); // source pointers rounded to nearest integer
+        }
+    }
+}
+/**
+ * Source and result should be of equal dimensions.
+ * To make a color in the result be 'transparent' in later operations, set its HexColor opacity to 0.
+ * This function is for translating bitmap-equivalents to HexColor arrays. Not for creating Windows.
+ * Chars set to 0 will be copied to result as color 1, set to 1 copied as color 2, etc.
+ **/
+HexColor *toHexArray(char *source, HexColor *result, int width, int height, int colorCount, ...) // Requiring the number of colors isn't a particularly good implementation, but it is a particularly easy one.
+{
+    HexColor replacement;
+    va_list colors;
+    va_start(colors, colorCount);
+    for (int i = 0; i < colorCount; i++)
+    {
+        replacement = va_arg(colors, HexColor);
+        for (int j = 0; j < width * height; j++)
+            if (source[j] == i)
+                result[j] = replacement;
+    }
+    return result;
 }

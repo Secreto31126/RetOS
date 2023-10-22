@@ -29,7 +29,7 @@ typedef enum T_B_ALIGNMENT
     ALIGN_TOP,
     ALIGN_BOTTOM,
     ALIGN_CENTER
-} L_R_ALIGNMENT;
+} T_B_ALIGNMENT;
 
 typedef struct Window
 {
@@ -40,5 +40,7 @@ typedef struct Window
 
 uint64_t screenWidth();
 uint64_t screenHeight();
+HexColor *toHexArray(char *source, HexColor *result, int width, int height, int colorCount, ...);
+void drawFromHexArray(Window w, HexColor *source, int sourceWidth, int sourceHeight, int x, int y, double xScaleFactor, double yScaleFactor);
 
 #endif

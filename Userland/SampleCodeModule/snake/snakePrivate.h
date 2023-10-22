@@ -16,7 +16,7 @@ typedef struct snake
     DIRECTION direction;
     uint64_t color;
     char alive;
-    char growing;
+    char moved;
 } snake;
 
 typedef struct tile

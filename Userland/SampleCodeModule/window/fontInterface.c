@@ -36,7 +36,7 @@ char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor h
             {
                 char letter[TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH] = currentFont.letters[string[index]]; // Surprisingly enough, this is correct
                 HexColor aux[TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH];
-                drawFromHexArray(w, toHexArray(letter, aux, TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, 2, highlightColor, letterColor), TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, j, i, size, size);
+                drawFromHexArray(w, toHexArray(letter, aux, TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, 2, highlightColor, letterColor), TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, j, i, size, size); // Arte.
             }
         }
     if (string[index])

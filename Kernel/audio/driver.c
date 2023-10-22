@@ -26,7 +26,6 @@ static void nosound()
     output_byte(0x61, tmp);
 }
 
-// Make a beep
 void beep(uint32_t frequency, uint64_t duration)
 {
     play_sound(frequency);

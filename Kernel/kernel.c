@@ -92,7 +92,8 @@ void *initializeKernelBinary()
 
 int main()
 {
-	imperial_march();
+	// imperial_march();
+	beep(440, 18 * 2);
 	drawShape(RetOSbackground, 0, 0, get_width(), get_height());
 
 	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());

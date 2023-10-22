@@ -31,27 +31,27 @@
  */
 void imperial_march()
 {
-    beep(A3, 14);
+    beep_syncronic(A3, 14);
     sleep_ticks(3);
-    beep(A3, 14);
+    beep_syncronic(A3, 14);
     sleep_ticks(3);
-    beep(A3, 14);
+    beep_syncronic(A3, 14);
     sleep_ticks(10);
-    beep(F3, 5);
-    beep(C4, 4);
-    beep(A3, 14);
-    beep(F3, 5);
-    beep(C4, 4);
-    beep(A3, 22);
+    beep_syncronic(F3, 5);
+    beep_syncronic(C4, 4);
+    beep_syncronic(A3, 14);
+    beep_syncronic(F3, 5);
+    beep_syncronic(C4, 4);
+    beep_syncronic(A3, 22);
     sleep_ticks(10);
-    beep(E4, 12);
-    beep(E4, 12);
-    beep(E4, 12);
+    beep_syncronic(E4, 12);
+    beep_syncronic(E4, 12);
+    beep_syncronic(E4, 12);
     sleep_ticks(10);
-    beep(F4, 6);
-    beep(D4, 5);
-    beep(A3, 12);
-    beep(F3, 5);
-    beep(C4, 5);
-    beep(A3, 22);
+    beep_syncronic(F4, 6);
+    beep_syncronic(D4, 5);
+    beep_syncronic(A3, 12);
+    beep_syncronic(F3, 5);
+    beep_syncronic(C4, 5);
+    beep_syncronic(A3, 22);
 }

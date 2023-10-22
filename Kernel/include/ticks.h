@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+typedef void (*Callback)(void);
+
 /**
  * @brief Get the tick value
  * @note 18 tick = 1s, 1 tick = 55.555ms
@@ -20,5 +22,12 @@ void update_tick();
  * @param ticks Amount of ticks to sleep
  */
 void sleep_ticks(uint64_t ticks);
+/**
+ * @brief Add a task to the scheduler
+ *
+ * @param ticks Amount of ticks to wait before executing the task
+ * @param task The task to execute
+ */
+void add_task(uint64_t ticks, Callback task);
 
 #endif

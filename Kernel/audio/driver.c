@@ -22,14 +22,18 @@ static void play_sound(uint32_t freq)
 // make it shutup
 static void nosound()
 {
-    uint8_t tmp = input_byte(0x61) & 0xFC;
-    output_byte(0x61, tmp);
+    output_byte(0x61, input_byte(0x61) & 0xFC);
+}
+
+void beep_syncronic(uint32_t frequency, uint64_t duration)
+{
+    play_sound(frequency);
+    sleep_ticks(duration);
+    nosound();
 }
 
 void beep(uint32_t frequency, uint64_t duration)
 {
     play_sound(frequency);
-    sleep_ticks(duration);
-    nosound();
-    // set_PIT_2(old_frequency);
+    add_task(duration, nosound);
 }

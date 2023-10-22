@@ -55,3 +55,97 @@ void imperial_march()
     beep(C4, 5);
     beep(A3, 22);
 }
+
+void hes_a_pirate()
+{
+    beep(E3, 6);
+    beep(G3, 6);
+    beep(A3, 6);
+    sleep_ticks(3);
+    beep(A3, 10);
+
+    beep(A3, 6);
+    beep(B3, 6);
+    beep(C4, 6);
+    sleep_ticks(3);
+    beep(C4, 10);
+
+    beep(C4, 6);
+    beep(D4, 6);
+    beep(B3, 6);
+    sleep_ticks(3);
+    beep(B3, 10);
+
+    beep(A3, 6);
+    beep(G3, 6);
+    beep(A3, 6);
+
+    sleep_ticks(10);
+
+    beep(E3, 6);
+    beep(G3, 6);
+    beep(A3, 6);
+    sleep_ticks(3);
+    beep(A3, 10);
+
+    beep(A3, 6);
+    beep(B3, 6);
+    beep(C4, 6);
+    sleep_ticks(3);
+    beep(C4, 10);
+
+    beep(C4, 6);
+    beep(D4, 6);
+    beep(B3, 6);
+    sleep_ticks(3);
+    beep(B3, 10);
+
+    beep(G3, 6);
+    beep(A3, 6);
+
+    sleep_ticks(10);
+
+    beep(E3, 6);
+    beep(G3, 6);
+    beep(A3, 6);
+    sleep_ticks(3);
+    beep(A3, 10);
+
+    beep(A3, 6);
+    beep(B3, 6);
+    beep(C4, 6);
+    sleep_ticks(3);
+    beep(C4, 10);
+
+    beep(C4, 6);
+    beep(D4, 6);
+    beep(E4, 6);
+    sleep_ticks(3);
+    beep(E4, 6);
+
+    beep(D4, 6);
+    beep(C4, 6);
+    beep(D4, 6);
+    beep(A3, 10);
+
+    sleep_ticks(10);
+
+    beep(A3, 6);
+    beep(B3, 6);
+    beep(C4, 6);
+    sleep_ticks(3);
+    beep(C4, 10);
+
+    beep(D4, 10);
+    beep(E4, 4);
+    beep(A3, 10);
+
+    beep(A3, 6);
+    beep(C4, 6);
+    beep(B3, 18);
+    sleep_ticks(3);
+    beep(B3, 10);
+    beep(C4, 6);
+    beep(A3, 6);
+    beep(B3, 10);
+}

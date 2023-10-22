@@ -16,11 +16,12 @@ typedef struct snake
     DIRECTION direction;
     uint64_t color;
     char alive;
+    char growing;
 } snake;
 
 typedef struct tile
 {
-    unsigned int identifier;
+    char identifier;
     unsigned int health;
 } tile;
 

@@ -27,10 +27,12 @@ void initialize()
 char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor highlightColor, double size)
 {
     int index = 0;
-    uint64_t drawLimitX = w.width - TRUE_LETTER_HEIGHT;
-    uint64_t drawLimitY = w.height - TRUE_LETTER_HEIGHT;
-    for (int i = 0; i < drawLimitY; i += TRUE_LETTER_HEIGHT) // Whole window must be colored, as the window is not ensured to be empty (Otherwise, backspace and similar would not affect window)
-        for (int j = 0; j < drawLimitX; j += TRUE_LETTER_WIDTH)
+    double width = TRUE_LETTER_WIDTH * size;
+    double height = TRUE_LETTER_HEIGHT * size;
+    uint64_t drawLimitX = w.width - width;
+    uint64_t drawLimitY = w.height - height;
+    for (int i = 0; i < drawLimitY; i += height) // Whole window must be colored, as the window is not ensured to be empty (Otherwise, backspace and similar would not affect window)
+        for (int j = 0; j < drawLimitX; j += height)
         {
             if (string[index])
             {

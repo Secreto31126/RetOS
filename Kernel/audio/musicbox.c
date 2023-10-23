@@ -58,96 +58,96 @@ void imperial_march()
 
 void hes_a_pirate()
 {
-    beep(E3, 6);
-    beep(G3, 6);
-    beep(A3, 6);
+    beep(E3, 3);
+    beep(G3, 3);
+    beep(A3, 3);
     sleep_ticks(3);
-    beep(A3, 10);
+    beep(A3, 7);
 
-    beep(A3, 6);
-    beep(B3, 6);
-    beep(C4, 6);
+    beep(A3, 3);
+    beep(B3, 3);
+    beep(C4, 3);
     sleep_ticks(3);
-    beep(C4, 10);
+    beep(C4, 7);
 
-    beep(C4, 6);
-    beep(D4, 6);
-    beep(B3, 6);
+    beep(C4, 3);
+    beep(D4, 3);
+    beep(B3, 3);
     sleep_ticks(3);
-    beep(B3, 10);
+    beep(B3, 7);
 
-    beep(A3, 6);
-    beep(G3, 6);
-    beep(A3, 6);
+    beep(A3, 3);
+    beep(G3, 3);
+    beep(A3, 3);
 
     sleep_ticks(10);
 
-    beep(E3, 6);
-    beep(G3, 6);
-    beep(A3, 6);
+    beep(E3, 3);
+    beep(G3, 3);
+    beep(A3, 3);
     sleep_ticks(3);
-    beep(A3, 10);
+    beep(A3, 7);
 
-    beep(A3, 6);
-    beep(B3, 6);
-    beep(C4, 6);
+    beep(A3, 3);
+    beep(B3, 3);
+    beep(C4, 3);
     sleep_ticks(3);
-    beep(C4, 10);
+    beep(C4, 7);
 
-    beep(C4, 6);
-    beep(D4, 6);
-    beep(B3, 6);
+    beep(C4, 3);
+    beep(D4, 3);
+    beep(B3, 3);
     sleep_ticks(3);
-    beep(B3, 10);
+    beep(B3, 7);
 
-    beep(G3, 6);
-    beep(A3, 6);
+    beep(G3, 3);
+    beep(A3, 3);
 
     sleep_ticks(10);
 
-    beep(E3, 6);
-    beep(G3, 6);
-    beep(A3, 6);
+    beep(E3, 3);
+    beep(G3, 3);
+    beep(A3, 3);
     sleep_ticks(3);
-    beep(A3, 10);
+    beep(A3, 7);
 
-    beep(A3, 6);
-    beep(B3, 6);
-    beep(C4, 6);
+    beep(A3, 3);
+    beep(B3, 3);
+    beep(C4, 3);
     sleep_ticks(3);
-    beep(C4, 10);
+    beep(C4, 7);
 
-    beep(C4, 6);
-    beep(D4, 6);
-    beep(E4, 6);
+    beep(C4, 3);
+    beep(D4, 3);
+    beep(E4, 3);
     sleep_ticks(3);
-    beep(E4, 6);
+    beep(E4, 3);
 
-    beep(D4, 6);
-    beep(C4, 6);
-    beep(D4, 6);
-    beep(A3, 10);
+    beep(D4, 3);
+    beep(C4, 3);
+    beep(D4, 3);
+    beep(A3, 7);
 
     sleep_ticks(10);
 
-    beep(A3, 6);
-    beep(B3, 6);
-    beep(C4, 6);
+    beep(A3, 3);
+    beep(B3, 3);
+    beep(C4, 3);
     sleep_ticks(3);
-    beep(C4, 10);
+    beep(C4, 7);
 
-    beep(D4, 10);
+    beep(D4, 7);
     beep(E4, 4);
-    beep(A3, 10);
+    beep(A3, 7);
 
-    beep(A3, 6);
-    beep(C4, 6);
+    beep(A3, 3);
+    beep(C4, 3);
     beep(B3, 18);
     sleep_ticks(3);
-    beep(B3, 10);
-    beep(C4, 6);
-    beep(A3, 6);
-    beep(B3, 10);
+    beep(B3, 7);
+    beep(C4, 3);
+    beep(A3, 3);
+    beep(B3, 7);
 }
 
 void outer_wilds()

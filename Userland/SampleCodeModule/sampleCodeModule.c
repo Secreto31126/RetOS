@@ -2,8 +2,10 @@
 
 // char *v = (char *)0xB8000 + 79 * 2;
 #include "nstdlib/nstdlib.h"
-#include "window/window.h"
-#include "window/fontInterface.h"
+#include "shell/shell.h"
+#define SHELL_W 1024
+#define SHELL_H 768
+
 int main()
 {
 	/*
@@ -12,26 +14,7 @@ int main()
 	for (int i = 0; i < 10; i++)
 		printf("%c", getChar());
 	*/
-	char c;
-	initialize();
-	uint32_t width = getScreenHeight();
-	uint32_t height = getScreenWidth();
-	printf("w:%dh:%d", width, height);
-	char buffer[(width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH];
-	uint64_t index = 0;
-	HexColor pixels[width * height];
-	Window protoShell = getWindow(width, height, pixels);
-	while ((c = getChar()) != 'q')
-	{
-		printf("%c", c);
-		buffer[index++] = c;
-		buffer[index] = 0;
-		printf("In1");
-		drawStringToWindow(protoShell, buffer, 0x87654321, 0x12345678, 1.0);
-		printf("In2");
-		drawWindow(protoShell, 0, 0);
-		printf("In3");
-	}
+	printf("%c", shellStart() == 1);
 	return 0xDEADC0DE;
 	return 0xDEADBEEF;
 }

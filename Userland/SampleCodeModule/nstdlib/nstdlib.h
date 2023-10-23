@@ -11,8 +11,11 @@
 extern int print_sys(unsigned int fd, char *str, unsigned long long len);
 extern int read_sys(unsigned int fd, char *str, unsigned long long len);
 extern unsigned long long get_unix_time(void);
+extern void *malloc(uint64_t size);
+void free(void *ptr);
 
 // library
+void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize);
 char *utoa(unsigned int n, char *buffer, int radix);
 char *itoa(int n, char *buffer, int radix);
 char *ultoa(uint64_t ll, char *buffer, int radix);

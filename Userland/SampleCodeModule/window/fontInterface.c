@@ -37,7 +37,6 @@ char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor h
     for (double i = 0; i < drawLimitY; i += height) // Whole window must be colored, as the window is not ensured to be empty (Otherwise, backspace and similar would not affect window)
         for (double j = 0; j < drawLimitX; j += width)
         {
-            printf("j:%dw.width:%ddrawLimitX:%d\t", (int)j, w.width, drawLimitX);
             if (string[index])
             {
                 char *letter;
@@ -47,6 +46,7 @@ char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor h
                 index++;
             }
         }
+    printf("GotHere (God)");
     if (string[index])
         return 0;
     return 1;

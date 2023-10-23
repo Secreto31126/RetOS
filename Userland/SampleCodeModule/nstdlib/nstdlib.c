@@ -1,6 +1,17 @@
 #include "nstdlib.h"
 #define MAX_DIGITS_IN_LONG 20
 #define MAX_STDIN_STRING 256
+
+void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize)
+{
+    void *aux = malloc(newSize);
+    oldSize = oldSize > newSize ? newSize : oldSize;
+    for (uint64_t i = 0; i < oldSize; i++)
+        *((char *)(aux + i)) = *((char *)(ptr + i));
+    free(ptr);
+    return aux;
+}
+
 char *ultoa(unsigned long l, char *buffer, int radix)
 {
     char *toRet = buffer;

@@ -149,3 +149,95 @@ void hes_a_pirate()
     beep(A3, 6);
     beep(B3, 10);
 }
+
+void outer_wilds()
+{
+    beep(E3, 10);
+    beep(A3, 10);
+    beep(C4sus, 12);
+
+    beep(A3, 7);
+    beep(D4, 7);
+    beep(C4sus, 7);
+    beep(B3, 7);
+    beep(A3, 7);
+    beep(B3, 7);
+    beep(C4sus, 7);
+    beep(A3, 10);
+
+    beep(E3, 10);
+    beep(A3, 10);
+    beep(C4sus, 12);
+
+    beep(A3, 7);
+    beep(D4, 7);
+    beep(C4sus, 7);
+    beep(B3, 7);
+    beep(A3, 7);
+    beep(B3, 7);
+    beep(C4sus, 7);
+    beep(E4, 7);
+    beep(C4sus, 7);
+
+    beep(E3, 10);
+    beep(A3, 10);
+    beep(C4sus, 12);
+
+    beep(A3, 7);
+    beep(D4, 7);
+    beep(C4sus, 7);
+    beep(B3, 7);
+    beep(A3, 7);
+    beep(B3, 7);
+    beep(C4sus, 7);
+    beep(A3, 10);
+
+    beep(E3, 10);
+    beep(A3, 10);
+    beep(C4sus, 12);
+
+    beep(A3, 7);
+    beep(D4, 7);
+    beep(C4sus, 7);
+    beep(B3, 7);
+    beep(A3, 7);
+    beep(B3, 7);
+    beep(C4sus, 7);
+    beep(E4, 7);
+    beep(C4sus, 7);
+
+    beep(E4, 7);
+    beep(C4sus, 7);
+    beep(E4, 7);
+    beep(C4sus, 7);
+
+    beep(A3, 7);
+    beep(C4sus, 7);
+    beep(A3, 7);
+    beep(C4sus, 7);
+
+    beep(E4, 7);
+    beep(C4sus, 7);
+    beep(E4, 7);
+    beep(C4sus, 7);
+
+    beep(A3, 7);
+    beep(C4sus, 7);
+    beep(A3, 7);
+    beep(C4sus, 7);
+
+    beep(E4, 7);
+    beep(C4sus, 7);
+    beep(E4, 7);
+    beep(C4sus, 7);
+
+    beep(A3, 7);
+    beep(C4sus, 7);
+    beep(A3, 7);
+    beep(C4sus, 7);
+
+    beep(E4, 7);
+    beep(C4sus, 7);
+    beep(E4, 7);
+    beep(C4sus, 7);
+}

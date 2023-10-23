@@ -92,7 +92,7 @@ void *initializeKernelBinary()
 
 int main()
 {
-	hes_a_pirate();
+	outer_wilds();
 	drawShape(RetOSbackground, 0, 0, get_width(), get_height());
 
 	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());

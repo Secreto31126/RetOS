@@ -1,6 +1,8 @@
     global print_sys
 	global get_unix_time
     global read_sys
+    global draw
+    global get_screen_size
 
 ; int print_sys(unsigned int fd, char *str, size_t len);
 print_sys:

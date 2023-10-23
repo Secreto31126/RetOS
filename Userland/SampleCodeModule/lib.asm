@@ -20,3 +20,13 @@ get_unix_time:
 	shl rdx, 32
 	or rax, rdx
 	ret
+; uint64_t draw(HexColor *figure, uint64_t dimensions, uint64_t position)
+draw:
+    mov rax,333
+    int 80h
+    ret
+; uint64_t get_screen_size()
+get_screen_size:
+    mov rax, 337
+    int 80h
+    ret

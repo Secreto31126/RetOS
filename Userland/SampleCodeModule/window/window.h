@@ -42,5 +42,8 @@ uint64_t screenWidth();
 uint64_t screenHeight();
 HexColor *toHexArray(char *source, HexColor *result, int width, int height, int colorCount, ...);
 void drawFromHexArray(Window w, HexColor *source, int sourceWidth, int sourceHeight, int x, int y, double xScaleFactor, double yScaleFactor);
+uint64_t getScreenWidth();
+uint64_t getScreenHeight();
+uint64_t drawWindow(Window w, uint32_t x, uint32_t y);
 
 #endif

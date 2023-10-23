@@ -7,6 +7,9 @@
 #define GET_GREEN(x) (((x) >> 8) & 0xFF)
 #define GET_BLUE(x) ((x) & 0xFF)
 
+extern uint64_t get_screen_size();
+extern uint64_t draw(HexColor *figure, uint64_t dimensions, uint64_t position);
+
 int putPixelStd(Window w, HexColor color, uint64_t x, uint64_t y) // yes, a lot of this is essentially a paste from the kernel's driver. Proper isolation is still kept. Both systems of representing pixels are essentially the same (since we created both). The only communication between these systems is through syscalls, even if they look the same. We choose to create and manage a parallel window in userland to prevent repeated syscalls and because modelling a screen from a character array,bitmap,etc. in kernel was literally hardcoding graphics into the os. long comment goes brrr
 {
     if (x >= w.width || y >= w.height)
@@ -97,4 +100,17 @@ HexColor *toHexArray(char *source, HexColor *result, int width, int height, int 
                 result[j] = replacement;
     }
     return result;
+}
+
+uint64_t getScreenWidth()
+{
+    return (get_screen_size() >> 32) & 0xFFFFFFFF;
+}
+uint64_t getScreenHeight()
+{
+    return (get_screen_size()) & 0xFFFFFFFF;
+}
+uint64_t drawWindow(Window w, uint32_t x, uint32_t y)
+{
+    return draw(w.pixels, ((w.width << 32) & 0xFFFFFFFF00000000) | (w.height & 0xFFFFFFFF), ((x << 32) & 0xFFFFFFFF00000000) | (y & 0xFFFFFFFF))
 }

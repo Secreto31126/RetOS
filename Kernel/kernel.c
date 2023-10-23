@@ -91,7 +91,7 @@ void *initializeKernelBinary()
 
 int main()
 {
-	drawShape(RetOSbackground, 0, 0, get_width(), get_height());
+	// drawShape(RetOSbackground, 0, 0, get_width(), get_height());
 
 	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
 	ncNewline();

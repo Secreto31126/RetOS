@@ -18,17 +18,17 @@ typedef HexColor (*ShapeFunction)(int, int, int, int);
 
 typedef enum L_R_ALIGNMENT
 {
-    FIT_TO_SCREEN,
+    FIT_TO_SCREEN_L_R,
     ALIGN_LEFT,
     ALIGN_RIGHT,
-    ALIGN_CENTER
+    ALIGN_CENTER_L_R
 } L_R_ALIGNMENT;
 typedef enum T_B_ALIGNMENT
 {
-    FIT_TO_SCREEN,
+    FIT_TO_SCREEN_T_B,
     ALIGN_TOP,
     ALIGN_BOTTOM,
-    ALIGN_CENTER
+    ALIGN_CENTER_T_B
 } T_B_ALIGNMENT;
 
 typedef struct Window
@@ -44,6 +44,7 @@ HexColor *toHexArray(char *source, HexColor *result, int width, int height, int 
 void drawFromHexArray(Window w, HexColor *source, int sourceWidth, int sourceHeight, int x, int y, double xScaleFactor, double yScaleFactor);
 uint64_t getScreenWidth();
 uint64_t getScreenHeight();
-uint64_t drawWindow(Window w, uint32_t x, uint32_t y);
+uint64_t drawWindow(Window w, uint64_t x, uint64_t y);
+Window getWindow(uint64_t width, uint64_t height, HexColor *pixels);
 
 #endif

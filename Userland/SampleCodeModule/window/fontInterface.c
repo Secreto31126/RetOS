@@ -1,6 +1,7 @@
 #include "fontInterface.h"
 #include "fonts.h"
 #define FONT_COUNT 1
+#define ASCII_MAX 128
 typedef struct font
 {
     char *name;
@@ -20,7 +21,7 @@ void setFont(int fontNumber)
 }
 void initialize()
 {
-    loadFont("Default", Default, 0);
+    loadFont("Default", Classic, 0);
     setFont(0);
 }
 
@@ -36,7 +37,8 @@ char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor h
         {
             if (string[index])
             {
-                char letter[TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH] = currentFont.letters[string[index]]; // Surprisingly enough, this is correct
+                char *letter;
+                *letter = currentFont.letters[string[index] % ASCII_MAX]; // Surprisingly enough, this is correct
                 HexColor aux[TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH];
                 drawFromHexArray(w, toHexArray(letter, aux, TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, 2, highlightColor, letterColor), TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, j, i, size, size); // Arte.
             }

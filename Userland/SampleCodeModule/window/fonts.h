@@ -6,7 +6,7 @@
 #define TRUE_LETTER_HEIGHT ((LETTER_HEIGHT) + (BORDER_THICKNESS))
 #define LETTER_HEIGHT 13
 
-char Default[][TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH] = {
+static char Classic[][TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH] = {
 {{0, 0, 0, 0, 0, 0, 0, 0, },
 {0, 0, 0, 0, 0, 0, 0, 0, },
 {0, 0, 0, 0, 0, 0, 0, 0, },

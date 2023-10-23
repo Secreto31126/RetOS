@@ -10,6 +10,22 @@
 extern uint64_t get_screen_size();
 extern uint64_t draw(HexColor *figure, uint64_t dimensions, uint64_t position);
 
+uint8_t mergeOneColor(uint8_t background, uint8_t overlay, uint8_t opacity)
+{
+    if (!opacity)
+        return background;
+    double op = (double)opacity / 0xFF;
+    return (background * (1 - op) + overlay * op) / 2;
+}
+uint64_t mergeColor(HexColor background, uint64_t overlay)
+{
+    uint8_t op = GET_OPACITY(overlay);
+    return GET_HEX(0xFF,
+                   mergeOneColor(GET_RED(background), GET_RED(overlay), op),
+                   mergeOneColor(GET_GREEN(background), GET_GREEN(overlay), op),
+                   mergeOneColor(GET_BLUE(background), GET_BLUE(overlay), op));
+}
+
 int putPixelStd(Window w, HexColor color, uint64_t x, uint64_t y) // yes, a lot of this is essentially a paste from the kernel's driver. Proper isolation is still kept. Both systems of representing pixels are essentially the same (since we created both). The only communication between these systems is through syscalls, even if they look the same. We choose to create and manage a parallel window in userland to prevent repeated syscalls and because modelling a screen from a character array,bitmap,etc. in kernel was literally hardcoding graphics into the os. long comment goes brrr
 {
     if (x >= w.width || y >= w.height)
@@ -29,28 +45,6 @@ int putPixel(Window w, HexColor color, uint64_t x, uint64_t y)
 {
     return putPixelStd(w, color, x, y);
 }
-
-uint64_t mergeColor(HexColor background, uint64_t overlay)
-{
-    uint8_t op = GET_OPACITY(overlay);
-    return GET_HEX(0xFF,
-                   mergeOneColor(GET_RED(background), GET_RED(overlay), op),
-                   mergeOneColor(GET_GREEN(background), GET_GREEN(overlay), op),
-                   mergeOneColor(GET_BLUE(background), GET_BLUE(overlay), op));
-}
-uint8_t mergeOneColor(uint8_t background, uint8_t overlay, uint8_t opacity)
-{
-    if (!opacity)
-        return background;
-    double op = (double)opacity / 0xFF;
-    return (background * (1 - op) + overlay * op) / 2;
-}
-
-void drawShape(Window w, ShapeFunction f, int x, int y, int xRange, int yRange)
-{
-    drawScaledShape(w, f, x, y, xRange, yRange, 1, 1);
-}
-
 void drawScaledShape(Window w, ShapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor)
 {
     if (!xScaleFactor || !yScaleFactor)
@@ -65,6 +59,10 @@ void drawScaledShape(Window w, ShapeFunction f, int x, int y, int xRange, int yR
                 putPixel(w, r, x + j, y + i);
         }
     }
+}
+void drawShape(Window w, ShapeFunction f, int x, int y, int xRange, int yRange)
+{
+    drawScaledShape(w, f, x, y, xRange, yRange, 1, 1);
 }
 
 void drawFromHexArray(Window w, HexColor *source, int sourceWidth, int sourceHeight, int x, int y, double xScaleFactor, double yScaleFactor)
@@ -110,7 +108,15 @@ uint64_t getScreenHeight()
 {
     return (get_screen_size()) & 0xFFFFFFFF;
 }
-uint64_t drawWindow(Window w, uint32_t x, uint32_t y)
+uint64_t drawWindow(Window w, uint64_t x, uint64_t y)
 {
-    return draw(w.pixels, ((w.width << 32) & 0xFFFFFFFF00000000) | (w.height & 0xFFFFFFFF), ((x << 32) & 0xFFFFFFFF00000000) | (y & 0xFFFFFFFF))
+    return draw(w.pixels, ((w.width >> 32) & 0xFFFFFFFF00000000) | (w.height & 0xFFFFFFFF), ((x >> 32) & 0xFFFFFFFF00000000) | (y & 0xFFFFFFFF));
+}
+Window getWindow(uint64_t width, uint64_t height, HexColor *pixels)
+{
+    Window ans;
+    ans.width = width;
+    ans.height = height;
+    ans.pixels = pixels;
+    return ans;
 }

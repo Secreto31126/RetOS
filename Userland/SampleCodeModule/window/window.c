@@ -70,11 +70,11 @@ void drawFromHexArray(Window w, HexColor *source, int sourceWidth, int sourceHei
         return;
     xScaleFactor /= 1; // scaleFactor 2 means one pixel in source represents two pixels in window
     yScaleFactor /= 1;
-    for (double i = 0; i < sourceHeight && i < w.height; i += yScaleFactor)
+    for (double i = 0; i + y < sourceHeight && i < w.height; i += yScaleFactor)
     {
-        for (double j = 0; j < sourceWidth && j < w.width; j += xScaleFactor)
+        for (double j = 0; j + x < sourceWidth && j < w.width; j += xScaleFactor)
         {
-            putPixel(w, source[((int)(i + 0.5)) * sourceWidth + ((int)(j + 0.5))], i, j); // source pointers rounded to nearest integer
+            putPixel(w, source[((int)(i + y + 0.5)) * sourceWidth + ((int)(j + x + 0.5))], i, j); // source pointers rounded to nearest integer
         }
     }
 }

@@ -75,11 +75,11 @@ uint64_t write(uint64_t fd, const char *buffer, uint64_t count)
 
 uint64_t draw(HexColor *figure, uint64_t dimensions, uint64_t position)
 {
-    uint32_t width = dimensions >> 16 & 0xFFFF;
-    uint32_t height = dimensions & 0xFFFF;
+    uint32_t width = dimensions >> 32 & 0xFFFFFFFF;
+    uint32_t height = dimensions & 0xFFFFFFFF;
 
-    uint32_t x = position >> 16 & 0xFFFF;
-    uint32_t y = position & 0xFFFF;
+    uint32_t x = position >> 32 & 0xFFFFFFFF;
+    uint32_t y = position & 0xFFFFFFFF;
 
     return drawFromArray(figure, width, height, x, y);
 }

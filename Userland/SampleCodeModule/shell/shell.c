@@ -6,6 +6,13 @@
 
 char shellStart()
 {
+
+    HexColor testPixels[900];
+    for (int i = 0; i < 900; i++)
+        testPixels[i] = 0xFFFFFFFF;
+    Window testW = getWindow(30, 30, testPixels);
+    drawWindow(testW, 10, 10);
+
     char c;
     initialize();
     uint32_t width = 1024;

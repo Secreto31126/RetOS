@@ -46,7 +46,6 @@ char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor h
                 index++;
             }
         }
-    printf("GotHere (God)");
     if (string[index])
         return 0;
     return 1;

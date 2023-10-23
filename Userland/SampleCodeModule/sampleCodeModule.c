@@ -14,18 +14,23 @@ int main()
 	*/
 	char c;
 	initialize();
-	uint64_t width = getScreenHeight();
-	uint64_t height = getScreenWidth();
+	uint32_t width = getScreenHeight();
+	uint32_t height = getScreenWidth();
+	printf("w:%dh:%d", width, height);
 	char buffer[(width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH];
 	uint64_t index = 0;
 	HexColor pixels[width * height];
 	Window protoShell = getWindow(width, height, pixels);
-	while ((c = getChar()))
+	while ((c = getChar()) != 'q')
 	{
+		printf("%c", c);
 		buffer[index++] = c;
 		buffer[index] = 0;
-		drawStringToWindow(protoShell, buffer, 0xFFFFFFFF, 0x00000000, 1);
-		drawWindow(protoShell, width, height);
+		printf("In1");
+		drawStringToWindow(protoShell, buffer, 0x87654321, 0x12345678, 1.0);
+		printf("In2");
+		drawWindow(protoShell, 0, 0);
+		printf("In3");
 	}
 	return 0xDEADC0DE;
 	return 0xDEADBEEF;

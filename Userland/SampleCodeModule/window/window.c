@@ -102,7 +102,7 @@ HexColor *toHexArray(char *source, HexColor *result, int width, int height, int 
 
 uint64_t getScreenWidth()
 {
-    return (get_screen_size() >> 32) & 0xFFFFFFFF;
+    return (get_screen_size() >> 32);
 }
 uint64_t getScreenHeight()
 {
@@ -110,7 +110,7 @@ uint64_t getScreenHeight()
 }
 uint64_t drawWindow(Window w, uint64_t x, uint64_t y)
 {
-    return draw(w.pixels, ((w.width >> 32) & 0xFFFFFFFF00000000) | (w.height & 0xFFFFFFFF), ((x >> 32) & 0xFFFFFFFF00000000) | (y & 0xFFFFFFFF));
+    return draw(w.pixels, ((w.width >> 16) & 0xFFFFFFFF00000000) | (w.height & 0xFFFFFFFF), ((x >> 16) & 0xFFFFFFFF00000000) | (y & 0xFFFFFFFF));
 }
 Window getWindow(uint64_t width, uint64_t height, HexColor *pixels)
 {

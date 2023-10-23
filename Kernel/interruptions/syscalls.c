@@ -112,5 +112,5 @@ uint64_t get_time()
 
 uint64_t get_screen_size()
 {
-    return get_width() << 32 + get_height();
+    return get_width() << 16 + get_height();
 }

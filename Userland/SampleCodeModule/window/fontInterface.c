@@ -32,7 +32,7 @@ char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor h
     uint64_t drawLimitX = w.width - width;
     uint64_t drawLimitY = w.height - height;
     for (int i = 0; i < drawLimitY; i += height) // Whole window must be colored, as the window is not ensured to be empty (Otherwise, backspace and similar would not affect window)
-        for (int j = 0; j < drawLimitX; j += height)
+        for (int j = 0; j < drawLimitX; j += width)
         {
             if (string[index])
             {

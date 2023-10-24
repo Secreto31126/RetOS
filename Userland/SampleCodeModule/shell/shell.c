@@ -13,7 +13,6 @@ char shellStart()
     char buffer[(width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH];
     uint64_t index = 0;
     HexColor *pixels = malloc((width * height * sizeof(HexColor)));
-    pixels = 0x18000000;
     Window protoShell = getWindow(width, height, pixels);
     while ((c = getChar()) != 'q')
     {
@@ -22,5 +21,6 @@ char shellStart()
         drawStringToWindow(protoShell, buffer, 0xFFFF0000, 0xFF00FF00, 1.0);
         drawWindow(protoShell, 0, 0);
     }
+    free(pixels);
     return 1;
 }

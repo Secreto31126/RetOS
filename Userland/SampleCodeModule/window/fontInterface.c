@@ -25,7 +25,9 @@ void initialize()
     loadFont("Default", Classic, 0);
     setFont(0);
 }
-
+/**
+ * @deprecated drawCharToWindow has more finesse (and can carry a paint bucket)
+ */
 char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor highlightColor, double size)
 {
     int index = 0;
@@ -44,8 +46,20 @@ char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor h
                 drawFromHexArray(w, toHexArray(letter, aux, TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, 2, highlightColor, letterColor), TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, (int)(j + 0.5), (int)(i + 0.5), size, size); // Arte.
                 index++;
             }
+            else
+            {
+                // If we had bothered to finish this function, it would fill the rest of the window in black. We did not. We also did not erase it, it is a decent reference.
+            }
         }
     if (string[index])
         return 0;
     return 1;
+}
+
+// Whole window will not be colored. Shell must handle backspace and whatnot (Literally just draw an ascii value that is all zeroes (such as '\b'), then reduce index).
+// Char will be automatically scaled to fit the window, this works weirdly thus far, but probably won't in the future.
+void drawCharToWindow(Window w, char c, HexColor letterColor, HexColor highlightColor)
+{
+    HexColor aux[TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH];
+    drawFromHexArray(w, toHexArray((currentFont->letters) + ((int)c % ASCII_MAX) * TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH, aux, TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, 2, highlightColor, letterColor), TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, 0, 0, (double)w.width / TRUE_LETTER_WIDTH, (double)w.width / TRUE_LETTER_HEIGHT); // Variables auxiliares? Legibilidad? Couldn't be me.
 }

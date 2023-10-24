@@ -52,7 +52,7 @@ uint64_t drawFromArray(HexColor *array, uint32_t width, uint32_t height, uint32_
     {
         for (uint32_t j = 0; j < width && j < VBE_mode_info->width; j++)
         {
-            drawn += putPixel(array[j + i * height], x + j, y + i);
+            drawn += putPixel(array[j + i * width], x + j, y + i);
         }
     }
 

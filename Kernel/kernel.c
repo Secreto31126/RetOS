@@ -98,8 +98,6 @@ int main()
 
 	ncPrint((char *)sampleDataModuleAddress);
 	ncNewline();
-	ncPrint("In Kernel");
-	ncPrintHex(malloc_test());
 
 	return 0;
 }

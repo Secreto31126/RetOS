@@ -8,8 +8,8 @@ char shellStart()
 {
     char c;
     initialize();
-    uint32_t width = 1024; // getWidth();
-    uint32_t height = 768; // getHeight();
+    uint32_t width = getScreenWidth();
+    uint32_t height = getScreenHeight();
     char buffer[(width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH];
     uint64_t index = 0;
     HexColor *pixels = malloc((width * height * sizeof(HexColor)));

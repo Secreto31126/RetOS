@@ -6,6 +6,11 @@
 #define NULL ((void *)0)
 
 /**
+ * @brief Initializes the memory manager.
+ */
+void init_memory_manager();
+
+/**
  * @brief Reserves a block of memory of the given size.
  *
  * @param size The size of the block to reserve. Returns NULL if size is 0 or over 0x8000.

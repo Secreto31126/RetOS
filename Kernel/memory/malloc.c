@@ -16,12 +16,18 @@ void *malloc(uint32_t size)
             continue;
         }
 
-        for (uint64_t i = 0; map + i * sizeof(map_entry) < heap_start && !map[i]; i++)
+        for (uint64_t i = 1; map + i < heap_start; i++)
         {
             if (i * sizeof(map_entry) >= size)
             {
-                *map_start = size * sizeof(map_entry);
-                return map_start + map_size;
+                *map = i * sizeof(map_entry);
+                return (void *)map + map_size;
+            }
+
+            if (map[i])
+            {
+                map += i;
+                break;
             }
         }
     }

@@ -22,7 +22,6 @@ void setFont(int fontNumber)
 }
 void initialize()
 {
-    return;
     loadFont("Default", Classic, 0);
     setFont(0);
 }
@@ -40,7 +39,7 @@ char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor h
             if (string[index])
             {
                 char *letter;
-                *letter = currentFont->letters[string[index] % ASCII_MAX]; // Surprisingly enough, this is correct
+                letter = (currentFont->letters) + ((int)string[index] % ASCII_MAX) * TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH; // Surprisingly enough, this is correct
                 HexColor aux[TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH];
                 drawFromHexArray(w, toHexArray(letter, aux, TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, 2, highlightColor, letterColor), TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, (int)(j + 0.5), (int)(i + 0.5), size, size); // Arte.
                 index++;

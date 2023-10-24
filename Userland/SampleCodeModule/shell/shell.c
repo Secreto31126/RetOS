@@ -45,11 +45,8 @@ char shellStart()
         printf("%c", c);
         buffer[index++] = c;
         buffer[index] = 0;
-        printf("In1");
         drawStringToWindow(protoShell, buffer, 0xFFFF0000, 0xFF00FF00, 1.0);
-        printf("In2");
         drawWindow(protoShell, 0, 0);
-        printf("In3");
     }
     return 1;
 }

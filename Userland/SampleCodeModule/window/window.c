@@ -15,7 +15,7 @@ uint8_t mergeOneColor(uint8_t background, uint8_t overlay, uint8_t opacity)
     if (!opacity)
         return background;
     double op = (double)opacity / 0xFF;
-    return (background * (1 - op) + overlay * op) / 2;
+    return (background * (1 - op) + overlay * op);
 }
 uint64_t mergeColor(HexColor background, uint64_t overlay)
 {
@@ -69,14 +69,18 @@ void drawFromHexArray(Window w, HexColor *source, int sourceWidth, int sourceHei
 {
     if (!xScaleFactor || !yScaleFactor)
         return;
-    xScaleFactor /= 1; // scaleFactor 2 means one pixel in source represents two pixels in window
-    yScaleFactor /= 1;
-    for (double i = 0; i + y < sourceHeight && i < w.height; i += yScaleFactor)
+    xScaleFactor = 1 / xScaleFactor; // scaleFactor 2 means one pixel in source represents two pixels in window
+    yScaleFactor = 1 / yScaleFactor;
+    uint64_t xIndex, yIndex = y;
+    for (double i = 0; i < sourceHeight && yIndex < w.height; i += yScaleFactor)
     {
-        for (double j = 0; j + x < sourceWidth && j < w.width; j += xScaleFactor)
+        xIndex = x;
+        for (double j = 0; j < sourceWidth && xIndex < w.width; j += xScaleFactor)
         {
-            putPixel(w, source[((int)(i + y + 0.5)) * sourceWidth + ((int)(j + x + 0.5))], i, j); // source pointers rounded to nearest integer
+            putPixel(w, source[((int)(i + 0.5)) * sourceWidth + ((int)(j + 0.5))], xIndex, yIndex); // source pointers rounded to nearest integer
+            xIndex++;
         }
+        yIndex++;
     }
 }
 /**

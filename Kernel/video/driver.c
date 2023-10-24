@@ -39,7 +39,7 @@ uint8_t mergeColor(uint8_t background, uint8_t overlay, uint8_t opacity)
     if (!opacity)
         return background;
     double op = (double)opacity / 0xFF;
-    return (background * (1 - op) + overlay * op) / 2;
+    return (background * (1 - op) + overlay * op);
 }
 
 uint64_t drawFromArray(HexColor *array, uint32_t width, uint32_t height, uint32_t x, uint32_t y)

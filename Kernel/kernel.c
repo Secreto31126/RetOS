@@ -88,7 +88,7 @@ void *initializeKernelBinary()
 
 	return getStackBase();
 }
-
+extern uint64_t malloc_test();
 int main()
 {
 	// drawShape(RetOSbackground, 0, 0, get_width(), get_height());
@@ -98,6 +98,8 @@ int main()
 
 	ncPrint((char *)sampleDataModuleAddress);
 	ncNewline();
+	ncPrint("In Kernel");
+	ncPrintHex(malloc_test());
 
 	return 0;
 }

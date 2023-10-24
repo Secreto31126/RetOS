@@ -16,16 +16,20 @@ char shellStart()
             printf("%d|", *i);
     printf("Done\n");
     */
-
-    HexColor *testPixels = malloc(900 * sizeof(HexColor));
-    printf("testPixels: %l", testPixels);
+    /*
+        HexColor *testPixels = malloc(900 * sizeof(HexColor));
+        // HexColor *testPixels = 0x10000000;
+        printf("testPixels: %l", testPixels);
+        for (int i = 0; i < 900; i++)
+            testPixels[i] = 0xFFFFFFFF;
+        for (int i = 0; i < 900; i++)
+            printf("%l", testPixels[i]);
+*/
+    HexColor *testPixels = 0x18000000;
     for (int i = 0; i < 900; i++)
         testPixels[i] = 0xFFFFFFFF;
-    for (int i = 0; i < 900; i++)
-        printf("%l|", testPixels[i]);
     Window testW = getWindow(30, 30, testPixels);
-    drawWindow(testW, 10, 10);
-    return 0;
+    drawWindow(testW, 0, 0);
 
     char c;
     initialize();
@@ -34,6 +38,7 @@ char shellStart()
     char buffer[(width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH];
     uint64_t index = 0;
     HexColor pixels = malloc((width * height * sizeof(HexColor)));
+    pixels = 0x18000000;
     Window protoShell = getWindow(width, height, pixels);
     while ((c = getChar()) != 'q')
     {
@@ -41,7 +46,7 @@ char shellStart()
         buffer[index++] = c;
         buffer[index] = 0;
         printf("In1");
-        drawStringToWindow(protoShell, buffer, 0x87654321, 0x12345678, 1.0);
+        drawStringToWindow(protoShell, buffer, 0xFFFF0000, 0xFF00FF00, 1.0);
         printf("In2");
         drawWindow(protoShell, 0, 0);
         printf("In3");

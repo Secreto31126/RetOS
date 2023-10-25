@@ -19,7 +19,7 @@ signed int parseDirY(DIRECTION dir);
 void killSnake(unsigned int identifier);
 void growSnake(unsigned int identifier);
 void makeApple();
-
+static int snakeC;
 void setBoard(int snakeCount)
 {
     objects = 0;
@@ -83,16 +83,16 @@ unsigned int update()
                     int nextX = j + parseDirX(snakes[lookingAt.identifier - 1].direction);
                     int nextY = i + parseDirY(snakes[lookingAt.identifier - 1].direction);
 
+                    char aux[10];
+                    paintString(itoa(nextX, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
+                    paintString("|", 0xFFFFFFFF, 0xFF00FFFF);
+                    paintString(itoa(nextY, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
+                    paintString("|", 0xFFFFFFFF, 0xFF00FFFF);
+                    paintString(itoa(i, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
+                    paintString("|", 0xFFFFFFFF, 0xFF00FFFF);
+                    paintString(itoa(j, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
                     if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].identifier != EMPTY && board[nextY][nextX].identifier != APPLE))
                     {
-                        char aux[10];
-                        paintString(itoa(nextX, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
-                        paintString("|", 0xFFFFFFFF, 0xFF00FFFF);
-                        paintString(itoa(nextY, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
-                        paintString("|", 0xFFFFFFFF, 0xFF00FFFF);
-                        paintString(itoa(i, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
-                        paintString("dir:", 0xFFFFFFFF, 0xFF00FFFF);
-                        paintString(itoa(snakes[lookingAt.identifier - 1].direction, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
                         killSnake(lookingAt.identifier);
                         toReturn = lookingAt.identifier;
                     }
@@ -103,7 +103,7 @@ unsigned int update()
                             growSnake(lookingAt.identifier);
                             makeApple();
                         }
-                        board[nextY][nextX].identifier = lookingAt.identifier;
+                        board[nextY][nextX].identifier = HEAD;
                         DIRECTION aux = snakes[lookingAt.identifier - 1].direction;
                         board[nextY][nextX].health = snakes[lookingAt.identifier - 1].length + (aux == RIGHT || aux == DOWN) ? 1 : 0; // board is analyzed left-right and up-down. A newly created head to the right or down will be shrunk incorrectly otherwise
                         snakes[lookingAt.identifier - 1].moved = 1;                                                                   // ensures no snake moves twice in a turn
@@ -126,14 +126,14 @@ unsigned int update()
                 board[i][j].toDraw = NO_DRAW;
             }
         }
-    for (int i = 0; i < PLAYER_COUNT; i++)
+    for (int i = 0; i < snakeC; i++)
         snakes[i].moved = 0; // resets all snake movements
     return toReturn;         // identifier of dead snake, or 0
 }
 
 char isHead(unsigned int identifier, unsigned int health)
 {
-    return identifier != EMPTY && identifier != APPLE && (snakes[(identifier - 1) % PLAYER_COUNT].length == health);
+    return identifier != EMPTY && identifier != APPLE && (snakes[(identifier - 1) % snakeC].length == health);
 }
 char isTail(unsigned int identifier, unsigned int health)
 {

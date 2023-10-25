@@ -33,11 +33,6 @@ void newLine()
 }
 char paintChar(char c, HexColor letterColor, HexColor highlightColor)
 {
-    if (!yPointer && !xPointer)
-    {
-        newLine();
-        paintString(lineStart, 0xFFFFFFFF, 0xFF000000);
-    }
     if (c == '\b')
     {
         if (xPointer <= 0) // currently can't backspace linebreaks. Also shouldn't be able to backspace through line starters, but shell should handle that.

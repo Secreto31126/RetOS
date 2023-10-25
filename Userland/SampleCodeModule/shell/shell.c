@@ -17,10 +17,20 @@ char shellStart()
     // Window protoShell = getWindow(width, height, pixels);
     startPainter(width, height);
     setSize(1.0);
-    setLineStart(":~");
+    static char lineStart[3] = ":~";
+    setLineStart(lineStart);
+    paintString("You are now in shell:\n", 0xFFFFFFFF, 0xFFFF00FF);
     while ((c = getChar()) != 'q')
     {
-        buffer[index++] = c;
+        if (c == '\b')
+        {
+            if (strcmp(buffer + index - strlen(lineStart) + 1, lineStart))
+                continue;
+            else
+                index--;
+        }
+        else
+            buffer[index++] = c;
         buffer[index] = 0;
         paintChar(c, 0xFFFFFFFF, 0xFF000000);
         // drawStringToWindow(protoShell, buffer, 0xFFFFFFFF, 0xFF101010, 1.0);

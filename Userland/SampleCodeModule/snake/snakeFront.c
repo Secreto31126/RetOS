@@ -1,6 +1,6 @@
 #include "snake.h"
 #include "snakePrivate.h"
-#define MOVE_INTERVAL 100
+#define MOVE_INTERVAL 1
 
 typedef struct frontSnake
 {
@@ -8,13 +8,9 @@ typedef struct frontSnake
 } frontSnake;
 void doMovement(char c, frontSnake *snakes);
 void putDeath(int snakeNumber);
-uint64_t getTime()
-{
-    return 0;
-}
 char timeHasPassed(uint64_t start, uint64_t unit)
 {
-    return (getTime() - start) > unit;
+    return (get_tick() - start) > unit;
 }
 int playSnake(uint16_t snakeCount)
 {
@@ -26,18 +22,20 @@ int playSnake(uint16_t snakeCount)
     char gameOver = 0;
     int deadSnake = 0;
     uint16_t deathCount = 0;
-    uint64_t time = getTime();
+    uint64_t time = get_tick();
     frontSnake *snakes = malloc(snakeCount * sizeof(frontSnake));
+    startPainter(getScreenWidth(), getScreenHeight());
     while (!gameOver)
     {
         char c;
-        while (!(c = readChar()))
+        while ((c = readChar()))
         {
             doMovement(c, snakes);
         }
         if (timeHasPassed(time, MOVE_INTERVAL))
         {
-            time = getTime();
+            paintChar('i', 0xFFFF0000, 0xFF00FF00);
+            time = get_tick();
             for (int i = 0; i < snakeCount; i++)
                 setDirection(i, snakes[i].nextMove);
             deadSnake = update();
@@ -74,6 +72,14 @@ int playSnake(uint16_t snakeCount)
                     }
                     toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, 0xFF00FF00, 0xFFFF0000);
                     drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
+                    paintChar('h', -1, 0);
+                    break;
+                case TAIL:
+                case BODY:
+                    source = classicOther;
+                    toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, 0xFF00FF00, 0xFFFF0000);
+                    drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
+                    paintChar('b', -1, 0);
                     break;
                 case NO_DRAW:
                 default:

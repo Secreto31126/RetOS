@@ -15,7 +15,7 @@ typedef struct snakeDrawing
     char *tRTurn;
 } snakeDrawing;
 
-char classicHeadUp[DRAW_SIZE][DRAW_SIZE] = {
+static char classicHeadUp[DRAW_SIZE][DRAW_SIZE] = {
     {0},
     {0},
     {0},
@@ -28,7 +28,7 @@ char classicHeadUp[DRAW_SIZE][DRAW_SIZE] = {
     {0},
     {0},
     {0}};
-char classicHeadDown[DRAW_SIZE][DRAW_SIZE] = {
+static char classicHeadDown[DRAW_SIZE][DRAW_SIZE] = {
     {0},
     {0},
     {0},
@@ -41,7 +41,7 @@ char classicHeadDown[DRAW_SIZE][DRAW_SIZE] = {
     {0},
     {0},
     {0}};
-char classicHeadRight[DRAW_SIZE][DRAW_SIZE] = {
+static char classicHeadRight[DRAW_SIZE][DRAW_SIZE] = {
     {0},
     {0},
     {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
@@ -54,7 +54,7 @@ char classicHeadRight[DRAW_SIZE][DRAW_SIZE] = {
     {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
     {0},
     {0}};
-char classicHeadLeft[DRAW_SIZE][DRAW_SIZE] = {
+static char classicHeadLeft[DRAW_SIZE][DRAW_SIZE] = {
     {0},
     {0},
     {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
@@ -67,6 +67,6 @@ char classicHeadLeft[DRAW_SIZE][DRAW_SIZE] = {
     {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
     {0},
     {0}};
-char classicOther[DRAW_SIZE][DRAW_SIZE] = {{0}};
+static char classicOther[DRAW_SIZE][DRAW_SIZE] = {{0}};
 
 #endif

@@ -15,7 +15,7 @@ int main()
 	for (int i = 0; i < 10; i++)
 		printf("%c", getChar());
 	*/
-	// printf("%c", shellStart() == 1);
+	printf("%c", shellStart() == 1);
 	printf("%c", playSnake(1));
 	printf("In sample");
 	return 0xDEADC0DE;

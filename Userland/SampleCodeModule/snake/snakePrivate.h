@@ -7,7 +7,6 @@
 
 typedef enum DIRECTION
 {
-    NONE,
     LEFT,
     RIGHT,
     UP,
@@ -49,5 +48,6 @@ void setDirection(unsigned int playerNumber, DIRECTION direction);
 tile *getBoard();
 snake *getSnakes();
 unsigned int update();
+extern uint64_t get_tick();
 
 #endif

@@ -4,6 +4,7 @@
 #include "./../window/window.h"
 #include "./../window/fontInterface.h"
 #include "./../window/painter.h"
+#include "./../snake/random.h"
 
 char shellStart()
 {
@@ -23,6 +24,8 @@ char shellStart()
     char leaving = 0;
     while ((c = getChar()) != 'q' || !leaving)
     {
+        if (c != 'q')
+            setSeed(c);
         if (c == 'q')
             leaving = 1;
         else

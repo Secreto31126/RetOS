@@ -40,8 +40,9 @@ void setBoard(int snakeCount)
             board[0][j].toDraw = SHEEP;
         }
     }
-    for (int i = 1; i <= PLAYER_COUNT; i++)
+    for (int i = 1; i <= snakeCount; i++)
     {
+        paintChar("p", -1, 0);
         unsigned int pos = randBetween(0, boardSizeNoMargins - i - APPLE_COUNT); // no objects will be placed on edges on setting board.
         unsigned int j = getNthEmpty(pos);
         if (j < boardSizeNoMargins)
@@ -82,8 +83,16 @@ unsigned int update()
                     int nextX = j + parseDirX(snakes[lookingAt.identifier - 1].direction);
                     int nextY = i + parseDirY(snakes[lookingAt.identifier - 1].direction);
 
-                    if (nextX < 0 || nextX > (BOARD_WIDTH - 1) || nextY < 0 || nextY > (BOARD_HEIGHT - 1) || (board[nextY][nextX].identifier != EMPTY && board[nextY][nextX].identifier != APPLE))
+                    if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].identifier != EMPTY && board[nextY][nextX].identifier != APPLE))
                     {
+                        char aux[10];
+                        paintString(itoa(nextX, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
+                        paintString("|", 0xFFFFFFFF, 0xFF00FFFF);
+                        paintString(itoa(nextY, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
+                        paintString("|", 0xFFFFFFFF, 0xFF00FFFF);
+                        paintString(itoa(i, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
+                        paintString("dir:", 0xFFFFFFFF, 0xFF00FFFF);
+                        paintString(itoa(snakes[lookingAt.identifier - 1].direction, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
                         killSnake(lookingAt.identifier);
                         toReturn = lookingAt.identifier;
                     }

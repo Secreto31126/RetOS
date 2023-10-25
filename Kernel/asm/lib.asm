@@ -169,7 +169,6 @@ dump_reg_string0C: db 'R12:'
 dump_reg_string0D: db 'R13:'
 dump_reg_string0E: db 'R14:'
 dump_reg_string0F: db 'R15:'
-hextable: 		db '0123456789ABCDEF'
 
 	section .bss
 ; extern char dump_reg_string[340];

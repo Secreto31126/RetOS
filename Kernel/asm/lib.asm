@@ -171,5 +171,5 @@ dump_reg_string0E: db 'R14:'
 dump_reg_string0F: db 'R15:'
 
 	section .bss
-; extern char dump_reg_string[340];
-dump_reg_string: resb 340
+; extern char dump_reg_string[360];
+dump_reg_string: resb 360

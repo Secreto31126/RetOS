@@ -15,7 +15,7 @@
     global cascade_pic
     global even_ports_handler
     global odd_ports_handler
-    global usb_pic
+    global usb_handler
 
     global syscall_handler
 
@@ -71,8 +71,8 @@ even_ports_handler:
 odd_ports_handler:
 	master_pic_handler 4
 
-; void usb_pic(void);
-usb_pic:
+; void usb_handler(void);
+usb_handler:
 	master_pic_handler 5
 
 ; uint64_t syscall_handler(void);

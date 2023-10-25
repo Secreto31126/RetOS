@@ -1,8 +1,7 @@
 #include "painter.h"
-
+#define LINE_START_MAX 20
 static double size = 1.0, maxLineSize = 1.0;
-char aux[1] = {0};
-static char *lineStart = aux;
+static char *lineStart;
 static uint64_t w, h, xPointer = 0, yPointer = 0;
 static Window stamp;
 
@@ -14,7 +13,7 @@ void startPainter(uint64_t width, uint64_t height)
 }
 void setSize(double s)
 {
-    if (strlen(lineStart) * TRUE_LETTER_WIDTH * size < w) // lineStart cannot occupy more than a line
+    // if (strlen(lineStart) * TRUE_LETTER_WIDTH * s < w) // lineStart cannot occupy more than a line
     {
         size = s;
         if (s > maxLineSize)
@@ -23,7 +22,7 @@ void setSize(double s)
 }
 void setLineStart(char *start)
 {
-    if (strlen(lineStart) * TRUE_LETTER_WIDTH * size < w)
+    if ((strlen(start) * TRUE_LETTER_WIDTH * size) < w)
         lineStart = start;
 }
 void newLine()
@@ -34,6 +33,11 @@ void newLine()
 }
 char paintChar(char c, HexColor letterColor, HexColor highlightColor)
 {
+    if (!yPointer && !xPointer)
+    {
+        newLine();
+        paintString(lineStart, 0xFFFFFFFF, 0xFF000000);
+    }
     if (c == '\b')
     {
         if (xPointer <= 0) // currently can't backspace linebreaks. Also shouldn't be able to backspace through line starters, but shell should handle that.
@@ -43,6 +47,7 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
             drawCharToWindow(stamp, 0, 0xFF000000, 0xFF000000);
             xPointer -= TRUE_LETTER_WIDTH * size;
             drawWindow(stamp, xPointer, yPointer);
+            return 1;
         }
     }
     if ((xPointer + TRUE_LETTER_WIDTH * size) > w || c == '\n')
@@ -61,7 +66,7 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
 }
 char paintString(char *c, HexColor letterColor, HexColor highlightColor)
 {
-    while (*c && paintChar(c, letterColor, highlightColor))
+    while (*c && paintChar(*c, letterColor, highlightColor))
     {
         c++;
     }

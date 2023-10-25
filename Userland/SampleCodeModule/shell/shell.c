@@ -16,8 +16,8 @@ char shellStart()
     // HexColor *pixels = malloc((width * height * sizeof(HexColor)));
     // Window protoShell = getWindow(width, height, pixels);
     startPainter(width, height);
-    setLineStart(">-");
     setSize(1.0);
+    setLineStart(":~");
     while ((c = getChar()) != 'q')
     {
         buffer[index++] = c;

@@ -3,6 +3,7 @@
 // char *v = (char *)0xB8000 + 79 * 2;
 #include "nstdlib/nstdlib.h"
 #include "shell/shell.h"
+#include "snake/snake.h"
 #define SHELL_W 1024
 #define SHELL_H 768
 
@@ -14,7 +15,8 @@ int main()
 	for (int i = 0; i < 10; i++)
 		printf("%c", getChar());
 	*/
-	printf("%c", shellStart() == 1);
+	// printf("%c", shellStart() == 1);
+	printf("%c", playSnake(1));
 	printf("In sample");
 	return 0xDEADC0DE;
 	return 0xDEADBEEF;

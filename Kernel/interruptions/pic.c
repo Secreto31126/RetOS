@@ -10,18 +10,15 @@
 static void tick_handler();
 static void keyboard_handler();
 
-void pic_manager(int interrupt)
+static void (*pic_handlers[2])(void) = {
+    tick_handler,
+    keyboard_handler};
+
+void pic_manager(uint8_t interrupt)
 {
-    switch (interrupt)
+    if (interrupt < 2)
     {
-    case 0:
-        return tick_handler();
-
-    case 1:
-        return keyboard_handler();
-
-    default:
-        break;
+        pic_handlers[interrupt]();
     }
 }
 

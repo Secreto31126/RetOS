@@ -12,4 +12,6 @@
 #include <console.h>
 #include <localization.h>
 
+void noop();
+
 #endif

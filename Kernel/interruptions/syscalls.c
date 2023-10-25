@@ -1,7 +1,7 @@
 #include "interruptions.h"
 
-uint64_t read(uint64_t fd, char *buffer, uint64_t count);
-uint64_t write(uint64_t fd, const char *buffer, uint64_t count);
+static uint64_t read(uint64_t fd, char *buffer, uint64_t count);
+static uint64_t write(uint64_t fd, const char *buffer, uint64_t count);
 /**
  * @brief Draw a pixel array to the screen via syscall
  *
@@ -10,44 +10,36 @@ uint64_t write(uint64_t fd, const char *buffer, uint64_t count);
  * @param position 0xXXXXYYYY
  * @return uint64_t number of pixels drawn
  */
-uint64_t draw(HexColor *figure, uint32_t dimensions, uint32_t position);
-uint64_t mloc(uint64_t size);
-uint64_t fre(uint64_t ptr);
-uint64_t get_time();
+static uint64_t draw(HexColor *figure, uint32_t dimensions, uint32_t position);
+static uint64_t get_time();
 /**
  * @brief Get the screen size
  *
  * @return uint32_t 0xWWWWHHHH
  */
-uint32_t get_screen_size();
+static uint32_t get_screen_size();
+
+typedef uint64_t (*syscall)(uint64_t, uint64_t, uint64_t, uint64_t);
+static syscall syscall_handlers[7] = {
+    read,
+    write,
+    draw,
+    malloc,
+    free,
+    get_time,
+    get_screen_size};
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 {
-    switch (rax)
+    if (rax < 7)
     {
-    case 0:
-        return read(rdi, (char *)rsi, rdx);
-    case 1:
-        return write(rdi, (const char *)rsi, rdx);
-    case 333:
-        return draw((HexColor *)rdi, rsi, rdx);
-    case 334:
-        return mloc(rdi);
-    case 335:
-        return fre(rdi);
-    case 336:
-        return get_time();
-    case 337:
-        return get_screen_size();
-
-    default:
-        break;
+        return syscall_handlers[rax](rdi, rsi, rdx, rax);
     }
 
     return -1;
 }
 
-uint64_t read(uint64_t fd, char *buffer, uint64_t count)
+static uint64_t read(uint64_t fd, char *buffer, uint64_t count)
 {
     if (fd != 0)
     {
@@ -57,7 +49,7 @@ uint64_t read(uint64_t fd, char *buffer, uint64_t count)
     return read_stdin((uint8_t *)buffer, count);
 }
 
-uint64_t write(uint64_t fd, const char *buffer, uint64_t count)
+static uint64_t write(uint64_t fd, const char *buffer, uint64_t count)
 {
     if (fd != 1)
     {
@@ -73,7 +65,7 @@ uint64_t write(uint64_t fd, const char *buffer, uint64_t count)
     return i;
 }
 
-uint64_t draw(HexColor *figure, uint32_t dimensions, uint32_t position)
+static uint64_t draw(HexColor *figure, uint32_t dimensions, uint32_t position)
 {
     uint32_t width = (dimensions >> 16) & 0xFFFF;
     uint32_t height = dimensions & 0xFFFF;
@@ -84,18 +76,7 @@ uint64_t draw(HexColor *figure, uint32_t dimensions, uint32_t position)
     return drawFromArray(figure, width, height, x, y);
 }
 
-uint64_t mloc(uint64_t size)
-{
-    return (uint64_t)malloc(size);
-}
-
-uint64_t fre(uint64_t ptr)
-{
-    free((void *)ptr);
-    return 0;
-}
-
-uint64_t get_time()
+static uint64_t get_time()
 {
     unset_interrupt_flag();
 
@@ -110,7 +91,7 @@ uint64_t get_time()
     return hour << 8 + minute;
 }
 
-uint32_t get_screen_size()
+static uint32_t get_screen_size()
 {
     return (get_width() << 16) & 0xFFFF0000 + get_height();
 }

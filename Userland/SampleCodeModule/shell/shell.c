@@ -27,5 +27,6 @@ char shellStart()
         // drawWindow(protoShell, 0, 0);
     }
     // free(pixels);
+    endPainter();
     return 1;
 }

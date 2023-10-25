@@ -50,9 +50,9 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
             return 0;
         else
         {
+            newLine();
             if (c == '\n')
                 paintString(lineStart, letterColor, highlightColor);
-            newLine();
         }
     drawCharToWindow(stamp, c, letterColor, highlightColor);
     drawWindow(stamp, xPointer, yPointer);
@@ -77,4 +77,8 @@ void blank()
         ;
     xPointer = 0;
     yPointer = 0;
+}
+void endPainter()
+{
+    free(stamp.pixels);
 }

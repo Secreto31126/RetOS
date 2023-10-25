@@ -14,5 +14,6 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor);
 char paintString(char *c, HexColor letterColor, HexColor highlightColor);
 void setLineStart(char *s);
 void setSize(double s);
+void endPainter();
 
 #endif

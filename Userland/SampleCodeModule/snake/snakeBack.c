@@ -20,13 +20,16 @@ void setBoard()
         board[0][i].identifier = EMPTY;
     }
 
-    uint64_t boardSizeNoMargins = (BOARD_HEIGHT - 2) * (BOARD_WIDTH - 2);
+    uint64_t boardSizeNoMargins = BOARD_SIZE_NO_MARGINS; // just to avoid calculating it in every loop
     for (int i = 0; i < APPLE_COUNT; i++)
     {
         unsigned int pos = randBetween(0, boardSizeNoMargins - i); // no objects will be placed on edges on setting board.
         unsigned int j = getNthEmpty(pos);
         if (j < boardSizeNoMargins)
+        {
             board[0][j].identifier = APPLE; // No objects will be added if board is full.
+            board[0][j].toDraw = SHEEP;
+        }
     }
     for (int i = 1; i <= PLAYER_COUNT; i++)
     {
@@ -36,6 +39,7 @@ void setBoard()
         {
             board[0][j].identifier = i; // No objects will be added if board is full. Snake n represented by numbers k such that k = (n+1) modulo (PLAYER_COUNT+1). 1 represents an apple.
             board[0][j].health = START_PLAYER_LENGTH;
+            board[0][j].toDraw = HEAD;
         }
         snakes[i - 1].length = START_PLAYER_LENGTH;
         snakes[i - 1].color = getHexColor();
@@ -75,7 +79,10 @@ unsigned int update()
                     else
                     {
                         if (board[nextY][nextX].identifier == APPLE)
+                        {
                             growSnake(lookingAt.identifier);
+                            makeApple();
+                        }
                         board[nextY][nextX].identifier = lookingAt.identifier;
                         DIRECTION aux = snakes[lookingAt.identifier - 1].direction;
                         board[nextY][nextX].health = snakes[lookingAt.identifier - 1].length + (aux == RIGHT || aux == DOWN) ? 1 : 0; // board is analyzed left-right and up-down. A newly created head to the right or down will be shrunk incorrectly otherwise
@@ -85,8 +92,15 @@ unsigned int update()
                 else if (isTail(lookingAt.identifier, lookingAt.health))
                 {
                     board[i][j].identifier = EMPTY;
+                    board[i][j].toDraw = BLANK;
                 }
                 board[i][j].health--; // All snake parts lose one 'health' per movement. This way, parts remain for as many movements as the snake is long, giving the appearance of a continuous snake. Using identifiers to uniformly color snakes reinforces this
+                if (isTail(board[i][j].identifier, board[i][j].health))
+                    board[i][j].toDraw = TAIL;
+            }
+            else if (lookingAt.identifier == EMPTY)
+            {
+                board[i][j].toDraw = NO_DRAW;
             }
         }
     for (int i = 0; i < PLAYER_COUNT; i++)
@@ -131,7 +145,10 @@ void killSnake(unsigned int identifier)
 {
     for (int i = 0; i < BOARD_SIZE; i++)
         if (board[0][i].identifier == identifier)
+        {
             board[0][i].identifier = EMPTY;
+            board[0][i].toDraw = BLANK;
+        }
     snakes[identifier - 1].alive = 0;
 }
 void growSnake(unsigned int identifier)
@@ -140,6 +157,18 @@ void growSnake(unsigned int identifier)
         if (board[0][i].identifier == identifier)
             board[0][i].health++;
     snakes[identifier - 1].length++;
+    objects++;
+}
+void makeApple()
+{
+    uint64_t boardSizeNoMargins = BOARD_SIZE_NO_MARGINS;
+    unsigned int pos = randBetween(0, boardSizeNoMargins - objects); // no objects will be placed on edges on setting board.
+    unsigned int j = getNthEmpty(pos);
+    if (j < boardSizeNoMargins)
+    {
+        board[0][j].identifier = APPLE; // No objects will be added if board is full.
+        board[0][j].toDraw = SHEEP;
+    }
 }
 
 unsigned int getNthEmpty(unsigned int n)

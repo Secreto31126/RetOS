@@ -4,7 +4,9 @@
 #include <interruptions.h>
 
 #include <lib.h>
+#include <audio.h>
 #include <video.h>
+#include <ticks.h>
 #include <stdin.h>
 #include <stdint.h>
 #include <header.h>

@@ -18,20 +18,32 @@ static uint64_t get_time();
  * @return uint32_t 0xWWWWHHHH
  */
 static uint32_t get_screen_size();
+/**
+ * @brief Let it beep
+ *
+ * @param rdi The sound frequency
+ * @param rsi The sound duration
+ * @param _ Unused
+ * @param rax The syscall number, it's the return value to avoid modifying the register
+ * @return uint64_t rax
+ */
+static uint64_t beep_bop(uint64_t rdi, uint64_t rsi, uint64_t _, uint64_t rax);
 
 typedef uint64_t (*syscall)(uint64_t, uint64_t, uint64_t, uint64_t);
-static syscall syscall_handlers[7] = {
+static syscall syscall_handlers[] = {
     read,
     write,
     draw,
     malloc,
     free,
     get_time,
-    get_screen_size};
+    get_screen_size,
+    beep_bop,
+    get_tick};
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 {
-    if (rax < 7)
+    if (rax < 9)
     {
         return syscall_handlers[rax](rdi, rsi, rdx, rax);
     }
@@ -94,4 +106,10 @@ static uint64_t get_time()
 static uint32_t get_screen_size()
 {
     return (get_width() << 16) + get_height();
+}
+
+static uint64_t beep_bop(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
+{
+    beep(rdi, rsi);
+    return rax;
 }

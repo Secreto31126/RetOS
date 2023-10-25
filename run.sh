@@ -26,9 +26,9 @@ if [ "$1" = "DEBUG" ]
 then
     echo "Debug mode"
     echo "Quick! Run the following command in another terminal:"
-    echo 'qemu-system-x86_64 -s -S -hda "./Image/x64BareBonesImage.qcow2" -m 512'
+    echo 'qemu-system-x86_64 -s -S -hda "./Image/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk'
 else
-    qemu-system-x86_64 -hda "$path/Image/x64BareBonesImage.qcow2" -m 512 -d int
+    qemu-system-x86_64 -hda "$path/Image/x64BareBonesImage.qcow2" -m 512 -d int -soundhw pcspk
     make clean -CToolchain > /dev/null
     make clean > /dev/null
 fi

@@ -8,6 +8,7 @@
 	global output_byte
 	global set_interrupt_flag
 	global unset_interrupt_flag
+	global halt_once
 	global dump_regs
 	global dump_reg_string
 
@@ -73,6 +74,10 @@ set_interrupt_flag:
 ; void unset_interrupt_flag(void);
 unset_interrupt_flag:
 	cli
+	ret
+
+halt_once:
+	hlt
 	ret
 
 %macro save_hex_in_string 0

@@ -4,6 +4,7 @@
 #include <modules.h>
 #include <console.h>
 #include <localization.h>
+#include <audio.h>
 #include <video.h>
 #include <memory.h>
 
@@ -96,6 +97,8 @@ void *initializeKernelBinary()
 
 int main()
 {
+	hes_a_pirate();
+
 	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
 	ncNewline();
 

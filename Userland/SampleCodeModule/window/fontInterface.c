@@ -61,6 +61,6 @@ char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor h
 void drawCharToWindow(Window w, char c, HexColor letterColor, HexColor highlightColor)
 {
     HexColor aux[TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH];
-    // drawFromHexArray(w, toHexArray((currentFont->letters) + ((int)c % ASCII_MAX) * TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH, aux, TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, 2, highlightColor, letterColor), TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, 0, 0, (double)w.width / TRUE_LETTER_WIDTH, (double)w.width / TRUE_LETTER_HEIGHT); // Variables auxiliares? Legibilidad? Couldn't be me.
-    toHexArray((currentFont->letters) + ((int)c % ASCII_MAX) * TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH, w.pixels, TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, 2, highlightColor, letterColor);
+    drawFromHexArray(w, toHexArray((currentFont->letters) + ((int)c % ASCII_MAX) * TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH, aux, TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, 2, highlightColor, letterColor), TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, 0, 0, (double)w.width / TRUE_LETTER_WIDTH, (double)w.height / TRUE_LETTER_HEIGHT); // Variables auxiliares? Legibilidad? Couldn't be me.
+    // toHexArray((currentFont->letters) + ((int)c % ASCII_MAX) * TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH, w.pixels, TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, 2, highlightColor, letterColor); // This is equivalent if not resizing
 }

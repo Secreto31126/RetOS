@@ -241,3 +241,44 @@ void outer_wilds()
     beep(E4, 7);
     beep(C4sus, 7);
 }
+
+void do_i_wanna_know()
+{
+    beep(F3, 3);
+    beep(G3, 3);
+    beep(A3sus, 8);
+    beep(G3, 18);
+
+    sleep_ticks(18);
+
+    beep(F3, 3);
+    beep(G3, 3);
+    beep(A3sus, 5);
+    beep(F4, 6);
+    beep(D4sus, 18);
+    beep(D4, 6);
+    beep(C4, 18);
+
+    sleep_ticks(3);
+
+    beep(A3sus, 3);
+    beep(C4, 3);
+    beep(D4, 3);
+    beep(C4, 9);
+
+    sleep_ticks(6);
+
+    beep(A3sus, 4);
+    beep(C4, 4);
+    beep(D4, 4);
+    sleep_ticks(2);
+    beep(D4, 4);
+    beep(G3, 18);
+
+    sleep_ticks(9);
+
+    beep(F3, 3);
+    beep(G3, 3);
+    beep(A3sus, 8);
+    beep(G3, 18);
+}

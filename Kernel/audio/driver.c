@@ -6,7 +6,7 @@
 static void play_sound(uint32_t freq)
 {
     // Set the PIT to the desired frequency
-    uint32_t div = 1193180 / freq;
+    uint32_t div = 1193182 / freq;
     output_byte(0x43, 0xB6);
     output_byte(0x42, (uint8_t)(div));
     output_byte(0x42, (uint8_t)(div >> 8));

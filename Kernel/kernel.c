@@ -4,6 +4,7 @@
 #include <modules.h>
 #include <console.h>
 #include <localization.h>
+#include <audio.h>
 #include <video.h>
 #include <memory.h>
 
@@ -93,10 +94,10 @@ void *initializeKernelBinary()
 
 	return getStackBase();
 }
-extern uint64_t malloc_test();
+
 int main()
 {
-	// drawShape(RetOSbackground, 0, 0, get_width(), get_height());
+	hes_a_pirate();
 
 	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
 	ncNewline();

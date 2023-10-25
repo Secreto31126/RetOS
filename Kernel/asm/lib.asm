@@ -8,6 +8,7 @@
 	global output_byte
 	global set_interrupt_flag
 	global unset_interrupt_flag
+	global halt_once
 	global dump_regs
 	global dump_reg_string
 
@@ -73,6 +74,10 @@ set_interrupt_flag:
 ; void unset_interrupt_flag(void);
 unset_interrupt_flag:
 	cli
+	ret
+
+halt_once:
+	hlt
 	ret
 
 %macro save_hex_in_string 0
@@ -169,8 +174,7 @@ dump_reg_string0C: db 'R12:'
 dump_reg_string0D: db 'R13:'
 dump_reg_string0E: db 'R14:'
 dump_reg_string0F: db 'R15:'
-hextable: 		db '0123456789ABCDEF'
 
 	section .bss
-; extern char dump_reg_string[340];
-dump_reg_string: resb 340
+; extern char dump_reg_string[360];
+dump_reg_string: resb 360

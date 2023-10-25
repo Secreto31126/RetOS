@@ -5,6 +5,7 @@
 #include <console.h>
 #include <localization.h>
 #include <video.h>
+#include <memory.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -42,6 +43,10 @@ void *initializeKernelBinary()
 	ncPrint("CPU Vendor:");
 	ncPrint(cpuVendor(buffer));
 	ncNewline();
+
+	ncPrint("[Loading memory manager]");
+	init_memory_manager();
+	ncPrint("[Done]");
 
 	ncPrint("[Loading modules]");
 	ncNewline();
@@ -88,10 +93,10 @@ void *initializeKernelBinary()
 
 	return getStackBase();
 }
-
+extern uint64_t malloc_test();
 int main()
 {
-	drawShape(RetOSbackground, 0, 0, get_width(), get_height());
+	// drawShape(RetOSbackground, 0, 0, get_width(), get_height());
 
 	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
 	ncNewline();

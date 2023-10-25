@@ -282,3 +282,28 @@ void do_i_wanna_know()
     beep(A3sus, 8);
     beep(G3, 18);
 }
+
+void whistle_stop()
+{
+    beep(A4sus, 6);
+    beep(D3, 3);
+    beep(G3, 6);
+    beep(D3, 3);
+    beep(G3, 3);
+    beep(C3, 3);
+    beep(G3, 9);
+
+    sleep_ticks(9);
+
+    beep(D3sus, 3);
+    beep(G3, 3);
+    beep(C3, 3);
+    beep(G3, 9);
+
+    sleep_ticks(9);
+
+    beep(D3sus, 3);
+    beep(G3, 3);
+    beep(C3, 3);
+    beep(G3, 9);
+}

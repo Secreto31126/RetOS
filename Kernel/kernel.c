@@ -93,11 +93,9 @@ void *initializeKernelBinary()
 
 	return getStackBase();
 }
-extern uint64_t malloc_test();
+
 int main()
 {
-	// drawShape(RetOSbackground, 0, 0, get_width(), get_height());
-
 	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
 	ncNewline();
 

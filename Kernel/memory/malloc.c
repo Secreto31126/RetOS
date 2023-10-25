@@ -12,7 +12,7 @@ void *malloc(uint32_t size)
     {
         if (*map)
         {
-            map += *map; // adds 32 * *map bytes
+            map += *map;
             continue;
         }
 

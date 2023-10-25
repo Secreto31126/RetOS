@@ -40,7 +40,7 @@ typedef struct Window
 
 uint64_t screenWidth();
 uint64_t screenHeight();
-HexColor *toHexArray(char *source, HexColor *result, int width, int height, int colorCount, ...);
+HexColor *toHexArray(char *source, HexColor *result, int width, int height, int resultWidth, int resultHeight, int colorCount, ...);
 void drawFromHexArray(Window w, HexColor *source, int sourceWidth, int sourceHeight, int x, int y, double xScaleFactor, double yScaleFactor);
 uint64_t getScreenWidth();
 uint64_t getScreenHeight();

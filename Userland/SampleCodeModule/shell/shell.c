@@ -20,8 +20,13 @@ char shellStart()
     static char lineStart[3] = ":~";
     setLineStart(lineStart);
     paintString("You are now in shell:\n", 0xFFFFFFFF, 0xFFFF00FF);
-    while ((c = getChar()) != 'q')
+    char leaving = 0;
+    while ((c = getChar()) != 'q' || !leaving)
     {
+        if (c == 'q')
+            leaving = 1;
+        else
+            leaving = 0;
         if (c == '\b')
         {
             if (strcmp(buffer + index - strlen(lineStart) + 1, lineStart))

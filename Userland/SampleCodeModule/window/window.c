@@ -84,22 +84,32 @@ void drawFromHexArray(Window w, HexColor *source, int sourceWidth, int sourceHei
     }
 }
 /**
- * Source and result should be of equal dimensions.
+ * Automatically scales source to result
  * To make a color in the result be 'transparent' in later operations, set its HexColor opacity to 0.
  * This function is for translating bitmap-equivalents to HexColor arrays. Not for creating Windows.
  * Chars set to 0 will be copied to result as color 1, set to 1 copied as color 2, etc.
  **/
-HexColor *toHexArray(char *source, HexColor *result, int width, int height, int colorCount, ...) // Requiring the number of colors isn't a particularly good implementation, but it is a particularly easy one.
+HexColor *toHexArray(char *source, HexColor *result, int sourceWidth, int sourceHeight, int resultWidth, int resultHeight, int colorCount, ...) // Requiring the number of colors isn't a particularly good implementation, but it is a particularly easy one.
 {
     HexColor replacement;
     va_list colors;
     va_start(colors, colorCount);
-    for (int i = 0; i < colorCount; i++)
+    double xScaleFactor = (double)resultWidth / sourceWidth, yScaleFactor = (double)resultHeight / sourceHeight;
+    for (int c = 0; c < colorCount; c++)
     {
         replacement = va_arg(colors, HexColor);
-        for (int j = 0; j < width * height; j++)
-            if (source[j] == i)
-                result[j] = replacement;
+        int xIndex, yIndex = 0;
+        for (double i = 0; i < resultHeight && yIndex < sourceHeight; i += xScaleFactor)
+        {
+            xIndex = 0;
+            for (double j = 0; j < resultWidth && xIndex < sourceWidth; j += yScaleFactor)
+            {
+                if (source[xIndex + yIndex * sourceWidth] == c)
+                    result[(int)(j + 0.5) + (int)(i + 0.5) * resultWidth] = replacement;
+                xIndex++;
+            }
+            yIndex++;
+        }
     }
     return result;
 }

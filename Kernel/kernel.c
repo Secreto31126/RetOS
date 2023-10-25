@@ -97,7 +97,7 @@ void *initializeKernelBinary()
 
 int main()
 {
-	hes_a_pirate();
+	here_comes_the_sun();
 
 	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
 	ncNewline();

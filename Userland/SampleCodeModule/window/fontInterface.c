@@ -57,7 +57,7 @@ char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor h
 }
 
 // Whole window will not be colored. Shell must handle backspace and whatnot (Literally just draw an ascii value that is all zeroes (such as '\b'), then reduce index).
-// Char will be automatically scaled to fit the window, this works weirdly thus far, but probably won't in the future.
+// Char will be automatically scaled to fit the window, this works weirdly thus far, but probably won't in the future :D.
 void drawCharToWindow(Window w, char c, HexColor letterColor, HexColor highlightColor)
 {
     HexColor aux[TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH];

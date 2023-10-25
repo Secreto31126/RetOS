@@ -5,12 +5,8 @@
     global free
 	global get_unix_time
     global get_screen_size
-
-; int print_sys(unsigned int fd, char *str, size_t len);
-print_sys:
-    mov rax, 1
-    int 80h
-    ret
+    global beep
+    global get_tick
 
 ; int read_sys(unsigned int fd, char *str, size_t len);
 read_sys:
@@ -18,11 +14,11 @@ read_sys:
     int 80h
     ret
 
-; uint64_t get_unix_time(void);
-get_unix_time:
-	mov rax, 5
+; int print_sys(unsigned int fd, char *str, size_t len);
+print_sys:
+    mov rax, 1
     int 80h
-	ret
+    ret
 
 ; uint64_t draw(HexColor *figure, uint64_t dimensions, uint64_t position)
 draw:
@@ -30,9 +26,9 @@ draw:
     int 80h
     ret
 
-; uint64_t get_screen_size()
-get_screen_size:
-    mov rax, 6
+; uint64_t malloc(uint64_t size)
+malloc:
+    mov rax, 3
     int 80h
     ret
 
@@ -42,8 +38,26 @@ free:
     int 80h
     ret
 
-; uint64_t malloc(uint64_t size)
-malloc:
-    mov rax, 3
+; uint64_t get_unix_time(void);
+get_unix_time:
+	mov rax, 5
+    int 80h
+	ret
+
+; uint64_t get_screen_size()
+get_screen_size:
+    mov rax, 6
+    int 80h
+    ret
+
+; void beep(uint64_t frequency, uint64_t duration)
+beep:
+    mov rax, 7
+    int 80h
+    ret
+
+; uint64_t get_tick()
+get_tick:
+    mov rax, 8
     int 80h
     ret

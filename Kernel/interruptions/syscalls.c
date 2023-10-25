@@ -1,5 +1,13 @@
 #include "interruptions.h"
 
+/**
+ * @brief Read from a file descriptor
+ *
+ * @param fd 0 for stdin, 3 for stdkey
+ * @param buffer The buffer to write to
+ * @param count The number of bytes to read
+ * @return uint64_t The number of bytes read
+ */
 static uint64_t read(uint64_t fd, char *buffer, uint64_t count);
 static uint64_t write(uint64_t fd, const char *buffer, uint64_t count);
 /**
@@ -53,12 +61,15 @@ uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 
 static uint64_t read(uint64_t fd, char *buffer, uint64_t count)
 {
-    if (fd != 0)
+    switch (fd)
     {
+    case 0:
+        return read_stdin((uint8_t *)buffer, count);
+    case 3:
+        return read_stdkey((uint8_t *)buffer, count);
+    default:
         return -1;
     }
-
-    return read_stdin((uint8_t *)buffer, count);
 }
 
 static uint64_t write(uint64_t fd, const char *buffer, uint64_t count)

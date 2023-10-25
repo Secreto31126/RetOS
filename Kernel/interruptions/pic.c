@@ -27,9 +27,6 @@ static void tick_handler()
     update_tick();
 }
 
-#define MAX_KEYS 17
-static uint16_t pressed_keys[MAX_KEYS];
-
 static void keyboard_handler()
 {
     static int caps = 0;
@@ -42,6 +39,8 @@ static void keyboard_handler()
 
     // ncPrintHex(scancode);
     // ncTab();
+
+    stdkey_keyevent(scancode);
 
     // If esc key
     if (scancode == 1)
@@ -99,50 +98,9 @@ static void keyboard_handler()
         return;
     }
 
-    // If the scancode is a release event, release the key from the pressed keys array
-    if (IS_RELEASE(scancode))
-    {
-        uint8_t code = PRESSED_OR_RELEASED(scancode);
-        for (int i = 0; i < MAX_KEYS; i++)
-        {
-            if (code == pressed_keys[i])
-            {
-                pressed_keys[i] = 0;
-                break;
-            }
-        }
-    }
-    else
-    {
-        int pos = -1;
-        for (int i = 0; i < MAX_KEYS; i++)
-        {
-            if (pressed_keys[i] == scancode)
-            {
-                pos = -1;
-                break;
-            }
-
-            if (pos < 0 && pressed_keys[i] == 0)
-            {
-                pos = i;
-            }
-        }
-
-        if (pos >= 0)
-        {
-            pressed_keys[pos] = PRESSED_OR_RELEASED(scancode);
-        }
-    }
-
     char modifier = (shift ? NEGATE(caps) : caps) + altgr * 2;
-    for (int i = 0; i < MAX_KEYS; i++)
-    {
-        if (pressed_keys[i])
-        {
-            uint16_t letter = get_scancode_utf16(pressed_keys[i], modifier);
-            if (letter)
-                write_stdin(&letter, 1);
-        }
-    }
+
+    uint16_t letter = get_scancode_utf16(scancode, modifier);
+    if (letter)
+        write_stdin(&letter, 1);
 }

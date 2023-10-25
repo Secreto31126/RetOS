@@ -1,3 +1,4 @@
+```asm
 %macro slave_pic_handler 1
 	pushall
 	mov		rdi, %1
@@ -9,3 +10,4 @@
 	popall
 	iretq
 %endmacro
+```

@@ -5,6 +5,8 @@
 	extern dump_regs
 	extern dump_regs_include_rip
 
+	extern handle_catch
+
     global zero_division_exception_handler
     global invalid_opcode_exception_handler
 
@@ -24,9 +26,11 @@
 	call	dump_regs
 	mov		rdi, [rsp]
 	call	dump_regs_include_rip
-	mov		rdi, %1
+
 	call	exception_manager
-	iretq ; Shouldn't return to the faulty instruction
+
+	mov		rdi, %1
+	call handle_catch
 %endmacro
 
 %macro master_pic_handler 1
@@ -45,7 +49,7 @@ zero_division_exception_handler:
 
 ; void invalid_opcode_exception_handler(void);
 invalid_opcode_exception_handler:
-	exception_handler 1
+	exception_handler 6
 
 ; void tick_handler(void);
 tick_handler:

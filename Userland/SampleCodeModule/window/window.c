@@ -94,18 +94,18 @@ HexColor *toHexArray(char *source, HexColor *result, int sourceWidth, int source
     HexColor replacement;
     va_list colors;
     va_start(colors, colorCount);
-    double xScaleFactor = (double)resultWidth / sourceWidth, yScaleFactor = (double)resultHeight / sourceHeight;
+    double xScaleFactor = (double)sourceWidth / resultWidth, yScaleFactor = (double)sourceHeight / resultHeight;
     for (int c = 0; c < colorCount; c++)
     {
         replacement = va_arg(colors, HexColor);
         int xIndex, yIndex = 0;
-        for (double i = 0; i < resultHeight && yIndex < sourceHeight; i += xScaleFactor)
+        for (double i = 0; i < sourceHeight && yIndex < resultHeight; i += xScaleFactor)
         {
             xIndex = 0;
-            for (double j = 0; j < resultWidth && xIndex < sourceWidth; j += yScaleFactor)
+            for (double j = 0; j < sourceWidth && xIndex < resultWidth; j += yScaleFactor)
             {
-                if (source[xIndex + yIndex * sourceWidth] == c)
-                    result[(int)(j + 0.5) + (int)(i + 0.5) * resultWidth] = replacement;
+                if (source[(int)(j) + (int)(i)*sourceWidth] == c)
+                    result[xIndex + yIndex * resultWidth] = replacement;
                 xIndex++;
             }
             yIndex++;

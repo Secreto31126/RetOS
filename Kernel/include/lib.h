@@ -16,7 +16,7 @@ extern void output_byte(uint16_t port, uint8_t value);
 extern void set_interrupt_flag(void);
 void unset_interrupt_flag(void);
 
-extern char dump_reg_string[340];
+extern char dump_reg_string[360];
 /**
  * @brief Dump registers value into dump_reg_string
  */

@@ -10,18 +10,15 @@
 static void tick_handler();
 static void keyboard_handler();
 
-void pic_manager(int interrupt)
+static void (*pic_handlers[2])(void) = {
+    tick_handler,
+    keyboard_handler};
+
+void pic_manager(uint8_t interrupt)
 {
-    switch (interrupt)
+    if (interrupt < 2)
     {
-    case 0:
-        return tick_handler();
-
-    case 1:
-        return keyboard_handler();
-
-    default:
-        break;
+        pic_handlers[interrupt]();
     }
 }
 
@@ -36,7 +33,7 @@ static void tick_handler()
 }
 
 #define MAX_KEYS 17
-static uint8_t pressed_keys[MAX_KEYS];
+static uint16_t pressed_keys[MAX_KEYS];
 
 static void keyboard_handler()
 {
@@ -47,6 +44,9 @@ static void keyboard_handler()
 
     // Read the scancode from the keyboard controller
     uint8_t scancode = input_byte(0x60);
+
+    // ncPrintHex(scancode);
+    // ncTab();
 
     // If esc key
     if (scancode == 1)
@@ -145,8 +145,9 @@ static void keyboard_handler()
     {
         if (pressed_keys[i])
         {
-            uint8_t letter = get_scancode_utf16(pressed_keys[i], modifier);
-            write_stdin(&letter, 1);
+            uint16_t letter = get_scancode_utf16(pressed_keys[i], modifier);
+            if (letter)
+                write_stdin(&letter, 1);
         }
     }
 }

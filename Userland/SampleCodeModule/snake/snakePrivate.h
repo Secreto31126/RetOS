@@ -3,6 +3,7 @@
 #include "./../window/fontInterface.h"
 #include "./../window/window.h"
 #include "./../window/painter.h"
+#include "random.h"
 #include "snakeDrawings.h"
 
 typedef enum DIRECTION

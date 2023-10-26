@@ -5,6 +5,8 @@
 typedef struct frontSnake
 {
     DIRECTION nextMove;
+    HexColor bodyColor;
+    HexColor otherColor;
 } frontSnake;
 void doMovement(char c, frontSnake *snakes);
 void putDeath(int snakeNumber);
@@ -27,7 +29,11 @@ int playSnake(uint16_t snakeCount)
 
     frontSnake *snakes = malloc(2 * sizeof(frontSnake)); // Still saves space for second snake. Simpler than checking snakeCount for every non-complex operation
     for (int i = 0; i < snakeCount; i++)
+    {
         snakes[i].nextMove = NONE;
+        snakes[i].bodyColor = getHexColor();
+        snakes[i].otherColor = getHexColor();
+    }
 
     uint64_t time = get_tick();
     while (!gameOver)
@@ -76,14 +82,14 @@ int playSnake(uint16_t snakeCount)
                         source = classicHeadUp;
                         break;
                     }
-                    toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, 0xFF00FF00, 0xFFFF0000);
+                    toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, snakes[board[i].identifier - 1].bodyColor, snakes[board[i].identifier - 1].otherColor);
                     drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
                     paintChar('h', -1, 0); // remove
                     break;
                 case TAIL:
                 case BODY:
                     source = classicOther;
-                    toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, 0xFF00FF00, 0xFFFF0000);
+                    toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, snakes[board[i].identifier - 1].bodyColor, snakes[board[i].identifier - 1].otherColor);
                     drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
                     paintChar('b', -1, 0); // remove
                     break;

@@ -17,12 +17,12 @@ void setSize(double s)
     // if (strlen(lineStart) * TRUE_LETTER_WIDTH * s < w) // lineStart cannot occupy more than a line
     {
         size = s;
-        if (s > maxLineSize)
-            maxLineSize = s;
-        free(stamp.pixels);
-        stamp.pixels = malloc(((int)(TRUE_LETTER_HEIGHT * size)) * ((int)(TRUE_LETTER_WIDTH * size)));
         stamp.width = TRUE_LETTER_WIDTH * size;
         stamp.height = TRUE_LETTER_HEIGHT * size;
+        free(stamp.pixels);
+        stamp.pixels = malloc(((int)(TRUE_LETTER_HEIGHT * size)) * ((int)(TRUE_LETTER_WIDTH * size)) * sizeof(HexColor));
+        if (s > maxLineSize)
+            maxLineSize = s;
     }
 }
 void setLineStart(char *start)

@@ -53,7 +53,7 @@ void setBoard(int snakeCount)
         }
         snakes[i - 1].length = START_PLAYER_LENGTH;
         snakes[i - 1].color = getHexColor();
-        snakes[i - 1].direction = ((j % BOARD_HEIGHT) > (BOARD_WIDTH / 2)) ? RIGHT : RIGHT; // This way you don't start moving towards the edge. Still won't spawn at the edge out of respect.
+        snakes[i - 1].direction = ((j % BOARD_HEIGHT) > (BOARD_WIDTH / 2)) ? LEFT : RIGHT; // This way you don't start moving towards the edge. Still won't spawn at the edge out of respect.
         snakes[i - 1].alive = 1;
         snakes[i - 1].moved = 0;
     }

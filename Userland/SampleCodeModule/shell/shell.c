@@ -17,7 +17,7 @@ char shellStart()
     // HexColor *pixels = malloc((width * height * sizeof(HexColor)));
     // Window protoShell = getWindow(width, height, pixels);
     startPainter(width, height);
-    setSize(1.0);
+    setSize(3.0);
     static char lineStart[3] = ":~";
     setLineStart(lineStart);
     paintString("You are now in shell:\n", 0xFFFFFFFF, 0xFFFF00FF);

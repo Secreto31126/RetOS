@@ -19,6 +19,10 @@ void setSize(double s)
         size = s;
         if (s > maxLineSize)
             maxLineSize = s;
+        free(stamp.pixels);
+        stamp.pixels = malloc(((int)(TRUE_LETTER_HEIGHT * size)) * ((int)(TRUE_LETTER_WIDTH * size)));
+        stamp.width = TRUE_LETTER_WIDTH * size;
+        stamp.height = TRUE_LETTER_HEIGHT * size;
     }
 }
 void setLineStart(char *start)

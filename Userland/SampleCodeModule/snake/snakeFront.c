@@ -16,7 +16,6 @@ int playSnake(uint16_t snakeCount)
 {
     uint64_t tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
     Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
-    startPainter(getScreenWidth(), getScreenHeight()); // remove
 
     char gameOver = 0;
     int deadSnake = 0;

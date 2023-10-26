@@ -111,6 +111,7 @@ HexColor *toHexArray(char *source, HexColor *result, int sourceWidth, int source
             yIndex++;
         }
     }
+    va_end(colors);
     return result;
 }
 

@@ -70,6 +70,7 @@ void setDirection(unsigned int playerNumber, DIRECTION direction)
 // returns 0 if no players died. Returns the player identifier if a player died.
 unsigned int update()
 {
+    paintString("inBack", 0xFFFF0000, 0xFF00FF00);
     char toReturn = 0;
     tile lookingAt;
     for (int i = 0; i < BOARD_HEIGHT; i++)

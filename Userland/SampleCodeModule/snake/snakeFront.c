@@ -8,17 +8,17 @@ typedef struct frontSnake
     HexColor bodyColor;
     HexColor otherColor;
 } frontSnake;
+
 void doMovement(char c, frontSnake *snakes);
 void putDeath(int snakeNumber);
+void drawBoard(frontSnake *snakes);
+
 char timeHasPassed(uint64_t start, uint64_t unit)
 {
     return (get_tick() - start) > unit;
 }
 int playSnake(uint16_t snakeCount)
 {
-    uint64_t tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
-    Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
-
     char gameOver = 0;
     int deadSnake = 0;
     uint16_t deathCount = 0;
@@ -42,10 +42,11 @@ int playSnake(uint16_t snakeCount)
         while ((c = readChar()))
         {
             doMovement(c, snakes);
+            paintString("reading", 0xFFFF0000, 0xFF00FF00);
         }
         if (timeHasPassed(time, MOVE_INTERVAL))
         {
-            paintChar('i', 0xFFFF0000, 0xFF00FF00); // remove
+            paintString("time", 0xFFFF0000, 0xFF00FF00); // remove
             time = get_tick();
             for (int i = 0; i < snakeCount; i++)
                 if (snakes[i].nextMove != NONE)
@@ -58,50 +59,10 @@ int playSnake(uint16_t snakeCount)
                 if (deathCount >= snakeCount)
                     gameOver = 1;
             }
-            tile *board = getBoard();
-            snake *backSnakes = getSnakes();
-            for (int i = 0; i < BOARD_HEIGHT * BOARD_WIDTH; i++)
-            {
-                char *source;
-                switch (board[i].toDraw)
-                {
-                case HEAD:
-                    switch (backSnakes[board[i].identifier - 1].direction)
-                    {
-                    case LEFT:
-                        source = classicHeadLeft;
-                        break;
-                    case RIGHT:
-                        source = classicHeadRight;
-                        break;
-                    case DOWN:
-                        source = classicHeadDown;
-                        break;
-                    case UP:
-                    default:
-                        source = classicHeadUp;
-                        break;
-                    }
-                    toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, snakes[board[i].identifier - 1].bodyColor, snakes[board[i].identifier - 1].otherColor);
-                    drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
-                    paintChar('h', -1, 0); // remove
-                    break;
-                case TAIL:
-                case BODY:
-                    source = classicOther;
-                    toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, snakes[board[i].identifier - 1].bodyColor, snakes[board[i].identifier - 1].otherColor);
-                    drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
-                    paintChar('b', -1, 0); // remove
-                    break;
-                case NO_DRAW:
-                default:
-                    break;
-                }
-            }
+            drawBoard(snakes);
         }
     }
     free(snakes);
-    free(stamp.pixels);
     return deadSnake;
 }
 void putDeath(int snakeNumber)
@@ -138,4 +99,73 @@ void doMovement(char c, frontSnake *snakes)
     default:
         break;
     }
+}
+
+void drawBoard(frontSnake *snakes)
+{
+    uint64_t tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
+    Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
+    tile *board = getBoard();
+    snake *backSnakes = getSnakes();
+    char *source;
+    for (int i = 0; i < (BOARD_HEIGHT * BOARD_WIDTH); i++)
+    {
+        source = malloc(1200);
+        paintString("Making stamp", -1, 0);
+        toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 1, 0x88FFFFFF);
+        paintString("Drawing stamp", -1, 0);
+        drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
+        paintString("success", -1, 0);
+        char aux[100];
+        paintString("Drew on: ", -1, 0);
+        paintString(itoa((i % BOARD_HEIGHT) * tileWidth, aux, 10), -1, 0);
+        paintString(",", -1, 0);
+        paintString(itoa((i / BOARD_WIDTH) * tileHeight, aux, 10), -1, 0);
+        paintString(itoa(i, aux, 10), -1 * 3, 0);
+        /*
+        switch (board[i].toDraw)
+        {
+        case HEAD:
+            switch (backSnakes[board[i].identifier - 1].direction)
+            {
+            case LEFT:
+                source = classicHeadLeft;
+                break;
+            case RIGHT:
+                source = classicHeadRight;
+                break;
+            case DOWN:
+                source = classicHeadDown;
+                break;
+            case UP:
+            default:
+                source = classicHeadUp;
+                break;
+            }
+            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, snakes[board[i].identifier - 1].bodyColor, snakes[board[i].identifier - 1].otherColor);
+            drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
+            paintChar('h', -1, 0); // remove
+            break;
+        case TAIL:
+        case BODY:
+            source = classicOther;
+            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, snakes[board[i].identifier - 1].bodyColor, snakes[board[i].identifier - 1].otherColor);
+            drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
+            paintChar('b', -1, 0); // remove
+            break;
+        case NO_DRAW:
+            source = malloc(1200);
+            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 1, 0x88FFFFFF);
+            drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
+            paintString("NoDraw", -1, 0); // remove
+            free(source);
+            break;
+        default:
+            break;
+        }
+    */
+    }
+    paintString("Leaving", -1, 0);
+    free(source); // remove
+    free(stamp.pixels);
 }

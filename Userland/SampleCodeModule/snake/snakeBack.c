@@ -53,7 +53,7 @@ void setBoard(int snakeCount)
         }
         snakes[i - 1].length = START_PLAYER_LENGTH;
         snakes[i - 1].color = getHexColor();
-        snakes[i - 1].direction = ((j % BOARD_WIDTH) > (BOARD_WIDTH / 2)) ? LEFT : RIGHT; // This way you don't start moving towards the edge. Still won't spawn at the edge out of respect.
+        snakes[i - 1].direction = ((j % BOARD_HEIGHT) > (BOARD_WIDTH / 2)) ? RIGHT : RIGHT; // This way you don't start moving towards the edge. Still won't spawn at the edge out of respect.
         snakes[i - 1].alive = 1;
         snakes[i - 1].moved = 0;
     }
@@ -77,20 +77,21 @@ unsigned int update()
         {
             lookingAt = board[i][j];
             if (lookingAt.identifier != EMPTY && lookingAt.identifier != APPLE)
-            {                                                                                                  // not empty and not an apple -> is a snake
+            {
+                char aux[10];
+                paintString(itoa(lookingAt.identifier, aux, 10), 0xFFFF0000, 0xFF000020);                      // not empty and not an apple -> is a snake
                 if (isHead(lookingAt.identifier, lookingAt.health) && !snakes[lookingAt.identifier - 1].moved) // prevents moving a newly formed head
                 {
                     int nextX = j + parseDirX(snakes[lookingAt.identifier - 1].direction);
                     int nextY = i + parseDirY(snakes[lookingAt.identifier - 1].direction);
 
-                    char aux[10];
                     paintString(itoa(nextX, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
                     paintString("|", 0xFFFFFFFF, 0xFF00FFFF);
                     paintString(itoa(nextY, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
                     paintString("|", 0xFFFFFFFF, 0xFF00FFFF);
-                    paintString(itoa(i, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
-                    paintString("|", 0xFFFFFFFF, 0xFF00FFFF);
                     paintString(itoa(j, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
+                    paintString("|", 0xFFFFFFFF, 0xFF00FFFF);
+                    paintString(itoa(i, aux, 10), 0xFFFFFFFF, 0xFF00FFFF);
                     if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].identifier != EMPTY && board[nextY][nextX].identifier != APPLE))
                     {
                         killSnake(lookingAt.identifier);
@@ -103,7 +104,8 @@ unsigned int update()
                             growSnake(lookingAt.identifier);
                             makeApple();
                         }
-                        board[nextY][nextX].identifier = HEAD;
+                        board[nextY][nextX].identifier = lookingAt.identifier;
+                        board[nextY][nextX].toDraw = HEAD;
                         DIRECTION aux = snakes[lookingAt.identifier - 1].direction;
                         board[nextY][nextX].health = snakes[lookingAt.identifier - 1].length + (aux == RIGHT || aux == DOWN) ? 1 : 0; // board is analyzed left-right and up-down. A newly created head to the right or down will be shrunk incorrectly otherwise
                         snakes[lookingAt.identifier - 1].moved = 1;                                                                   // ensures no snake moves twice in a turn
@@ -118,7 +120,7 @@ unsigned int update()
                 board[i][j].health--; // All snake parts lose one 'health' per movement. This way, parts remain for as many movements as the snake is long, giving the appearance of a continuous snake. Using identifiers to uniformly color snakes reinforces this
                 if (isTail(board[i][j].identifier, board[i][j].health))
                     board[i][j].toDraw = TAIL;
-                else
+                else if (!(isHead(board[i][j].identifier, board[i][j].health) && snakes[board[i][j].identifier - 1].moved))
                     board[i][j].toDraw = BODY;
             }
             else if (lookingAt.identifier == EMPTY)
@@ -133,7 +135,7 @@ unsigned int update()
 
 char isHead(unsigned int identifier, unsigned int health)
 {
-    return identifier != EMPTY && identifier != APPLE && (snakes[(identifier - 1) % snakeC].length == health);
+    return identifier != EMPTY && identifier != APPLE && (snakes[(identifier - 1) % snakeC].length <= health); // changing PLAYER_COUNT to snakeC broke something
 }
 char isTail(unsigned int identifier, unsigned int health)
 {
@@ -166,6 +168,7 @@ signed int parseDirY(DIRECTION dir)
 }
 void killSnake(unsigned int identifier)
 {
+    paintChar(identifier, 0xFFFF0000, 0xFF000000);
     for (int i = 0; i < BOARD_SIZE; i++)
         if (board[0][i].identifier == identifier)
         {

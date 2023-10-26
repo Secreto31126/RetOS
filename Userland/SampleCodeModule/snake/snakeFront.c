@@ -1,6 +1,6 @@
 #include "snake.h"
 #include "snakePrivate.h"
-#define MOVE_INTERVAL 1
+#define MOVE_INTERVAL 2
 
 typedef struct frontSnake
 {
@@ -16,15 +16,21 @@ int playSnake(uint16_t snakeCount)
 {
     uint64_t tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
     Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
-    if (snakeCount > 2)
-        snakeCount = 2;
-    setBoard(snakeCount);
+    startPainter(getScreenWidth(), getScreenHeight()); // remove
+
     char gameOver = 0;
     int deadSnake = 0;
     uint16_t deathCount = 0;
+
+    if (snakeCount > 2)
+        snakeCount = 2;
+    setBoard(snakeCount);
+
+    frontSnake *snakes = malloc(2 * sizeof(frontSnake)); // Still saves space for second snake. Simpler than checking snakeCount for every non-complex operation
+    for (int i = 0; i < snakeCount; i++)
+        snakes[i].nextMove = NONE;
+
     uint64_t time = get_tick();
-    frontSnake *snakes = malloc(snakeCount * sizeof(frontSnake));
-    startPainter(getScreenWidth(), getScreenHeight());
     while (!gameOver)
     {
         char c;
@@ -34,10 +40,11 @@ int playSnake(uint16_t snakeCount)
         }
         if (timeHasPassed(time, MOVE_INTERVAL))
         {
-            paintChar('i', 0xFFFF0000, 0xFF00FF00);
+            paintChar('i', 0xFFFF0000, 0xFF00FF00); // remove
             time = get_tick();
             for (int i = 0; i < snakeCount; i++)
-                setDirection(i, snakes[i].nextMove);
+                if (snakes[i].nextMove != NONE)
+                    setDirection(i, snakes[i].nextMove);
             deadSnake = update();
             if (deadSnake)
             {
@@ -72,14 +79,14 @@ int playSnake(uint16_t snakeCount)
                     }
                     toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, 0xFF00FF00, 0xFFFF0000);
                     drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
-                    paintChar('h', -1, 0);
+                    paintChar('h', -1, 0); // remove
                     break;
                 case TAIL:
                 case BODY:
                     source = classicOther;
                     toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, 0xFF00FF00, 0xFFFF0000);
                     drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
-                    paintChar('b', -1, 0);
+                    paintChar('b', -1, 0); // remove
                     break;
                 case NO_DRAW:
                 default:

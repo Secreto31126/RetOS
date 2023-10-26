@@ -7,6 +7,7 @@
 
 typedef enum DIRECTION
 {
+    NONE,
     LEFT,
     RIGHT,
     UP,

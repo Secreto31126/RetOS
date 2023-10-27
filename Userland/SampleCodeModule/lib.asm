@@ -7,6 +7,7 @@
     global get_screen_size
     global beep
     global get_tick
+    global halt_user
 
 ; int read_sys(unsigned int fd, char *str, size_t len);
 read_sys:
@@ -60,4 +61,8 @@ beep:
 get_tick:
     mov rax, 8
     int 80h
+    ret
+
+halt_user:
+    hlt
     ret

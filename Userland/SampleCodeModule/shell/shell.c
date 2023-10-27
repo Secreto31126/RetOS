@@ -30,9 +30,10 @@ char shellStart()
             leaving = 1;
         else
             leaving = 0;
+
         if (c == '\b')
         {
-            if (strcmp(buffer + index - strlen(lineStart) + 1, lineStart))
+            if (*(buffer - 1) == '\n')
                 continue;
             else
                 index--;

@@ -27,6 +27,7 @@ void setBoard(int snakeCount)
     {
         board[0][i].health = 0;
         board[0][i].player = 0;
+        board[0][i].toDraw = NO_DRAW;
     }
 
     uint64_t boardSizeNoMargins = BOARD_SIZE_NO_MARGINS; // just to avoid calculating it in every loop

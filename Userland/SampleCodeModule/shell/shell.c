@@ -54,7 +54,7 @@ char shellStart()
                     blank();
                     char winner = playSnake(2);
                     paintString("Player ", -1, 0);
-                    paintChar(winner, -1, 0);
+                    paintChar(winner + '0', -1, 0);
                     paintString(" wins", -1, 0);
                 }
             }

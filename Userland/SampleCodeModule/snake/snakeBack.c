@@ -99,9 +99,9 @@ unsigned int update(int snakeCount)
                     }
                 }
                 board[i][j].health--; // All snake parts lose one 'health' per movement. This way, parts remain for as many movements as the snake is long, giving the appearance of a continuous snake. Using players to uniformly color snakes reinforces this
-                if (lookingAt.health == 1)
+                if (board[i][j].health == 1)
                     board[i][j].toDraw = TAIL;
-                if (lookingAt.health == 0)
+                if (board[i][j].health == 0)
                     board[i][j].toDraw = BLANK;
             }
             else if (lookingAt.toDraw != APPLE) // apples redrawn at every turn currently. Prevents not drawing new apples

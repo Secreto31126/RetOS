@@ -41,7 +41,6 @@ void setBoard(int snakeCount)
     }
     for (int i = 0; i < snakeCount; i++)
     {
-        paintChar("p", -1, 0);
         unsigned int pos = randBetween(0, boardSizeNoMargins - i - APPLE_COUNT); // no objects will be placed on edges on setting board.
         unsigned int j = getNthEmpty(pos);
         if (j < boardSizeNoMargins)
@@ -68,7 +67,6 @@ void setDirection(unsigned int playerNumber, DIRECTION direction)
 // returns 0 if no players died. Returns the player player if a player died.
 unsigned int update(int snakeCount)
 {
-    paintString("inBack", 0xFFFFFF00, 0xFF00FF00);
     char toReturn = 0;
     tile lookingAt;
     char aux[10];
@@ -82,11 +80,7 @@ unsigned int update(int snakeCount)
                 {
                     int nextX = j + parseDirX(snakes[lookingAt.player].direction);
                     int nextY = i + parseDirY(snakes[lookingAt.player].direction);
-                    paintChar('x', -1, 0);
-                    paintString(itoa(nextX, aux, 10), -1, 0);
-                    paintChar('y', -1, 0);
-                    paintString(itoa(nextY, aux, 10), -1, 0);
-                    if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || board[nextY][nextX].health != 0)
+                    if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].health != 0))
                     {
                         killSnake(lookingAt.player);
                         toReturn = lookingAt.player + 1;
@@ -104,13 +98,11 @@ unsigned int update(int snakeCount)
                         board[i][j].toDraw = BODY;
                     }
                 }
-                else if (isTail(lookingAt))
-                {
-                    board[i][j].toDraw = BLANK;
-                }
                 board[i][j].health--; // All snake parts lose one 'health' per movement. This way, parts remain for as many movements as the snake is long, giving the appearance of a continuous snake. Using players to uniformly color snakes reinforces this
                 if (lookingAt.health == 1)
                     board[i][j].toDraw = TAIL;
+                if (lookingAt.health == 0)
+                    board[i][j].toDraw = BLANK;
             }
             else if (lookingAt.toDraw != APPLE) // apples redrawn at every turn currently. Prevents not drawing new apples
             {
@@ -137,8 +129,6 @@ void setNewHeads(int snakeCount)
 
 void killSnake(unsigned int player)
 {
-    paintString("death of:", -1, 0);
-    paintChar(player + '0', 0xFFFF0000, 0xFF000000);
     for (int i = 0; i < BOARD_SIZE; i++)
         if (board[0][i].player == player && board[0][i].health != 0)
         {
@@ -196,9 +186,9 @@ signed int parseDirX(DIRECTION dir)
 signed int parseDirY(DIRECTION dir)
 {
     if (dir == DOWN)
-        return -1;
-    if (dir == UP)
         return 1;
+    if (dir == UP)
+        return -1;
     return 0;
 }
 tile *getBoard()

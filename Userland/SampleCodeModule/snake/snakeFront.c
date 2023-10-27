@@ -43,11 +43,9 @@ int playSnake(uint16_t snakeCount)
         while ((c = readChar()))
         {
             doMovement(c, snakes);
-            paintString("reading", 0xFFFF0000, 0xFF00FF00);
         }
         if (timeHasPassed(time, MOVE_INTERVAL))
         {
-            paintString("time", 0xFFFF0000, 0xFF00FF00); // remove
             time = get_tick();
             for (int i = 0; i < snakeCount; i++)
                 if (snakes[i].nextMove != NONE)
@@ -55,7 +53,6 @@ int playSnake(uint16_t snakeCount)
 
             if ((deadSnake = update(snakeCount)))
             {
-                paintChar(deadSnake + '0', 0xFFFF00FF, 0xFF00FF00);
                 putDeath(deadSnake);
                 deathCount++;
                 if (deathCount >= snakeCount)
@@ -113,25 +110,8 @@ void drawBoard(frontSnake *snakes)
     tile *board = getBoard();
     snake *backSnakes = getSnakes();
     char *source;
-    char aux[20];
     for (int i = 0; i < (BOARD_HEIGHT * BOARD_WIDTH); i++)
     {
-        /* // remove
-                paintString("Will draw on: ", -1, 0);
-                paintString(itoa((i % BOARD_HEIGHT) * tileWidth, aux, 10), -1, 0);
-                paintString(",", -1, 0);
-                paintString(itoa((i / BOARD_WIDTH) * tileHeight, aux, 10), -1, 0);
-                paintString("i is: ", -1, 0);
-                paintString(itoa(i, aux, 10), -1 * 3, 0);
-                paintString("Making stamp", -1, 0);
-                toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 1, 0x88FFFFFF);
-                paintString("Drawing stamp", -1, 0);
-                drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
-                paintString("success", -1, 0);
-        */
-        //
-        // paintChar(board[i].toDraw + '0', -1, 0);
-        // paintChar('|', -1, 0);
         switch (board[i].toDraw)
         {
         case HEAD:
@@ -152,37 +132,28 @@ void drawBoard(frontSnake *snakes)
                 break;
             }
             toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
-            drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
-            paintChar('h', -1, 0); // remove
+            drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
             break;
         case TAIL:
         case BODY:
             source = classicOther;
             toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
-            drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
-            paintChar('b', -1, 0); // remove
+            drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
+            break;
+        case APPLE:
+            source = apple;
+            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 4, 0xFF000000, APPLE_RED, APPLE_BROWN, APPLE_GREEN);
+            drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
+            break;
+        case BLANK:
+            source = background;
+            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 1, BACKGROUND_COLOR);
+            drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
             break;
         case NO_DRAW:
-            /*
-                source = malloc(tileHeight * tileWidth * sizeof(HexColor));
-                toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 1, 0x88FFFFFF);
-                drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
-                free(source);
-                */
-            break;
         default:
             break;
         }
-        if (board[i].health)
-        {
-            source = classicOther;
-            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
-            drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
-            paintChar('t', -1, 0); // remove}
-            //
-        }
     }
-    paintString("Leaving", -1, 0);
-    // free(source); // remove
     free(stamp.pixels);
 }

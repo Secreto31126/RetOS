@@ -1,5 +1,11 @@
 #ifndef SNKP_H
 #define SNKP_H
+
+#define APPLE_BROWN 0xFF452C09
+#define APPLE_RED 0xFFba2709
+#define APPLE_GREEN 0xFF124F0D
+#define BACKGROUND_COLOR 0xFF000000
+
 #include "./../window/fontInterface.h"
 #include "./../window/window.h"
 #include "./../window/painter.h"

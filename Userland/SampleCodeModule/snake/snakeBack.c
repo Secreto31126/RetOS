@@ -71,6 +71,7 @@ unsigned int update(int snakeCount)
     paintString("inBack", 0xFFFFFF00, 0xFF00FF00);
     char toReturn = 0;
     tile lookingAt;
+    char aux[10];
     for (int i = 0; i < BOARD_HEIGHT; i++)
         for (int j = 0; j < BOARD_WIDTH; j++)
         {
@@ -81,6 +82,10 @@ unsigned int update(int snakeCount)
                 {
                     int nextX = j + parseDirX(snakes[lookingAt.player].direction);
                     int nextY = i + parseDirY(snakes[lookingAt.player].direction);
+                    paintChar('x', -1, 0);
+                    paintString(itoa(nextX, aux, 10), -1, 0);
+                    paintChar('y', -1, 0);
+                    paintString(itoa(nextY, aux, 10), -1, 0);
                     if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || board[nextY][nextX].health != 0)
                     {
                         killSnake(lookingAt.player);
@@ -125,6 +130,7 @@ void setNewHeads(int snakeCount)
         {
             board[s.nextHeadCoordinates[1]][s.nextHeadCoordinates[0]].player = i;
             board[s.nextHeadCoordinates[1]][s.nextHeadCoordinates[0]].toDraw = HEAD;
+            board[s.nextHeadCoordinates[1]][s.nextHeadCoordinates[0]].health = s.length;
         }
     }
 }

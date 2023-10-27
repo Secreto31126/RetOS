@@ -28,7 +28,10 @@ void setSize(double s)
 void setLineStart(char *start)
 {
     if ((strlen(start) * TRUE_LETTER_WIDTH * size) < w)
-        lineStart = start;
+        for (int i = 0; *(start + i); i++)
+            if (*(start + i) == '\n')
+                return;
+    lineStart = start;
 }
 void newLine()
 {

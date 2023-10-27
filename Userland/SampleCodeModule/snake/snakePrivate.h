@@ -8,11 +8,11 @@
 
 typedef enum DIRECTION
 {
-    NONE,
     LEFT,
     RIGHT,
     UP,
     DOWN,
+    NONE,
 } DIRECTION;
 typedef enum TO_DRAW
 {

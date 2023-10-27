@@ -1,6 +1,6 @@
 #include "snake.h"
 #include "snakePrivate.h"
-#define MOVE_INTERVAL 2
+#define MOVE_INTERVAL 1
 
 typedef struct frontSnake
 {
@@ -34,6 +34,7 @@ int playSnake(uint16_t snakeCount)
         snakes[i].bodyColor = getHexColor();
         snakes[i].otherColor = getHexColor();
     }
+    drawBoard(snakes);
 
     uint64_t time = get_tick();
     while (!gameOver)
@@ -51,8 +52,10 @@ int playSnake(uint16_t snakeCount)
             for (int i = 0; i < snakeCount; i++)
                 if (snakes[i].nextMove != NONE)
                     setDirection(i, snakes[i].nextMove);
+
             if ((deadSnake = update(snakeCount)))
             {
+                paintChar(deadSnake + '0', 0xFFFF00FF, 0xFF00FF00);
                 putDeath(deadSnake);
                 deathCount++;
                 if (deathCount >= snakeCount)
@@ -61,6 +64,7 @@ int playSnake(uint16_t snakeCount)
             drawBoard(snakes);
         }
     }
+    paintString("Game Over", 0xFFFF0000, 0);
     free(snakes);
     return deadSnake;
 }
@@ -126,8 +130,8 @@ void drawBoard(frontSnake *snakes)
                 paintString("success", -1, 0);
         */
         //
-        paintChar(board[i].toDraw + '0', -1, 0);
-        paintChar('|', -1, 0);
+        // paintChar(board[i].toDraw + '0', -1, 0);
+        // paintChar('|', -1, 0);
         switch (board[i].toDraw)
         {
         case HEAD:
@@ -169,7 +173,14 @@ void drawBoard(frontSnake *snakes)
         default:
             break;
         }
-        //
+        if (board[i].health)
+        {
+            source = classicOther;
+            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
+            drawWindow(stamp, (i % BOARD_HEIGHT) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
+            paintChar('t', -1, 0); // remove}
+            //
+        }
     }
     paintString("Leaving", -1, 0);
     // free(source); // remove

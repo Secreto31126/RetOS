@@ -61,7 +61,7 @@ void setBoard(int snakeCount)
 void setDirection(unsigned int playerNumber, DIRECTION direction)
 {
     DIRECTION prev = snakes[playerNumber % PLAYER_COUNT].direction;
-    if (!(prev == UP && direction == DOWN) && !(prev == DOWN && direction == UP) && !(prev == LEFT && direction == RIGHT) && !(prev == RIGHT && direction == LEFT))
+    if (!(prev == UP && direction == DOWN) && !(prev == DOWN && direction == UP) && !(prev == LEFT && direction == RIGHT) && !(prev == RIGHT && direction == LEFT) && direction != NONE)
         snakes[playerNumber % PLAYER_COUNT].direction = direction;
 }
 
@@ -84,10 +84,10 @@ unsigned int update(int snakeCount)
                     if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || board[nextY][nextX].health != 0)
                     {
                         killSnake(lookingAt.player);
+                        toReturn = lookingAt.player + 1;
                     }
                     else
                     {
-                        toReturn = lookingAt.player + 1;
                         if (board[nextY][nextX].toDraw == APPLE)
                         {
                             growSnake(lookingAt.player);
@@ -99,7 +99,7 @@ unsigned int update(int snakeCount)
                         board[i][j].toDraw = BODY;
                     }
                 }
-                else if (isTail(board[i][j]))
+                else if (isTail(lookingAt))
                 {
                     board[i][j].toDraw = BLANK;
                 }
@@ -131,7 +131,8 @@ void setNewHeads(int snakeCount)
 
 void killSnake(unsigned int player)
 {
-    paintChar(player, 0xFFFF0000, 0xFF000000);
+    paintString("death of:", -1, 0);
+    paintChar(player + '0', 0xFFFF0000, 0xFF000000);
     for (int i = 0; i < BOARD_SIZE; i++)
         if (board[0][i].player == player && board[0][i].health != 0)
         {

@@ -18,7 +18,7 @@ signed int parseDirY(DIRECTION dir);
 void killSnake(unsigned int player);
 void growSnake(unsigned int player);
 void makeApple();
-void setNewHeads();
+void setNewHeads(int snakeCount);
 
 void setBoard(int snakeCount)
 {
@@ -75,7 +75,7 @@ unsigned int update(int snakeCount)
         for (int j = 0; j < BOARD_WIDTH; j++)
         {
             lookingAt = board[i][j];
-            if (lookingAt.health != 0) // All else should have health 0
+            if (lookingAt.health > 0) // All else should have health 0
             {
                 if (isHead(lookingAt))
                 {
@@ -83,6 +83,11 @@ unsigned int update(int snakeCount)
                     int nextY = i + parseDirY(snakes[lookingAt.player].direction);
                     if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || board[nextY][nextX].health != 0)
                     {
+                        killSnake(lookingAt.player);
+                    }
+                    else
+                    {
+                        toReturn = lookingAt.player + 1;
                         if (board[nextY][nextX].toDraw == APPLE)
                         {
                             growSnake(lookingAt.player);
@@ -91,11 +96,7 @@ unsigned int update(int snakeCount)
                         snakes[lookingAt.player].nextHeadCoordinates[0] = nextX;
                         snakes[lookingAt.player].nextHeadCoordinates[1] = nextY;
                         snakes[lookingAt.player].lastMove = snakes[lookingAt.player].direction;
-                    }
-                    else
-                    {
-                        killSnake(lookingAt.player);
-                        toReturn = lookingAt.player + 1;
+                        board[i][j].toDraw = BODY;
                     }
                 }
                 else if (isTail(board[i][j]))

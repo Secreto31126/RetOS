@@ -112,20 +112,22 @@ void drawBoard(frontSnake *snakes)
     char aux[20];
     for (int i = 0; i < (BOARD_HEIGHT * BOARD_WIDTH); i++)
     {
-
-        paintString("Will draw on: ", -1, 0);
-        paintString(itoa((i % BOARD_HEIGHT) * tileWidth, aux, 10), -1, 0);
-        paintString(",", -1, 0);
-        paintString(itoa((i / BOARD_WIDTH) * tileHeight, aux, 10), -1, 0);
-        paintString("i is: ", -1, 0);
-        paintString(itoa(i, aux, 10), -1 * 3, 0);
-        paintString("Making stamp", -1, 0);
-        toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 1, 0x88FFFFFF);
-        paintString("Drawing stamp", -1, 0);
-        drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
-        paintString("success", -1, 0);
-
+        /* // remove
+                paintString("Will draw on: ", -1, 0);
+                paintString(itoa((i % BOARD_HEIGHT) * tileWidth, aux, 10), -1, 0);
+                paintString(",", -1, 0);
+                paintString(itoa((i / BOARD_WIDTH) * tileHeight, aux, 10), -1, 0);
+                paintString("i is: ", -1, 0);
+                paintString(itoa(i, aux, 10), -1 * 3, 0);
+                paintString("Making stamp", -1, 0);
+                toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 1, 0x88FFFFFF);
+                paintString("Drawing stamp", -1, 0);
+                drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
+                paintString("success", -1, 0);
+        */
         //
+        paintChar(board[i].toDraw + '0', -1, 0);
+        paintChar('|', -1, 0);
         switch (board[i].toDraw)
         {
         case HEAD:

@@ -24,8 +24,6 @@ char shellStart()
     char leaving = 0;
     while ((c = getChar()) != 'q' || !leaving)
     {
-        if (c != 'q')
-            setSeed(c * 200);
         if (c == 'q')
             leaving = 1;
         else
@@ -47,5 +45,6 @@ char shellStart()
     }
     // free(pixels);
     endPainter();
+    setSeed(get_tick());
     return 1;
 }

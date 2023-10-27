@@ -25,7 +25,7 @@ typedef enum TO_DRAW
     B_R_TURN,
     T_L_TURN,
     T_R_TURN,
-    SHEEP, // apple was taken
+    APPLE, // apple was taken
 } TO_DRAW;
 
 typedef struct
@@ -34,13 +34,13 @@ typedef struct
     DIRECTION direction;
     uint64_t color;
     char alive;
-    char moved;
+    char nextHeadCoordinates[2];
     DIRECTION lastMove; // Currently unused, for drawing more complex snakes
 } snake;
 
 typedef struct tile
 {
-    char identifier;
+    char player;
     unsigned int health;
     TO_DRAW toDraw;
 } tile;

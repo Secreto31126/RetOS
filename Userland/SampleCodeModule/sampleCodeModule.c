@@ -16,7 +16,6 @@ int main()
 		printf("%c", getChar());
 	*/
 	printf("%c", shellStart() == 1);
-	printf("%c", playSnake(2));
 	printf("In sample");
 	return 0xDEADC0DE;
 	return 0xDEADBEEF;

@@ -86,10 +86,11 @@ void blank()
 {
     xPointer = 0;
     yPointer = 0;
-    while (paintChar(0, 0xFF000000, 0xFF000000)) // paints a fully black character on the whole window until the window is full
-        ;
-    xPointer = 0;
-    yPointer = 0;
+    Window blanker = getWindow(w, h, malloc(w * h * sizeof(HexColor)));
+    char blackPixel[1] = {0};
+    toHexArray(blackPixel, blanker.pixels, 1, 1, w, h, 1, 0xFF000000);
+    drawWindow(blanker, 0, 0);
+    free(blanker.pixels);
 }
 void endPainter()
 {

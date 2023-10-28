@@ -7,7 +7,7 @@
 #define BOARD_SIZE_NO_MARGINS ((BOARD_HEIGHT - 2) * (BOARD_WIDTH - 2))
 
 static tile board[BOARD_HEIGHT][BOARD_WIDTH];
-static snake snakes[PLAYER_COUNT];
+static snake *snakes;
 static unsigned int objects;
 
 unsigned int getNthEmpty(unsigned int n);
@@ -22,6 +22,7 @@ void setNewHeads(int snakeCount);
 
 void setBoard(int snakeCount)
 {
+    snakes = malloc(sizeof(snake) * snakeCount);
     objects = 0;
     for (int i = 0; i < BOARD_SIZE; i++)
     {
@@ -47,7 +48,7 @@ void setBoard(int snakeCount)
         unsigned int j = getNthEmpty(pos);
         if (j < boardSizeNoMargins)
         {
-            board[0][j].player = i; // No objects will be added if board is full. Snake n represented by numbers k such that k = (n+1) modulo (PLAYER_COUNT+1). 1 represents an apple.
+            board[0][j].player = i; // No objects will be added if board is full.
             board[0][j].health = START_PLAYER_LENGTH;
             board[0][j].toDraw = HEAD;
         }
@@ -61,9 +62,9 @@ void setBoard(int snakeCount)
 
 void setDirection(unsigned int playerNumber, DIRECTION direction)
 {
-    DIRECTION prev = snakes[playerNumber % PLAYER_COUNT].direction;
+    DIRECTION prev = snakes[playerNumber].direction;
     if (!(prev == UP && direction == DOWN) && !(prev == DOWN && direction == UP) && !(prev == LEFT && direction == RIGHT) && !(prev == RIGHT && direction == LEFT) && direction != NONE)
-        snakes[playerNumber % PLAYER_COUNT].direction = direction;
+        snakes[playerNumber].direction = direction;
 }
 
 // returns 0 if no players died. Returns the player player if a player died.
@@ -122,6 +123,10 @@ unsigned int update(int snakeCount)
     setNewHeads(snakeCount);
     return toReturn; // player of dead snake, or 0
 }
+void freeBack()
+{
+    free(snakes);
+}
 
 void setNewHeads(int snakeCount)
 {
@@ -172,8 +177,8 @@ unsigned int getNthEmpty(unsigned int n)
     unsigned int j;
     for (j = 0; j < n && n < BOARD_SIZE_NO_MARGINS; j++)
     {
-        if (board[0][j].toDraw != APPLE && board[0][j].health == 0) // inefficient to look through whole array. Also inefficient to ask for more random numbers if spot selected is occupied. This was chosen because our rng is not particularly random, so repeated calls not particularly good.
-            n++;                                                    // only advances position if there is not an object on the board. This serves to select the n-th empty tile
+        if (!(board[0][j].toDraw != APPLE && (board[0][j].health == 0 || (board[0][j].health == 1 && board[0][j].toDraw == BLANK)))) // inefficient to look through whole array. Also inefficient to ask for more random numbers if spot selected is occupied. This was chosen because our rng is not particularly random, so repeated calls not particularly good.
+            n++;                                                                                                                     // only advances position if there is not an object on the board. This serves to select the n-th empty tile
     }
     return j;
 }

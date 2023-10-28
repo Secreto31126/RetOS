@@ -22,9 +22,6 @@ int playSnake(uint16_t snakeCount)
     char gameOver = 0;
     int deadSnake = 0;
     uint16_t deathCount = 0;
-
-    if (snakeCount > 2)
-        snakeCount = 2;
     setBoard(snakeCount);
 
     frontSnake *snakes = malloc(2 * sizeof(frontSnake)); // Still saves space for second snake. Simpler than checking snakeCount for every non-complex operation
@@ -146,9 +143,7 @@ void drawBoard(frontSnake *snakes)
             switch (board[i].drawDirection)
             {
             case LEFT:
-                rotateBy90(stamp);
-                rotateBy90(stamp);
-                rotateBy90(stamp); // Probably should make other rotations. But this is not a bottleneck and also works fine for now.
+                rotateBy270(stamp); // Probably should make other rotations. But this is not a bottleneck and also works fine for now.
                 break;
             case DOWN:
                 rotateBy180(stamp);
@@ -163,4 +158,5 @@ void drawBoard(frontSnake *snakes)
         drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
     }
     free(stamp.pixels);
+    freeBack();
 }

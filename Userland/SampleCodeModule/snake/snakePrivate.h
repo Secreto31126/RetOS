@@ -58,5 +58,6 @@ tile *getBoard();
 snake *getSnakes();
 unsigned int update();
 extern uint64_t get_tick();
+void freeBack();
 
 #endif

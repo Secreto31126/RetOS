@@ -1,6 +1,6 @@
 #include "snake.h"
 #include "snakePrivate.h"
-#define MOVE_INTERVAL 1
+#define MOVE_INTERVAL 3
 
 typedef struct frontSnake
 {
@@ -106,7 +106,10 @@ void doMovement(char c, frontSnake *snakes)
 void drawBoard(frontSnake *snakes)
 {
     uint64_t tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
+    char aux[10];
     Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
+    paintString(itoa(stamp.width, aux, 10), -1, 0);
+    paintChar('|', -1, 0);
     tile *board = getBoard();
     snake *backSnakes = getSnakes();
     char *source;

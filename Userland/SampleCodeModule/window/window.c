@@ -99,10 +99,10 @@ HexColor *toHexArray(char *source, HexColor *result, int sourceWidth, int source
     {
         replacement = va_arg(colors, HexColor);
         int xIndex, yIndex = 0;
-        for (double i = 0; i < sourceHeight && yIndex < resultHeight; i += xScaleFactor)
+        for (double i = 0; i < sourceHeight && yIndex < resultHeight; i += yScaleFactor)
         {
             xIndex = 0;
-            for (double j = 0; j < sourceWidth && xIndex < resultWidth; j += yScaleFactor)
+            for (double j = 0; j < sourceWidth && xIndex < resultWidth; j += xScaleFactor)
             {
                 if (source[(int)(j) + (int)(i)*sourceWidth] == c)
                     result[xIndex + yIndex * resultWidth] = replacement;

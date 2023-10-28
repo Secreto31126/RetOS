@@ -33,7 +33,7 @@ void setBoard(int snakeCount)
     uint64_t boardSizeNoMargins = BOARD_SIZE_NO_MARGINS; // just to avoid calculating it in every loop
     for (int i = 0; i < APPLE_COUNT; i++)
     {
-        unsigned int pos = randBetween(0, boardSizeNoMargins - i); // no objects will be placed on edges on setting board.
+        unsigned int pos = randBetween(0, boardSizeNoMargins - i); // no objects will be placed on edges upon setting board.
         unsigned int j = getNthEmpty(pos);
         if (j < boardSizeNoMargins)
         { // No objects will be added if board is full.
@@ -77,11 +77,15 @@ unsigned int update(int snakeCount)
             lookingAt = board[i][j];
             if (lookingAt.health > 0) // All else should have health 0
             {
-                if (isHead(lookingAt))
+                if (lookingAt.toDraw == BLANK) // allows blanks to remain for one reading to ensure they are not turned to NO_DRAW before they can be read by the front-end
+                {
+                    board[i][j].health = 0;
+                }
+                else if (isHead(lookingAt))
                 {
                     int nextX = j + parseDirX(snakes[lookingAt.player].direction);
                     int nextY = i + parseDirY(snakes[lookingAt.player].direction);
-                    if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].health != 0))
+                    if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].health != 0 && board[nextX][nextY].toDraw != BLANK))
                     {
                         killSnake(lookingAt.player);
                         toReturn = lookingAt.player + 1;
@@ -133,8 +137,7 @@ void killSnake(unsigned int player)
     for (int i = 0; i < BOARD_SIZE; i++)
         if (board[0][i].player == player && board[0][i].health != 0)
         {
-            board[0][i].toDraw = BLANK;
-            board[0][i].health = 0;
+            board[0][i].health = 1; // Tiles with health 1 will die on next read and be removed.
         }
     snakes[player].alive = 0;
 }

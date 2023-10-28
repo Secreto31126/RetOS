@@ -25,7 +25,7 @@ char shellStart()
     startPainter(width, height);
     setSize(1.0);
     setLineStart(":~");
-    paintString("You are now in shell:\n", 0xFFFFFFFF, 0xFFFF00FF);
+    paintString("You are now in shell:\n", -1, 0);
     char leaving = 0;
     while ((c = getChar()) != 'q' || !leaving)
     {
@@ -53,9 +53,9 @@ char shellStart()
                 {
                     blank();
                     char winner = playSnake(2);
-                    paintString("Player ", -1, 0);
+                    paintString("You are now in shell. Player ", -1, 0);
                     paintChar(winner + '0', -1, 0);
-                    paintString(" wins", -1, 0);
+                    paintString(" won", -1, 0);
                 }
             }
         }

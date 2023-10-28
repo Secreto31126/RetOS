@@ -114,34 +114,68 @@ HexColor *toHexArray(char *source, HexColor *result, int sourceWidth, int source
     va_end(colors);
     return result;
 }
-Window rotateBy90(Window w)
-{
-    double ratio = (double)w.width / w.height;
-    // Transpose
-    for (int i = 0; i < w.height; i++)
-    {
-        for (double j = (double)i + 1; j < w.width; j += ratio)
-        {
-            swap(w, i, (int)j, (int)j, i);
-        }
-    }
-    // Reverse
-    int wOver2 = w.width / 2;
-    for (int i = 0; i < w.height; i++)
-    {
-        for (int j = 0; j < wOver2; j++)
-        {
-            swap(w, i, j, i, w.width - j - 1);
-        }
-    }
-}
-
 void swap(Window w, int i1, int j1, int i2, int j2)
 {
     HexColor aux;
     aux = w.pixels[i1 * w.width + j1];
     w.pixels[i1 * w.width + j1] = w.pixels[i2 * w.width + j2];
     w.pixels[i2 * w.width + j2] = aux;
+}
+Window rotateBy90(Window w)
+{
+    int width = w.width, height = w.height;
+    double ratio = (double)width / height;
+    HexColor *source = w.pixels;
+    HexColor *result = malloc(width * height * sizeof(HexColor));
+
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            result[i * width + j] = source[((int)((width - j - 1) / ratio)) * width + ((int)(i * ratio))];
+        }
+    }
+    int size = height * width;
+    for (int i = 0; i < size; i++)
+    {
+        source[i] = result[i];
+    }
+    free(result);
+    return w;
+}
+Window rotateBy270(Window w) // more efficient that three 90 rotations
+{
+    int width = w.width, height = w.height;
+    double ratio = (double)width / height;
+    HexColor *source = w.pixels;
+    HexColor *result = malloc(width * height * sizeof(HexColor));
+
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            result[i * width + j] = source[((int)(j / ratio)) * width + width - ((int)(i * ratio))];
+        }
+    }
+    int size = height * width;
+    for (int i = 0; i < size; i++)
+    {
+        source[i] = result[i];
+    }
+    free(result);
+    return w;
+}
+Window rotateBy180(Window w)
+{
+    int hOver2 = w.height / 2, width = w.width, height = w.height;
+    for (int i = 0; i < hOver2; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            swap(w, i, j, height - i - 1, j);
+        }
+    }
+    return w;
 }
 
 uint64_t getScreenWidth()

@@ -49,6 +49,7 @@ typedef struct tile
     char player;
     unsigned int health;
     TO_DRAW toDraw;
+    DIRECTION drawDirection;
 } tile;
 
 void setBoard(int snakeCount);

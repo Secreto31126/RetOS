@@ -36,10 +36,13 @@ char shellStart()
 
         if (c == '\b')
         {
-            if (*(buffer - 1) == '\n')
+            if (*(buffer - 1) == '\n' || !index)
                 continue;
             else
+            {
                 index--;
+                commandIndex--;
+            }
         }
         else
         {

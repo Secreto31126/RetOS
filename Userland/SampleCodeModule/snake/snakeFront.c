@@ -123,7 +123,7 @@ void drawBoard(frontSnake *snakes)
             break;
         case TAIL:
             source = classicTail;
-            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, BACKGROUND_COLOR, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
+            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 3, BACKGROUND_COLOR, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
             break;
         case BODY:
             source = classicOther;
@@ -139,12 +139,11 @@ void drawBoard(frontSnake *snakes)
             break;
         case NO_DRAW:
         default:
-            free(stamp.pixels);
-            return;
+            continue;
             break;
         }
-        if (source != apple) // don't want spinning apples.
-            switch (backSnakes[board[i].player].direction)
+        if (source != apple && source != background) // don't want spinning apples.
+            switch (board[i].drawDirection)
             {
             case LEFT:
                 rotateBy90(stamp);
@@ -152,8 +151,7 @@ void drawBoard(frontSnake *snakes)
                 rotateBy90(stamp); // Probably should make other rotations. But this is not a bottleneck and also works fine for now.
                 break;
             case DOWN:
-                rotateBy90(stamp);
-                rotateBy90(stamp);
+                rotateBy180(stamp);
                 break;
             case RIGHT:
                 rotateBy90(stamp);
@@ -162,7 +160,7 @@ void drawBoard(frontSnake *snakes)
             default:
                 break;
             }
+        drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
     }
-    drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
     free(stamp.pixels);
 }

@@ -28,6 +28,7 @@ void setBoard(int snakeCount)
         board[0][i].health = 0;
         board[0][i].player = 0;
         board[0][i].toDraw = NO_DRAW;
+        board[0][i].drawDirection = UP;
     }
 
     uint64_t boardSizeNoMargins = BOARD_SIZE_NO_MARGINS; // just to avoid calculating it in every loop
@@ -103,6 +104,10 @@ unsigned int update(int snakeCount)
                         board[i][j].toDraw = BODY;
                     }
                 }
+                else
+                {
+                    board[i][j].toDraw = NO_DRAW; // No need to update unmoving parts until they die.
+                }
                 board[i][j].health--; // All snake parts lose one 'health' per movement. This way, parts remain for as many movements as the snake is long, giving the appearance of a continuous snake. Using players to uniformly color snakes reinforces this
                 if (board[i][j].health == 1)
                     board[i][j].toDraw = TAIL;
@@ -128,6 +133,7 @@ void setNewHeads(int snakeCount)
             board[s.nextHeadCoordinates[1]][s.nextHeadCoordinates[0]].player = i;
             board[s.nextHeadCoordinates[1]][s.nextHeadCoordinates[0]].toDraw = HEAD;
             board[s.nextHeadCoordinates[1]][s.nextHeadCoordinates[0]].health = s.length;
+            board[s.nextHeadCoordinates[1]][s.nextHeadCoordinates[0]].drawDirection = s.direction;
         }
     }
 }

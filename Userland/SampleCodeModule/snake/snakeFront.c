@@ -118,45 +118,51 @@ void drawBoard(frontSnake *snakes)
         switch (board[i].toDraw)
         {
         case HEAD:
-            switch (backSnakes[board[i].player].direction)
-            {
-            case LEFT:
-                source = classicHeadLeft;
-                break;
-            case RIGHT:
-                source = classicHeadRight;
-                break;
-            case DOWN:
-                source = classicHeadDown;
-                break;
-            case UP:
-            default:
-                source = classicHeadUp;
-                break;
-            }
+            source = classicHeadUp;
             toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
-            drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
             break;
         case TAIL:
+            source = classicTail;
+            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, BACKGROUND_COLOR, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
+            break;
         case BODY:
             source = classicOther;
             toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
-            drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
             break;
         case APPLE:
             source = apple;
-            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 4, 0xFF000000, APPLE_RED, APPLE_BROWN, APPLE_GREEN);
-            drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
+            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 4, BACKGROUND_COLOR, APPLE_RED, APPLE_BROWN, APPLE_GREEN);
             break;
         case BLANK:
             source = background;
             toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 1, BACKGROUND_COLOR);
-            drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
             break;
         case NO_DRAW:
         default:
+            free(stamp.pixels);
+            return;
             break;
         }
+        if (source != apple) // don't want spinning apples.
+            switch (backSnakes[board[i].player].direction)
+            {
+            case LEFT:
+                rotateBy90(stamp);
+                rotateBy90(stamp);
+                rotateBy90(stamp); // Probably should make other rotations. But this is not a bottleneck and also works fine for now.
+                break;
+            case DOWN:
+                rotateBy90(stamp);
+                rotateBy90(stamp);
+                break;
+            case RIGHT:
+                rotateBy90(stamp);
+                break;
+            case UP:
+            default:
+                break;
+            }
     }
+    drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
     free(stamp.pixels);
 }

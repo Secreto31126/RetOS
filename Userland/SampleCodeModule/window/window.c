@@ -114,6 +114,35 @@ HexColor *toHexArray(char *source, HexColor *result, int sourceWidth, int source
     va_end(colors);
     return result;
 }
+Window rotateBy90(Window w)
+{
+    double ratio = (double)w.width / w.height;
+    // Transpose
+    for (int i = 0; i < w.height; i++)
+    {
+        for (double j = (double)i + 1; j < w.width; j += ratio)
+        {
+            swap(w, i, (int)j, (int)j, i);
+        }
+    }
+    // Reverse
+    int wOver2 = w.width / 2;
+    for (int i = 0; i < w.height; i++)
+    {
+        for (int j = 0; j < wOver2; j++)
+        {
+            swap(w, i, j, i, w.width - j - 1);
+        }
+    }
+}
+
+void swap(Window w, int i1, int j1, int i2, int j2)
+{
+    HexColor aux;
+    aux = w.pixels[i1 * w.width + j1];
+    w.pixels[i1 * w.width + j1] = w.pixels[i2 * w.width + j2];
+    w.pixels[i2 * w.width + j2] = aux;
+}
 
 uint64_t getScreenWidth()
 {

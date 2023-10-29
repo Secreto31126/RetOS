@@ -36,5 +36,6 @@ char strcmp(char *s1, char *s2);
 void wait();
 uint64_t getHours();
 uint64_t getMinutes();
+char *getTimeString(char *buffer);
 
 #endif

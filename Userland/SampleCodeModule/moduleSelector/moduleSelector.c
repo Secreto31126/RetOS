@@ -11,8 +11,7 @@ void startModules()
 {
     initializeFonts();
     startPainter(getScreenWidth(), getScreenHeight());
-    setSize(1.0);
-    paintString(prompt, -1, 0);
+    setEnvironment();
 
     char c;
     while ((c = getChar()) != '4')
@@ -23,22 +22,22 @@ void startModules()
         {
             blank();
             shellStart();
-            paintString(prompt, -1, 0);
+            setEnvironment();
             break;
         }
         case '2':
         {
             blank();
-            char *toPrint = sPrintf("Time is %d:%d.\nPress any key to return to module selector.", getHours(), getMinutes());
+            char aux[6];
+            char *toPrint = sPrintf("Time is %s.\nPress any key to return to module selector.", getTimeString(aux));
             paintString(toPrint, -1, 0);
             free(toPrint);
-            char aux[10];                                  // remove
-            paintString(itoa(getHours(), aux, 10), -1, 0); // remove
-            paintChar(':', -1, 0);
-            paintString(itoa(getMinutes(), aux, 10), -1, 0); // remove
+            toPrint = sPrintf("Thisstringshouldhavenospacesinit%s", "Norbetweenthatandthis");
+            paintString(toPrint, -1, 0);
+            free(toPrint);
             getChar();
             blank();
-            paintString(prompt, -1, 0);
+            setEnvironment();
             break;
         }
         case '3':
@@ -55,4 +54,11 @@ void startModules()
     wait();
     blank();
     endPainter();
+}
+
+void setEnvironment()
+{
+    setSize(1.0);
+    setLineStart("");
+    paintString(prompt, -1, 0);
 }

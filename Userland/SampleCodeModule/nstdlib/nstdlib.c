@@ -1,11 +1,13 @@
 #include "nstdlib.h"
 #define MAX_DIGITS_IN_LONG 20
 #define MAX_STDIN_STRING 256
-#define BLOCK 50
+#define BLOCK 10
 
 extern void halt_user();
 uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisManyChars);
 uint64_t concatFrom(char *s1, char *s2);
+
+static char *allocatedPrints;
 
 void wait()
 {
@@ -416,14 +418,14 @@ uint64_t sPuts(char *receiver, char *source)
 uint64_t addString(char **receiver, uint64_t *length, char *source, uint64_t *allocated)
 {
     uint64_t len = strlen(source);
-    if (*length + len <= *allocated)
+    if ((*length + len) <= *allocated)
     {
         uint64_t toAdd = ((*length + len - *allocated) / BLOCK + 1) * BLOCK; // space that must be added, rounded to nearest block
-        *receiver = realloc(*receiver, *allocated, toAdd);
+        *receiver = realloc(*receiver, *allocated, toAdd * sizeof(char));
         *allocated += toAdd;
     }
-    sPuts(*receiver + *length, source);
-    *length += len;
+    sPuts(*receiver + *length - 1, source);
+    *length += len - 1;
     return len;
 }
 /**
@@ -434,14 +436,14 @@ uint64_t sPrintf(char *format, ...)
     va_list argp;
     va_start(argp, format);
     uint64_t allocated = BLOCK;
-    uint64_t count = 1;
+    uint64_t count = 1; // counts null termination
     char *toReturn = malloc(sizeof(char) * allocated);
     *toReturn = 0;
     while (*format != 0 && *format != EOF)
     {
         if (count == allocated) // Always checks if resize is necessary before checking to add any characters. Prevents copying code in every single-character edition.
         {
-            toReturn = realloc(toReturn, allocated, allocated + BLOCK);
+            toReturn = realloc(toReturn, allocated, (allocated + BLOCK) * sizeof(char));
             allocated += BLOCK;
         }
         if (*format == '%')
@@ -489,9 +491,9 @@ uint64_t sPrintf(char *format, ...)
         else
         {
             sPutChar(toReturn, *format);
+            count++;
         }
         format++;
-        count++;
     }
     va_end(argp);
     toReturn = realloc(toReturn, allocated, count);
@@ -508,4 +510,29 @@ uint64_t getHours()
 {
     uint64_t hexedTime = get_unix_time();
     return ((hexedTime & 0xF00) >> 8) + (((hexedTime & 0xF000) >> 12) * 10);
+}
+
+// buffer should have at least 6 spaces in which to wrtie the time and add a null termination
+char *getTimeString(char *buffer)
+{
+    uint64_t min = getMinutes(), hr = getHours();
+    char addedZeroFlag = 0;
+    if (hr < 10)
+    {
+        *buffer = '0';
+        addedZeroFlag = 1;
+    }
+    itoa(hr, buffer + addedZeroFlag, 10);
+    buffer += 2; // For the two digits added
+    *(buffer++) = ':';
+    addedZeroFlag = 0;
+    if (min < 10)
+    {
+        *buffer = '0';
+        addedZeroFlag = 1;
+    }
+    itoa(min, buffer + addedZeroFlag, 10);
+    buffer += 2; // For the two digits added
+    *buffer = 0;
+    return buffer - 5; // In total, buffer was shifted 5 spaces to format as 'HH:MM\0'
 }

@@ -116,7 +116,7 @@ void drawBoard(frontSnake *snakes)
         {
         case HEAD:
             source = classicHeadUp;
-            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 2, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
+            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 3, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor, 0xFFFF0000);
             break;
         case TAIL:
             source = classicTail;

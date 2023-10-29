@@ -55,7 +55,7 @@ char shellStart()
                 if (strcmp(commandBuffer, "snake"))
                 {
                     blank();
-                    char winner = playSnake(5);
+                    char winner = playSnake(2);
                     paintString("You are now in shell. Player ", -1, 0);
                     paintChar(winner + '0', -1, 0);
                     paintString(" won", -1, 0);

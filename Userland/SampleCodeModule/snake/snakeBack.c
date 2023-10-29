@@ -101,8 +101,8 @@ unsigned int update(int snakeCount)
                         }
                         snakes[lookingAt.player].nextHeadCoordinates[0] = nextX;
                         snakes[lookingAt.player].nextHeadCoordinates[1] = nextY;
-                        snakes[lookingAt.player].lastMove = snakes[lookingAt.player].direction;
                         board[i][j].toDraw = BODY;
+                        board[i][j].drawDirection = snakes[lookingAt.player].direction;
                     }
                 }
                 else

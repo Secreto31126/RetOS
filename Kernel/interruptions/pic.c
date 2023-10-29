@@ -98,6 +98,9 @@ static void keyboard_handler()
         return;
     }
 
+    if (IS_RELEASE(scancode))
+        return;
+
     char modifier = (shift ? NEGATE(caps) : caps) + altgr * 2;
 
     uint16_t letter = get_scancode_utf16(scancode, modifier);

@@ -2,6 +2,13 @@
 #define MAX_DIGITS_IN_LONG 20
 #define MAX_STDIN_STRING 256
 
+extern void halt_user();
+
+void wait()
+{
+    halt_user();
+}
+
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize)
 {
     void *aux = malloc(newSize);
@@ -348,7 +355,7 @@ char getChar()
 {
     char c;
     while (!read_sys(0, &c, 1))
-        ;
+        wait();
     return c;
 }
 

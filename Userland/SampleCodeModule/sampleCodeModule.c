@@ -3,6 +3,7 @@
 // char *v = (char *)0xB8000 + 79 * 2;
 #include "nstdlib/nstdlib.h"
 #include "shell/shell.h"
+#include "snake/snake.h"
 #define SHELL_W 1024
 #define SHELL_H 768
 

@@ -94,24 +94,88 @@ HexColor *toHexArray(char *source, HexColor *result, int sourceWidth, int source
     HexColor replacement;
     va_list colors;
     va_start(colors, colorCount);
-    double xScaleFactor = (double)resultWidth / sourceWidth, yScaleFactor = (double)resultHeight / sourceHeight;
+    double xScaleFactor = (double)sourceWidth / resultWidth, yScaleFactor = (double)sourceHeight / resultHeight;
     for (int c = 0; c < colorCount; c++)
     {
         replacement = va_arg(colors, HexColor);
         int xIndex, yIndex = 0;
-        for (double i = 0; i < resultHeight && yIndex < sourceHeight; i += xScaleFactor)
+        for (double i = 0; i < sourceHeight && yIndex < resultHeight; i += yScaleFactor)
         {
             xIndex = 0;
-            for (double j = 0; j < resultWidth && xIndex < sourceWidth; j += yScaleFactor)
+            for (double j = 0; j < sourceWidth && xIndex < resultWidth; j += xScaleFactor)
             {
-                if (source[xIndex + yIndex * sourceWidth] == c)
-                    result[(int)(j + 0.5) + (int)(i + 0.5) * resultWidth] = replacement;
+                if (source[(int)(j) + (int)(i)*sourceWidth] == c)
+                    result[xIndex + yIndex * resultWidth] = replacement;
                 xIndex++;
             }
             yIndex++;
         }
     }
+    va_end(colors);
     return result;
+}
+void swap(Window w, int i1, int j1, int i2, int j2)
+{
+    HexColor aux;
+    aux = w.pixels[i1 * w.width + j1];
+    w.pixels[i1 * w.width + j1] = w.pixels[i2 * w.width + j2];
+    w.pixels[i2 * w.width + j2] = aux;
+}
+Window rotateBy90(Window w)
+{
+    int width = w.width, height = w.height;
+    double ratio = (double)width / height;
+    HexColor *source = w.pixels;
+    HexColor *result = malloc(width * height * sizeof(HexColor));
+
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            result[i * width + j] = source[((int)((width - j - 1) / ratio)) * width + ((int)(i * ratio))];
+        }
+    }
+    int size = height * width;
+    for (int i = 0; i < size; i++)
+    {
+        source[i] = result[i];
+    }
+    free(result);
+    return w;
+}
+Window rotateBy270(Window w) // more efficient that three 90 rotations
+{
+    int width = w.width, height = w.height;
+    double ratio = (double)width / height;
+    HexColor *source = w.pixels;
+    HexColor *result = malloc(width * height * sizeof(HexColor));
+
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            result[i * width + j] = source[((int)(j / ratio)) * width + width - ((int)(i * ratio))];
+        }
+    }
+    int size = height * width;
+    for (int i = 0; i < size; i++)
+    {
+        source[i] = result[i];
+    }
+    free(result);
+    return w;
+}
+Window rotateBy180(Window w)
+{
+    int hOver2 = w.height / 2, width = w.width, height = w.height;
+    for (int i = 0; i < hOver2; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            swap(w, i, j, height - i - 1, j);
+        }
+    }
+    return w;
 }
 
 uint64_t getScreenWidth()
@@ -133,4 +197,9 @@ Window getWindow(uint64_t width, uint64_t height, HexColor *pixels)
     ans.height = height;
     ans.pixels = pixels;
     return ans;
+}
+
+void freeWindow(Window w)
+{
+    free(w.pixels);
 }

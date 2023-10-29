@@ -225,20 +225,21 @@ Window overlayOnWindow(Window w, ShapeFunction f, uint64_t xOffset, uint64_t yOf
 Window overlayFromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sourceHeight, HexColor *map, uint64_t xOffset, uint64_t yOffset, OVERLAY_MODE m)
 {
     uint64_t width = w.width, height = w.height;
-    HexColor *receiver = w.pixels;
-    double xRatio = (double)sourceWidth / getScreenWidth(), yRatio = (double)sourceHeight / getScreenHeight(); // char array is a background
-    for (int i = 0; i < height; i++)
+    HexColor *result = w.pixels;
+    double xScaleFactor = (double)sourceWidth / getScreenWidth(), yScaleFactor = (double)sourceHeight / getScreenHeight();
+    int xIndex, yIndex = 0;
+    for (double i = yOffset / yScaleFactor; i < sourceHeight && yIndex < height; i += yScaleFactor)
     {
-        for (int j = 0; j < width; j++)
+        xIndex = 0;
+        for (double j = xOffset / xScaleFactor; j < sourceWidth && xIndex < width; j += xScaleFactor)
         {
             if (m == OPAQUE)
-                receiver[i * width + j] = colorMapper(map, source[((int)(i * width * yRatio)) + ((int)(j * xRatio))]);
+                result[xIndex + yIndex * width] = colorMapper(map, source[(int)(j) + (int)(i)*sourceWidth]);
             else
-            {
-                HexColor mapped = colorMapper(map, source[((int)(i * width * yRatio)) + ((int)(j * xRatio))]);
-                receiver[i * width + j] = mergeColor(receiver[i * width + j], mapped);
-            }
+                result[xIndex + yIndex * width] = mergeColor(result[xIndex + yIndex * width], colorMapper(map, source[(int)(j) + (int)(i)*sourceWidth]));
+            xIndex++;
         }
+        yIndex++;
     }
     return w;
 }

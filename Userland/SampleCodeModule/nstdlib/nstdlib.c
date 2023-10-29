@@ -501,12 +501,11 @@ uint64_t sPrintf(char *format, ...)
 uint64_t getMinutes()
 {
     uint64_t hexedTime = get_unix_time();
-    return (hexedTime & 0xF) + (((hexedTime & 0xF0) / 16) * 10);
+    return (hexedTime & 0xF) + (((hexedTime & 0xF0) >> 4) * 10);
 }
 
 uint64_t getHours()
 {
     uint64_t hexedTime = get_unix_time();
-    // return (hexedTime & 0xF00) + (((hexedTime & 0xF000) / 16) * 10);
-    return get_unix_time();
+    return ((hexedTime & 0xF00) >> 8) + (((hexedTime & 0xF000) >> 12) * 10);
 }

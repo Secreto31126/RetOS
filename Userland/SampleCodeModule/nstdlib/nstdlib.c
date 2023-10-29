@@ -371,14 +371,14 @@ uint64_t pow(double base, uint64_t exponent)
         ans *= base;
     return ans;
 }
-char strcmp(char *s1, char *s2)
+
+char strcmp(const char *a, const char *b)
 {
-    while (*s1 || *s2)
+    while (*a && *a == *b)
     {
-        if (*s1 != *s2)
-            return 0;
-        s1++;
-        s2++;
+        a++;
+        b++;
     }
-    return 1;
+    int dist = (int)(unsigned char)(*a) - (int)(unsigned char)(*b);
+    return dist ? dist > 0 ? 1 : -1 : 0;
 }

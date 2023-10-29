@@ -2,12 +2,11 @@
 #define MAX_DIGITS_IN_LONG 20
 #define MAX_STDIN_STRING 256
 #define BLOCK 10
+#define null 0
 
 extern void halt_user();
 uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisManyChars);
 uint64_t concatFrom(char *s1, char *s2);
-
-static char *allocatedPrints;
 
 void wait()
 {
@@ -428,8 +427,30 @@ uint64_t addString(char **receiver, uint64_t *length, char *source, uint64_t *al
     *length += len - 1;
     return len;
 }
+
+static char **allocatedPrints = null; // A pointer to pointers to char. Stores all allocated strings in sPrintf.
+static char allocatedPrintCount = 0;  // These serve to keep track of allocated memory in sPrintf and other functions that allocate strings, so as not to offload free responsibility to users.
+void addToAllocated(char *address)
+{
+    if (!(allocatedPrintCount % BLOCK))
+    {
+        allocatedPrints = realloc(allocatedPrints, allocatedPrintCount * sizeof(char *), (allocatedPrintCount + BLOCK) * sizeof(char *));
+    }
+    allocatedPrints[allocatedPrintCount++] = address;
+}
+
+void freePrints()
+{
+    for (int i = 0; i < allocatedPrintCount; i++)
+        free(allocatedPrints[i]);
+    free(allocatedPrints);
+    allocatedPrints = null;
+    allocatedPrintCount = 0;
+}
+
 /**
  * returns formatted string
+ * User should call freePrints() to free memory allocated for returned string
  */
 uint64_t sPrintf(char *format, ...)
 {
@@ -439,6 +460,7 @@ uint64_t sPrintf(char *format, ...)
     uint64_t count = 1; // counts null termination
     char *toReturn = malloc(sizeof(char) * allocated);
     *toReturn = 0;
+    addToAllocated(toReturn);
     while (*format != 0 && *format != EOF)
     {
         if (count == allocated) // Always checks if resize is necessary before checking to add any characters. Prevents copying code in every single-character edition.
@@ -512,9 +534,11 @@ uint64_t getHours()
     return ((hexedTime & 0xF00) >> 8) + (((hexedTime & 0xF000) >> 12) * 10);
 }
 
-// buffer should have at least 6 spaces in which to wrtie the time and add a null termination
-char *getTimeString(char *buffer)
+// User should call freePrints() to free memory allocated for returned string
+char *getTimeString()
 {
+    char *buffer = malloc(6 * sizeof(char)); // return string format will be 6 chars long. defining a value for this is unnecessary and confusing
+    addToAllocated(buffer);
     uint64_t min = getMinutes(), hr = getHours();
     char addedZeroFlag = 0;
     if (hr < 10)

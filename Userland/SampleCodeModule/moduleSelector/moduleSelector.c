@@ -28,13 +28,8 @@ void startModules()
         case '2':
         {
             blank();
-            char aux[6];
-            char *toPrint = sPrintf("Time is %s.\nPress any key to return to module selector.", getTimeString(aux));
-            paintString(toPrint, -1, 0);
-            free(toPrint);
-            toPrint = sPrintf("Thisstringshouldhavenospacesinit%s", "NorbetweenthatandthisdsafghjkhghgdfsdasDSFGHKJLHJGHFGDSFDASDFSGHJKHLJHKJHGDSFADSdfsghfjghkjgdsfadfsgdhfgjhgdsffdgfhgh");
-            paintString(toPrint, -1, 0);
-            free(toPrint);
+            paintString(sPrintf("Time is %s.\nPress any key to return to module selector.", getTimeString()), -1, 0);
+            freePrints();
             getChar();
             blank();
             setEnvironment();

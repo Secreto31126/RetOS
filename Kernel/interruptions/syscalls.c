@@ -113,7 +113,7 @@ static uint64_t get_time()
 
     set_interrupt_flag();
 
-    return hour << 8 + minute;
+    return (get_hour_offset(hour) << 8) + minute;
 }
 
 static uint32_t get_screen_size()

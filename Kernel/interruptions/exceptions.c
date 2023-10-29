@@ -23,7 +23,8 @@ static void (*exception_handlers[20])(void) = {
     noop,
     noop,
     noop,
-    noop};
+    noop,
+};
 
 void exception_manager(uint8_t exception)
 {

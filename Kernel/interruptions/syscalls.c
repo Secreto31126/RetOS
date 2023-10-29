@@ -1,5 +1,13 @@
 #include "interruptions.h"
 
+/**
+ * @brief Read from a file descriptor
+ *
+ * @param fd 0 for stdin, 3 for stdkey
+ * @param buffer The buffer to write to
+ * @param count The number of bytes to read
+ * @return uint64_t The number of bytes read
+ */
 static uint64_t read(uint64_t fd, char *buffer, uint64_t count);
 static uint64_t write(uint64_t fd, const char *buffer, uint64_t count);
 /**
@@ -39,7 +47,8 @@ static syscall syscall_handlers[] = {
     get_time,
     get_screen_size,
     beep_bop,
-    get_tick};
+    get_tick,
+};
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 {
@@ -51,14 +60,18 @@ uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
     return -1;
 }
 
+static uint64_t (*files[4])(uint8_t *, uint16_t) = {
+    read_stdin,
+    noop,
+    noop,
+    read_stdkey,
+};
+
 static uint64_t read(uint64_t fd, char *buffer, uint64_t count)
 {
-    if (fd != 0)
-    {
-        return -1;
-    }
-
-    return read_stdin((uint8_t *)buffer, count);
+    if (fd < 4)
+        return files[fd]((uint8_t *)buffer, count);
+    return -1;
 }
 
 static uint64_t write(uint64_t fd, const char *buffer, uint64_t count)

@@ -54,6 +54,7 @@ char shellStart()
                 commandIndex = 0;
                 if (strcmp(commandBuffer, "snake"))
                 {
+                    setSeed(get_tick());
                     blank();
                     char winner = playSnake(2);
                     paintString("You are now in shell. Player ", -1, 0);
@@ -71,6 +72,5 @@ char shellStart()
     // free(pixels);
     blank();
     endPainter();
-    setSeed(get_tick());
     return 1;
 }

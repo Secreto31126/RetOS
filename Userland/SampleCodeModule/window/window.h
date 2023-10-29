@@ -1,5 +1,6 @@
 #ifndef WND_H
 #include <stdint.h>
+#include "./../nstdlib/nstdlib.h"
 #define WND_H
 
 /**
@@ -46,5 +47,8 @@ uint64_t getScreenWidth();
 uint64_t getScreenHeight();
 uint64_t drawWindow(Window w, uint64_t x, uint64_t y);
 Window getWindow(uint64_t width, uint64_t height, HexColor *pixels);
+Window rotateBy90(Window w);
+Window rotateBy180(Window w);
+Window rotateBy270(Window w);
 
 #endif

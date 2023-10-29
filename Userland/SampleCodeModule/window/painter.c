@@ -14,12 +14,12 @@ void startPainter(uint64_t width, uint64_t height)
 }
 void setSize(double s)
 {
-    // if (strlen(lineStart) * TRUE_LETTER_WIDTH * s < w) // lineStart cannot occupy more than a line
+    if (strlen(lineStart) * TRUE_LETTER_WIDTH * s < w) // lineStart cannot occupy more than a line
     {
         size = s;
         stamp.width = TRUE_LETTER_WIDTH * size;
         stamp.height = TRUE_LETTER_HEIGHT * size;
-        free(stamp.pixels);
+        freeWindow(stamp);
         stamp.pixels = malloc(((int)(TRUE_LETTER_HEIGHT * size)) * ((int)(TRUE_LETTER_WIDTH * size)) * sizeof(HexColor));
         if (s > maxLineSize)
             maxLineSize = s;
@@ -28,7 +28,10 @@ void setSize(double s)
 void setLineStart(char *start)
 {
     if ((strlen(start) * TRUE_LETTER_WIDTH * size) < w)
-        lineStart = start;
+        for (int i = 0; *(start + i); i++)
+            if (*(start + i) == '\n')
+                return;
+    lineStart = start;
 }
 void newLine()
 {
@@ -83,12 +86,13 @@ void blank()
 {
     xPointer = 0;
     yPointer = 0;
-    while (paintChar(0, 0xFF000000, 0xFF000000)) // paints a fully black character on the whole window until the window is full
-        ;
-    xPointer = 0;
-    yPointer = 0;
+    Window blanker = getWindow(w, h, malloc(w * h * sizeof(HexColor)));
+    char blackPixel[1] = {0};
+    toHexArray(blackPixel, blanker.pixels, 1, 1, w, h, 1, 0xFF000000);
+    drawWindow(blanker, 0, 0);
+    freeWindow(blanker);
 }
 void endPainter()
 {
-    free(stamp.pixels);
+    freeWindow(stamp);
 }

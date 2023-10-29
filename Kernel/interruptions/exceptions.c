@@ -5,20 +5,32 @@ static uint64_t exceptions = 0;
 static void zero_division();
 static void invalid_opcode();
 
-void exception_manager(int exception)
+static void (*exception_handlers[20])(void) = {
+    zero_division,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    invalid_opcode,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop};
+
+void exception_manager(uint8_t exception)
 {
     exceptions++;
-
-    switch (exception)
+    if (exception < 20)
     {
-    case 0:
-        return zero_division();
-
-    case 1:
-        return invalid_opcode();
-
-    default:
-        break;
+        exception_handlers[exception]();
     }
 }
 

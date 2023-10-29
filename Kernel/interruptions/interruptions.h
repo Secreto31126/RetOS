@@ -4,12 +4,16 @@
 #include <interruptions.h>
 
 #include <lib.h>
+#include <audio.h>
 #include <video.h>
+#include <ticks.h>
 #include <stdin.h>
 #include <stdint.h>
 #include <header.h>
 #include <memory.h>
 #include <console.h>
 #include <localization.h>
+
+void noop();
 
 #endif

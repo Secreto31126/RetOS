@@ -6,7 +6,7 @@ void setSeed(unsigned int newSeed)
     seed = newSeed;
 }
 unsigned int rand()
-{
+{ // A linear-feedback shift register ('sourced' from wikipedia)
     bit = ((seed >> 0) ^ (seed >> 2) ^ (seed >> 3) ^ (seed >> 5)) & 1;
     return (seed = (seed >> 1) | (bit << 15));
 }

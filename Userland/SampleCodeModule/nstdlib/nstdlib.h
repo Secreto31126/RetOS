@@ -26,10 +26,15 @@ int read(char *buffer, int count);
 uint64_t scanf(char *format, ...);
 uint64_t puts(char *string);
 uint64_t printf(char *format, ...);
+uint64_t sPrintf(char *format, ...);
+uint64_t sPuts(char *receiver, char *source);
+char sPutChar(char *receiver, char c);
 uint64_t strlen(char *s);
 static const double pi = 3.14159265359;
 uint64_t pow(double base, uint64_t exponent); // can't return doubles in userland because SSE registers aren't usable
 char strcmp(char *s1, char *s2);
 void wait();
+uint64_t getHours();
+uint64_t getMinutes();
 
 #endif

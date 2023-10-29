@@ -23,7 +23,7 @@ char shellStart()
     char c;
     commandBuffer = malloc(sizeof(char) * (MAX_COMMAND_LENGTH + 1));
     buffer = malloc((width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH);
-    initialize();
+    initializeFonts();
     startPainter(width, height);
     setSize(1.0);
     setLineStart(":~");
@@ -36,8 +36,6 @@ char shellStart()
             leaving = 1;
         else
             leaving = 0;
-        if (c == 'p')
-            warpLineUp(1);
         if (c == '\b')
         {
             if (*(buffer - 1) == '\n' || !index)
@@ -84,7 +82,6 @@ char shellStart()
     blank();
     free(commandBuffer);
     free(buffer);
-    endPainter();
     return 1;
 }
 

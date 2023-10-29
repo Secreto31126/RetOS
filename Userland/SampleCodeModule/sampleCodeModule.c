@@ -4,8 +4,7 @@
 #include "nstdlib/nstdlib.h"
 #include "shell/shell.h"
 #include "snake/snake.h"
-#define SHELL_W 1024
-#define SHELL_H 768
+#include "moduleSelector/moduleSelector.h"
 
 int main()
 {
@@ -15,8 +14,7 @@ int main()
 	for (int i = 0; i < 10; i++)
 		printf("%c", getChar());
 	*/
-	printf("%c", shellStart() == 1);
-	printf("In sample");
+	startModules();
 	return 0xDEADC0DE;
 	return 0xDEADBEEF;
 }

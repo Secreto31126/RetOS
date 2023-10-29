@@ -20,7 +20,7 @@ void setFont(int fontNumber)
 {
     currentFont = fonts + (fontNumber % FONT_COUNT);
 }
-void initialize()
+void initializeFonts()
 {
     loadFont("Default", Classic, 0);
     setFont(0);

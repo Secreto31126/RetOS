@@ -10,6 +10,7 @@ void startPainter(uint64_t width, uint64_t height)
 {
     w = width;
     h = height;
+    lineStart = "";
     stamp = getWindow(TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, malloc(TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH * sizeof(HexColor)));
 }
 void setSize(double s)

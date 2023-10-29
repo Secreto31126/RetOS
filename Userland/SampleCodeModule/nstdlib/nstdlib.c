@@ -1,8 +1,11 @@
 #include "nstdlib.h"
 #define MAX_DIGITS_IN_LONG 20
 #define MAX_STDIN_STRING 256
+#define BLOCK 50
 
 extern void halt_user();
+uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisManyChars);
+uint64_t concatFrom(char *s1, char *s2);
 
 void wait()
 {
@@ -231,7 +234,6 @@ uint64_t printf(char *format, ...)
     va_end(argp);
     return count;
 }
-uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisManyChars);
 /**
  * returns number of fields converted
  */
@@ -297,7 +299,6 @@ uint64_t insertString(char *startAddress, char *insertion)
 {
     return replaceWith(startAddress, insertion, 0);
 }
-uint64_t concatFrom(char *s1, char *s2);
 
 uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisManyChars)
 {
@@ -381,4 +382,131 @@ char strcmp(char *a, char *b)
     }
     int dist = (int)(unsigned char)(*a) - (int)(unsigned char)(*b);
     return dist ? dist > 0 ? 1 : -1 : 0;
+}
+
+// User is responsible for ensuring receiver has enough memory allocated to receive a char
+char sPutChar(char *receiver, char c)
+{
+    while (*receiver)
+        receiver++;
+    *receiver = c;
+    *(receiver + 1) = 0;
+    return c;
+}
+
+// returns length of resulting string
+uint64_t sPuts(char *receiver, char *source)
+{
+    char count = 0;
+    while (*receiver)
+    {
+        receiver++;
+        count++;
+    }
+    while (*source)
+    {
+        *(receiver++) = *(source++);
+        count++;
+    }
+    *receiver = 0;
+    return count;
+}
+
+// Returns length of string added
+uint64_t addString(char **receiver, uint64_t *length, char *source, uint64_t *allocated)
+{
+    uint64_t len = strlen(source);
+    if (*length + len <= *allocated)
+    {
+        uint64_t toAdd = ((*length + len - *allocated) / BLOCK + 1) * BLOCK; // space that must be added, rounded to nearest block
+        *receiver = realloc(*receiver, *allocated, toAdd);
+        *allocated += toAdd;
+    }
+    sPuts(*receiver + *length, source);
+    *length += len;
+    return len;
+}
+/**
+ * returns formatted string
+ */
+uint64_t sPrintf(char *format, ...)
+{
+    va_list argp;
+    va_start(argp, format);
+    uint64_t allocated = BLOCK;
+    uint64_t count = 1;
+    char *toReturn = malloc(sizeof(char) * allocated);
+    *toReturn = 0;
+    while (*format != 0 && *format != EOF)
+    {
+        if (count == allocated) // Always checks if resize is necessary before checking to add any characters. Prevents copying code in every single-character edition.
+        {
+            toReturn = realloc(toReturn, allocated, allocated + BLOCK);
+            allocated += BLOCK;
+        }
+        if (*format == '%')
+        {
+            format++;
+            switch (*format)
+            {
+            case 'c':
+            {
+                sPutChar(toReturn, va_arg(argp, int));
+                count++;
+                break;
+            }
+            case 's':
+            {
+                addString(&toReturn, &count, va_arg(argp, char *), &allocated);
+                break;
+            }
+            case 'i':
+            case 'd':
+            {
+                char aux[MAX_DIGITS_IN_LONG];
+                addString(&toReturn, &count, itoa(va_arg(argp, int), aux, 10), &allocated);
+                break;
+            }
+            case 'u':
+            {
+                char aux[MAX_DIGITS_IN_LONG];
+                addString(&toReturn, &count, utoa(va_arg(argp, int), aux, 10), &allocated);
+                break;
+            }
+            case 'l':
+            {
+                char aux[MAX_DIGITS_IN_LONG];
+                addString(&toReturn, &count, ultoa(va_arg(argp, int), aux, 10), &allocated);
+                break;
+            }
+            default:
+            {
+                sPutChar(toReturn, '%');
+                break;
+            }
+            }
+        }
+        else
+        {
+            sPutChar(toReturn, *format);
+        }
+        format++;
+        count++;
+    }
+    va_end(argp);
+    toReturn = realloc(toReturn, allocated, count);
+    return toReturn;
+}
+
+uint64_t getMinutes()
+{
+    uint64_t hexedTime = get_unix_time();
+    return (hexedTime & 0xF) + (((hexedTime & 0xF0) / 16) * 10);
+}
+
+uint64_t getHours()
+{
+    uint64_t hexedTime = get_unix_time();
+    // return (hexedTime & 0xF00) + (((hexedTime & 0xF000) / 16) * 10);
+    return get_unix_time();
 }

@@ -4,7 +4,7 @@
 typedef struct command
 {
     char *code;
-    char *(action(char));
+    char *(*action)(char);
 } command;
 
 #endif

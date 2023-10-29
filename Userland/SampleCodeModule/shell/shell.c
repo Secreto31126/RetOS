@@ -17,7 +17,7 @@ char shellStart()
     uint64_t commandIndex = 0;
 
     char c;
-    char commandBuffer[MAX_COMMAND_LENGTH + 1] = {0};
+    char *commandBuffer = malloc(sizeof(char) * (MAX_COMMAND_LENGTH + 1));
     char buffer[(width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH];
     // HexColor *pixels = malloc((width * height * sizeof(HexColor)));
     // Window protoShell = getWindow(width, height, pixels);
@@ -49,7 +49,14 @@ char shellStart()
         {
             buffer[index++] = c;
             if (c != '\n')
+            {
                 commandBuffer[commandIndex++] = c;
+                if (commandIndex >= MAX_COMMAND_LENGTH)
+                {
+                    commandBuffer++;
+                    commandIndex--;
+                }
+            }
             else
             {
                 commandIndex = 0;
@@ -69,6 +76,7 @@ char shellStart()
         paintChar(c, 0xFFFFFFFF, 0xFF000000);
     }
     blank();
+    free(commandBuffer);
     endPainter();
     return 1;
 }

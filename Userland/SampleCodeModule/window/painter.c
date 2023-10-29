@@ -14,7 +14,7 @@ void startPainter(uint64_t width, uint64_t height)
 }
 void setSize(double s)
 {
-    // if (strlen(lineStart) * TRUE_LETTER_WIDTH * s < w) // lineStart cannot occupy more than a line
+    if (strlen(lineStart) * TRUE_LETTER_WIDTH * s < w) // lineStart cannot occupy more than a line
     {
         size = s;
         stamp.width = TRUE_LETTER_WIDTH * size;

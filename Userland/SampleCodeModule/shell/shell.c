@@ -27,6 +27,7 @@ char shellStart()
     setLineStart(":~");
     paintString("You are now in shell:\n", -1, 0);
     char leaving = 0;
+    setSize(3.0);
     while ((c = getChar()) != 'q' || !leaving)
     {
         if (c == 'q')

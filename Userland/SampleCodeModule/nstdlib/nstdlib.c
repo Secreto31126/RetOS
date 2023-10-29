@@ -373,7 +373,7 @@ uint64_t pow(double base, uint64_t exponent)
 }
 char strcmp(char *s1, char *s2)
 {
-    while (*s1 && *s2)
+    while (*s1 || *s2)
     {
         if (*s1 != *s2)
             return 0;

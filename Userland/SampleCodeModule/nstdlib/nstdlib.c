@@ -372,7 +372,7 @@ uint64_t pow(double base, uint64_t exponent)
     return ans;
 }
 
-char strcmp(const char *a, const char *b)
+char strcmp(char *a, char *b)
 {
     while (*a && *a == *b)
     {

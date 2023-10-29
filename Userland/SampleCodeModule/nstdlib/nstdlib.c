@@ -418,10 +418,10 @@ uint64_t sPuts(char *receiver, char *source)
 uint64_t addString(char **receiver, uint64_t *length, char *source, uint64_t *allocated)
 {
     uint64_t len = strlen(source);
-    if ((*length + len) <= *allocated)
+    if ((*length + len) >= *allocated)
     {
         uint64_t toAdd = ((*length + len - *allocated) / BLOCK + 1) * BLOCK; // space that must be added, rounded to nearest block
-        *receiver = realloc(*receiver, *allocated, toAdd * sizeof(char));
+        *receiver = realloc(*receiver, *allocated, (*allocated + toAdd) * sizeof(char));
         *allocated += toAdd;
     }
     sPuts(*receiver + *length - 1, source);

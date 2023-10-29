@@ -59,17 +59,18 @@ uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
     return -1;
 }
 
+static uint64_t (*files[4])(uint8_t *, uint16_t) = {
+    read_stdin,
+    noop,
+    noop,
+    read_stdkey,
+};
+
 static uint64_t read(uint64_t fd, char *buffer, uint64_t count)
 {
-    switch (fd)
-    {
-    case 0:
-        return read_stdin((uint8_t *)buffer, count);
-    case 3:
-        return read_stdkey((uint8_t *)buffer, count);
-    default:
-        return -1;
-    }
+    if (fd < 4)
+        return files[fd]((uint8_t *)buffer, count);
+    return -1;
 }
 
 static uint64_t write(uint64_t fd, const char *buffer, uint64_t count)

@@ -7,7 +7,7 @@
 #include "./../snake/random.h"
 #include "./../snake/snake.h"
 
-#define MAX_COMMAND_LENGTH 30
+#define MAX_COMMAND_LENGTH 90 // Absolutely arbitrary
 
 char shellStart()
 {

@@ -60,7 +60,7 @@ char shellStart()
             else
             {
                 commandIndex = 0;
-                if (strcmp(commandBuffer, "snake"))
+                if (!strcmp(commandBuffer, "snake"))
                 {
                     setSeed(get_tick());
                     blank();

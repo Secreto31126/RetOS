@@ -157,6 +157,6 @@ void drawBoard(frontSnake *snakes)
             }
         drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
     }
-    free(stamp.pixels);
+    freeWindow(stamp);
     freeBack();
 }

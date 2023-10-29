@@ -66,10 +66,7 @@ char shellStart()
         commandBuffer[commandIndex] = 0;
         buffer[index] = 0;
         paintChar(c, 0xFFFFFFFF, 0xFF000000);
-        // drawStringToWindow(protoShell, buffer, 0xFFFFFFFF, 0xFF101010, 1.0);
-        // drawWindow(protoShell, 0, 0);
     }
-    // free(pixels);
     blank();
     endPainter();
     return 1;

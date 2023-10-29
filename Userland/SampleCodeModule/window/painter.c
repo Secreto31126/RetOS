@@ -19,7 +19,7 @@ void setSize(double s)
         size = s;
         stamp.width = TRUE_LETTER_WIDTH * size;
         stamp.height = TRUE_LETTER_HEIGHT * size;
-        free(stamp.pixels);
+        freeWindow(stamp);
         stamp.pixels = malloc(((int)(TRUE_LETTER_HEIGHT * size)) * ((int)(TRUE_LETTER_WIDTH * size)) * sizeof(HexColor));
         if (s > maxLineSize)
             maxLineSize = s;
@@ -90,9 +90,9 @@ void blank()
     char blackPixel[1] = {0};
     toHexArray(blackPixel, blanker.pixels, 1, 1, w, h, 1, 0xFF000000);
     drawWindow(blanker, 0, 0);
-    free(blanker.pixels);
+    freeWindow(blanker);
 }
 void endPainter()
 {
-    free(stamp.pixels);
+    freeWindow(stamp);
 }

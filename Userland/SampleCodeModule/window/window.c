@@ -198,3 +198,8 @@ Window getWindow(uint64_t width, uint64_t height, HexColor *pixels)
     ans.pixels = pixels;
     return ans;
 }
+
+void freeWindow(Window w)
+{
+    free(w.pixels);
+}

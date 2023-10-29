@@ -12,7 +12,8 @@ static void keyboard_handler();
 
 static void (*pic_handlers[2])(void) = {
     tick_handler,
-    keyboard_handler};
+    keyboard_handler,
+};
 
 void pic_manager(uint8_t interrupt)
 {

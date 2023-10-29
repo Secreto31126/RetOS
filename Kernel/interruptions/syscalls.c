@@ -47,7 +47,8 @@ static syscall syscall_handlers[] = {
     get_time,
     get_screen_size,
     beep_bop,
-    get_tick};
+    get_tick,
+};
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 {

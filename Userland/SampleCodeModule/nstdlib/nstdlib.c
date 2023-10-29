@@ -7,6 +7,7 @@
 extern void halt_user();
 uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisManyChars);
 uint64_t concatFrom(char *s1, char *s2);
+void addToAllocated(char *address);
 
 void wait()
 {

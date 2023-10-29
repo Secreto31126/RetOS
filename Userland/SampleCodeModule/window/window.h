@@ -12,10 +12,18 @@ enum HEX_COLORS
     HEX_RED = 0xFF0000,
     HEX_GREEN = 0x00FF00,
     HEX_BLUE = 0x0000FF,
+    HEX_WHITE = 0xFFFFFF,
+    HEX_BLACK = 0x000000,
 };
 
+typedef enum OVERLAY_MODE
+{
+    TRANSPARENT,
+    OPAQUE,
+} OVERLAY_MODE;
+
 typedef uint32_t HexColor;
-typedef HexColor (*ShapeFunction)(int, int, int, int);
+typedef HexColor (*ShapeFunction)(int, int, double, double); // First two are the x and y coordinates regarding the origin. The second two are scale factors of the shape
 
 typedef enum L_R_ALIGNMENT
 {
@@ -50,5 +58,9 @@ Window getWindow(uint64_t width, uint64_t height, HexColor *pixels);
 Window rotateBy90(Window w);
 Window rotateBy180(Window w);
 Window rotateBy270(Window w);
+void freeWindow(Window w);
+// Offsets refer to position of window top left corner regarding the 'origin' of the ShapeFunction used.
+Window overlayOnWindow(Window w, ShapeFunction f, uint64_t xOffset, uint64_t yOffset, double xScaleFactor, double yScaleFactor, OVERLAY_MODE m);
+Window overlayFromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sourceHeight, HexColor *map, uint64_t xOffset, uint64_t yOffset, OVERLAY_MODE m);
 
 #endif

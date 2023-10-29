@@ -430,7 +430,7 @@ uint64_t addString(char **receiver, uint64_t *length, char *source, uint64_t *al
 }
 
 static char **allocatedPrints = null; // A pointer to pointers to char. Stores all allocated strings in sPrintf.
-static char allocatedPrintCount = 0;  // These serve to keep track of allocated memory in sPrintf and other functions that allocate strings, so as not to offload free responsibility to users.
+static int allocatedPrintCount = 0;   // These serve to keep track of allocated memory in sPrintf and other functions that allocate strings, so as not to offload free responsibility to users.
 void addToAllocated(char *address)
 {
     if (!(allocatedPrintCount % BLOCK))

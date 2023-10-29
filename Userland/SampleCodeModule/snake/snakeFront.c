@@ -1,5 +1,6 @@
 #include "snake.h"
 #include "snakePrivate.h"
+#include "./../window/backgroundArrays.h"
 #define MOVE_INTERVAL 3
 
 typedef struct frontSnake
@@ -12,11 +13,25 @@ typedef struct frontSnake
 void doMovement(char c, frontSnake *snakes);
 void putDeath(int snakeNumber);
 void drawBoard(frontSnake *snakes);
+void drawBackground();
+static ShapeFunction backgroundFunction = RetOSBackground;
 
 char timeHasPassed(uint64_t start, uint64_t unit)
 {
     return (get_tick() - start) > unit;
 }
+
+// As we do not currently have a single draw mode
+void drawBackgroundWithParameters(Window w, uint64_t xOffset, uint64_t yOffset)
+{
+    // source = background;
+    // toHexArray(source, w.pixels, DRAW_SIZE, DRAW_SIZE, w.width, w.height, 1, BACKGROUND_COLOR);
+
+    overlayOnWindow(w, backgroundFunction, xOffset, yOffset, 1.0, 1.0, OPAQUE);
+
+    // overlayFromCharArray(w, windowsBackground, WINDOWS_WIDTH, WINDOWS_HEIGHT, windowsColorMap, xOffset, yOffset, OPAQUE);
+}
+
 int playSnake(uint16_t snakeCount)
 {
     char gameOver = 0;
@@ -31,6 +46,7 @@ int playSnake(uint16_t snakeCount)
         snakes[i].bodyColor = getHexColor();
         snakes[i].otherColor = getHexColor();
     }
+    drawBackground();
     drawBoard(snakes);
 
     uint64_t time = get_tick();
@@ -119,6 +135,8 @@ void drawBoard(frontSnake *snakes)
             toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 3, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor, 0xFFFF0000);
             break;
         case TAIL:
+            drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
+            drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight); // Since the tail has transparency, the background must be redrawn before drawing tail.
             source = classicTail;
             toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 3, BACKGROUND_COLOR, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
             break;
@@ -131,15 +149,14 @@ void drawBoard(frontSnake *snakes)
             toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 4, BACKGROUND_COLOR, APPLE_RED, APPLE_BROWN, APPLE_GREEN);
             break;
         case BLANK:
-            source = background;
-            toHexArray(source, stamp.pixels, DRAW_SIZE, DRAW_SIZE, stamp.width, stamp.height, 1, BACKGROUND_COLOR);
+            drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
             break;
         case NO_DRAW:
         default:
             continue;
             break;
         }
-        if (source != apple && source != background) // don't want spinning apples.
+        if (board[i].toDraw != APPLE && board[i].toDraw != BLANK) // don't want spinning apples.
             switch (board[i].drawDirection)
             {
             case LEFT:
@@ -159,4 +176,21 @@ void drawBoard(frontSnake *snakes)
     }
     freeWindow(stamp);
     freeBack();
+}
+
+void drawBackground()
+{
+    uint64_t tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
+    Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
+    tile *board = getBoard();
+    for (int i = 0; i < (BOARD_HEIGHT * BOARD_WIDTH); i++)
+    {
+        drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
+        drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight); // Since the tail has transparency, the background must be redrawn before drawing tail.
+    }
+}
+
+void setBackground(ShapeFunction newBackground)
+{
+    backgroundFunction = newBackground;
 }

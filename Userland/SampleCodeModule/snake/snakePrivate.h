@@ -4,11 +4,12 @@
 #define APPLE_BROWN 0xFF452C09
 #define APPLE_RED 0xFFba2709
 #define APPLE_GREEN 0xFF124F0D
-#define BACKGROUND_COLOR 0xFF000000
+#define BACKGROUND_COLOR 0x00000000
 
 #include "./../window/fontInterface.h"
 #include "./../window/window.h"
 #include "./../window/painter.h"
+#include "./../window/figures.h"
 #include "random.h"
 #include "snakeDrawings.h"
 

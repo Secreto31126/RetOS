@@ -1,4 +1,5 @@
 #include "window.h"
+#include "figures.h"
 #include <stdarg.h>
 
 #define GET_HEX(a, r, g, b) (((a) << 24) + ((r) << 16) + ((g) << 8) + (b))
@@ -202,4 +203,42 @@ Window getWindow(uint64_t width, uint64_t height, HexColor *pixels)
 void freeWindow(Window w)
 {
     free(w.pixels);
+}
+
+Window overlayOnWindow(Window w, ShapeFunction f, uint64_t xOffset, uint64_t yOffset, double xScaleFactor, double yScaleFactor, OVERLAY_MODE m)
+{
+    HexColor *toOverlay = w.pixels; // To avoid referencing within a loop
+    uint64_t height = w.height, width = w.width;
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            if (m == OPAQUE)
+                toOverlay[i * width + j] = f(j + xOffset, i + yOffset, xScaleFactor, yScaleFactor);
+            else
+                toOverlay[i * width + j] = mergeColor(toOverlay[i * width + j], f(j + xOffset, i + yOffset, xScaleFactor, yScaleFactor));
+        }
+    }
+    return w;
+}
+
+Window overlayFromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sourceHeight, HexColor *map, uint64_t xOffset, uint64_t yOffset, OVERLAY_MODE m)
+{
+    uint64_t width = w.width, height = w.height;
+    HexColor *receiver = w.pixels;
+    double xRatio = (double)sourceWidth / getScreenWidth(), yRatio = (double)sourceHeight / getScreenHeight(); // char array is a background
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            if (m == OPAQUE)
+                receiver[i * width + j] = colorMapper(map, source[((int)(i * width * yRatio)) + ((int)(j * xRatio))]);
+            else
+            {
+                HexColor mapped = colorMapper(map, source[((int)(i * width * yRatio)) + ((int)(j * xRatio))]);
+                receiver[i * width + j] = mergeColor(receiver[i * width + j], mapped);
+            }
+        }
+    }
+    return w;
 }

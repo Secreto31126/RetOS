@@ -6,6 +6,7 @@
 #include "./../nstdlib/nstdlib.h"
 
 static const char prompt[] = "You are now in the module selector.\nPress 1 to continue to shell.\nPress 2 to get the current time.\nPress 3 to dump all registers.\nPress 4 to end program (shut down).";
+void setEnvironment();
 
 void startModules()
 {

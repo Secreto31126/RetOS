@@ -8,19 +8,21 @@
 #include "./../snake/snake.h"
 
 #define MAX_COMMAND_LENGTH 90 // Absolutely arbitrary
+void warpLineUp(int lines);
+
+static char *buffer, *commandBuffer;
+static uint64_t index, commandIndex;
 
 char shellStart()
 {
     uint32_t width = getScreenWidth();
     uint32_t height = getScreenHeight();
-    uint64_t index = 0;
-    uint64_t commandIndex = 0;
+    index = 0;
+    commandIndex = 0;
 
     char c;
-    char *commandBuffer = malloc(sizeof(char) * (MAX_COMMAND_LENGTH + 1));
-    char buffer[(width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH];
-    // HexColor *pixels = malloc((width * height * sizeof(HexColor)));
-    // Window protoShell = getWindow(width, height, pixels);
+    commandBuffer = malloc(sizeof(char) * (MAX_COMMAND_LENGTH + 1));
+    buffer = malloc((width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH);
     initialize();
     startPainter(width, height);
     setSize(1.0);
@@ -34,7 +36,8 @@ char shellStart()
             leaving = 1;
         else
             leaving = 0;
-
+        if (c == 'p')
+            warpLineUp(1);
         if (c == '\b')
         {
             if (*(buffer - 1) == '\n' || !index)
@@ -73,10 +76,31 @@ char shellStart()
         }
         commandBuffer[commandIndex] = 0;
         buffer[index] = 0;
-        paintChar(c, 0xFFFFFFFF, 0xFF000000);
+        if (!paintChar(c, 0xFFFFFFFF, 0xFF000000))
+        {
+            warpLineUp(1);
+        }
     }
     blank();
     free(commandBuffer);
+    free(buffer);
     endPainter();
     return 1;
+}
+
+void warpLineUp(int lines)
+{
+    blank();
+    for (int line = 0; line < lines; line++)
+    {
+        uint64_t lineLength = getCharPerLine();
+        for (int i = 0; i < getCharPerLine && *buffer != '\n'; i++)
+        {
+            buffer++;
+            index--;
+        }
+    }
+    buffer++;
+    index--; // get rid of that last '\n'
+    paintString(buffer, -1, 0);
 }

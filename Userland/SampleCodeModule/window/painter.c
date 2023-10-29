@@ -59,7 +59,7 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
         }
     }
     if ((xPointer + TRUE_LETTER_WIDTH * size) > w || c == '\n')
-        if ((yPointer + TRUE_LETTER_HEIGHT * maxLineSize) > h)
+        if ((yPointer + TRUE_LETTER_HEIGHT * maxLineSize * 2) > h) // *2 because letters are drawn from cursor downwards, so otherwise last line would have its top on the bottom of the screen
             return 0;
         else
         {
@@ -82,6 +82,12 @@ char paintString(char *c, HexColor letterColor, HexColor highlightColor)
         return 0;
     return 1;
 }
+
+uint64_t getCharPerLine()
+{
+    return (uint64_t)(w / TRUE_LETTER_WIDTH / size);
+}
+
 void blank()
 {
     xPointer = 0;

@@ -1,18 +1,9 @@
-#include <stdint.h>
 #include "shell.h"
-#include "./../nstdlib/nstdlib.h"
-#include "./../window/window.h"
-#include "./../window/fontInterface.h"
-#include "./../window/painter.h"
-#include "./../snake/random.h"
-#include "./../snake/snake.h"
-
-#define MAX_COMMAND_LENGTH 90 // Absolutely arbitrary
 void warpLineUp(int lines);
 
 static char *buffer, *commandBuffer;
 static uint64_t index, commandIndex;
-
+static HexColor letterColor = 0xFF000000 | HEX_WHITE, highlightColor = 0x00000000 | HEX_BLACK;
 char shellStart()
 {
     uint32_t width = getScreenWidth();
@@ -27,7 +18,7 @@ char shellStart()
     startPainter(width, height);
     setSize(1.0);
     setLineStart(":~");
-    paintString("You are now in shell:\n", -1, 0);
+    paintString("You are now in shell:\n", letterColor, highlightColor);
     char leaving = 0;
     setSize(1.0);
     while ((c = getChar()) != 'q' || !leaving)
@@ -66,15 +57,15 @@ char shellStart()
                     setSeed(get_tick());
                     blank();
                     char winner = playSnake(2);
-                    paintString("You are now in shell. Player ", -1, 0);
-                    paintChar(winner + '0', -1, 0);
-                    paintString(" won", -1, 0);
+                    paintString("You are now in shell. Player ", letterColor, highlightColor);
+                    paintChar(winner + '0', letterColor, highlightColor);
+                    paintString(" won", letterColor, highlightColor);
                 }
             }
         }
         commandBuffer[commandIndex] = 0;
         buffer[index] = 0;
-        if (!paintChar(c, 0xFFFFFFFF, 0xFF000000))
+        if (!paintChar(c, letterColor, highlightColor))
         {
             warpLineUp(1);
         }
@@ -99,5 +90,26 @@ void warpLineUp(int lines)
     }
     buffer++;
     index--; // get rid of that last '\n'
-    paintString(buffer, -1, 0);
+    paintString(buffer, letterColor, highlightColor);
+}
+void setLetterColor(HexColor color)
+{
+    letterColor = 0xFF000000 & color; // Letters cannot be transparent
+}
+void setHighlightColor(HexColor color)
+{
+    highlightColor = color; // highlights can be transparent
+}
+void resize(double size)
+{
+    setSize(size);
+    blank();
+    while (!paintString(buffer, letterColor, highlightColor))
+        warpLineUp(1);
+}
+void setPrompt(char *newPrompt)
+{
+    setLineStart(newPrompt);
+    blank();
+    paintString(buffer, letterColor, highlightColor);
 }

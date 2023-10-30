@@ -561,3 +561,32 @@ char *getTimeString()
     *buffer = 0;
     return buffer - 5; // In total, buffer was shifted 5 spaces to format as 'HH:MM\0'
 }
+
+char isPrefix(char *prefix, char *word)
+{
+    while (*prefix)
+        if (*(prefix++) != *(word++))
+            return 0;
+    return 1;
+}
+
+char *concatUnlimited(char *s1, char *s2)
+{
+    uint64_t index = 0;
+    char *toReturn;
+    while (*s1)
+    {
+        if (!(index % BLOCK))
+            toReturn = realloc(toReturn, index * sizeof(char), (index + BLOCK) * sizeof(char));
+        *(toReturn + index++) = *s1;
+    }
+    while (*s2)
+    {
+        if (!(index % BLOCK))
+            toReturn = realloc(toReturn, index * sizeof(char), (index + BLOCK) * sizeof(char));
+        *(toReturn + index++) = *s2;
+    }
+    *(toReturn + index) = 0;
+    addToAllocated(toReturn);
+    return toReturn;
+}

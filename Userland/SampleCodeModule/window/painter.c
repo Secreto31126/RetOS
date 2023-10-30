@@ -40,24 +40,32 @@ void newLine()
     xPointer = 0;
     maxLineSize = size;
 }
+void paintBackSpace()
+{
+    if (xPointer <= 0)
+    {
+        yPointer -= maxLineSize * TRUE_LETTER_HEIGHT;
+        xPointer = X_LINE_END;
+    }
+    drawCharToWindow(stamp, 0, 0xFF000000, 0xFF000000);
+    xPointer -= TRUE_LETTER_WIDTH * size;
+    drawWindow(stamp, xPointer, yPointer);
+}
+void drawChar(char c, HexColor letterColor, HexColor highlightColor)
+{
+    drawCharToWindow(stamp, c, letterColor, highlightColor);
+    drawWindow(stamp, xPointer, yPointer);
+    xPointer += TRUE_LETTER_WIDTH * size;
+}
 char paintChar(char c, HexColor letterColor, HexColor highlightColor)
 {
     if (c == '\b')
     {
-        if (xPointer <= 0 && yPointer <= 0) // shouldn't be able to backspace through line starters, but shell should handle that.
-            return 1;
-        else
+        if (!(xPointer <= 0 && yPointer <= 0)) // shouldn't be able to backspace through line starters, but shell should handle that.
         {
-            if (xPointer <= 0)
-            {
-                yPointer -= maxLineSize * TRUE_LETTER_HEIGHT;
-                xPointer = X_LINE_END;
-            }
-            drawCharToWindow(stamp, 0, 0xFF000000, 0xFF000000);
-            xPointer -= TRUE_LETTER_WIDTH * size;
-            drawWindow(stamp, xPointer, yPointer);
-            return 1;
+            paintBackSpace();
         }
+        return 1;
     }
     if ((xPointer + TRUE_LETTER_WIDTH * size) > w || c == '\n')
         if ((yPointer + TRUE_LETTER_HEIGHT * maxLineSize * 2) > h) // *2 because letters are drawn from cursor downwards, so otherwise last line would have its top on the bottom of the screen
@@ -68,14 +76,41 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
             if (c == '\n')
                 paintString(lineStart, letterColor, highlightColor);
         }
-    drawCharToWindow(stamp, c, letterColor, highlightColor);
-    drawWindow(stamp, xPointer, yPointer);
-    xPointer += TRUE_LETTER_WIDTH * size;
+    drawChar(c, letterColor, highlightColor);
     return 1;
 }
+char paintCNoLineStart(char c, HexColor letterColor, HexColor highlightColor)
+{
+    if (c == '\b')
+    {
+        if (!(xPointer <= 0 && yPointer <= 0)) // shouldn't be able to backspace through line starters, but shell should handle that.
+        {
+            paintBackSpace();
+        }
+        return 1;
+    }
+    if ((xPointer + TRUE_LETTER_WIDTH * size) > w || c == '\n')
+        if ((yPointer + TRUE_LETTER_HEIGHT * maxLineSize * 2) > h) // *2 because letters are drawn from cursor downwards, so otherwise last line would have its top on the bottom of the screen
+            return 0;
+        else
+            newLine();
+    drawChar(c, letterColor, highlightColor);
+    return 1;
+}
+
 char paintString(char *c, HexColor letterColor, HexColor highlightColor)
 {
     while (*c && paintChar(*c, letterColor, highlightColor))
+    {
+        c++;
+    }
+    if (*c)
+        return 0;
+    return 1;
+}
+char paintSNoLineStart(char *c, HexColor letterColor, HexColor highlightColor)
+{
+    while (*c && paintCNoLineStart(*c, letterColor, highlightColor))
     {
         c++;
     }

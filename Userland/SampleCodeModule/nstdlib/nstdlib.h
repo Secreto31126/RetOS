@@ -33,10 +33,14 @@ uint64_t strlen(char *s);
 static const double pi = 3.14159265359;
 uint64_t pow(double base, uint64_t exponent); // can't return doubles in userland because SSE registers aren't usable
 char strcmp(char *s1, char *s2);
+char isPrefix(char *prefix, char *word);
 void wait();
 uint64_t getHours();
 uint64_t getMinutes();
 char *getTimeString();
 void freePrints();
+char *concatUnlimited(char *s1, char *s2);
+// tracks allocated strings. All tracked strings freed upon call to freePrints.
+void addToAllocated(char *address);
 
 #endif

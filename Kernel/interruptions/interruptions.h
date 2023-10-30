@@ -8,10 +8,13 @@
 #include <video.h>
 #include <ticks.h>
 #include <stdin.h>
+#include <stdkey.h>
 #include <stdint.h>
 #include <header.h>
 #include <memory.h>
 #include <console.h>
 #include <localization.h>
+
+void noop();
 
 #endif

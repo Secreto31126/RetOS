@@ -6,6 +6,7 @@
 #include <localization.h>
 #include <audio.h>
 #include <video.h>
+#include <memory.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -43,6 +44,10 @@ void *initializeKernelBinary()
 	ncPrint("CPU Vendor:");
 	ncPrint(cpuVendor(buffer));
 	ncNewline();
+
+	ncPrint("[Loading memory manager]");
+	init_memory_manager();
+	ncPrint("[Done]");
 
 	ncPrint("[Loading modules]");
 	ncNewline();
@@ -92,9 +97,7 @@ void *initializeKernelBinary()
 
 int main()
 {
-	imperial_march();
-
-	drawShape(RetOSbackground, 0, 0, get_width(), get_height());
+	// hes_a_pirate();
 
 	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
 	ncNewline();

@@ -17,7 +17,7 @@ extern void set_interrupt_flag(void);
 extern void unset_interrupt_flag(void);
 extern void halt_once(void);
 
-extern char dump_reg_string[340];
+extern char dump_reg_string[360];
 /**
  * @brief Dump registers value into dump_reg_string
  */

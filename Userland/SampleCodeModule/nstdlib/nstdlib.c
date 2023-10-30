@@ -1,6 +1,24 @@
 #include "nstdlib.h"
 #define MAX_DIGITS_IN_LONG 20
 #define MAX_STDIN_STRING 256
+
+extern void halt_user();
+
+void wait()
+{
+    halt_user();
+}
+
+void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize)
+{
+    void *aux = malloc(newSize);
+    oldSize = oldSize > newSize ? newSize : oldSize;
+    for (uint64_t i = 0; i < oldSize; i++)
+        *((char *)(aux + i)) = *((char *)(ptr + i));
+    free(ptr);
+    return aux;
+}
+
 char *ultoa(unsigned long l, char *buffer, int radix)
 {
     char *toRet = buffer;
@@ -337,7 +355,7 @@ char getChar()
 {
     char c;
     while (!read_sys(0, &c, 1))
-        ;
+        wait();
     return c;
 }
 
@@ -352,4 +370,15 @@ uint64_t pow(double base, uint64_t exponent)
     for (uint64_t i = 0; i < exponent; i++)
         ans *= base;
     return ans;
+}
+char strcmp(char *s1, char *s2)
+{
+    while (*s1 && *s2)
+    {
+        if (*s1 != *s2)
+            return 0;
+        s1++;
+        s2++;
+    }
+    return 1;
 }

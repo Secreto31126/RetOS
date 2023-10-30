@@ -1,4 +1,4 @@
-#include "video.h"
+#include "window.h"
 
 HexColor redRectangleFigure()
 {

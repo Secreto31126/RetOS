@@ -1,66 +1,80 @@
 #include "interruptions.h"
 
-uint64_t read(uint64_t fd, char *buffer, uint64_t count);
-uint64_t write(uint64_t fd, const char *buffer, uint64_t count);
+/**
+ * @brief Read from a file descriptor
+ *
+ * @param fd 0 for stdin, 3 for stdkey
+ * @param buffer The buffer to write to
+ * @param count The number of bytes to read
+ * @return uint64_t The number of bytes read
+ */
+static uint64_t read(uint64_t fd, char *buffer, uint64_t count);
+static uint64_t write(uint64_t fd, const char *buffer, uint64_t count);
 /**
  * @brief Draw a pixel array to the screen via syscall
  *
  * @param figure Contiguous HexColor memory pointer to draw
- * @param dimensions 0xWWWWWWWWHHHHHHHH
- * @param position 0xXXXXXXXXYYYYYYYY
+ * @param dimensions 0xWWWWHHHH
+ * @param position 0xXXXXYYYY
  * @return uint64_t number of pixels drawn
  */
-uint64_t draw(HexColor *figure, uint64_t dimensions, uint64_t position);
-uint64_t mloc(uint64_t size);
-uint64_t fre(uint64_t ptr);
-uint64_t get_time();
+static uint64_t draw(HexColor *figure, uint32_t dimensions, uint32_t position);
+static uint64_t get_time();
 /**
  * @brief Get the screen size
  *
- * @return uint64_t 0xWWWWWWWWHHHHHHHH
+ * @return uint32_t 0xWWWWHHHH
  */
-uint64_t get_screen_size();
+static uint32_t get_screen_size();
+/**
+ * @brief Let it beep
+ *
+ * @param rdi The sound frequency
+ * @param rsi The sound duration
+ * @param _ Unused
+ * @param rax The syscall number, it's the return value to avoid modifying the register
+ * @return uint64_t rax
+ */
+static uint64_t beep_bop(uint64_t rdi, uint64_t rsi, uint64_t _, uint64_t rax);
+
+typedef uint64_t (*syscall)(uint64_t, uint64_t, uint64_t, uint64_t);
+static syscall syscall_handlers[] = {
+    read,
+    write,
+    draw,
+    malloc,
+    free,
+    get_time,
+    get_screen_size,
+    beep_bop,
+    get_tick,
+};
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 {
-    switch (rax)
+    if (rax < 9)
     {
-    case 0:
-        return read(rdi, (char *)rsi, rdx);
-    case 1:
-        return write(rdi, (const char *)rsi, rdx);
-    case 333:
-        return draw((HexColor *)rdi, rsi, rdx);
-    case 334:
-        return mloc(rdi);
-    case 335:
-        return fre(rdi);
-    case 336:
-        return get_time();
-    case 337:
-        return get_screen_size();
-    case 338:
-        beep(rdi);
-        return rax;
-
-    default:
-        break;
+        return syscall_handlers[rax](rdi, rsi, rdx, rax);
     }
 
     return -1;
 }
 
-uint64_t read(uint64_t fd, char *buffer, uint64_t count)
-{
-    if (fd != 0)
-    {
-        return -1;
-    }
+static uint64_t (*files[4])(uint8_t *, uint16_t) = {
+    read_stdin,
+    noop,
+    noop,
+    read_stdkey,
+};
 
-    return read_stdin((uint8_t *)buffer, count);
+static uint64_t read(uint64_t fd, char *buffer, uint64_t count)
+{
+    if (fd < 4)
+        return files[fd]((uint8_t *)buffer, count);
+    return -1;
 }
 
-uint64_t write(uint64_t fd, const char *buffer, uint64_t count)
+static uint64_t write(uint64_t fd, const char *buffer, uint64_t count)
 {
     if (fd != 1)
     {
@@ -76,29 +90,18 @@ uint64_t write(uint64_t fd, const char *buffer, uint64_t count)
     return i;
 }
 
-uint64_t draw(HexColor *figure, uint64_t dimensions, uint64_t position)
+static uint64_t draw(HexColor *figure, uint32_t dimensions, uint32_t position)
 {
-    uint32_t width = dimensions >> 32 & 0xFFFFFFFF;
-    uint32_t height = dimensions & 0xFFFFFFFF;
+    uint32_t width = (dimensions >> 16) & 0xFFFF;
+    uint32_t height = dimensions & 0xFFFF;
 
-    uint32_t x = position >> 32 & 0xFFFFFFFF;
-    uint32_t y = position & 0xFFFFFFFF;
+    uint32_t x = (position >> 16) & 0xFFFF;
+    uint32_t y = position & 0xFFFF;
 
     return drawFromArray(figure, width, height, x, y);
 }
 
-uint64_t mloc(uint64_t size)
-{
-    return (uint64_t)malloc(size);
-}
-
-uint64_t fre(uint64_t ptr)
-{
-    free((void *)ptr);
-    return 0;
-}
-
-uint64_t get_time()
+static uint64_t get_time()
 {
     unset_interrupt_flag();
 
@@ -113,7 +116,13 @@ uint64_t get_time()
     return hour << 8 + minute;
 }
 
-uint64_t get_screen_size()
+static uint32_t get_screen_size()
 {
-    return get_width() << 16 + get_height();
+    return (get_width() << 16) + get_height();
+}
+
+static uint64_t beep_bop(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
+{
+    beep(rdi);
+    return rax;
 }

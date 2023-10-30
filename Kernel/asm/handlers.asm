@@ -2,6 +2,9 @@
 	extern pic_manager
 	extern syscall_manager
 
+	extern dump_regs
+	extern dump_regs_include_rip
+
     global zero_division_exception_handler
     global invalid_opcode_exception_handler
 
@@ -18,10 +21,11 @@
 %include "macro.s"
 
 %macro exception_handler 1
-	pushall
+	call	dump_regs
+	mov		rdi, [rsp]
+	call	dump_regs_include_rip
 	mov		rdi, %1
 	call	exception_manager
-	popall
 	iretq ; Shouldn't return to the faulty instruction
 %endmacro
 

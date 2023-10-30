@@ -11,7 +11,7 @@ typedef struct
 
 #define MAX_TASKS 256
 static uint8_t active_tasks = 0;
-static Task task_list[MAX_TASKS] = {0};
+static Task shedule[MAX_TASKS] = {0};
 
 uint64_t get_tick()
 {
@@ -31,19 +31,17 @@ void update_tick()
     uint8_t counted = 0;
     for (uint8_t i = 0; counted < active_tasks && i < MAX_TASKS; i++)
     {
-        if (!task_list[i].task)
+        if (!shedule[i].task)
             continue;
 
-        if (task_list[i].tick == current_tick)
+        if (shedule[i].tick <= current_tick)
         {
-            task_list[i].task();
-            task_list[i].task == 0;
+            shedule[i].task();
+            shedule[i].task == 0;
             active_tasks--;
         }
         else
-        {
             counted++;
-        }
     }
 }
 
@@ -66,11 +64,11 @@ void add_task(uint64_t ticks, Callback task)
         return;
 
     uint8_t i = 0;
-    while (task_list[i].task != 0)
+    while (shedule[i].task != 0)
         i++;
 
-    task_list[i].task = task;
-    task_list[i].tick = current_tick + ticks;
+    shedule[i].task = task;
+    shedule[i].tick = current_tick + ticks;
 
     active_tasks++;
 }

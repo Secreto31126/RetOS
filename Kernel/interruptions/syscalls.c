@@ -37,8 +37,9 @@ static uint32_t get_screen_size();
  */
 static uint64_t beep_bop(uint64_t rdi, uint64_t, uint64_t, uint64_t rax);
 
+#define SYSCALL_COUNT 10
 typedef uint64_t (*syscall)(uint64_t, uint64_t, uint64_t, uint64_t);
-static syscall syscall_handlers[] = {
+static syscall syscall_handlers[SYSCALL_COUNT] = {
     read,
     write,
     draw,
@@ -48,11 +49,12 @@ static syscall syscall_handlers[] = {
     get_screen_size,
     beep_bop,
     get_tick,
+    add_task,
 };
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 {
-    if (rax < 9)
+    if (rax < SYSCALL_COUNT)
     {
         return syscall_handlers[rax](rdi, rsi, rdx, rax);
     }

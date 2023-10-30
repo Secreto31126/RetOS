@@ -1,4 +1,5 @@
 #include "window.h"
+#include "painter.h"
 #include "figures.h"
 #include <stdarg.h>
 
@@ -224,15 +225,22 @@ Window overlayOnWindow(Window w, ShapeFunction f, uint64_t xOffset, uint64_t yOf
 
 Window overlayFromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sourceHeight, HexColor *map, uint64_t xOffset, uint64_t yOffset, OVERLAY_MODE m)
 {
-    uint64_t width = w.width, height = w.height;
+    uint64_t width = w.width, height = w.height, screenW = getScreenWidth(), screenH = getScreenHeight();
     HexColor *result = w.pixels;
-    double xScaleFactor = (double)sourceWidth / getScreenWidth(), yScaleFactor = (double)sourceHeight / getScreenHeight();
+    double xScaleFactor = (double)sourceWidth / screenW, yScaleFactor = (double)sourceHeight / screenH;
     int xIndex, yIndex = 0;
-    for (double i = yOffset / yScaleFactor; i < sourceHeight && yIndex < height; i += yScaleFactor)
+    for (double i = yOffset * sourceHeight / screenH; i < sourceHeight && yIndex < height; i += yScaleFactor)
     {
         xIndex = 0;
-        for (double j = xOffset / xScaleFactor; j < sourceWidth && xIndex < width; j += xScaleFactor)
+        for (double j = xOffset * sourceWidth / screenW; j < sourceWidth && xIndex < width; j += xScaleFactor)
         {
+            char aux[20];
+            if (colorMapper(map, source[(int)(j) + (int)(i)*sourceWidth]) == 0)
+            {
+                paintString(" read: ", -1, 0);
+                paintString(itoa(source[(int)(j) + (int)(i)*sourceWidth], aux, 10), -1, 0);
+                paintChar('|', -1, 0);
+            }
             if (m == OPAQUE)
                 result[xIndex + yIndex * width] = colorMapper(map, source[(int)(j) + (int)(i)*sourceWidth]);
             else

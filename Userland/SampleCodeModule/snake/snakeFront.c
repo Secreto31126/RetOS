@@ -2,12 +2,12 @@
 #include "snakePrivate.h"
 #include "./../window/backgroundArrays.h"
 #define MOVE_INTERVAL 3
+#define MAX_SNAKE_COLORS 4
 
 typedef struct frontSnake
 {
     DIRECTION nextMove;
-    HexColor bodyColor;
-    HexColor otherColor;
+    HexColor *colorMap;
 } frontSnake;
 
 void doMovement(char c, frontSnake *snakes);
@@ -15,6 +15,7 @@ void putDeath(int snakeNumber);
 void drawBoard(frontSnake *snakes);
 void drawBackground();
 static ShapeFunction backgroundFunction = RetOSBackground;
+static HexColor appleColorMap[] = {0x00000000, APPLE_RED, APPLE_BROWN, APPLE_GREEN};
 
 char timeHasPassed(uint64_t start, uint64_t unit)
 {
@@ -29,7 +30,8 @@ void drawBackgroundWithParameters(Window w, uint64_t xOffset, uint64_t yOffset)
 
     // overlayOnWindow(w, backgroundFunction, xOffset, yOffset, 1.0, 1.0, OPAQUE);
 
-    overlayFromCharArray(w, windowsArray, WINDOWS_WIDTH, WINDOWS_HEIGHT, windowsColorMap, xOffset, yOffset, OPAQUE);
+    // overlayFromCharArray(w, windowsArray, WINDOWS_WIDTH, WINDOWS_HEIGHT, windowsColorMap, xOffset, yOffset, OPAQUE);
+    overlayFromCharArray(w, marioArray, WINDOWS_WIDTH, WINDOWS_HEIGHT, marioColorMap, xOffset, yOffset, OPAQUE);
 }
 
 int playSnake(uint16_t snakeCount)
@@ -43,8 +45,13 @@ int playSnake(uint16_t snakeCount)
     for (int i = 0; i < snakeCount; i++)
     {
         snakes[i].nextMove = NONE;
-        snakes[i].bodyColor = getHexColor();
-        snakes[i].otherColor = getHexColor();
+        snakes[i].colorMap = malloc(MAX_SNAKE_COLORS * sizeof(HexColor));
+        for (int j = 1; j < MAX_SNAKE_COLORS - 1; j++)
+        {
+            snakes[i].colorMap[j] = getHexColor();
+        }
+        snakes[i].colorMap[0] = 0x00000000;                              // First color is reserved for transparency
+        snakes[i].colorMap[MAX_SNAKE_COLORS - 1] = 0xFF000000 | HEX_RED; // Last color is reserved for eyes, always red
     }
     setSnakeDrawings();
     drawBackground();
@@ -78,6 +85,7 @@ int playSnake(uint16_t snakeCount)
     blank();
     paintString("Game Over. Press a key to return to shell.", 0xFFFF0000, 0);
     getChar();
+    freeColorMaps(snakeCount, snakes);
     free(snakes);
     freeSnakeDrawings();
     blank();
@@ -136,21 +144,25 @@ void drawBoard(frontSnake *snakes)
         {
         case HEAD:
             source = currentDrawing.drawings[HEAD_D];
-            toHexArray(source, stamp.pixels, drawSize, drawSize, stamp.width, stamp.height, 3, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor, 0xFFFF0000);
+            // toHexArray(source, stamp.pixels, drawSize, drawSize, stamp.width, stamp.height, 3, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor, 0xFFFF0000);
+            fromCharArray(stamp, source, drawSize, drawSize, snakes[board[i].player].colorMap, 0, 0, OPAQUE);
             break;
         case TAIL:
             drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
             drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight); // Since the tail has transparency, the background must be redrawn before drawing tail.
             source = currentDrawing.drawings[TAIL_D];
-            toHexArray(source, stamp.pixels, drawSize, drawSize, stamp.width, stamp.height, 3, BACKGROUND_COLOR, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
+            // toHexArray(source, stamp.pixels, drawSize, drawSize, stamp.width, stamp.height, 3, BACKGROUND_COLOR, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
+            fromCharArray(stamp, source, drawSize, drawSize, snakes[board[i].player].colorMap, 0, 0, OPAQUE);
             break;
         case BODY:
             source = currentDrawing.drawings[BODY_D];
-            toHexArray(source, stamp.pixels, drawSize, drawSize, stamp.width, stamp.height, 2, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
+            // toHexArray(source, stamp.pixels, drawSize, drawSize, stamp.width, stamp.height, 2, snakes[board[i].player].bodyColor, snakes[board[i].player].otherColor);
+            fromCharArray(stamp, source, drawSize, drawSize, snakes[board[i].player].colorMap, 0, 0, OPAQUE);
             break;
         case APPLE:
             source = currentDrawing.drawings[APPLE_D];
-            toHexArray(source, stamp.pixels, drawSize, drawSize, stamp.width, stamp.height, 4, BACKGROUND_COLOR, APPLE_RED, APPLE_BROWN, APPLE_GREEN);
+            // toHexArray(source, stamp.pixels, drawSize, drawSize, stamp.width, stamp.height, 4, BACKGROUND_COLOR, APPLE_RED, APPLE_BROWN, APPLE_GREEN);
+            fromCharArray(stamp, source, drawSize, drawSize, appleColorMap, 0, 0, OPAQUE);
             break;
         case BLANK:
             drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
@@ -197,4 +209,9 @@ void drawBackground()
 void setBackground(ShapeFunction newBackground)
 {
     backgroundFunction = newBackground;
+}
+void freeColorMaps(int snakeCount, frontSnake *snakes)
+{
+    for (int i = 0; i < snakeCount; i++)
+        free(snakes[i].colorMap);
 }

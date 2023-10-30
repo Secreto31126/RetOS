@@ -244,3 +244,25 @@ Window overlayFromCharArray(Window w, char *source, uint64_t sourceWidth, uint64
     }
     return w;
 }
+
+Window fromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sourceHeight, HexColor *map, uint64_t xOffset, uint64_t yOffset, OVERLAY_MODE m)
+{
+    uint64_t width = w.width, height = w.height;
+    HexColor *result = w.pixels;
+    double xScaleFactor = (double)sourceWidth / width, yScaleFactor = (double)sourceHeight / height;
+    int xIndex, yIndex = 0;
+    for (double i = 0; i < sourceHeight && yIndex < height; i += yScaleFactor)
+    {
+        xIndex = 0;
+        for (double j = 0; j < sourceWidth && xIndex < width; j += xScaleFactor)
+        {
+            if (m == OPAQUE)
+                result[xIndex + yIndex * width] = colorMapper(map, source[(int)(j) + (int)(i)*sourceWidth]);
+            else
+                result[xIndex + yIndex * width] = mergeColor(result[xIndex + yIndex * width], colorMapper(map, source[(int)(j) + (int)(i)*sourceWidth]));
+            xIndex++;
+        }
+        yIndex++;
+    }
+    return w;
+}

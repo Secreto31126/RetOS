@@ -1,3 +1,4 @@
+// @deprecated
 #include "window.h"
 #include "figures.h"
 #include "backgroundArrays.h"
@@ -44,17 +45,4 @@ HexColor RetOSBackground(int x, int y, double xScaleFactor, double yScaleFactor)
 HexColor colorMapper(HexColor *colorMap, int code)
 {
     return colorMap[code];
-}
-static uint64_t w, h;
-static double windowsXRatio, windowsYRatio;
-updateFigures()
-{
-    w = getScreenWidth();
-    h = getScreenHeight();
-    windowsXRatio = BACKGROUND_WIDTH / (double)w;
-    windowsYRatio = BACKGROUND_HEIGHT / (double)h;
-}
-HexColor windowsBackground(int x, int y, double xScaleFactor, double yScaleFactor)
-{
-    return colorMapper(windowsColorMap, windowsArray[(int)(y * windowsYRatio)][(int)(x * windowsXRatio)]);
 }

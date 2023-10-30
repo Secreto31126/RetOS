@@ -1,6 +1,6 @@
 #include "window.h"
 #include "painter.h"
-#include "figures.h"
+// #include "figures.h" //no longer used
 #include <stdarg.h>
 
 #define GET_HEX(a, r, g, b) (((a) << 24) + ((r) << 16) + ((g) << 8) + (b))

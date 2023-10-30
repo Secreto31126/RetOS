@@ -52,7 +52,7 @@ void setBoard(int snakeCount)
         }
         snakes[i].length = START_PLAYER_LENGTH;
         snakes[i].color = getHexColor();
-        snakes[i].direction = ((j % BOARD_HEIGHT) > (BOARD_WIDTH / 2)) ? LEFT : RIGHT; // This way you don't start moving towards the edge. Still won't spawn at the edge out of respect.
+        snakes[i].direction = ((j % BOARD_WIDTH) > (BOARD_WIDTH / 2)) ? LEFT : RIGHT; // This way you don't start moving towards the edge. Still won't spawn at the edge out of respect.
         snakes[i].alive = 1;
     }
     objects = APPLE_COUNT + snakeCount * START_PLAYER_LENGTH; // counts non-empty tiles, useful for resetting apples

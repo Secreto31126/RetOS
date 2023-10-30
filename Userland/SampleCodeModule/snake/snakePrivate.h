@@ -6,7 +6,7 @@
 #include "./../window/fontInterface.h"
 #include "./../window/window.h"
 #include "./../window/painter.h"
-#include "./../window/figures.h"
+// #include "./../window/figures.h" // no longer used
 #include "random.h"
 #include "snakeDrawings.h"
 

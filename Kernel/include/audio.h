@@ -4,18 +4,9 @@
 /**
  * @brief Plays a beep sound asynchronously
  *
- * @param frequency The frequency of the beep
- * @param duration The duration of the beep in ticks
+ * @param frequency The frequency of the beep, 0 to shut up
  */
-void beep(uint32_t frequency, uint64_t duration);
-
-/**
- * @brief Plays a beep sound synchronously
- *
- * @param frequency The frequency of the beep
- * @param duration The duration of the beep in ticks
- */
-void beep_syncronic(uint32_t frequency, uint64_t duration);
+void beep(uint32_t frequency);
 
 void imperial_march();
 

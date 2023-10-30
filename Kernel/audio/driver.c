@@ -3,8 +3,14 @@
 /**
  * @see https://wiki.osdev.org/PC_Speaker
  */
-static void play_sound(uint32_t freq)
+void beep(uint32_t freq)
 {
+    if (!freq)
+    {
+        output_byte(0x61, input_byte(0x61) & 0xFC);
+        return;
+    }
+
     // Set the PIT to the desired frequency
     uint32_t div = 1193180 / freq;
     output_byte(0x43, 0xB6);
@@ -17,23 +23,4 @@ static void play_sound(uint32_t freq)
     {
         output_byte(0x61, tmp | 3);
     }
-}
-
-// make it shutup
-static void nosound()
-{
-    output_byte(0x61, input_byte(0x61) & 0xFC);
-}
-
-void beep_syncronic(uint32_t frequency, uint64_t duration)
-{
-    play_sound(frequency);
-    sleep_ticks(duration);
-    nosound();
-}
-
-void beep(uint32_t frequency, uint64_t duration)
-{
-    play_sound(frequency);
-    add_task(duration, nosound);
 }

@@ -1,5 +1,6 @@
 #include "audio.h"
 
+#define SHH 0
 #define C3 262
 #define C3sus 278
 #define D3 294
@@ -26,32 +27,38 @@
 #define B4 988
 #define C5 1046
 
+#define MEEP(f, d) \
+    beep(f);       \
+    sleep_ticks(d);
+
 /**
  * @see https://github.com/gabszzz/The-Imperial-March
  */
 void imperial_march()
 {
-    beep_syncronic(A3, 14);
-    sleep_ticks(3);
-    beep_syncronic(A3, 14);
-    sleep_ticks(3);
-    beep_syncronic(A3, 14);
-    sleep_ticks(10);
-    beep_syncronic(F3, 5);
-    beep_syncronic(C4, 4);
-    beep_syncronic(A3, 14);
-    beep_syncronic(F3, 5);
-    beep_syncronic(C4, 4);
-    beep_syncronic(A3, 22);
-    sleep_ticks(10);
-    beep_syncronic(E4, 12);
-    beep_syncronic(E4, 12);
-    beep_syncronic(E4, 12);
-    sleep_ticks(10);
-    beep_syncronic(F4, 6);
-    beep_syncronic(D4, 5);
-    beep_syncronic(A3, 12);
-    beep_syncronic(F3, 5);
-    beep_syncronic(C4, 5);
-    beep_syncronic(A3, 22);
+    MEEP(A3, 14);
+    MEEP(SHH, 3);
+    MEEP(A3, 14);
+    MEEP(SHH, 3);
+    MEEP(A3, 14);
+    MEEP(SHH, 10);
+    MEEP(F3, 5);
+    MEEP(C4, 4);
+    MEEP(A3, 14);
+    MEEP(F3, 5);
+    MEEP(C4, 4);
+    MEEP(A3, 22);
+    MEEP(SHH, 10);
+    MEEP(E4, 12);
+    MEEP(E4, 12);
+    MEEP(E4, 12);
+    MEEP(SHH, 10);
+    MEEP(F4, 6);
+    MEEP(D4, 5);
+    MEEP(A3, 12);
+    MEEP(F3, 5);
+    MEEP(C4, 5);
+    MEEP(A3, 22);
+
+    beep(SHH);
 }

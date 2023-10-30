@@ -11,7 +11,7 @@
  */
 typedef void (*Catch)(uint64_t exception, char *registers);
 
-extern void handle_catch(uint64t exception);
+// extern void handle_catch(uint64t exception);
 /**
  * @brief Setup the catch for a CPU exception
  *

@@ -7,6 +7,7 @@
 #include <audio.h>
 #include <video.h>
 #include <memory.h>
+#include <catcher.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -95,9 +96,22 @@ void *initializeKernelBinary()
 	return getStackBase();
 }
 
+void woops(uint64_t error, char *dump)
+{
+	ncPrint("Woops! Something went wrong. Error code: ");
+	ncPrintHex(error);
+	ncNewline();
+	ncPrint("Dump: ");
+	ncPrint(dump);
+	while (1)
+		;
+}
+
 int main()
 {
 	// hes_a_pirate();
+	setup_catch(woops, (uint64_t)getStackBase());
+	ncPrintDec(1 / 0);
 
 	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
 	ncNewline();

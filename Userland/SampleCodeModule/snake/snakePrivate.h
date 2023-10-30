@@ -2,8 +2,6 @@
 #define SNKP_H
 
 #define BACKGROUND_COLOR 0x00000000
-#define MOVE_INTERVAL 2
-#define MAX_SNAKE_COLORS 4
 
 #include "./../window/fontInterface.h"
 #include "./../window/window.h"

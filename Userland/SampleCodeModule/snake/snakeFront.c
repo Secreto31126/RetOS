@@ -203,7 +203,6 @@ void drawBackground()
 {
     uint64_t tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
     Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
-    tile *board = getBoard();
     for (int i = 0; i < (BOARD_HEIGHT * BOARD_WIDTH); i++)
     {
         drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);

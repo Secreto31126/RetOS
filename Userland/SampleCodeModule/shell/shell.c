@@ -21,8 +21,8 @@ char shellStart()
     paintString("You are now in shell:\n", letterColor, highlightColor);
     char leaving = 0;
     setSize(1.0);
-    setBackgroundArray(marioArray);
-    setBackgroundColorMap(marioColorMap);
+    setBackgroundArray(pongArray);
+    setBackgroundColorMap(pongColorMap);
     while ((c = getChar()) != 'q' || !leaving)
     {
         if (c == 'q')

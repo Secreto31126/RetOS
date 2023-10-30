@@ -13,7 +13,31 @@
  */
 static uint64_t exceptions = 0;
 
-void exception_manager()
+static void zero_division();
+static void invalid_opcode();
+
+static void (*exception_handlers[20])(void) = {
+    zero_division,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    invalid_opcode,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+};
+
+void exception_manager(uint8_t exception)
 {
     exceptions++;
 }

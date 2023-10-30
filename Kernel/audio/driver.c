@@ -5,6 +5,8 @@
  */
 static void play_sound(uint32_t freq)
 {
+    unset_interrupt_flag();
+
     // Set the PIT to the desired frequency
     uint32_t div = 1193182 / freq;
     output_byte(0x43, 0xB6);
@@ -17,6 +19,8 @@ static void play_sound(uint32_t freq)
     {
         output_byte(0x61, tmp | 3);
     }
+
+    set_interrupt_flag();
 }
 
 // make it shutup

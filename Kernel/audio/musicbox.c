@@ -325,34 +325,36 @@ void whistle_stop()
 
 void here_comes_the_sun()
 {
-    beep(B4, 9);
-    beep(A4, 9);
-    beep(B4, 9);
-    beep(G4, 9);
+    MEEP(B4, 9);
+    MEEP(A4, 9);
+    MEEP(B4, 9);
+    MEEP(G4, 9);
 
-    sleep_ticks(7);
+    MEEP(SHH, 7);
 
-    beep(B4, 7);
-    beep(G4, 9);
-    beep(A4, 9);
-    beep(B4, 9);
+    MEEP(B4, 7);
+    MEEP(G4, 9);
+    MEEP(A4, 9);
+    MEEP(B4, 9);
 
-    sleep_ticks(2);
+    MEEP(SHH, 2);
 
-    beep(B4, 9);
-    beep(A4, 9);
-    beep(B4, 9);
-    beep(G4, 12);
+    MEEP(B4, 9);
+    MEEP(A4, 9);
+    MEEP(B4, 9);
+    MEEP(G4, 12);
 
-    sleep_ticks(2);
+    MEEP(SHH, 2);
 
-    beep(G4, 9);
-    beep(A4, 9);
-    beep(G4, 9);
+    MEEP(G4, 9);
+    MEEP(A4, 9);
+    MEEP(G4, 9);
 
-    sleep_ticks(9);
+    MEEP(SHH, 9);
 
-    beep(B4, 9);
-    beep(A4, 9);
-    beep(G4, 9);
+    MEEP(B4, 9);
+    MEEP(A4, 9);
+    MEEP(G4, 9);
+
+    beep(SHH);
 }

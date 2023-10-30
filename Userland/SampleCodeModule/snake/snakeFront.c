@@ -29,7 +29,7 @@ void drawBackgroundWithParameters(Window w, uint64_t xOffset, uint64_t yOffset)
 
     // overlayOnWindow(w, backgroundFunction, xOffset, yOffset, 1.0, 1.0, OPAQUE);
 
-    overlayFromCharArray(w, windowsArray, WINDOWS_WIDTH, WINDOWS_HEIGHT, windowsColorMap, xOffset, yOffset, OPAQUE); // Never quite got this to work
+    overlayFromCharArray(w, windowsArray, WINDOWS_WIDTH, WINDOWS_HEIGHT, windowsColorMap, xOffset, yOffset, OPAQUE);
 }
 
 int playSnake(uint16_t snakeCount)

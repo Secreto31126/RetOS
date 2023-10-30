@@ -234,13 +234,6 @@ Window overlayFromCharArray(Window w, char *source, uint64_t sourceWidth, uint64
         xIndex = 0;
         for (double j = xOffset * sourceWidth / screenW; j < sourceWidth && xIndex < width; j += xScaleFactor)
         {
-            char aux[20];
-            if (colorMapper(map, source[(int)(j) + (int)(i)*sourceWidth]) == 0)
-            {
-                paintString(" read: ", -1, 0);
-                paintString(itoa(source[(int)(j) + (int)(i)*sourceWidth], aux, 10), -1, 0);
-                paintChar('|', -1, 0);
-            }
             if (m == OPAQUE)
                 result[xIndex + yIndex * width] = colorMapper(map, source[(int)(j) + (int)(i)*sourceWidth]);
             else

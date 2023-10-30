@@ -30,7 +30,7 @@
 	call	exception_manager
 
 	mov		rdi, %1
-	call handle_catch
+	call	handle_catch
 %endmacro
 
 %macro master_pic_handler 1

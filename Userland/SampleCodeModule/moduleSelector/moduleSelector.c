@@ -11,6 +11,7 @@ void setEnvironment();
 void startModules()
 {
     initializeFonts();
+    initializeSnake();
     startPainter(getScreenWidth(), getScreenHeight());
     setEnvironment();
 

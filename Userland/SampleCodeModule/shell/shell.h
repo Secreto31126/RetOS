@@ -8,6 +8,7 @@
 #include "./../window/painter.h"
 #include "./../snake/random.h"
 #include "./../snake/snake.h"
+#include "./../window/backgroundArrays.h"
 
 #define MAX_COMMAND_LENGTH 90
 

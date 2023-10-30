@@ -39,11 +39,12 @@ void drawBackgroundWithParameters(Window w, uint64_t xOffset, uint64_t yOffset)
     overlayFromCharArray(w, backgroundArray, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, backgroundColorMap, xOffset, yOffset, OPAQUE);
     drawWindow(w, xOffset, yOffset);
 }
-
+void initializeSnake()
+{
+    setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, 0, classicApple); // turn currently unused
+}
 int playSnake(uint16_t snakeCount)
 {
-
-    setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, 0, classicApple); // turn currently unused
     char gameOver = 0;
     int deadSnake = 0;
     uint16_t deathCount = 0;
@@ -194,7 +195,6 @@ void drawBoard(frontSnake *snakes)
             }
         drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
     }
-    paintString("out", -1, 0);
     freeWindow(stamp);
     freeBack();
 }

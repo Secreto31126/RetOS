@@ -1,5 +1,6 @@
 #include "commandHandler.h"
 #include "commandHandlerPrivate.h"
+#include "./../../snake/snake.h"
 #define BLOCK 10
 
 static command *commands;
@@ -24,7 +25,8 @@ void addCommand(char *commandCode, char *help, char *(*commandAction)(char *))
 }
 char *handleCommand(char *command)
 {
-    if (strcmp(command, ""))
+    command = shiftToWord(command);
+    if (strcmpHandleWhitespace(command, "") || strcmpHandleWhitespace(command, " "))
         return "";
     for (int i = 0; i < commandCount; i++)
     {
@@ -38,7 +40,8 @@ char *handleCommand(char *command)
 // prints will be freed after calling this function. returned string is not freed.
 char *getHelp(char *commandParameters)
 {
-    if (strcmp("", commandParameters))
+    commandParameters = shiftToWord(commandParameters);
+    if (strcmpHandleWhitespace("", commandParameters))
     {
         char *toReturn = "";
         for (int i = 0; i < commandCount; i++)
@@ -49,13 +52,22 @@ char *getHelp(char *commandParameters)
         return toReturn; // only allocated
     }
     for (int i = 0; i < commandCount; i++)
-        if (strcmp(commandParameters, commands[i].code))
+        if (strcmpHandleWhitespace(commandParameters, commands[i].code))
             return commands[i].help;
 }
 
 char *startSnake(char *commandParameters)
 {
+    commandParameters = shiftToWord(commandParameters);
     char *formatString = "Player %d won. Returning to shell";
-    if (strcmp("", commandParameters) || strcmp("1", commandParameters))
+    if (strcmpHandleWhitespace("", commandParameters) || strcmpHandleWhitespace("1", commandParameters))
         return sPrintf(formatString, playSnake(1));
+    if (strcmpHandleWhitespace("2", commandParameters))
+        return sPrintf(formatString, playSnake(2));
+    return "Invalid snake parameter";
+}
+
+char *setSnakeTheme(char *commandParameters)
+{
+    commandParameters = shiftToWord(commandParameters);
 }

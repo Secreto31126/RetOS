@@ -42,5 +42,7 @@ void freePrints();
 char *concatUnlimited(char *s1, char *s2);
 // tracks allocated strings. All tracked strings freed upon call to freePrints.
 void addToAllocated(char *address);
+char strcmpHandleWhitespace(char *s1, char *s2);
+char *shiftToWord(char *s);
 
 #endif

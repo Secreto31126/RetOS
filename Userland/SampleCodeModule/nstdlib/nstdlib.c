@@ -590,3 +590,33 @@ char *concatUnlimited(char *s1, char *s2)
     addToAllocated(toReturn);
     return toReturn;
 }
+
+char strcmpHandleWhitespace(char *s1, char *s2)
+{
+    char wFlag = 0; //
+    while (*s1 || *s2)
+    {
+        while (wFlag && *s1 == ' ')
+            s1++;
+        while (wFlag && *s2 == ' ')
+            s2++;
+        wFlag = 0;
+        if (*s1 == ' ')
+        {
+            wFlag = 1;
+        }
+        if (*(s1++) != *(s2++))
+        {
+            printf("s1: \'%c\' ", *(s1 - 1));
+            printf("s2: \'%c\' \n", *(s2 - 1));
+            return 0;
+        }
+    }
+    return 1;
+}
+char *shiftToWord(char *s)
+{
+    while (*s == ' ')
+        s++;
+    return s;
+}

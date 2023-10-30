@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "./../../nstdlib/nstdlib.h"
 #include "./../../snake/snake.h"
+#include "./../../window/backgroundArrays.h"
 /**
  * Currently:
  * set highlight and letter colors

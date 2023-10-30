@@ -51,6 +51,10 @@ updateFigures()
 {
     w = getScreenWidth();
     h = getScreenHeight();
-    windowsXRatio = WINDOWS_WIDTH / (double)w;
-    windowsYRatio = WINDOWS_HEIGHT / (double)h;
+    windowsXRatio = BACKGROUND_WIDTH / (double)w;
+    windowsYRatio = BACKGROUND_HEIGHT / (double)h;
+}
+HexColor windowsBackground(int x, int y, double xScaleFactor, double yScaleFactor)
+{
+    return colorMapper(windowsColorMap, windowsArray[(int)(y * windowsYRatio)][(int)(x * windowsXRatio)]);
 }

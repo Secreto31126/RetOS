@@ -3,17 +3,6 @@
 
 #include <stdint.h>
 
-/**
- * @brief List of most common colors
- * in 0xRRGGBB format
- */
-enum HEX_COLORS
-{
-	HEX_RED = 0xFF0000,
-	HEX_GREEN = 0x00FF00,
-	HEX_BLUE = 0x0000FF,
-};
-
 typedef uint32_t HexColor;
 typedef HexColor (*ShapeFunction)(int, int, int, int);
 
@@ -41,7 +30,7 @@ int putPixel(HexColor hexColor, uint64_t x, uint64_t y);
 int putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint64_t x, uint64_t y);
 /***
  * ShapeFunction receives coordinates (two integers), and returns a HexColor of form
- * 0xOORRGGBB. Where OO is the opacity for that pixel, and RRGGBB a hexColor
+ * 0xOORRGGBB. Where OO is the opacity for that pixel, and RRGGBB a HexColor
  */
 void drawShape(ShapeFunction f, int x, int y, int xRange, int yRange);
 void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor);
@@ -68,17 +57,5 @@ uint16_t get_width();
  * @return uint16_t 768
  */
 uint16_t get_height();
-
-HexColor redRectangleFigure();
-HexColor greenRectangleFigure();
-HexColor blueRectangleFigure();
-HexColor redLine(int x, int y);
-HexColor drawCircle(int x, int y, int w, int h);
-HexColor redCircle(int x, int y, int w, int h);
-/**
- * @deprecated
- */
-HexColor drawEllipse(int x, int y);
-HexColor RetOSbackground(int x, int y);
 
 #endif

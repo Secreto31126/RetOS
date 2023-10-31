@@ -2,30 +2,26 @@
 #define CMNDP_H
 #define COMMAND_COUNT 7
 #include <stdint.h>
-#include "./../../nstdlib/nstdlib.h"
-#include "./../../snake/snake.h"
-#include "./../../window/backgroundArrays.h"
 /**
  * Currently:
- * set highlight and letter colors
+ * set highlight and letter colors .
  * warp up
- * change letter size
+ * change letter size .
  * change command prompt
- * snake
+ * play snake .
+ * snake themes .
  * sing
  * exit
- * help
+ * help .
  */
 typedef struct command
 {
     char *code;
     char *help;
-    char *(*action)(char *);
+    char *(*action)(char *, char *);
 } command;
 
-void addCommand(char *commandCode, char *help, char *(*action)(char *));
-char *handleCommand(char *command);
-
-char *getHelp(char *commandParameters);
+void addCommand(char *commandCode, char *help, char *(*action)(char *, char *));
+char *handleCommand(char *command, char *mustRedraw);
 
 #endif

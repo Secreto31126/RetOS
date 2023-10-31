@@ -1,5 +1,6 @@
 #include "moduleSelector.h"
 #include "./../shell/shell.h"
+#include "./../shell/commandHandler/commandHandler.h"
 #include "./../window/painter.h"
 #include "./../window/window.h"
 #include "./../window/fontInterface.h"
@@ -11,9 +12,9 @@ void setEnvironment();
 void startModules()
 {
     initializeFonts();
-    initializeSnake();
     startPainter(getScreenWidth(), getScreenHeight());
     setEnvironment();
+    initializeCommands();
 
     char c;
     while ((c = getChar()) != '4')
@@ -51,11 +52,11 @@ void startModules()
     wait();
     blank();
     endPainter();
+    freeCommands();
 }
 
 void setEnvironment()
 {
     setSize(1.0);
-    setLineStart("");
     paintString(prompt, -1, 0);
 }

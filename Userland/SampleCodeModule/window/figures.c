@@ -1,7 +1,6 @@
 // @deprecated
 #include "window.h"
 #include "figures.h"
-#include "backgroundArrays.h"
 
 HexColor redRectangleFigure()
 {
@@ -40,9 +39,4 @@ HexColor RetOSBackground(int x, int y, double xScaleFactor, double yScaleFactor)
     if (!((int)(x * xScaleFactor * y * yScaleFactor)))
         return 0;
     return 0xFF000000 | ((((int)(0xFFFFFF * x * y * xScaleFactor * yScaleFactor) & 0x00FFFFFF)) ^ 0x00FFFFFF);
-}
-
-HexColor colorMapper(HexColor *colorMap, int code)
-{
-    return colorMap[code];
 }

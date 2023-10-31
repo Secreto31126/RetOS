@@ -8,7 +8,8 @@
 #include "./../window/painter.h"
 #include "./../snake/random.h"
 #include "./../snake/snake.h"
-#include "./../window/backgroundArrays.h"
+#include "./../snake/drawings/backgroundArrays.h"
+#include "./../snake/drawings/snakeDrawings.h"
 
 #define MAX_COMMAND_LENGTH 90
 
@@ -16,7 +17,6 @@ char shellStart();
 void setHighlightColor(HexColor color);
 void setLetterColor(HexColor color);
 void resize(double size);
-void setPrompt(char *newPrompt);
 void warpLineUp(int lines);
 
 #endif

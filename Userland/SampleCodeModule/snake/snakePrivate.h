@@ -8,7 +8,6 @@
 #include "./../window/painter.h"
 // #include "./../window/figures.h" // no longer used
 #include "random.h"
-#include "snakeDrawings.h"
 
 typedef enum DIRECTION
 {

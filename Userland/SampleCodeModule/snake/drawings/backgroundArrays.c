@@ -1,6 +1,9 @@
 #include "backgroundArrays.h"
 
-HexColor appleColorMap[] = {0x00000000, APPLE_RED, APPLE_BROWN, APPLE_GREEN};
+HexColor colorMapper(HexColor *colorMap, int code)
+{
+    return colorMap[code];
+}
 
 /*All hex values and arrays below were created from jpg images linked on each item using an image parser written in Java*/
 // https://www.newegg.com/insider/wp-content/uploads/windows_xp_bliss-wide.jpg

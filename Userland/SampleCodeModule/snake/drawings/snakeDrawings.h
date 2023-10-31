@@ -1,6 +1,6 @@
 #ifndef SDRAW_H
 #define SDRAW_H
-
+#include "./../../window/window.h"
 #define DRAW_SIZE 12
 #define BIG_DRAW_SIZE 24
 typedef struct snakeDrawing
@@ -11,17 +11,8 @@ typedef struct snakeDrawing
     char *tailDrawing;
     char *turnDrawing;
     char *growItemDrawing;
+    HexColor *growItemColorMap;
 } snakeDrawing;
-
-typedef enum Drawing
-{
-    HEAD_D = 0,
-    BODY_D,
-    TAIL_D,
-    TURN_D,
-    APPLE_D,
-    NUMBER_OF_DRAWINGS
-} Drawing;
 
 // cycles through currentDrawing
 void makeSnakeDrawings();
@@ -33,5 +24,9 @@ extern char classicOther[DRAW_SIZE][DRAW_SIZE];
 extern char classicTail[DRAW_SIZE][DRAW_SIZE];
 extern char classicApple[DRAW_SIZE][DRAW_SIZE];
 extern char background[DRAW_SIZE][DRAW_SIZE];
+extern char goomba[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
+extern HexColor appleColorMap[];
+extern HexColor marioItemColorMap[];
+extern char marioItem[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 
 #endif

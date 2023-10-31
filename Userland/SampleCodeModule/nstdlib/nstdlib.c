@@ -78,6 +78,36 @@ uint64_t atoi(char *s)
     }
     return ret;
 }
+uint64_t atoiHex(char *s)
+{
+    char maxLength = 8; // max number of hex digits in a uint64_t
+    uint64_t ret = 0;
+    while (maxLength)
+    {
+        maxLength--;
+        if (*s >= '0' && *s <= '9')
+        {
+            ret *= 16;
+            ret += *s - '0';
+            s++;
+        }
+        else if (*s >= 'A' && *s <= 'F')
+        {
+            ret *= 16;
+            ret += *s - 'A' + 10;
+            s++;
+        }
+        else if (*s >= 'a' && *s <= 'f')
+        {
+            ret *= 16;
+            ret += *s - 'a' + 10;
+            s++;
+        }
+        else
+            break;
+    }
+    return ret;
+}
 
 uint64_t numLength(char *s)
 {
@@ -375,7 +405,7 @@ uint64_t pow(double base, uint64_t exponent)
     return ans;
 }
 
-char strcmp(char *a, char *b)
+char strCompare(char *a, char *b)
 {
     while (*a && *a == *b)
     {
@@ -384,6 +414,16 @@ char strcmp(char *a, char *b)
     }
     int dist = (int)(unsigned char)(*a) - (int)(unsigned char)(*b);
     return dist ? dist > 0 ? 1 : -1 : 0;
+}
+
+char strcmp(char *s1, char *s2)
+{
+    while (*s1 || *s2)
+    {
+        if (*(s1++) != *(s2++))
+            return 0;
+    }
+    return 1;
 }
 
 // User is responsible for ensuring receiver has enough memory allocated to receive a char
@@ -453,7 +493,7 @@ void freePrints()
  * returns formatted string
  * User should call freePrints() to free memory allocated for returned string
  */
-uint64_t sPrintf(char *format, ...)
+char *sPrintf(char *format, ...)
 {
     va_list argp;
     va_start(argp, format);

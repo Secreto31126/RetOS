@@ -1,6 +1,7 @@
 #include "snake.h"
 #include "snakePrivate.h"
-#include "./../window/backgroundArrays.h"
+#include "./drawings/backgroundArrays.h"
+#include "drawings/snakeDrawings.h"
 
 typedef struct frontSnake
 {
@@ -12,14 +13,15 @@ void doMovement(char c, frontSnake *snakes);
 void putDeath(int snakeNumber);
 void drawBoard(frontSnake *snakes);
 void drawBackground();
+void freeColorMaps(int snakeCount, frontSnake *snakes);
 // default theme is windows
 static char *backgroundArray = windowsArray;
 static HexColor *backgroundColorMap = windowsColorMap;
-static char *growItemColorMap = appleColorMap;
 static char redrawBeforeBody = 0;
 static char redrawBeforeTail = 1;
 static char redrawBeforeTurn = 1; // currently unused
-static snakeDrawing currentDrawing;
+static char redrawBeforeHead = 0;
+static snakeDrawing currentDrawing = {DRAW_SIZE, classicHeadUp, classicOther, classicTail, 0, classicApple, appleColorMap}; // turn currently unused
 
 char timeHasPassed(uint64_t start, uint64_t unit)
 {
@@ -38,10 +40,6 @@ void drawBackgroundWithParameters(Window w, uint64_t xOffset, uint64_t yOffset)
 
     overlayFromCharArray(w, backgroundArray, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, backgroundColorMap, xOffset, yOffset, OPAQUE);
     drawWindow(w, xOffset, yOffset);
-}
-void initializeSnake()
-{
-    setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, 0, classicApple); // turn currently unused
 }
 int playSnake(uint16_t snakeCount)
 {
@@ -90,8 +88,8 @@ int playSnake(uint16_t snakeCount)
             drawBoard(snakes);
         }
     }
-    // blank();
-    drawBackground();  // undecided between a blank background or the snake background.
+    blank();
+    // drawBackground();  // undecided between a blank background or the snake background.
     while (readChar()) // empties out buffer, in case player pressed a key while background was being cleared (not necessary, just prevents skipping the game over screen)
         ;
     paintString("Game Over. Press a key to return to shell.", 0xFFFF0000, 0);
@@ -152,12 +150,14 @@ void drawBoard(frontSnake *snakes)
         switch (board[i].toDraw)
         {
         case HEAD:
+            if (redrawBeforeHead)
+                drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight); // Since the head can have transparency, the background must be redrawn before drawing head if a grow item has color where the head has transparency.
             source = currentDrawing.headDrawing;
             fromCharArray(stamp, source, drawSize, drawSize, snakes[board[i].player].colorMap, 0, 0, OPAQUE);
             break;
         case TAIL:
             if (redrawBeforeTail)
-                drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight); // Since the tail has transparency, the background must be redrawn before drawing tail.
+                drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight); // Since the tail has transparency, the background must be redrawn before drawing tail if the head has color where the tail is transparent.
             source = currentDrawing.tailDrawing;
             fromCharArray(stamp, source, drawSize, drawSize, snakes[board[i].player].colorMap, 0, 0, OPAQUE);
             break;
@@ -169,7 +169,7 @@ void drawBoard(frontSnake *snakes)
             break;
         case APPLE:
             source = currentDrawing.growItemDrawing;
-            fromCharArray(stamp, source, drawSize, drawSize, growItemColorMap, 0, 0, OPAQUE);
+            fromCharArray(stamp, source, drawSize, drawSize, currentDrawing.growItemColorMap, 0, 0, OPAQUE);
             break;
         case BLANK:
             drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
@@ -221,16 +221,19 @@ void setBackgroundColorMap(HexColor *newBackground)
 {
     backgroundColorMap = newBackground;
 }
-void setGrowItemColorMap(HexColor *newBackground)
+void setDrawOptions(char headRedraw, char bodyRedraw, char tailRedraw, char turnRedraw)
 {
-    growItemColorMap = newBackground;
+    redrawBeforeHead = headRedraw;
+    redrawBeforeBody = bodyRedraw;
+    redrawBeforeTail = tailRedraw;
+    redrawBeforeTurn = turnRedraw;
 }
 void freeColorMaps(int snakeCount, frontSnake *snakes)
 {
     for (int i = 0; i < snakeCount; i++)
         free(snakes[i].colorMap);
 }
-void setSnakeDrawing(char drawSize, char *headDrawing, char *bodyDrawing, char *tailDrawing, char *turnDrawing, char *growItemDrawing)
+void setSnakeDrawing(char drawSize, char *headDrawing, char *bodyDrawing, char *tailDrawing, char *turnDrawing, char *growItemDrawing, HexColor *growItemColorMap)
 {
     currentDrawing.drawSize = drawSize;
     currentDrawing.headDrawing = headDrawing;
@@ -238,4 +241,5 @@ void setSnakeDrawing(char drawSize, char *headDrawing, char *bodyDrawing, char *
     currentDrawing.tailDrawing = tailDrawing;
     currentDrawing.turnDrawing = turnDrawing;
     currentDrawing.growItemDrawing = growItemDrawing;
+    currentDrawing.growItemColorMap = growItemColorMap;
 }

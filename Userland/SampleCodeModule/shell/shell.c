@@ -1,9 +1,12 @@
 #include "shell.h"
+#include "commandHandler/commandHandler.h"
 void warpLineUp(int lines);
-
+void passCommand(char *toPass);
+void paintLineStart();
 static char *buffer, *commandBuffer;
 static uint64_t index, commandIndex;
 static HexColor letterColor = 0xFF000000 | HEX_WHITE, highlightColor = 0x00000000 | HEX_BLACK;
+static char *lineStart = ":~ ";
 char shellStart()
 {
     uint32_t width = getScreenWidth();
@@ -17,18 +20,16 @@ char shellStart()
     initializeFonts();
     startPainter(width, height);
     setSize(1.0);
-    setLineStart(":~");
     paintString("You are now in shell:\n", letterColor, highlightColor);
+    paintLineStart();
     char leaving = 0;
     setSize(1.0);
-    setBackgroundArray(creationArray);
-    setBackgroundColorMap(creationColorMap);
-    while ((c = getChar()) != 'q' || !leaving)
+    setBackgroundArray(windowsArray);
+    setBackgroundColorMap(windowsColorMap);
+    setSnakeDrawing(BIG_DRAW_SIZE, goomba, goomba, goomba, goomba, marioItem, marioItemColorMap);
+    setDrawOptions(1, 0, 0, 0);
+    while ((c = getChar()) != '\n' || !strcmp(commandBuffer, "exit"))
     {
-        if (c == 'q')
-            leaving = 1;
-        else
-            leaving = 0;
         if (c == '\b')
         {
             if (*(buffer - 1) == '\n' || !index)
@@ -53,16 +54,12 @@ char shellStart()
             }
             else
             {
+                passCommand(commandBuffer);
                 commandIndex = 0;
-                if (!strcmp(commandBuffer, "snake"))
-                {
-                    setSeed(get_tick());
-                    blank();
-                    char winner = playSnake(2);
-                    paintString("You are now in shell. Player ", letterColor, highlightColor);
-                    paintChar(winner + '0', letterColor, highlightColor);
-                    paintString(" won", letterColor, highlightColor);
-                }
+                *commandBuffer = 0;
+                paintChar('\n', letterColor, highlightColor);
+                paintLineStart();
+                continue;
             }
         }
         commandBuffer[commandIndex] = 0;
@@ -109,9 +106,28 @@ void resize(double size)
     while (!paintString(buffer, letterColor, highlightColor))
         warpLineUp(1);
 }
-void setPrompt(char *newPrompt)
+void passCommand(char *toPass)
 {
-    setLineStart(newPrompt);
-    blank();
-    paintString(buffer, letterColor, highlightColor);
+    char mustRedraw = 0;
+    char *toPaint = handleCommand(toPass, &mustRedraw);
+    if (mustRedraw)
+    {
+        buffer[--index] = 0; // to remove last '\n' from buffer
+        paintString("You are now in shell:\n", letterColor, highlightColor);
+        paintString(buffer, letterColor, highlightColor);
+    }
+    if (!strcmp(toPaint, ""))
+    {
+        paintString("\n", letterColor, highlightColor);
+        paintString(toPaint, letterColor, highlightColor);
+    }
+}
+void paintLineStart()
+{
+    char *aux = lineStart;
+    while (*aux)
+    {
+        paintChar(*aux, letterColor, highlightColor);
+        buffer[index++] = *(aux++);
+    }
 }

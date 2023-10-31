@@ -5,7 +5,8 @@
 	extern dump_regs
 	extern dump_regs_include_rip
 
-	extern handle_catch
+	extern getStackBase
+	extern main
 
     global zero_division_exception_handler
     global invalid_opcode_exception_handler
@@ -27,10 +28,12 @@
 	mov		rdi, [rsp]
 	call	dump_regs_include_rip
 
+	mov		rdi, %1
 	call	exception_manager
 
-	mov		rdi, %1
-	call	handle_catch
+	call	getStackBase
+	mov		rsp, rax
+	call	main
 %endmacro
 
 %macro master_pic_handler 1

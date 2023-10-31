@@ -39,6 +39,18 @@
 	iretq
 %endmacro
 
+%macro slave_pic_handler 1
+	pushall
+	mov		rdi, %1
+	call	pic_manager
+	mov     al, 0x20
+	out     0xA0, al
+	mov     al, 0x20
+	out     0x20, al
+	popall
+	iretq
+%endmacro
+
 ; void zero_division_handler(void);
 zero_division_exception_handler:
 	exception_handler 0

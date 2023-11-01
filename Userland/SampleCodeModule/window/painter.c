@@ -85,11 +85,6 @@ void blank()
     yPointer = 0;
     Window blanker = getWindow(w, h, malloc(w * h * sizeof(HexColor)));
     char blackPixel = 0;
-    if (!blanker.pixels)
-    {
-        paintString("LAREPUTAMADRE", -1, 0);
-        getChar();
-    }
     toHexArray(&blackPixel, blanker.pixels, 1, 1, w, h, 1, 0xFF000000);
     drawWindow(blanker, 0, 0);
     // freeWindow(blanker);

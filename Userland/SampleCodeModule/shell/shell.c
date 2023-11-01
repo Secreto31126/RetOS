@@ -64,7 +64,7 @@ char shellStart()
             else
             {
                 fromLastEnter = 0;
-                passCommand(commandBuffer);
+                // passCommand(commandBuffer);
                 commandIndex = 0;
                 *commandBuffer = 0;
                 paintLineStart();
@@ -80,28 +80,6 @@ char shellStart()
     return 1;
 }
 
-void warpN(uint64_t n)
-{
-    int i;
-    for (i = n; buffer[i]; i++)
-    {
-        buffer[i - n] = buffer[i];
-    }
-    buffer[i - n] = 0;
-    index -= n;
-}
-void warpOneLine()
-{
-    uint64_t max = getCharPerLine();
-    int i, j;
-    for (i = 0; i < max && buffer[i] != '\n'; i++)
-        ;
-    i++;
-    warpN(i);
-
-    blank();
-    paintString(buffer, letterColor, highlightColor);
-}
 void setLetterColor(HexColor color)
 {
     letterColor = 0xFF000000 | color; // Letters cannot be transparent
@@ -147,13 +125,41 @@ void paintLineStart()
         buffer[index++] = *(aux++);
     }
 }
+void warpNLines(uint8_t n)
+{
+    uint64_t max = getCharPerLine();
+    int i = 0, j;
+    while (n)
+    {
+        for (; i < max && buffer[i] && buffer[i] != '\n'; i++)
+            ;
+        n--;
+        i++;
+    }
+    for (j = i; buffer[j]; j++)
+        buffer[j - i] = buffer[j];
+    index -= i;
+    buffer[index] = 0;
+
+    blank();
+    paintString(buffer, letterColor, highlightColor);
+}
 void paintStringOrWarp(char *s)
 {
     while (!paintString(s, letterColor, highlightColor))
-        warpOneLine();
+        warpNLines(1);
 }
 void paintCharOrWarp(char c)
 {
     while (!paintChar(c, letterColor, highlightColor))
-        warpOneLine();
+        warpNLines(1);
+}
+void clearShell()
+{
+    blank();
+    index = 0;
+    buffer[index] = 0;
+    commandIndex = 0;
+    commandBuffer[commandIndex] = 0;
+    fromLastEnter = 0;
 }

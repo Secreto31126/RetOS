@@ -44,6 +44,12 @@ uint8_t mergeColor(uint8_t background, uint8_t overlay, uint8_t opacity)
 
 uint64_t drawFromArray(HexColor *array, uint32_t width, uint32_t height, uint32_t x, uint32_t y)
 {
+    if (!array)
+    {
+        clear_screen();
+        return VBE_mode_info->width * VBE_mode_info->height;
+    }
+
     if (x >= VBE_mode_info->width || y >= VBE_mode_info->height)
         return 0;
 

@@ -5,6 +5,9 @@
 	extern dump_regs
 	extern dump_regs_include_rip
 
+	extern getStackBase
+	extern main
+
     global zero_division_exception_handler
     global invalid_opcode_exception_handler
 
@@ -13,7 +16,7 @@
     global cascade_pic
     global even_ports_handler
     global odd_ports_handler
-    global usb_pic
+    global usb_handler
 
     global syscall_handler
 
@@ -24,9 +27,13 @@
 	call	dump_regs
 	mov		rdi, [rsp]
 	call	dump_regs_include_rip
+
 	mov		rdi, %1
 	call	exception_manager
-	iretq ; Shouldn't return to the faulty instruction
+
+	call	getStackBase
+	mov		rsp, rax
+	call	main
 %endmacro
 
 %macro master_pic_handler 1
@@ -57,7 +64,7 @@ zero_division_exception_handler:
 
 ; void invalid_opcode_exception_handler(void);
 invalid_opcode_exception_handler:
-	exception_handler 1
+	exception_handler 6
 
 ; void tick_handler(void);
 tick_handler:
@@ -79,8 +86,8 @@ even_ports_handler:
 odd_ports_handler:
 	master_pic_handler 4
 
-; void usb_pic(void);
-usb_pic:
+; void usb_handler(void);
+usb_handler:
 	master_pic_handler 5
 
 ; uint64_t syscall_handler(void);

@@ -36,8 +36,16 @@ static uint32_t get_screen_size();
  * @return uint64_t rax
  */
 static uint64_t beep_bop(uint64_t rdi, uint64_t, uint64_t, uint64_t rax);
+/**
+ * @brief This wrapper makes happy Lucas noises :)
+ *
+ * @param buffer The buffer to write to
+ * @param count The number of bytes to write
+ * @return uint64_t The number of bytes written
+ */
+static uint64_t get_lucas(uint8_t *buffer, uint64_t count);
 
-#define SYSCALL_COUNT 9
+#define SYSCALL_COUNT 10
 typedef uint64_t (*syscall)(uint64_t, uint64_t, uint64_t, uint64_t);
 static syscall syscall_handlers[SYSCALL_COUNT] = {
     read,
@@ -49,6 +57,7 @@ static syscall syscall_handlers[SYSCALL_COUNT] = {
     get_screen_size,
     beep_bop,
     get_tick,
+    get_lucas,
 };
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
@@ -64,7 +73,7 @@ uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 static uint64_t (*files[4])(uint8_t *, uint16_t) = {
     read_stdin,
     noop,
-    noop,
+    read_stderr,
     read_stdkey,
 };
 
@@ -126,4 +135,9 @@ static uint64_t beep_bop(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 {
     beep(rdi);
     return rax;
+}
+
+static uint64_t get_lucas(uint8_t *buffer, uint64_t count)
+{
+    return read_stderr(buffer, count);
 }

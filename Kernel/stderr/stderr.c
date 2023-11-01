@@ -41,6 +41,9 @@ uint16_t read_stderr(uint8_t *buf, uint16_t len)
 
 uint16_t write_stderr(uint8_t *buf, uint16_t len)
 {
+    // Only read the latest message (dump)
+    reader = writer;
+
     int i = 0;
     while (i < len)
     {

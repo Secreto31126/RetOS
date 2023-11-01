@@ -1,5 +1,6 @@
 #include "shell.h"
 #include "commandHandler/commandHandler.h"
+#define BLOCK 50
 void warpLineUp(uint64_t lines);
 void passCommand(char *toPass);
 void paintLineStart();
@@ -80,17 +81,16 @@ void warpLineUp(uint64_t lines)
     blank();
     uint64_t len = strlen(buffer);
     uint64_t maxRemove = getCharPerLine();
-    uint64_t removed = 0;
-    int i;
+    int i, j;
     for (i = 0; lines && i < len; i++)
     {
-        if ((!(removed % maxRemove) && removed) || buffer[i] == '\n')
+        if ((!(i % maxRemove) && i) || buffer[i] == '\n')
             lines--;
-        removed++;
     }
-    for (; i < len; i++)
-        buffer[i - removed] = buffer[i];
-    buffer[i - removed] = 0;
+    for (j = i; j < len; j++)
+        buffer[j - i] = buffer[j];
+    buffer[j - i] = 0;
+    index -= i;
     paintString(buffer, letterColor, highlightColor);
 }
 void setLetterColor(HexColor color)

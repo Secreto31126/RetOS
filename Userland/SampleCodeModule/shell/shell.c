@@ -105,7 +105,7 @@ void warpOneLine()
     for (i = 0; i < max && buffer[i] && (buffer[i] != '\n'); i++)
         ;
     i++;
-    for (j = i - 1; buffer[j]; j++)
+    for (j = i; buffer[j]; j++)
         buffer[j - i] = buffer[j];
     index -= i;
     buffer[index] = 0;

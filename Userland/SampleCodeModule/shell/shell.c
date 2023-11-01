@@ -32,11 +32,11 @@ char shellStart()
     setDrawOptions(1, 0, 0, 0);
     while ((c = getChar()) != '\n' || !strcmp(commandBuffer, "exit"))
     {
+        paintCharOrWarp(c);
         if (c == '\b')
         {
             if (*(buffer - 1) == '\n' || !index)
             {
-                paintChar('i', letterColor, highlightColor);
                 continue;
             }
             else
@@ -47,7 +47,6 @@ char shellStart()
         }
         else
         {
-            paintCharOrWarp(c);
             buffer[index++] = c;
             if (c != '\n')
             {

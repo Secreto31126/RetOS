@@ -155,6 +155,8 @@ dump_regs:
 
 	mov byte [dump_reg_string + rcx], 0
 
+	mov	[rsp], rcx
+
 	popall
 	ret
 

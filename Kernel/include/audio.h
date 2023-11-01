@@ -2,12 +2,11 @@
 #define AIO_H
 
 /**
- * @brief Plays a beep sound
+ * @brief Plays a beep sound asynchronously
  *
- * @param frequency The frequency of the beep
- * @param duration The duration of the beep in ticks
+ * @param frequency The frequency of the beep, 0 to shut up
  */
-void beep(uint32_t frequency, uint64_t duration);
+void beep(uint32_t frequency);
 
 void imperial_march();
 void hes_a_pirate();

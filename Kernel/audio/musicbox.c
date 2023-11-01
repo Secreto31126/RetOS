@@ -1,5 +1,6 @@
 #include "audio.h"
 
+#define SHH 0
 #define C3 262
 #define C3sus 278
 #define D3 294
@@ -26,318 +27,334 @@
 #define B4 988
 #define C5 1046
 
+#define MEEP(f, d) \
+    beep(f);       \
+    sleep_ticks(d);
+
 /**
  * @see https://github.com/gabszzz/The-Imperial-March
  */
 void imperial_march()
 {
-    beep(A3, 14);
-    sleep_ticks(3);
-    beep(A3, 14);
-    sleep_ticks(3);
-    beep(A3, 14);
-    sleep_ticks(10);
-    beep(F3, 5);
-    beep(C4, 4);
-    beep(A3, 14);
-    beep(F3, 5);
-    beep(C4, 4);
-    beep(A3, 22);
-    sleep_ticks(10);
-    beep(E4, 12);
-    beep(E4, 12);
-    beep(E4, 12);
-    sleep_ticks(10);
-    beep(F4, 6);
-    beep(D4, 5);
-    beep(A3, 12);
-    beep(F3, 5);
-    beep(C4, 5);
-    beep(A3, 22);
+    MEEP(A3, 14);
+    MEEP(SHH, 3);
+    MEEP(A3, 14);
+    MEEP(SHH, 3);
+    MEEP(A3, 14);
+    MEEP(SHH, 10);
+    MEEP(F3, 5);
+    MEEP(C4, 4);
+    MEEP(A3, 14);
+    MEEP(F3, 5);
+    MEEP(C4, 4);
+    MEEP(A3, 22);
+    MEEP(SHH, 10);
+    MEEP(E4, 12);
+    MEEP(E4, 12);
+    MEEP(E4, 12);
+    MEEP(SHH, 10);
+    MEEP(F4, 6);
+    MEEP(D4, 5);
+    MEEP(A3, 12);
+    MEEP(F3, 5);
+    MEEP(C4, 5);
+    MEEP(A3, 22);
+
+    beep(SHH);
 }
 
 void hes_a_pirate()
 {
-    beep(E3, 3);
-    beep(G3, 3);
-    beep(A3, 3);
-    sleep_ticks(3);
-    beep(A3, 7);
+    MEEP(E3, 3);
+    MEEP(G3, 3);
+    MEEP(A3, 3);
+    MEEP(SHH, 3);
+    MEEP(A3, 7);
 
-    beep(A3, 3);
-    beep(B3, 3);
-    beep(C4, 3);
-    sleep_ticks(3);
-    beep(C4, 7);
+    MEEP(A3, 3);
+    MEEP(B3, 3);
+    MEEP(C4, 3);
+    MEEP(SHH, 3);
+    MEEP(C4, 7);
 
-    beep(C4, 3);
-    beep(D4, 3);
-    beep(B3, 3);
-    sleep_ticks(3);
-    beep(B3, 7);
+    MEEP(C4, 3);
+    MEEP(D4, 3);
+    MEEP(B3, 3);
+    MEEP(SHH, 3);
+    MEEP(B3, 7);
 
-    beep(A3, 3);
-    beep(G3, 3);
-    beep(A3, 3);
+    MEEP(A3, 3);
+    MEEP(G3, 3);
+    MEEP(A3, 3);
 
-    sleep_ticks(10);
+    MEEP(SHH, 10);
 
-    beep(E3, 3);
-    beep(G3, 3);
-    beep(A3, 3);
-    sleep_ticks(3);
-    beep(A3, 7);
+    MEEP(E3, 3);
+    MEEP(G3, 3);
+    MEEP(A3, 3);
+    MEEP(SHH, 3);
+    MEEP(A3, 7);
 
-    beep(A3, 3);
-    beep(B3, 3);
-    beep(C4, 3);
-    sleep_ticks(3);
-    beep(C4, 7);
+    MEEP(A3, 3);
+    MEEP(B3, 3);
+    MEEP(C4, 3);
+    MEEP(SHH, 3);
+    MEEP(C4, 7);
 
-    beep(C4, 3);
-    beep(D4, 3);
-    beep(B3, 3);
-    sleep_ticks(3);
-    beep(B3, 7);
+    MEEP(C4, 3);
+    MEEP(D4, 3);
+    MEEP(B3, 3);
+    MEEP(SHH, 3);
+    MEEP(B3, 7);
 
-    beep(G3, 3);
-    beep(A3, 3);
+    MEEP(G3, 3);
+    MEEP(A3, 3);
 
-    sleep_ticks(10);
+    MEEP(SHH, 10);
 
-    beep(E3, 3);
-    beep(G3, 3);
-    beep(A3, 3);
-    sleep_ticks(3);
-    beep(A3, 7);
+    MEEP(E3, 3);
+    MEEP(G3, 3);
+    MEEP(A3, 3);
+    MEEP(SHH, 3);
+    MEEP(A3, 7);
 
-    beep(A3, 3);
-    beep(B3, 3);
-    beep(C4, 3);
-    sleep_ticks(3);
-    beep(C4, 7);
+    MEEP(A3, 3);
+    MEEP(B3, 3);
+    MEEP(C4, 3);
+    MEEP(SHH, 3);
+    MEEP(C4, 7);
 
-    beep(C4, 3);
-    beep(D4, 3);
-    beep(E4, 3);
-    sleep_ticks(3);
-    beep(E4, 3);
+    MEEP(C4, 3);
+    MEEP(D4, 3);
+    MEEP(E4, 3);
+    MEEP(SHH, 3);
+    MEEP(E4, 3);
 
-    beep(D4, 3);
-    beep(C4, 3);
-    beep(D4, 3);
-    beep(A3, 7);
+    MEEP(D4, 3);
+    MEEP(C4, 3);
+    MEEP(D4, 3);
+    MEEP(A3, 7);
 
-    sleep_ticks(10);
+    MEEP(SHH, 10);
 
-    beep(A3, 3);
-    beep(B3, 3);
-    beep(C4, 3);
-    sleep_ticks(3);
-    beep(C4, 7);
+    MEEP(A3, 3);
+    MEEP(B3, 3);
+    MEEP(C4, 3);
+    MEEP(SHH, 3);
+    MEEP(C4, 7);
 
-    beep(D4, 7);
-    beep(E4, 4);
-    beep(A3, 7);
+    MEEP(D4, 7);
+    MEEP(E4, 4);
+    MEEP(A3, 7);
 
-    beep(A3, 3);
-    beep(C4, 3);
-    beep(B3, 18);
-    sleep_ticks(3);
-    beep(B3, 7);
-    beep(C4, 3);
-    beep(A3, 3);
-    beep(B3, 7);
+    MEEP(A3, 3);
+    MEEP(C4, 3);
+    MEEP(B3, 18);
+    MEEP(SHH, 3);
+    MEEP(B3, 7);
+    MEEP(C4, 3);
+    MEEP(A3, 3);
+    MEEP(B3, 7);
+
+    beep(SHH);
 }
 
 void outer_wilds()
 {
-    beep(E3, 10);
-    beep(A3, 10);
-    beep(C4sus, 12);
+    MEEP(E3, 10);
+    MEEP(A3, 10);
+    MEEP(C4sus, 12);
 
-    beep(A3, 7);
-    beep(D4, 7);
-    beep(C4sus, 7);
-    beep(B3, 7);
-    beep(A3, 7);
-    beep(B3, 7);
-    beep(C4sus, 7);
-    beep(A3, 10);
+    MEEP(A3, 7);
+    MEEP(D4, 7);
+    MEEP(C4sus, 7);
+    MEEP(B3, 7);
+    MEEP(A3, 7);
+    MEEP(B3, 7);
+    MEEP(C4sus, 7);
+    MEEP(A3, 10);
 
-    beep(E3, 10);
-    beep(A3, 10);
-    beep(C4sus, 12);
+    MEEP(E3, 10);
+    MEEP(A3, 10);
+    MEEP(C4sus, 12);
 
-    beep(A3, 7);
-    beep(D4, 7);
-    beep(C4sus, 7);
-    beep(B3, 7);
-    beep(A3, 7);
-    beep(B3, 7);
-    beep(C4sus, 7);
-    beep(E4, 7);
-    beep(C4sus, 7);
+    MEEP(A3, 7);
+    MEEP(D4, 7);
+    MEEP(C4sus, 7);
+    MEEP(B3, 7);
+    MEEP(A3, 7);
+    MEEP(B3, 7);
+    MEEP(C4sus, 7);
+    MEEP(E4, 7);
+    MEEP(C4sus, 7);
 
-    beep(E3, 10);
-    beep(A3, 10);
-    beep(C4sus, 12);
+    MEEP(E3, 10);
+    MEEP(A3, 10);
+    MEEP(C4sus, 12);
 
-    beep(A3, 7);
-    beep(D4, 7);
-    beep(C4sus, 7);
-    beep(B3, 7);
-    beep(A3, 7);
-    beep(B3, 7);
-    beep(C4sus, 7);
-    beep(A3, 10);
+    MEEP(A3, 7);
+    MEEP(D4, 7);
+    MEEP(C4sus, 7);
+    MEEP(B3, 7);
+    MEEP(A3, 7);
+    MEEP(B3, 7);
+    MEEP(C4sus, 7);
+    MEEP(A3, 10);
 
-    beep(E3, 10);
-    beep(A3, 10);
-    beep(C4sus, 12);
+    MEEP(E3, 10);
+    MEEP(A3, 10);
+    MEEP(C4sus, 12);
 
-    beep(A3, 7);
-    beep(D4, 7);
-    beep(C4sus, 7);
-    beep(B3, 7);
-    beep(A3, 7);
-    beep(B3, 7);
-    beep(C4sus, 7);
-    beep(E4, 7);
-    beep(C4sus, 7);
+    MEEP(A3, 7);
+    MEEP(D4, 7);
+    MEEP(C4sus, 7);
+    MEEP(B3, 7);
+    MEEP(A3, 7);
+    MEEP(B3, 7);
+    MEEP(C4sus, 7);
+    MEEP(E4, 7);
+    MEEP(C4sus, 7);
 
-    beep(E4, 7);
-    beep(C4sus, 7);
-    beep(E4, 7);
-    beep(C4sus, 7);
+    MEEP(E4, 7);
+    MEEP(C4sus, 7);
+    MEEP(E4, 7);
+    MEEP(C4sus, 7);
 
-    beep(A3, 7);
-    beep(C4sus, 7);
-    beep(A3, 7);
-    beep(C4sus, 7);
+    MEEP(A3, 7);
+    MEEP(C4sus, 7);
+    MEEP(A3, 7);
+    MEEP(C4sus, 7);
 
-    beep(E4, 7);
-    beep(C4sus, 7);
-    beep(E4, 7);
-    beep(C4sus, 7);
+    MEEP(E4, 7);
+    MEEP(C4sus, 7);
+    MEEP(E4, 7);
+    MEEP(C4sus, 7);
 
-    beep(A3, 7);
-    beep(C4sus, 7);
-    beep(A3, 7);
-    beep(C4sus, 7);
+    MEEP(A3, 7);
+    MEEP(C4sus, 7);
+    MEEP(A3, 7);
+    MEEP(C4sus, 7);
 
-    beep(E4, 7);
-    beep(C4sus, 7);
-    beep(E4, 7);
-    beep(C4sus, 7);
+    MEEP(E4, 7);
+    MEEP(C4sus, 7);
+    MEEP(E4, 7);
+    MEEP(C4sus, 7);
 
-    beep(A3, 7);
-    beep(C4sus, 7);
-    beep(A3, 7);
-    beep(C4sus, 7);
+    MEEP(A3, 7);
+    MEEP(C4sus, 7);
+    MEEP(A3, 7);
+    MEEP(C4sus, 7);
 
-    beep(E4, 7);
-    beep(C4sus, 7);
-    beep(E4, 7);
-    beep(C4sus, 7);
+    MEEP(E4, 7);
+    MEEP(C4sus, 7);
+    MEEP(E4, 7);
+    MEEP(C4sus, 7);
+
+    beep(SHH);
 }
 
 void do_i_wanna_know()
 {
-    beep(F3, 3);
-    beep(G3, 3);
-    beep(A3sus, 8);
-    beep(G3, 18);
+    MEEP(F3, 3);
+    MEEP(G3, 3);
+    MEEP(A3sus, 8);
+    MEEP(G3, 18);
 
-    sleep_ticks(18);
+    MEEP(SHH, 18);
 
-    beep(F3, 3);
-    beep(G3, 3);
-    beep(A3sus, 5);
-    beep(F4, 6);
-    beep(D4sus, 18);
-    beep(D4, 6);
-    beep(C4, 18);
+    MEEP(F3, 3);
+    MEEP(G3, 3);
+    MEEP(A3sus, 5);
+    MEEP(F4, 6);
+    MEEP(D4sus, 18);
+    MEEP(D4, 6);
+    MEEP(C4, 18);
 
-    sleep_ticks(3);
+    MEEP(SHH, 3);
 
-    beep(A3sus, 3);
-    beep(C4, 3);
-    beep(D4, 3);
-    beep(C4, 9);
+    MEEP(A3sus, 3);
+    MEEP(C4, 3);
+    MEEP(D4, 3);
+    MEEP(C4, 9);
 
-    sleep_ticks(6);
+    MEEP(SHH, 6);
 
-    beep(A3sus, 4);
-    beep(C4, 4);
-    beep(D4, 4);
-    sleep_ticks(2);
-    beep(D4, 4);
-    beep(G3, 18);
+    MEEP(A3sus, 4);
+    MEEP(C4, 4);
+    MEEP(D4, 4);
+    MEEP(SHH, 2);
+    MEEP(D4, 4);
+    MEEP(G3, 18);
 
-    sleep_ticks(9);
+    MEEP(SHH, 9);
 
-    beep(F3, 3);
-    beep(G3, 3);
-    beep(A3sus, 8);
-    beep(G3, 18);
+    MEEP(F3, 3);
+    MEEP(G3, 3);
+    MEEP(A3sus, 8);
+    MEEP(G3, 18);
+
+    beep(SHH);
 }
 
 void whistle_stop()
 {
-    beep(A4sus, 6);
-    beep(D3, 3);
-    beep(G3, 6);
-    beep(D3, 3);
-    beep(G3, 3);
-    beep(C3, 3);
-    beep(G3, 9);
+    MEEP(A4sus, 6);
+    MEEP(D3, 3);
+    MEEP(G3, 6);
+    MEEP(D3, 3);
+    MEEP(G3, 3);
+    MEEP(C3, 3);
+    MEEP(G3, 9);
 
-    sleep_ticks(9);
+    MEEP(SHH, 9);
 
-    beep(D3sus, 3);
-    beep(G3, 3);
-    beep(C3, 3);
-    beep(G3, 9);
+    MEEP(D3sus, 3);
+    MEEP(G3, 3);
+    MEEP(C3, 3);
+    MEEP(G3, 9);
 
-    sleep_ticks(9);
+    MEEP(SHH, 9);
 
-    beep(D3sus, 3);
-    beep(G3, 3);
-    beep(C3, 3);
-    beep(G3, 9);
+    MEEP(D3sus, 3);
+    MEEP(G3, 3);
+    MEEP(C3, 3);
+    MEEP(G3, 9);
+
+    beep(SHH);
 }
 
 void here_comes_the_sun()
 {
-    beep(B4, 9);
-    beep(A4, 9);
-    beep(B4, 9);
-    beep(G4, 9);
+    MEEP(B4, 9);
+    MEEP(A4, 9);
+    MEEP(B4, 9);
+    MEEP(G4, 9);
 
-    sleep_ticks(7);
+    MEEP(SHH, 7);
 
-    beep(B4, 7);
-    beep(G4, 9);
-    beep(A4, 9);
-    beep(B4, 9);
+    MEEP(B4, 7);
+    MEEP(G4, 9);
+    MEEP(A4, 9);
+    MEEP(B4, 9);
 
-    sleep_ticks(2);
+    MEEP(SHH, 2);
 
-    beep(B4, 9);
-    beep(A4, 9);
-    beep(B4, 9);
-    beep(G4, 12);
+    MEEP(B4, 9);
+    MEEP(A4, 9);
+    MEEP(B4, 9);
+    MEEP(G4, 12);
 
-    sleep_ticks(2);
+    MEEP(SHH, 2);
 
-    beep(G4, 9);
-    beep(A4, 9);
-    beep(G4, 9);
+    MEEP(G4, 9);
+    MEEP(A4, 9);
+    MEEP(G4, 9);
 
-    sleep_ticks(9);
+    MEEP(SHH, 9);
 
-    beep(B4, 9);
-    beep(A4, 9);
-    beep(G4, 9);
+    MEEP(B4, 9);
+    MEEP(A4, 9);
+    MEEP(G4, 9);
+
+    beep(SHH);
 }

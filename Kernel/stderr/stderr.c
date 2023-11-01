@@ -5,7 +5,7 @@ static uint64_t reader = 0;
 static uint64_t writer = 0;
 #define INC(x) ((x) = ((x) + 1) % BUF_SIZE)
 
-char getc()
+static char getc()
 {
     char c = buffer[reader];
     INC(reader);
@@ -13,7 +13,7 @@ char getc()
     return c;
 }
 
-void putc(uint8_t c)
+static void putc(uint8_t c)
 {
     buffer[writer] = c;
     INC(writer);

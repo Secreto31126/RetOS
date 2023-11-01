@@ -31,7 +31,7 @@ char *handleCommand(char *command, char *mustRedraw)
         return "";
     for (int i = 0; i < commandCount; i++)
     {
-        if (isPrefix(command, commands[i].code))
+        if (isFirstWord(commands[i].code, command))
         {
             return commands[i].action(shiftToWord(command + strlen(commands[i].code)), mustRedraw); // Passes rest of command (the parameters) to the defined action. Skips to next word in case there is whitespace between the command and its parameters. Action is responsible for confirming valid parameters.
         }
@@ -54,10 +54,10 @@ char *getHelp(char *commandParameters, char *mustRedraw)
     }
     for (int i = 0; i < commandCount; i++) // otherwise, a single matching help menu is printed if it exists.
     {
-        if (strcmpHandleWhitespace(commandParameters, commands[i].code))
+        if (isFirstWord(commandParameters, commands[i].code))
             return sPrintf("%s\n\nEnd of help menu.", commands[i].help);
     }
-    return sPrintf("No help menu that matches \'%s\' was found.", commandParameters); // sPrintf automatically adds created string to list of strings to be freed by freePrints()
+    return sPrintf("No help menu that matches '%s' was found.", commandParameters); // sPrintf automatically adds created string to list of strings to be freed by freePrints()
 }
 
 char *startSnake(char *commandParameters, char *mustRedraw)
@@ -113,7 +113,7 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     }
     if (matchFlag)
         return "Theme set.";
-    return sPrintf("No theme matching %s was found. Available themes are \'mario\', \'creation\', \'windows\', and \'pong\'", commandParameters);
+    return sPrintf("No theme matching %s was found. Available themes are 'mario', 'creation', 'windows', and 'pong'", commandParameters);
 }
 
 char *changeighlightColor(char *commandParameters, char *mustRedraw)
@@ -141,5 +141,6 @@ char *changeLetterSize(char *commandParameters, char *mustRedraw)
 }
 void initializeCommands()
 {
-    addCommand("snake ", "Help display for snake module.\n\nFormat(s): \'snake\' | \'snake [PLAYERS]\'\n\nStarts the snake module. If PLAYERS is greater than two, game will be initialized with two players. If no PLAYERS parameter is given, game will be initialized with one player.", startSnake);
+    addCommand("help ", "Help display for help module.\n\nFormat(s): 'help' | 'help' [MODULE_NAME]\n\nDisplays the help displays for all modules or the module specified.", getHelp);
+    addCommand("snake ", "Help display for snake module.\n\nFormat(s): 'snake' | 'snake [PLAYERS]'\n\nStarts the snake module. If PLAYERS is greater than two, game will be initialized with two players. If no PLAYERS parameter is given, game will be initialized with one player.", startSnake);
 }

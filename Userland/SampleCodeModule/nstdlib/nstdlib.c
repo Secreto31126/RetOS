@@ -426,6 +426,14 @@ char strcmp(char *s1, char *s2)
     return 1;
 }
 
+char isFirstWord(char *s1, char *firstWord)
+{
+    while ((*s1 && *s1 != ' ') || (*firstWord && *firstWord != ' '))
+        if (*(s1++) != *(firstWord++))
+            return 0;
+    return 1;
+}
+
 // User is responsible for ensuring receiver has enough memory allocated to receive a char
 char sPutChar(char *receiver, char c)
 {
@@ -465,7 +473,7 @@ uint64_t addString(char **receiver, uint64_t *length, char *source, uint64_t *al
         *allocated += toAdd;
     }
     sPuts(*receiver + *length - 1, source);
-    *length += len - 1;
+    *length += len;
     return len;
 }
 

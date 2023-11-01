@@ -125,11 +125,13 @@ void passCommand(char *toPass)
     }
     if (!strcmp(toPaint, ""))
     {
-        paintStringOrWarp(toPaint);
-        paintStringOrWarp("\n");
+        if (!paintString(toPaint, letterColor, highlightColor))
+            paintStringOrWarp(buffer);
         buffer[index++] = '\n';
+        if (!paintChar('\n', letterColor, highlightColor))
+            paintStringOrWarp(buffer);
     }
-    freePrints(); // just out of some sense of responsibility
+    freePrints(); // just out of some sense of responsibility (and because the return of handleCommand may be an allocated string)
 }
 void paintLineStart()
 {

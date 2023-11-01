@@ -1,6 +1,6 @@
 #ifndef MDL_H
 #define MDL_H
 
-void startModules();
+void startModules(char *error);
 
 #endif

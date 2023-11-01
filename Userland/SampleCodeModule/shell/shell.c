@@ -2,6 +2,7 @@
 #include "commandHandler/commandHandler.h"
 #define BLOCK 50
 void warpLineUp(uint64_t lines);
+void warpOneLine();
 void passCommand(char *toPass);
 void paintLineStart();
 void paintStringOrWarp(char *s);
@@ -16,15 +17,14 @@ char shellStart()
 {
     uint32_t width = getScreenWidth();
     uint32_t height = getScreenHeight();
-    initializeFonts();
-    startPainter(width, height);
 
     index = 0;
     commandIndex = 0;
     commandBuffer = malloc(sizeof(char) * (MAX_COMMAND_LENGTH + 1));
     buffer = malloc((width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH);
-    sPuts(buffer, shellIntro);
-    index += strlen(shellIntro);
+    *buffer = 0;
+    *commandBuffer = 0;
+    index += sPuts(buffer, shellIntro);
     paintString(buffer, letterColor, highlightColor);
     paintLineStart();
 
@@ -64,7 +64,7 @@ char shellStart()
             else
             {
                 fromLastEnter = 0;
-                // passCommand(commandBuffer);
+                passCommand(commandBuffer);
                 commandIndex = 0;
                 *commandBuffer = 0;
                 paintLineStart();
@@ -80,36 +80,26 @@ char shellStart()
     return 1;
 }
 
-void warpLineUp(uint64_t lines)
+void warpN(uint64_t n)
 {
-    blank();
-    uint64_t len = strlen(buffer);
-    uint64_t maxRemove = getCharPerLine();
-    int i, j;
-    for (i = 0; lines && i < len; i++)
+    int i;
+    for (i = n; buffer[i]; i++)
     {
-        if ((!(i % maxRemove) && i) || buffer[i] == '\n')
-            lines--;
+        buffer[i - n] = buffer[i];
     }
-    for (j = i; j < len; j++)
-        buffer[j - i] = buffer[j];
-    index -= i;
-    buffer[index] = 0;
-    paintString(buffer, letterColor, highlightColor);
+    buffer[i - n] = 0;
+    index -= n;
 }
 void warpOneLine()
 {
-    blank();
     uint64_t max = getCharPerLine();
     int i, j;
-    for (i = 0; i < max && buffer[i] && (buffer[i] != '\n'); i++)
+    for (i = 0; i < max && buffer[i] != '\n'; i++)
         ;
     i++;
-    for (j = i; buffer[j]; j++)
-        buffer[j - i] = buffer[j];
-    index -= i;
-    buffer[index] = 0;
+    warpN(i);
 
+    blank();
     paintString(buffer, letterColor, highlightColor);
 }
 void setLetterColor(HexColor color)

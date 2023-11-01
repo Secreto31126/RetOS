@@ -444,14 +444,13 @@ char sPutChar(char *receiver, char c)
     return c;
 }
 
-// returns length of resulting string
+// returns length of added string
 uint64_t sPuts(char *receiver, char *source)
 {
     char count = 0;
     while (*receiver)
     {
         receiver++;
-        count++;
     }
     while (*source)
     {

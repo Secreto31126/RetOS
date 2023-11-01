@@ -195,6 +195,8 @@ uint64_t drawWindow(Window w, uint64_t x, uint64_t y)
 Window getWindow(uint64_t width, uint64_t height, HexColor *pixels)
 {
     Window ans;
+    width = width ? width : 1;
+    height = height ? height : 1;
     ans.width = width;
     ans.height = height;
     ans.pixels = pixels;

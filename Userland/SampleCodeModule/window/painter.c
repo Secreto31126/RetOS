@@ -16,7 +16,7 @@ void setSize(double s)
     size = s;
     stamp.width = TRUE_LETTER_WIDTH * size;
     stamp.height = TRUE_LETTER_HEIGHT * size;
-    freeWindow(stamp);
+    free(stamp.pixels);
     stamp.pixels = malloc(((int)(TRUE_LETTER_HEIGHT * size)) * ((int)(TRUE_LETTER_WIDTH * size)) * sizeof(HexColor));
 }
 void newLine()
@@ -80,13 +80,20 @@ uint64_t getCharPerLine()
 
 void blank()
 {
+
     xPointer = 0;
     yPointer = 0;
     Window blanker = getWindow(w, h, malloc(w * h * sizeof(HexColor)));
-    char blackPixel[1] = {0};
-    toHexArray(blackPixel, blanker.pixels, 1, 1, w, h, 1, 0xFF000000);
+    char blackPixel = 0;
+    if (!blanker.pixels)
+    {
+        paintString("LAREPUTAMADRE", -1, 0);
+        getChar();
+    }
+    toHexArray(&blackPixel, blanker.pixels, 1, 1, w, h, 1, 0xFF000000);
     drawWindow(blanker, 0, 0);
-    freeWindow(blanker);
+    // freeWindow(blanker);
+    free(blanker.pixels);
 }
 void endPainter()
 {

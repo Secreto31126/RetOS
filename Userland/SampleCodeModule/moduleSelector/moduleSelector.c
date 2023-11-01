@@ -9,13 +9,18 @@
 static const char prompt[] = "You are now in the module selector.\nPress 1 to continue to shell.\nPress 2 to get the current time.\nPress 3 to dump all registers.\nPress 4 to end program (shut down).";
 void setEnvironment();
 
-void startModules()
+void startModules(char *error)
 {
     initializeFonts();
     startPainter(getScreenWidth(), getScreenHeight());
+    if (error)
+    {
+        paintString(sPrintf("An error ocurred. Error code:\n%c\nPress any key to continue.", error), -1, 0);
+        getChar();
+        blank();
+    }
     setEnvironment();
     initializeCommands();
-
     char c;
     while ((c = getChar()) != '4')
     {

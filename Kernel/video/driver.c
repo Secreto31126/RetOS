@@ -59,6 +59,20 @@ uint64_t drawFromArray(HexColor *array, uint32_t width, uint32_t height, uint32_
     return drawn;
 }
 
+void clear_screen()
+{
+    uint64_t width = VBE_mode_info->width;
+    uint64_t height = VBE_mode_info->height;
+
+    for (uint64_t i = 0; i < height; i += sizeof(uint64_t))
+    {
+        for (uint64_t j = 0; j < width; j += sizeof(uint64_t))
+        {
+            ((uint64_t *)VBE_mode_info->framebuffer)[j + i * VBE_mode_info->width] = 0;
+        }
+    }
+}
+
 uint16_t get_width()
 {
     return VBE_mode_info->width;

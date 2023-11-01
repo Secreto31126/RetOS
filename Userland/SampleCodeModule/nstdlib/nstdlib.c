@@ -620,3 +620,19 @@ char *shiftToWord(char *s)
         s++;
     return s;
 }
+
+void sleep(uint64_t ticks)
+{
+    uint64_t end = get_tick() + ticks;
+    while (get_tick() < end)
+        wait();
+}
+
+void play_song(uint32_t *song, uint64_t length)
+{
+    for (uint32_t i = 0; i < length; i++)
+    {
+        beep(song[i]);
+        sleep(1);
+    }
+}

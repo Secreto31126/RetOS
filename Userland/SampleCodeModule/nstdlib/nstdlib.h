@@ -56,5 +56,12 @@ char *concatUnlimited(char *s1, char *s2);
 void addToAllocated(char *address);
 char strcmpHandleWhitespace(char *s1, char *s2);
 char *shiftToWord(char *s);
+/**
+ * @brief Play an array of frequencies, one per tick. Sync
+ *
+ * @param song The array of frequencies
+ * @param length The length of the array
+ */
+void play_song(uint32_t *song, uint64_t length);
 
 #endif

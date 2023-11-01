@@ -65,18 +65,26 @@ uint64_t drawFromArray(HexColor *array, uint32_t width, uint32_t height, uint32_
     return drawn;
 }
 
+/**
+ * @brief Only needed for the sizeof :)
+ */
+typedef struct
+{
+    char i, d, k;
+} framebuffer_elements;
+
 void clear_screen()
 {
-    uint64_t width = VBE_mode_info->width;
-    uint64_t height = VBE_mode_info->height;
+    uint64_t size = VBE_mode_info->width * VBE_mode_info->height;
+    uint64_t *end = (uint64_t *)((framebuffer_elements *)VBE_mode_info->framebuffer + size);
 
-    for (uint64_t i = 0; i < height; i += sizeof(uint64_t))
+    uint64_t *i = VBE_mode_info->framebuffer;
+    while (i < end - 1)
     {
-        for (uint64_t j = 0; j < width; j += sizeof(uint64_t))
-        {
-            ((uint64_t *)VBE_mode_info->framebuffer)[j + i * VBE_mode_info->width] = 0;
-        }
+        *(i++) = 0;
     }
+
+    *(end - 1) = 0; // hackerman
 }
 
 uint16_t get_width()

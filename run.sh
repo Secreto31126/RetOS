@@ -24,11 +24,22 @@ docker rm "$id" > /dev/null
 
 if [ "$1" = "DEBUG" ]
 then
+    echo
     echo "Debug mode"
     echo "Quick! Run the following command in another terminal:"
     echo 'qemu-system-x86_64 -s -S -hda "./Image/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk'
+elif [ "$1" = "FAST_WSL" ]
+then
+    echo
+    echo "Fast WSL mode"
+    echo "Copying files to /mnt/c/Users/tomyr/Documents/C/RetOS/Image"
+    cp "$path/Image/"* "/mnt/c/Users/tomyr/Documents/C/RetOS/Image/"
+    echo "Done"
+
+    make clean -CToolchain > /dev/null
+    make clean > /dev/null
 else
-    qemu-system-x86_64 -hda "$path/Image/x64BareBonesImage.qcow2" -m 512 -d int -soundhw pcspk
+    sudo qemu-system-x86_64 -hda "$path/Image/x64BareBonesImage.qcow2" -m 512 -d int -soundhw pcspk
     make clean -CToolchain > /dev/null
     make clean > /dev/null
 fi

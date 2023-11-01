@@ -20,7 +20,13 @@ static const uint64_t PageSize = 0x1000;
 static void *const sampleCodeModuleAddress = (void *)0x400000;
 static void *const sampleDataModuleAddress = (void *)0x500000;
 
-typedef int (*EntryPoint)();
+/**
+ * @brief Userland entry point
+ *
+ * @param dump_reg_string The string with the registers' dump, 0 if no exception happened yet
+ * @param error_code The error code, trash if there is dump_reg_string is 0
+ */
+typedef int (*EntryPoint)(char *, uint64_t);
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
@@ -97,9 +103,7 @@ void *initializeKernelBinary()
 
 int main()
 {
-	// hes_a_pirate();
-
-	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
+	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)(get_exceptions_count() ? dump_reg_string : 0, latest_error_code()));
 	ncNewline();
 
 	ncPrint((char *)sampleDataModuleAddress);

@@ -8,11 +8,23 @@
 #define EOF -1
 
 // syscalls
-extern int print_sys(unsigned int fd, char *str, unsigned long long len);
 extern int read_sys(unsigned int fd, char *str, unsigned long long len);
-extern unsigned long long get_unix_time(void);
+extern int print_sys(unsigned int fd, char *str, unsigned long long len);
 extern void *malloc(uint64_t size);
-void free(void *ptr);
+extern void free(void *ptr);
+extern unsigned long long get_unix_time(void);
+/**
+ * @brief Plays at the given frequency indefinitely. Async.
+ *
+ * @param frequency Frequency in Hz, 0 to stop.
+ */
+extern void beep(uint64_t frequency);
+/**
+ * @brief Get the current tick
+ *
+ * @return uint64_t The current tick
+ */
+extern uint64_t get_tick();
 
 // library
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize);

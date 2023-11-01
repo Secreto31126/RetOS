@@ -28,5 +28,8 @@ extern char goomba[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 extern HexColor appleColorMap[];
 extern HexColor marioItemColorMap[];
 extern char marioItem[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
+extern HexColor excaliburColorMap[];
+extern char excalibur[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
+extern char stone[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 
 #endif

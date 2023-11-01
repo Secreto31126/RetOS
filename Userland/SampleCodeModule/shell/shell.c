@@ -22,15 +22,9 @@ char shellStart()
     buffer = malloc((width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH);
     initializeFonts();
     startPainter(width, height);
-    setSize(1.0);
     paintString("You are now in shell:\n", letterColor, highlightColor);
     paintLineStart();
     char leaving = 0;
-    setSize(1.0);
-    setBackgroundArray(windowsArray);
-    setBackgroundColorMap(windowsColorMap);
-    setSnakeDrawing(BIG_DRAW_SIZE, goomba, goomba, goomba, goomba, marioItem, marioItemColorMap);
-    setDrawOptions(1, 0, 0, 0);
     while ((c = getChar()) != '\n' || !strcmp(commandBuffer, "exit"))
     {
         paintCharOrWarp(c);
@@ -44,6 +38,8 @@ char shellStart()
             {
                 index--;
                 commandIndex--;
+                commandBuffer[commandIndex] = 0;
+                buffer[index] = 0;
             }
         }
         else
@@ -60,7 +56,8 @@ char shellStart()
             }
             else
             {
-                passCommand(commandBuffer);
+
+                // passCommand(commandBuffer);
                 commandIndex = 0;
                 *commandBuffer = 0;
                 paintLineStart();
@@ -89,17 +86,36 @@ void warpLineUp(uint64_t lines)
     }
     for (j = i; j < len; j++)
         buffer[j - i] = buffer[j];
-    buffer[j - i] = 0;
     index -= i;
+    buffer[index] = 0;
+    paintString(buffer, letterColor, highlightColor);
+}
+void warpOneLine()
+{
+    blank();
+    uint64_t max = getCharPerLine();
+    int i, j;
+    for (i = 0; i < max && buffer[i] && buffer[i] != '\n'; i++)
+        ;
+    i++;
+    for (j = i; buffer[j]; j++)
+        buffer[j - i] = buffer[j];
+    index -= i;
+    buffer[index] = 0;
+
     paintString(buffer, letterColor, highlightColor);
 }
 void setLetterColor(HexColor color)
 {
-    letterColor = 0xFF000000 & color; // Letters cannot be transparent
+    letterColor = 0xFF000000 | color; // Letters cannot be transparent
+    blank();
+    paintStringOrWarp(buffer);
 }
 void setHighlightColor(HexColor color)
 {
     highlightColor = color; // highlights can be transparent
+    blank();
+    paintStringOrWarp(buffer);
 }
 void resize(double size)
 {
@@ -122,14 +138,22 @@ void passCommand(char *toPass)
         char *aux = toPaint;
         while (*aux)
             buffer[index++] = *(aux++);
+        buffer[index] = 0;
     }
     if (!strcmp(toPaint, ""))
     {
         if (!paintString(toPaint, letterColor, highlightColor))
+        {
+            blank();
             paintStringOrWarp(buffer);
+        }
         buffer[index++] = '\n';
+        buffer[index] = 0;
         if (!paintChar('\n', letterColor, highlightColor))
+        {
+            blank();
             paintStringOrWarp(buffer);
+        }
     }
     freePrints(); // just out of some sense of responsibility (and because the return of handleCommand may be an allocated string)
 }
@@ -145,10 +169,10 @@ void paintLineStart()
 void paintStringOrWarp(char *s)
 {
     while (!paintString(s, letterColor, highlightColor))
-        warpLineUp(1);
+        warpOneLine();
 }
 void paintCharOrWarp(char c)
 {
     while (!paintChar(c, letterColor, highlightColor))
-        warpLineUp(1);
+        warpOneLine();
 }

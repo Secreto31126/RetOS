@@ -12,6 +12,8 @@ extern HexColor pongColorMap[];
 extern char pongArray[BACKGROUND_HEIGHT][BACKGROUND_WIDTH];
 extern HexColor creationColorMap[];
 extern char creationArray[BACKGROUND_HEIGHT][BACKGROUND_WIDTH];
+extern HexColor camelotColorMap[];
+extern char camelotArray[BACKGROUND_HEIGHT][BACKGROUND_WIDTH];
 HexColor colorMapper(HexColor *colorMap, int code);
 
 #endif

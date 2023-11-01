@@ -22,6 +22,7 @@ void addCommand(char *commandCode, char *help, char *(*commandAction)(char *, ch
         commands = realloc(commands, commandCount * sizeof(command), (commandCount + BLOCK) * sizeof(command));
     commands[commandCount].code = commandCode;
     commands[commandCount].action = commandAction;
+    commands[commandCount].help = help;
     commandCount++;
 }
 char *handleCommand(char *command, char *mustRedraw)
@@ -43,10 +44,10 @@ char *getHelp(char *commandParameters, char *mustRedraw)
 {
     if (strcmpHandleWhitespace("", commandParameters)) // if the command is just 'help', all help menus are printed
     {
-        char *toReturn = "";
+        char *toReturn = "Help menu:\n";
         for (int i = 0; i < commandCount; i++)
-            toReturn = sPrintf("%s\n\n%s", toReturn, commands[i].help);
-        toReturn = sPrintf("%s\n\nEnd of help menu.", toReturn);
+            toReturn = sPrintf("%s\n%s", toReturn, commands[i].help);
+        toReturn = sPrintf("::%s\nEnd of help menu.", toReturn);
         toReturn = realloc(toReturn, strlen(toReturn) * sizeof(char), strlen(toReturn) * sizeof(char)); // creates a string not in freePrints.
         freePrints();                                                                                   // frees all non-returned auxiliary strings created by sPrintf
         addToAllocated(toReturn);                                                                       // ensures toReturn can be freed by nstdlib upon next call to freePrints
@@ -55,7 +56,7 @@ char *getHelp(char *commandParameters, char *mustRedraw)
     for (int i = 0; i < commandCount; i++) // otherwise, a single matching help menu is printed if it exists.
     {
         if (isFirstWord(commandParameters, commands[i].code))
-            return sPrintf("%s\n\nEnd of help menu.", commands[i].help);
+            return sPrintf("Help menu:\n%s\nEnd of help menu.", commands[i].help);
     }
     return sPrintf("No help menu that matches '%s' was found.", commandParameters); // sPrintf automatically adds created string to list of strings to be freed by freePrints()
 }
@@ -91,7 +92,7 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     {
         setBackgroundArray(marioArray);
         setBackgroundColorMap(marioColorMap);
-        setSnakeDrawing(BIG_DRAW_SIZE, goomba, goomba, goomba, goomba, goomba, marioItemColorMap);
+        setSnakeDrawing(BIG_DRAW_SIZE, goomba, goomba, goomba, goomba, marioItem, marioItemColorMap);
         setDrawOptions(1, 0, 0, 0);
         matchFlag = 1;
     }
@@ -111,12 +112,20 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
+    else if (strcmp(commandParameters, "camelot"))
+    {
+        setBackgroundArray(camelotArray);
+        setBackgroundColorMap(camelotColorMap);
+        setSnakeDrawing(BIG_DRAW_SIZE, stone, stone, stone, stone, excalibur, excaliburColorMap);
+        setDrawOptions(1, 0, 0, 0);
+        matchFlag = 1;
+    }
     if (matchFlag)
         return "Theme set.";
-    return sPrintf("No theme matching %s was found. Available themes are 'mario', 'creation', 'windows', and 'pong'", commandParameters);
+    return sPrintf("No theme matching %s was found.", commandParameters);
 }
 
-char *changeighlightColor(char *commandParameters, char *mustRedraw)
+char *changehighlightColor(char *commandParameters, char *mustRedraw)
 {
     if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
         return "Hex value given not valid.";
@@ -136,11 +145,15 @@ char *changeLetterSize(char *commandParameters, char *mustRedraw)
     uint64_t newSize = atoi(commandParameters);
     if (newSize == 0 || newSize >= MAX_LETTER_SIZE)
         return "Invalid letter size.";
-    setSize((double)newSize);
+    resize((double)newSize);
     return "Size set";
 }
 void initializeCommands()
 {
-    addCommand("help ", "Help display for help module.\n\nFormat(s): 'help' | 'help' [MODULE_NAME]\n\nDisplays the help displays for all modules or the module specified.", getHelp);
-    addCommand("snake ", "Help display for snake module.\n\nFormat(s): 'snake' | 'snake [PLAYERS]'\n\nStarts the snake module. If PLAYERS is greater than two, game will be initialized with two players. If no PLAYERS parameter is given, game will be initialized with one player.", startSnake);
+    addCommand("help", "Help display for help module.\nFormat(s): 'help' | 'help' [MODULE_NAME]\nDisplays the help displays for all modules or the module specified.", getHelp);
+    addCommand("snake", "Help display for snake module.\nFormat(s): 'snake' | 'snake [PLAYERS]'\nStarts the snake module. If PLAYERS is greater than two, game will be initialized with two players. If no PLAYERS parameter is given, game will be initialized with one player.", startSnake);
+    addCommand("set-theme", "Help display for set theme module.\nFormat: 'set-theme [THEME]'\nSets the theme of the snake game to the specified theme.\nCurrently supported themes are:\nmario windows camelot creation pong", setSnakeTheme);
+    addCommand("set-size", "Help display for set size module.\nFormat: 'set-size [NUMBER]'\nSets the size of the shell to the specified integer.", changeLetterSize);
+    addCommand("set-letter-color", "Help display for set letter color module.\nFormat: 'set-letter-color [HEX_COLOR]'\nSets the letter color of the shell to the specified integer.", changeLetterColor);
+    addCommand("set-highlight-color", "Help display for set highlight color.\nFormat: 'set-highlight-color [HEX_COLOR]'\nSets the highlight color of the shell to the specified integer.", changehighlightColor);
 }

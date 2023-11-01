@@ -1,8 +1,10 @@
 #include "shell.h"
 #include "commandHandler/commandHandler.h"
-void warpLineUp(int lines);
+void warpLineUp(uint64_t lines);
 void passCommand(char *toPass);
 void paintLineStart();
+void paintStringOrWarp(char *s);
+void paintCharOrWarp(char c);
 static char *buffer, *commandBuffer;
 static uint64_t index, commandIndex;
 static HexColor letterColor = 0xFF000000 | HEX_WHITE, highlightColor = 0x00000000 | HEX_BLACK;
@@ -33,7 +35,10 @@ char shellStart()
         if (c == '\b')
         {
             if (*(buffer - 1) == '\n' || !index)
+            {
+                paintChar('i', letterColor, highlightColor);
                 continue;
+            }
             else
             {
                 index--;
@@ -42,6 +47,7 @@ char shellStart()
         }
         else
         {
+            paintCharOrWarp(c);
             buffer[index++] = c;
             if (c != '\n')
             {
@@ -57,38 +63,35 @@ char shellStart()
                 passCommand(commandBuffer);
                 commandIndex = 0;
                 *commandBuffer = 0;
-                paintChar('\n', letterColor, highlightColor);
                 paintLineStart();
-                continue;
             }
         }
         commandBuffer[commandIndex] = 0;
         buffer[index] = 0;
-        if (!paintChar(c, letterColor, highlightColor))
-        {
-            warpLineUp(1);
-        }
     }
     blank();
     free(commandBuffer);
     free(buffer);
+    freePrints();
     return 1;
 }
 
-void warpLineUp(int lines)
+void warpLineUp(uint64_t lines)
 {
     blank();
-    for (int line = 0; line < lines; line++)
+    uint64_t len = strlen(buffer);
+    uint64_t maxRemove = getCharPerLine();
+    uint64_t removed = 0;
+    int i;
+    for (i = 0; lines && i < len; i++)
     {
-        uint64_t lineLength = getCharPerLine();
-        for (int i = 0; i < getCharPerLine && *buffer != '\n'; i++)
-        {
-            buffer++;
-            index--;
-        }
+        if ((!(removed % maxRemove) && removed) || buffer[i] == '\n')
+            lines--;
+        removed++;
     }
-    buffer++;
-    index--; // get rid of that last '\n'
+    for (; i < len; i++)
+        buffer[i - removed] = buffer[i];
+    buffer[i - removed] = 0;
     paintString(buffer, letterColor, highlightColor);
 }
 void setLetterColor(HexColor color)
@@ -103,8 +106,7 @@ void resize(double size)
 {
     setSize(size);
     blank();
-    while (!paintString(buffer, letterColor, highlightColor))
-        warpLineUp(1);
+    paintStringOrWarp(buffer);
 }
 void passCommand(char *toPass)
 {
@@ -113,21 +115,39 @@ void passCommand(char *toPass)
     if (mustRedraw)
     {
         buffer[--index] = 0; // to remove last '\n' from buffer
-        paintString("You are now in shell:\n", letterColor, highlightColor);
-        paintString(buffer, letterColor, highlightColor);
+        paintStringOrWarp("You are now in shell:\n");
+        paintStringOrWarp(buffer);
+    }
+    else
+    {
+        char *aux = toPaint;
+        while (*aux)
+            buffer[index++] = *(aux++);
     }
     if (!strcmp(toPaint, ""))
     {
-        paintString("\n", letterColor, highlightColor);
-        paintString(toPaint, letterColor, highlightColor);
+        paintStringOrWarp(toPaint);
+        paintStringOrWarp("\n");
+        buffer[index++] = '\n';
     }
+    freePrints(); // just out of some sense of responsibility
 }
 void paintLineStart()
 {
+    paintStringOrWarp(lineStart);
     char *aux = lineStart;
     while (*aux)
     {
-        paintChar(*aux, letterColor, highlightColor);
         buffer[index++] = *(aux++);
     }
+}
+void paintStringOrWarp(char *s)
+{
+    while (!paintString(s, letterColor, highlightColor))
+        warpLineUp(1);
+}
+void paintCharOrWarp(char c)
+{
+    while (!paintChar(c, letterColor, highlightColor))
+        warpLineUp(1);
 }

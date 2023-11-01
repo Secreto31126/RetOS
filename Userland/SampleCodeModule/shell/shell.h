@@ -17,6 +17,6 @@ char shellStart();
 void setHighlightColor(HexColor color);
 void setLetterColor(HexColor color);
 void resize(double size);
-void warpLineUp(int lines);
+void warpLineUp(uint64_t lines);
 
 #endif

@@ -1,7 +1,7 @@
 #include "painter.h"
 #define LINE_START_MAX 20
 #define X_LINE_END (((int)(w / (size * TRUE_LETTER_WIDTH))) * size * TRUE_LETTER_WIDTH)
-static double size = 1.0, maxLineSize = 1.0;
+static double size = 1.0;
 static uint64_t w, h, xPointer = 0, yPointer = 0;
 static Window stamp;
 
@@ -18,20 +18,17 @@ void setSize(double s)
     stamp.height = TRUE_LETTER_HEIGHT * size;
     freeWindow(stamp);
     stamp.pixels = malloc(((int)(TRUE_LETTER_HEIGHT * size)) * ((int)(TRUE_LETTER_WIDTH * size)) * sizeof(HexColor));
-    if (s > maxLineSize)
-        maxLineSize = s;
 }
 void newLine()
 {
-    yPointer += TRUE_LETTER_HEIGHT * maxLineSize;
+    yPointer += TRUE_LETTER_HEIGHT * size;
     xPointer = 0;
-    maxLineSize = size;
 }
 void paintBackSpace()
 {
     if (xPointer <= 0)
     {
-        yPointer -= maxLineSize * TRUE_LETTER_HEIGHT;
+        yPointer -= size * TRUE_LETTER_HEIGHT;
         xPointer = X_LINE_END;
     }
     drawCharToWindow(stamp, 0, 0xFF000000, 0xFF000000);
@@ -55,10 +52,13 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
         return 1;
     }
     if ((xPointer + TRUE_LETTER_WIDTH * size) > w || c == '\n')
-        if ((yPointer + TRUE_LETTER_HEIGHT * maxLineSize * 2) > h) // *2 because letters are drawn from cursor downwards, so otherwise last line would have its top on the bottom of the screen
+        if ((yPointer + TRUE_LETTER_HEIGHT * size * 2) > h) // *2 because letters are drawn from cursor downwards, so otherwise last line would have its top on the bottom of the screen
             return 0;
         else
+        {
             newLine();
+            return 1;
+        }
     drawChar(c, letterColor, highlightColor);
     return 1;
 }

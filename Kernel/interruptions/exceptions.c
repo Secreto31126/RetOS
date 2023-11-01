@@ -16,7 +16,8 @@ static uint64_t error_code = 0;
  */
 void exception_manager(uint8_t exception)
 {
-    exceptions++;
+    if (exception == 0 || exception == 6)
+        exceptions++;
     error_code = exception;
 }
 

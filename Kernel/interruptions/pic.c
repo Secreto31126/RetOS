@@ -85,7 +85,11 @@ static void keyboard_handler()
             altgr = BIN(!altgr);
             event = 0;
             return;
-        } // Else ignore alt
+        }
+        else
+        {
+            write_stderr(dump_reg_string, dump_regs() + 1);
+        }
     }
 
     if (scancode == 0xE0)

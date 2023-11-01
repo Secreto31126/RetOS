@@ -1,5 +1,5 @@
-#ifndef STDIN_H
-#define STDIN_H
+#ifndef STDERR_H
+#define STDERR_H
 
 #include <stdint.h>
 

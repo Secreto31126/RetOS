@@ -32,8 +32,15 @@ elif [ "$1" = "FAST_WSL" ]
 then
     echo
     echo "Fast WSL mode"
-    echo "Copying files to /mnt/c/Users/tomyr/Documents/C/RetOS/Image"
-    cp "$path/Image/"* "/mnt/c/Users/tomyr/Documents/C/RetOS/Image/"
+
+    if [ "$(whoami)" = "tomyr" ]
+    then
+        echo "Copying files to /mnt/c/Users/tomyr/Documents/C/RetOS/Image"
+        cp "$path/Image/"* "/mnt/c/Users/tomyr/Documents/C/RetOS/Image/"
+    else
+        echo "Copying files to /mnt/c/Users/Usuario/Documents/GitHub/RetOS/Image"
+        cp "$path/Image/"* "/mnt/c/Users/Usuario/Documents/GitHub/RetOS/Image/"
+    fi
     echo "Done"
 
     make clean -CToolchain > /dev/null

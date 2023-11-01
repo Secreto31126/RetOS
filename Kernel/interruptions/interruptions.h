@@ -15,6 +15,7 @@
 #include <console.h>
 #include <localization.h>
 
+typedef void (*InterruptionHandler)();
 void noop();
 
 #endif

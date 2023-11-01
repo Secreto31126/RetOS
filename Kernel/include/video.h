@@ -46,6 +46,10 @@ void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, doub
  */
 uint64_t drawFromArray(HexColor *array, uint32_t width, uint32_t height, uint32_t x, uint32_t y);
 /**
+ * @brief Hyper efficient way to clear the screen
+ */
+void clear_screen();
+/**
  * @brief Get the width size
  *
  * @return uint16_t 1024

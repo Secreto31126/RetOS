@@ -4,11 +4,33 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build and execute",
+            "label": "Build",
             "type": "shell",
             "command": "./run.sh",
+            "args": [
+                "FAST_WSL"
+            ],
             "group": {
                 "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Execute",
+            "type": "shell",
+            "command": "qemu-system-x86_64",
+            "args": [
+                "-hda",
+                "\"${workspaceFolder}/Image/x64BareBonesImage.qcow2\"",
+                "-m",
+                "512",
+                "-d",
+                "int",
+                "-soundhw",
+                "pcspk"
+            ],
+            "group": {
+                "kind": "test",
                 "isDefault": true
             }
         },

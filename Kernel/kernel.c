@@ -26,7 +26,7 @@ static void *const sampleDataModuleAddress = (void *)0x500000;
  * @param dump_reg_string The string with the registers' dump, 0 if no exception happened yet
  * @param error_code The error code, trash if there is dump_reg_string is 0
  */
-typedef int (*EntryPoint)(char *, uint64_t);
+typedef int (*EntryPoint)(uint64_t);
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
@@ -103,7 +103,7 @@ void *initializeKernelBinary()
 
 int main()
 {
-	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)(get_exceptions_count() ? dump_reg_string : 0, latest_error_code()));
+	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)(get_exceptions_count() + 1 ? latest_error_code() : 0));
 	ncNewline();
 
 	ncPrint((char *)sampleDataModuleAddress);

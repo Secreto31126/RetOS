@@ -53,7 +53,7 @@ static void set_idt_entry(int interrupt_number, InterruptionHandler handler, int
 void initialize_idt()
 {
     set_idt_entry(0x00, zero_division_exception_handler, ACS_INT);
-    set_idt_entry(0x01, invalid_opcode_exception_handler, ACS_INT);
+    set_idt_entry(0x06, invalid_opcode_exception_handler, ACS_INT);
     set_idt_entry(0x20, tick_handler, ACS_INT);
     set_idt_entry(0x21, keyboard_handler, ACS_INT);
     set_idt_entry(0x80, syscall_handler, ACS_INT);

@@ -92,11 +92,10 @@ int playSnake(uint16_t snakeCount)
     // drawBackground();  // undecided between a blank background or the snake background.
     while (readChar()) // empties out buffer, in case player pressed a key while background was being cleared (not necessary, just prevents skipping the game over screen)
         ;
-    paintString("Game Over. Press a key to return to shell.", 0xFFFF0000, 0);
+    paintString("Game Over. Press a key to return to shell.", 0xFF000000 | HEX_RED, 0xFF | HEX_BLACK);
     getChar();
     freeColorMaps(snakeCount, snakes);
     free(snakes);
-    blank();
     return deadSnake;
 }
 

@@ -9,44 +9,51 @@ void paintCharOrWarp(char c);
 static char *buffer, *commandBuffer;
 static uint64_t index, commandIndex;
 static HexColor letterColor = 0xFF000000 | HEX_WHITE, highlightColor = 0x00000000 | HEX_BLACK;
-static char *lineStart = ":~ ";
+static const char *lineStart = ":~ ";
+static const char *shellIntro = "You are now in shell:\n";
+static char fromLastEnter = 0;
 char shellStart()
 {
     uint32_t width = getScreenWidth();
     uint32_t height = getScreenHeight();
-    index = 0;
-    commandIndex = 0;
-
-    char c;
-    commandBuffer = malloc(sizeof(char) * (MAX_COMMAND_LENGTH + 1));
-    buffer = malloc((width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH);
     initializeFonts();
     startPainter(width, height);
-    paintString("You are now in shell:\n", letterColor, highlightColor);
+
+    index = 0;
+    commandIndex = 0;
+    commandBuffer = malloc(sizeof(char) * (MAX_COMMAND_LENGTH + 1));
+    buffer = malloc((width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH);
+    sPuts(buffer, shellIntro);
+    index += strlen(shellIntro);
+    paintString(buffer, letterColor, highlightColor);
     paintLineStart();
-    char leaving = 0;
+
+    char c;
     while ((c = getChar()) != '\n' || !strcmp(commandBuffer, "exit"))
     {
-        paintCharOrWarp(c);
         if (c == '\b')
         {
-            if (*(buffer - 1) == '\n' || !index)
+            if (!fromLastEnter || !index)
             {
                 continue;
             }
             else
             {
+                paintCharOrWarp(c);
                 index--;
                 commandIndex--;
+                fromLastEnter--;
                 commandBuffer[commandIndex] = 0;
                 buffer[index] = 0;
             }
         }
         else
         {
+            paintCharOrWarp(c);
             buffer[index++] = c;
             if (c != '\n')
             {
+                fromLastEnter++;
                 commandBuffer[commandIndex++] = c;
                 if (commandIndex >= MAX_COMMAND_LENGTH)
                 {
@@ -56,7 +63,7 @@ char shellStart()
             }
             else
             {
-
+                fromLastEnter = 0;
                 // passCommand(commandBuffer);
                 commandIndex = 0;
                 *commandBuffer = 0;
@@ -95,10 +102,10 @@ void warpOneLine()
     blank();
     uint64_t max = getCharPerLine();
     int i, j;
-    for (i = 0; i < max && buffer[i] && buffer[i] != '\n'; i++)
+    for (i = 0; i < max && buffer[i] && (buffer[i] != '\n'); i++)
         ;
     i++;
-    for (j = i; buffer[j]; j++)
+    for (j = i - 1; buffer[j]; j++)
         buffer[j - i] = buffer[j];
     index -= i;
     buffer[index] = 0;
@@ -126,36 +133,20 @@ void resize(double size)
 void passCommand(char *toPass)
 {
     char mustRedraw = 0;
-    char *toPaint = handleCommand(toPass, &mustRedraw);
-    if (mustRedraw)
+    char *toPaint = sPrintf("%s\n", handleCommand(toPass, &mustRedraw));
+    char *aux = toPaint;
+    while (*aux)
+        buffer[index++] = *(aux++);
+    buffer[index] = 0;
+    if (!strcmp(toPaint, "\n"))
     {
-        buffer[--index] = 0; // to remove last '\n' from buffer
-        paintStringOrWarp("You are now in shell:\n");
-        paintStringOrWarp(buffer);
-    }
-    else
-    {
-        char *aux = toPaint;
-        while (*aux)
-            buffer[index++] = *(aux++);
-        buffer[index] = 0;
-    }
-    if (!strcmp(toPaint, ""))
-    {
-        if (!paintString(toPaint, letterColor, highlightColor))
-        {
-            blank();
-            paintStringOrWarp(buffer);
-        }
-        buffer[index++] = '\n';
-        buffer[index] = 0;
-        if (!paintChar('\n', letterColor, highlightColor))
+        if (mustRedraw || !paintString(toPaint, letterColor, highlightColor))
         {
             blank();
             paintStringOrWarp(buffer);
         }
     }
-    freePrints(); // just out of some sense of responsibility (and because the return of handleCommand may be an allocated string)
+    freePrints();
 }
 void paintLineStart()
 {

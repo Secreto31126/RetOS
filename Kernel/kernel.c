@@ -7,6 +7,8 @@
 #include <audio.h>
 #include <video.h>
 #include <memory.h>
+#include <images.h>
+#include <ticks.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -22,10 +24,8 @@ static void *const sampleDataModuleAddress = (void *)0x500000;
 
 /**
  * @brief Userland entry point
- *
- * @param error_code The error code + 1
  */
-typedef int (*EntryPoint)(uint64_t);
+typedef int (*EntryPoint)();
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
@@ -102,7 +102,14 @@ void *initializeKernelBinary()
 
 int main()
 {
-	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)(0));
+	if (get_exceptions_count())
+	{
+		BSOD(latest_error_code());
+		sleep_ticks(18 * 5);
+		clear_screen();
+	}
+
+	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
 	ncNewline();
 
 	ncPrint((char *)sampleDataModuleAddress);

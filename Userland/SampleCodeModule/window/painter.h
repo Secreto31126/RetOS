@@ -16,5 +16,6 @@ void setSize(double s);
 void endPainter();
 uint64_t getCharPerLine();
 char willFit(char *s);
+void quickBlank();
 
 #endif

@@ -97,6 +97,7 @@ int playSnake(uint16_t snakeCount)
     getChar();
     freeColorMaps(snakeCount, snakes);
     free(snakes);
+    freeBack();
     return deadSnake;
 }
 
@@ -145,7 +146,7 @@ void drawBoard(frontSnake *snakes)
     tile *board = getBoard();
     snake *backSnakes = getSnakes();
     char *source;
-    int drawSize = currentDrawing.drawSize;
+    uint64_t drawSize = currentDrawing.drawSize;
     for (int i = 0; i < h; i += tileHeight)
     {
         for (int j = 0; j < w; j += tileWidth, address++)
@@ -205,7 +206,6 @@ void drawBoard(frontSnake *snakes)
         address--;
     }
     freeWindow(stamp);
-    freeBack();
 }
 
 void drawBackground()

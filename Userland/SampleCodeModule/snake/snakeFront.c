@@ -43,6 +43,7 @@ void drawBackgroundWithParameters(Window w, uint64_t xOffset, uint64_t yOffset)
 }
 int playSnake(uint16_t snakeCount)
 {
+    setSeed(get_tick);
     char gameOver = 0;
     int deadSnake = 0;
     uint16_t deathCount = 0;

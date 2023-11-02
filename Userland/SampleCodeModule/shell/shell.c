@@ -32,37 +32,6 @@ char shellStart()
     char c;
     while ((c = getChar()) != '\n' || !strcmp(commandBuffer, "exit"))
     {
-        // remove
-        if (c == '.')
-        {
-            blank();
-            for (int i = 0; i < width * height / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH; i++)
-            {
-                if (buffer[i])
-                {
-                    paintChar(buffer[i], letterColor, highlightColor);
-                }
-                else if (i == index)
-                {
-                    if (buffer[i])
-                        paintChar('I', letterColor, highlightColor);
-                    else
-                        paintChar('L', letterColor, highlightColor);
-                }
-                else
-                    paintChar('0', letterColor, highlightColor);
-            }
-            getChar();
-            blank();
-            paintString(buffer, letterColor, highlightColor);
-            continue;
-        }
-        if (c == '{')
-        {
-            warpAndRedraw();
-            continue;
-        }
-        // remove
         if (c == '\b')
         {
             if (!fromLastEnter || !index)
@@ -123,13 +92,16 @@ void paintStringOrWarp(char *s)
 {
     if (strcmp(s, ""))
         return;
-    if (!paintString(s, letterColor, highlightColor))
+    if (!willFit(buffer))
     {
+        warpOneLine();
         while (!willFit(buffer))
             warpOneLine();
         blank();
         paintString(buffer, letterColor, highlightColor);
     }
+    else
+        paintString(s, letterColor, highlightColor);
 }
 void paintCharOrWarp(char c)
 {
@@ -144,10 +116,11 @@ char *passCommand(char *toPass)
 
     if (mustRedraw)
     {
-        char *toReturn = sPrintf("\n%s%s\n%s", buffer, toPaint, lineStart);
+        char *toReturn = sPrintf("%s\n%s\n%s", buffer, toPaint, lineStart);
         index = 0;
         buffer[index] = 0;
-        blank();
+        if (willFit(toReturn))
+            blank();
         return toReturn;
     }
     if (strcmp(toPaint, ""))
@@ -157,16 +130,6 @@ char *passCommand(char *toPass)
 void warpOneLine()
 {
     warpNLines(1);
-    return;
-    uint64_t max = getCharPerLine();
-    int i, j;
-    for (i = 0; i < max && buffer[i] && buffer[i] != '\n'; i++)
-        ;
-    i++;
-    for (j = i; buffer[j]; j++)
-        buffer[j - i] = buffer[j];
-    index = j - i;
-    buffer[index] = 0;
 }
 void warpAndRedraw()
 {
@@ -174,23 +137,17 @@ void warpAndRedraw()
     blank();
     paintString(buffer, letterColor, highlightColor);
 }
-void setLetterColor(HexColor color)
+void setLetterColor(HexColor color) // command handler is responsible for setting mustRedraw to 1
 {
     letterColor = 0xFF000000 | color; // Letters cannot be transparent
-    blank();
-    paintStringOrWarp(buffer);
 }
-void setHighlightColor(HexColor color)
+void setHighlightColor(HexColor color) // command handler is responsible for setting mustRedraw to 1
 {
     highlightColor = color; // highlights can be transparent
-    blank();
-    paintStringOrWarp(buffer);
 }
-void resize(double size)
+void resize(double size) // command handler is responsible for setting mustRedraw to 1
 {
     setSize(size);
-    blank();
-    paintStringOrWarp(buffer);
 }
 
 void clearShell()

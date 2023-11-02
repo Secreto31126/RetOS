@@ -70,7 +70,6 @@ unsigned int update(int snakeCount)
 {
     char toReturn = 0;
     tile lookingAt;
-    char aux[10];
     for (int i = 0; i < BOARD_HEIGHT; i++)
         for (int j = 0; j < BOARD_WIDTH; j++)
         {
@@ -85,7 +84,7 @@ unsigned int update(int snakeCount)
                 {
                     int nextX = j + parseDirX(snakes[lookingAt.player].direction);
                     int nextY = i + parseDirY(snakes[lookingAt.player].direction);
-                    if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].health != 0 && board[nextX][nextY].toDraw != BLANK))
+                    if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].health != 0 && board[nextX][nextY].toDraw != BLANK && board[nextX][nextY].toDraw != APPLE))
                     {
                         killSnake(lookingAt.player);
                         toReturn = lookingAt.player + 1;

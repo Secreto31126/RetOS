@@ -130,6 +130,7 @@ char *changehighlightColor(char *commandParameters, char *mustRedraw)
     if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
         return "Hex value given not valid.";
     setHighlightColor(atoiHex(commandParameters)); // will read until an invalid character is found or 8 characters have been read. If an invalid character was found, what was read so far will be set as the color.
+    *mustRedraw = 1;
     return "Highlight color set.";
 }
 char *changeLetterColor(char *commandParameters, char *mustRedraw)
@@ -138,6 +139,7 @@ char *changeLetterColor(char *commandParameters, char *mustRedraw)
         return "Hex value given not valid.";
     uint64_t hex = 0;
     setLetterColor(atoiHex(commandParameters));
+    *mustRedraw = 1;
     return "Letter color set";
 }
 char *changeLetterSize(char *commandParameters, char *mustRedraw)
@@ -146,6 +148,7 @@ char *changeLetterSize(char *commandParameters, char *mustRedraw)
     if (newSize == 0 || newSize >= MAX_LETTER_SIZE)
         return "Invalid letter size.";
     resize((double)newSize);
+    *mustRedraw = 1;
     return "Size set";
 }
 void initializeCommands()

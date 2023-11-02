@@ -139,64 +139,70 @@ void doMovement(char c, frontSnake *snakes)
 
 void drawBoard(frontSnake *snakes)
 {
-    uint64_t tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
+    uint64_t h = getScreenHeight(), w = getScreenWidth(), address = 0;
+    uint64_t tileWidth = w / BOARD_WIDTH, tileHeight = h / BOARD_HEIGHT;
     Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
     tile *board = getBoard();
     snake *backSnakes = getSnakes();
     char *source;
-    for (int i = 0; i < (BOARD_HEIGHT * BOARD_WIDTH); i++)
+    int drawSize = currentDrawing.drawSize;
+    for (int i = 0; i < h; i += tileHeight)
     {
-        int drawSize = currentDrawing.drawSize;
-        switch (board[i].toDraw)
+        for (int j = 0; j < w; j += tileWidth, address++)
         {
-        case HEAD:
-            if (redrawBeforeHead)
-                drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight); // Since the head can have transparency, the background must be redrawn before drawing head if a grow item has color where the head has transparency.
-            source = currentDrawing.headDrawing;
-            fromCharArray(stamp, source, drawSize, drawSize, snakes[board[i].player].colorMap, 0, 0, OPAQUE);
-            break;
-        case TAIL:
-            if (redrawBeforeTail)
-                drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight); // Since the tail has transparency, the background must be redrawn before drawing tail if the head has color where the tail is transparent.
-            source = currentDrawing.tailDrawing;
-            fromCharArray(stamp, source, drawSize, drawSize, snakes[board[i].player].colorMap, 0, 0, OPAQUE);
-            break;
-        case BODY:
-            if (redrawBeforeBody)
-                drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight); // Since the body might have transparency, the background must be redrawn before drawing tail.
-            source = currentDrawing.bodyDrawing;
-            fromCharArray(stamp, source, drawSize, drawSize, snakes[board[i].player].colorMap, 0, 0, OPAQUE);
-            break;
-        case APPLE:
-            source = currentDrawing.growItemDrawing;
-            fromCharArray(stamp, source, drawSize, drawSize, currentDrawing.growItemColorMap, 0, 0, OPAQUE);
-            break;
-        case BLANK:
-            drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
-            continue;
-            break;
-        case NO_DRAW:
-        default:
-            continue;
-            break;
-        }
-        if (board[i].toDraw != APPLE && board[i].toDraw != BLANK) // don't want spinning apples or backgrounds.
-            switch (board[i].drawDirection)
+            char aux[10];
+            switch (board[address].toDraw)
             {
-            case LEFT:
-                rotateBy270(stamp); // Probably should make other rotations. But this is not a bottleneck and also works fine for now.
+            case HEAD:
+                if (redrawBeforeHead)
+                    drawBackgroundWithParameters(stamp, j, i); // Since the head can have transparency, the background must be redrawn before drawing head if a grow item has color where the head has transparency.
+                source = currentDrawing.headDrawing;
+                fromCharArray(stamp, source, drawSize, drawSize, snakes[board[address].player].colorMap, 0, 0, OPAQUE);
                 break;
-            case DOWN:
-                rotateBy180(stamp);
+            case TAIL:
+                if (redrawBeforeTail)
+                    drawBackgroundWithParameters(stamp, j, i); // Since the tail has transparency, the background must be redrawn before drawing tail if the head has color where the tail is transparent.
+                source = currentDrawing.tailDrawing;
+                fromCharArray(stamp, source, drawSize, drawSize, snakes[board[address].player].colorMap, 0, 0, OPAQUE);
                 break;
-            case RIGHT:
-                rotateBy90(stamp);
+            case BODY:
+                if (redrawBeforeBody)
+                    drawBackgroundWithParameters(stamp, j, i); // Since the body might have transparency, the background must be redrawn before drawing tail.
+                source = currentDrawing.bodyDrawing;
+                fromCharArray(stamp, source, drawSize, drawSize, snakes[board[address].player].colorMap, 0, 0, OPAQUE);
                 break;
-            case UP:
+            case APPLE:
+                source = currentDrawing.growItemDrawing;
+                fromCharArray(stamp, source, drawSize, drawSize, currentDrawing.growItemColorMap, 0, 0, OPAQUE);
+                break;
+            case BLANK:
+                drawBackgroundWithParameters(stamp, j, i);
+                continue;
+                break;
+            case NO_DRAW:
             default:
+                continue;
                 break;
             }
-        drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
+            if (board[address].toDraw != APPLE && board[i].toDraw != BLANK) // don't want spinning apples or backgrounds.
+                switch (board[address].drawDirection)
+                {
+                case LEFT:
+                    rotateBy270(stamp); // Probably should make other rotations. But this is not a bottleneck and also works fine for now.
+                    break;
+                case DOWN:
+                    rotateBy180(stamp);
+                    break;
+                case RIGHT:
+                    rotateBy90(stamp);
+                    break;
+                case UP:
+                default:
+                    break;
+                }
+            drawWindow(stamp, j, i);
+        }
+        address--;
     }
     freeWindow(stamp);
     freeBack();
@@ -205,11 +211,15 @@ void drawBoard(frontSnake *snakes)
 void drawBackground()
 {
     uint64_t tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
+    uint64_t h = getScreenHeight(), w = getScreenWidth();
     Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
-    for (int i = 0; i < (BOARD_HEIGHT * BOARD_WIDTH); i++)
+    for (int i = 0; i < h; i += tileHeight)
     {
-        drawBackgroundWithParameters(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight);
-        drawWindow(stamp, (i % BOARD_WIDTH) * tileWidth, (i / BOARD_WIDTH) * tileHeight); // Since the tail has transparency, the background must be redrawn before drawing tail.
+        for (int j = 0; j < w; j += tileWidth)
+        {
+            drawBackgroundWithParameters(stamp, j, i);
+            drawWindow(stamp, j, i); // Since the tail has transparency, the background must be redrawn before drawing tail.
+        }
     }
 }
 

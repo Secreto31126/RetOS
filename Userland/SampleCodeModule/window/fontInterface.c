@@ -57,10 +57,8 @@ char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor h
 }
 
 // Whole window will not be colored. Shell must handle backspace and whatnot (Literally just draw an ascii value that is all zeroes (such as '\b'), then reduce index).
-// Char will be automatically scaled to fit the window, this works weirdly thus far, but probably won't in the future :D.
+// Char will be automatically scaled to fit the window
 void drawCharToWindow(Window w, char c, HexColor letterColor, HexColor highlightColor)
 {
-    // HexColor aux[TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH];
-    // drawFromHexArray(w, toHexArray((currentFont->letters) + ((int)c % ASCII_MAX) * TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH, aux, TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT,TRUE_LETTER_WIDTH,TRUE_LETTER_HEIGHT, 2, highlightColor, letterColor), TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, 0, 0, (double)w.width/TRUE_LETTER_WIDTH, (double)w.height/TRUE_LETTER_HEIGHT); // Variables auxiliares? Legibilidad? Couldn't be me.
     toHexArray((currentFont->letters) + ((int)c % ASCII_MAX) * TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH, w.pixels, TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, w.width, w.height, 2, highlightColor, letterColor); // This is equivalent and quicker
 }

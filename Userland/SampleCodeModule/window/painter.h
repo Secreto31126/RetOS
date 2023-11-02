@@ -15,5 +15,6 @@ char paintString(char *c, HexColor letterColor, HexColor highlightColor);
 void setSize(double s);
 void endPainter();
 uint64_t getCharPerLine();
+char willFit(char *s);
 
 #endif

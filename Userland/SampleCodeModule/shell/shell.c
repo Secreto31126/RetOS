@@ -1,9 +1,10 @@
 #include "shell.h"
 #include "commandHandler/commandHandler.h"
 #define BLOCK 50
-void warpLineUp(uint64_t lines);
+void warpNLines(uint64_t n);
+void warpAndRedraw();
 void warpOneLine();
-void passCommand(char *toPass);
+char *passCommand(char *toPass);
 void paintLineStart();
 void paintStringOrWarp(char *s);
 void paintCharOrWarp(char c);
@@ -31,6 +32,37 @@ char shellStart()
     char c;
     while ((c = getChar()) != '\n' || !strcmp(commandBuffer, "exit"))
     {
+        // remove
+        if (c == '.')
+        {
+            blank();
+            for (int i = 0; i < width * height / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH; i++)
+            {
+                if (buffer[i])
+                {
+                    paintChar(buffer[i], letterColor, highlightColor);
+                }
+                else if (i == index)
+                {
+                    if (buffer[i])
+                        paintChar('I', letterColor, highlightColor);
+                    else
+                        paintChar('L', letterColor, highlightColor);
+                }
+                else
+                    paintChar('0', letterColor, highlightColor);
+            }
+            getChar();
+            blank();
+            paintString(buffer, letterColor, highlightColor);
+            continue;
+        }
+        if (c == '{')
+        {
+            warpAndRedraw();
+            continue;
+        }
+        // remove
         if (c == '\b')
         {
             if (!fromLastEnter || !index)
@@ -39,35 +71,27 @@ char shellStart()
             }
             else
             {
-                paintCharOrWarp(c);
+                paintChar(c, letterColor, highlightColor);
                 index--;
                 commandIndex--;
                 fromLastEnter--;
-                commandBuffer[commandIndex] = 0;
-                buffer[index] = 0;
             }
         }
         else
         {
-            paintCharOrWarp(c);
-            buffer[index++] = c;
-            if (c != '\n')
+            if (c == '\n')
             {
-                fromLastEnter++;
-                commandBuffer[commandIndex++] = c;
-                if (commandIndex >= MAX_COMMAND_LENGTH)
-                {
-                    commandBuffer++;
-                    commandIndex--;
-                }
+                fromLastEnter = 0;
+                addStringToBuffer(passCommand(commandBuffer));
+                freePrints();
+                commandIndex = 0;
             }
             else
             {
-                fromLastEnter = 0;
-                // passCommand(commandBuffer);
-                commandIndex = 0;
-                *commandBuffer = 0;
-                paintLineStart();
+                addCharToBuffer(c);
+                fromLastEnter++;
+                if (commandIndex < MAX_COMMAND_LENGTH)
+                    commandBuffer[commandIndex++] = c; // ignores commands after a certain length (since no commands should be that long)
             }
         }
         commandBuffer[commandIndex] = 0;
@@ -80,6 +104,76 @@ char shellStart()
     return 1;
 }
 
+void addCharToBuffer(char c)
+{
+    buffer[index++] = c;
+    buffer[index] = 0;
+    paintCharOrWarp(c);
+}
+void addStringToBuffer(char *s)
+{
+    //  paintString(s, 0xffff0000, 0xff00ff00);
+    char *aux = s;
+    while (*aux)
+        buffer[index++] = *(aux++);
+    buffer[index] = 0;
+    paintStringOrWarp(s);
+}
+void paintStringOrWarp(char *s)
+{
+    if (strcmp(s, ""))
+        return;
+    if (!paintString(s, letterColor, highlightColor))
+    {
+        while (!willFit(buffer))
+            warpOneLine();
+        blank();
+        paintString(buffer, letterColor, highlightColor);
+    }
+}
+void paintCharOrWarp(char c)
+{
+    if (!paintChar(c, letterColor, highlightColor))
+        warpAndRedraw();
+}
+
+char *passCommand(char *toPass)
+{
+    char mustRedraw = 0;
+    char *toPaint = handleCommand(toPass, &mustRedraw);
+
+    if (mustRedraw)
+    {
+        char *toReturn = sPrintf("\n%s%s\n%s", buffer, toPaint, lineStart);
+        index = 0;
+        buffer[index] = 0;
+        blank();
+        return toReturn;
+    }
+    if (strcmp(toPaint, ""))
+        return sPrintf("\n%s", lineStart);
+    return sPrintf("\n%s\n%s", toPaint, lineStart);
+}
+void warpOneLine()
+{
+    warpNLines(1);
+    return;
+    uint64_t max = getCharPerLine();
+    int i, j;
+    for (i = 0; i < max && buffer[i] && buffer[i] != '\n'; i++)
+        ;
+    i++;
+    for (j = i; buffer[j]; j++)
+        buffer[j - i] = buffer[j];
+    index = j - i;
+    buffer[index] = 0;
+}
+void warpAndRedraw()
+{
+    warpOneLine();
+    blank();
+    paintString(buffer, letterColor, highlightColor);
+}
 void setLetterColor(HexColor color)
 {
     letterColor = 0xFF000000 | color; // Letters cannot be transparent
@@ -98,62 +192,7 @@ void resize(double size)
     blank();
     paintStringOrWarp(buffer);
 }
-void passCommand(char *toPass)
-{
-    char mustRedraw = 0;
-    char *toPaint = sPrintf("%s\n", handleCommand(toPass, &mustRedraw));
-    char *aux = toPaint;
-    while (*aux)
-        buffer[index++] = *(aux++);
-    buffer[index] = 0;
-    if (!strcmp(toPaint, "\n"))
-    {
-        if (mustRedraw || !paintString(toPaint, letterColor, highlightColor))
-        {
-            blank();
-            paintStringOrWarp(buffer);
-        }
-    }
-    freePrints();
-}
-void paintLineStart()
-{
-    paintStringOrWarp(lineStart);
-    char *aux = lineStart;
-    while (*aux)
-    {
-        buffer[index++] = *(aux++);
-    }
-}
-void warpNLines(uint8_t n)
-{
-    uint64_t max = getCharPerLine();
-    int i = 0, j;
-    while (n)
-    {
-        for (; i < max && buffer[i] && buffer[i] != '\n'; i++)
-            ;
-        n--;
-        i++;
-    }
-    for (j = i; buffer[j]; j++)
-        buffer[j - i] = buffer[j];
-    index -= i;
-    buffer[index] = 0;
 
-    blank();
-    paintString(buffer, letterColor, highlightColor);
-}
-void paintStringOrWarp(char *s)
-{
-    while (!paintString(s, letterColor, highlightColor))
-        warpNLines(1);
-}
-void paintCharOrWarp(char c)
-{
-    while (!paintChar(c, letterColor, highlightColor))
-        warpNLines(1);
-}
 void clearShell()
 {
     blank();
@@ -162,4 +201,37 @@ void clearShell()
     commandIndex = 0;
     commandBuffer[commandIndex] = 0;
     fromLastEnter = 0;
+}
+
+/**
+ * @deprecated
+ */
+void warpNLines(uint64_t n) // char or char* you want to add must be in buffer already. This shortens the buffer from the start so that it fits, then repaints it.
+{
+    if (!n)
+        return;
+    uint64_t max = getCharPerLine();
+    int i = 0, j, k = 0;
+    while (n)
+    {
+        for (i = 0; i < max && buffer[k + i] && buffer[k + i] != '\n'; i++)
+            ;
+        n--;
+        i++;
+        k += i;
+    }
+    for (j = k; buffer[j]; j++)
+        buffer[j - k] = buffer[j];
+    index = j - k;
+    buffer[index] = 0;
+}
+void paintLineStart()
+{
+    paintString(lineStart, letterColor, highlightColor);
+    char *aux = lineStart;
+    while (*aux)
+    {
+        buffer[index++] = *(aux++);
+    }
+    buffer[index] = 0;
 }

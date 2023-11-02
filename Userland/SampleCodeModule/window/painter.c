@@ -72,6 +72,34 @@ char paintString(char *c, HexColor letterColor, HexColor highlightColor)
         return 0;
     return 1;
 }
+uint64_t maxYPointer()
+{
+    return h - 2 * size * TRUE_LETTER_HEIGHT;
+}
+uint64_t maxXPointer()
+{
+    return w - TRUE_LETTER_WIDTH * size;
+}
+char willFit(char *s)
+{
+    double xP = 0, yP = 0, maxX = w - TRUE_LETTER_WIDTH * size, maxY = h - 2 * TRUE_LETTER_HEIGHT * size;
+    while (*s)
+    {
+        if (*s == '\n' || xP > maxX)
+        {
+            xP = 0;
+            yP += TRUE_LETTER_HEIGHT * size;
+            if (yP > maxY)
+                return 0;
+        }
+        else
+        {
+            xP += TRUE_LETTER_WIDTH * size;
+        }
+        s++;
+    }
+    return 1;
+}
 
 uint64_t getCharPerLine()
 {
@@ -80,7 +108,6 @@ uint64_t getCharPerLine()
 
 void blank()
 {
-
     xPointer = 0;
     yPointer = 0;
     Window blanker = getWindow(w, h, malloc(w * h * sizeof(HexColor)));

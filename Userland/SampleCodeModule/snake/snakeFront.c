@@ -68,6 +68,7 @@ int playSnake(uint16_t snakeCount)
     uint64_t time = get_tick();
     while (!gameOver)
     {
+        shut();
         char c;
         while ((c = readChar()))
         {
@@ -79,13 +80,18 @@ int playSnake(uint16_t snakeCount)
             for (int i = 0; i < snakeCount; i++)
                 if (snakes[i].nextMove != NONE)
                     setDirection(i, snakes[i].nextMove);
-
-            if ((deadSnake = update(snakeCount)))
+            int deaths = 0;
+            int madeApple = 0;
+            if ((deadSnake = update(snakeCount, &deaths, &madeApple)))
             {
                 putDeath(deadSnake);
-                deathCount++;
+                deathCount += deaths;
                 if (deathCount >= snakeCount)
                     gameOver = 1;
+            }
+            if (madeApple)
+            {
+                play(330);
             }
             drawBoard(snakes);
         }
@@ -156,7 +162,6 @@ void drawBoard(frontSnake *snakes)
     {
         for (int j = 0; j < w; j += tileWidth, address++)
         {
-            char aux[10];
             switch (board[address].toDraw)
             {
             case HEAD:

@@ -35,9 +35,6 @@
 	call	getStackBase
 	mov		[rsp + 8 * 3], rax
 
-	mov		rdi, %1
-	inc		rdi
-
 	iretq
 %endmacro
 

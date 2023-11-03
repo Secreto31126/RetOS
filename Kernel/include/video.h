@@ -35,6 +35,13 @@ int putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint6
 void drawShape(ShapeFunction f, int x, int y, int xRange, int yRange);
 void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor);
 /**
+ * @brief The name says it all
+ *
+ * @param array The array to draw to full screen
+ * @return uint64_t The number of pixels drawn (width * height)
+ */
+uint64_t super_fast_fill_screen(HexColor *array);
+/**
  * @brief Receives an array, its dimensions, and the position to draw the top-left corner from
  *
  * @param array The array to draw

@@ -48,6 +48,20 @@ static uint8_t mergeColor(uint8_t background, uint8_t overlay, uint8_t opacity)
     return (background * (1 - op) + overlay * op);
 }
 
+uint64_t super_fast_fill_screen(HexColor *array)
+{
+    uint64_t size = VBE_mode_info->width * VBE_mode_info->height;
+    framebuffer_element *end = (framebuffer_element *)((uint64_t *)((uint64_t)VBE_mode_info->framebuffer) + size);
+
+    framebuffer_element *i = FRAMEBUFFER;
+    while (i < end - 1)
+    {
+        *(i++) = *((framebuffer_element *)(array++));
+    }
+
+    return size;
+}
+
 uint64_t drawFromArray(HexColor *array, uint32_t width, uint32_t height, uint32_t x, uint32_t y)
 {
     if (!array)
@@ -58,6 +72,9 @@ uint64_t drawFromArray(HexColor *array, uint32_t width, uint32_t height, uint32_
 
     if (x >= VBE_mode_info->width || y >= VBE_mode_info->height)
         return 0;
+
+    if (!x && !y && width >= VBE_mode_info->width && height >= VBE_mode_info->height)
+        return super_fast_fill_screen(array);
 
     uint64_t drawn = 0;
     for (uint32_t i = 0; i < height && i < VBE_mode_info->height; i++)

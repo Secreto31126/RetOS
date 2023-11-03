@@ -8,6 +8,7 @@
 #include <video.h>
 #include <ticks.h>
 #include <stdin.h>
+#include <stderr.h>
 #include <stdkey.h>
 #include <stdint.h>
 #include <header.h>

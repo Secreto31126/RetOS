@@ -116,7 +116,16 @@ char *passCommand(char *toPass)
 
     if (mustRedraw)
     {
-        char *toReturn = sPrintf("%s\n%s\n%s", buffer, toPaint, lineStart);
+        char *toReturn;
+        if (strcmp(toPaint, ""))
+        {
+            if (strcmp(buffer, ""))
+                toReturn = lineStart;
+            else
+                toReturn = sPrintf("%s\n%s", buffer, lineStart);
+        }
+        else
+            toReturn = sPrintf("%s\n%s\n%s", buffer, toPaint, lineStart);
         index = 0;
         buffer[index] = 0;
         if (willFit(toReturn))
@@ -124,7 +133,12 @@ char *passCommand(char *toPass)
         return toReturn;
     }
     if (strcmp(toPaint, ""))
-        return sPrintf("\n%s", lineStart);
+    {
+        if (strcmp(buffer, ""))
+            return lineStart;
+        else
+            return sPrintf("\n%s", lineStart);
+    }
     return sPrintf("\n%s\n%s", toPaint, lineStart);
 }
 void warpOneLine()
@@ -152,7 +166,7 @@ void resize(double size) // command handler is responsible for setting mustRedra
 
 void clearShell()
 {
-    blank();
+    quickBlank();
     index = 0;
     buffer[index] = 0;
     commandIndex = 0;
@@ -174,6 +188,11 @@ void warpNLines(uint64_t n) // char or char* you want to add must be in buffer a
         for (i = 0; i < max && buffer[k + i] && buffer[k + i] != '\n'; i++)
             ;
         n--;
+        if (!buffer[k + 1])
+        {
+            index = 0;
+            buffer[index] = 0;
+        }
         i++;
         k += i;
     }

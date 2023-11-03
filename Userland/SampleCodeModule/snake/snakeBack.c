@@ -145,7 +145,8 @@ void killSnake(unsigned int player)
     for (int i = 0; i < BOARD_SIZE; i++)
         if (board[0][i].player == player && board[0][i].health != 0)
         {
-            board[0][i].health = 1; // Tiles with health 1 will die on next read and be removed.
+            board[0][i].health = 1; // Tiles with health 1 and toDraw BLANK will be drawn as background and become NO_DRAW on next update loop
+            board[0][i].toDraw = BLANK;
         }
     snakes[player].alive = 0;
 }

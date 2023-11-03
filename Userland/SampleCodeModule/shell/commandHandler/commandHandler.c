@@ -104,6 +104,7 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
+    /* comentado temporalmente porque no alcanza el espacio
     else if (strcmp(commandParameters, "pong"))
     {
         setBackgroundArray(pongArray);
@@ -112,6 +113,7 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
+    */
     else if (strcmp(commandParameters, "camelot"))
     {
         setBackgroundArray(camelotArray);
@@ -151,6 +153,18 @@ char *changeLetterSize(char *commandParameters, char *mustRedraw)
     *mustRedraw = 1;
     return "Size set";
 }
+char *clearTheShell(char *commandParameters, char *mustRedraw)
+{
+    uint64_t toClear;
+    if ((toClear = atoi(commandParameters)))
+    {
+        *mustRedraw = 1;
+        warpNLines(toClear);
+    }
+    else
+        clearShell();
+    return "";
+}
 void initializeCommands()
 {
     addCommand("help", "Help display for help module.\nFormat(s): 'help' | 'help' [MODULE_NAME]\nDisplays the help displays for all modules or the module specified.", getHelp);
@@ -159,4 +173,5 @@ void initializeCommands()
     addCommand("set-size", "Help display for set size module.\nFormat: 'set-size [NUMBER]'\nSets the size of the shell to the specified integer.", changeLetterSize);
     addCommand("set-letter-color", "Help display for set letter color module.\nFormat: 'set-letter-color [HEX_COLOR]'\nSets the letter color of the shell to the specified integer.", changeLetterColor);
     addCommand("set-highlight-color", "Help display for set highlight color.\nFormat: 'set-highlight-color [HEX_COLOR]'\nSets the highlight color of the shell to the specified integer.", changehighlightColor);
+    addCommand("clear", "Help display for clear module. \n Format(s): 'clear' | 'clear [LINES]'\nClears the shell or the number or shifts up the number of lines indicated.", clearTheShell);
 }

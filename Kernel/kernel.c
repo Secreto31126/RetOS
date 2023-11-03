@@ -7,6 +7,8 @@
 #include <audio.h>
 #include <video.h>
 #include <memory.h>
+#include <images.h>
+#include <ticks.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -22,11 +24,8 @@ static void *const sampleDataModuleAddress = (void *)0x500000;
 
 /**
  * @brief Userland entry point
- *
- * @param dump_reg_string The string with the registers' dump, 0 if no exception happened yet
- * @param error_code The error code, trash if there is dump_reg_string is 0
  */
-typedef int (*EntryPoint)(char *, uint64_t);
+typedef int (*EntryPoint)();
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
@@ -103,7 +102,14 @@ void *initializeKernelBinary()
 
 int main()
 {
-	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)(get_exceptions_count() ? dump_reg_string : 0, latest_error_code()));
+	if (get_exceptions_count())
+	{
+		BSOD(latest_error_code());
+		sleep_ticks(18 * 5);
+		clear_screen();
+	}
+
+	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
 	ncNewline();
 
 	ncPrint((char *)sampleDataModuleAddress);

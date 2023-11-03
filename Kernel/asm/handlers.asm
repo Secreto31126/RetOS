@@ -31,9 +31,11 @@
 	mov		rdi, %1
 	call	exception_manager
 
+	mov	dword	[rsp + 8], 0x400000
 	call	getStackBase
-	mov		rsp, rax
-	call	main
+	mov		[rsp + 8 * 3], rax
+
+	iretq
 %endmacro
 
 %macro master_pic_handler 1

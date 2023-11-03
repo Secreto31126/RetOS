@@ -1,4 +1,4 @@
-#include "stdin.h"
+#include "stderr.h"
 
 static uint8_t on_your_left = 0;
 static uint64_t reader = 0;
@@ -28,7 +28,7 @@ static void putc(uint8_t c)
     }
 }
 
-uint16_t read_stdin(uint8_t *buf, uint16_t len)
+uint16_t read_stderr(uint8_t *buf, uint16_t len)
 {
     int i = 0;
     while (i < len && (reader != writer || on_your_left))
@@ -39,8 +39,11 @@ uint16_t read_stdin(uint8_t *buf, uint16_t len)
     return i;
 }
 
-uint16_t write_stdin(uint8_t *buf, uint16_t len)
+uint16_t write_stderr(uint8_t *buf, uint16_t len)
 {
+    // Only read the latest message (dump)
+    reader = writer;
+
     int i = 0;
     while (i < len)
     {

@@ -174,9 +174,6 @@ void clearShell()
     fromLastEnter = 0;
 }
 
-/**
- * @deprecated
- */
 void warpNLines(uint64_t n) // char or char* you want to add must be in buffer already. This shortens the buffer from the start so that it fits, then repaints it.
 {
     if (!n)

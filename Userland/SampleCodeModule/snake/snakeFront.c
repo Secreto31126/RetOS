@@ -80,17 +80,17 @@ int playSnake(uint16_t snakeCount)
                 if (snakes[i].nextMove != NONE)
                     setDirection(i, snakes[i].nextMove);
             int deaths = 0;
-            char madeApple = 0;
+            int madeApple = 0;
             if ((deadSnake = update(snakeCount, &deaths, &madeApple)))
             {
                 putDeath(deadSnake);
                 deathCount += deaths;
                 if (deathCount >= snakeCount)
                     gameOver = 1;
-                if (madeApple)
-                {
-                    playFor(330, 4);
-                }
+            }
+            if (madeApple)
+            {
+                playFor(330, 4);
             }
             drawBoard(snakes);
         }

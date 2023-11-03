@@ -66,7 +66,7 @@ void setDirection(unsigned int playerNumber, DIRECTION direction)
 }
 
 // returns 0 if no players died. Returns the player player if a player died.
-unsigned int update(int snakeCount, int *deathCount, char *madeApple)
+unsigned int update(int snakeCount, int *deathCount, int *madeApple)
 {
     char toReturn = 0;
     tile lookingAt;

@@ -68,6 +68,7 @@ int playSnake(uint16_t snakeCount)
     uint64_t time = get_tick();
     while (!gameOver)
     {
+        shut();
         char c;
         while ((c = readChar()))
         {
@@ -90,7 +91,7 @@ int playSnake(uint16_t snakeCount)
             }
             if (madeApple)
             {
-                playFor(330, 4);
+                play(330);
             }
             drawBoard(snakes);
         }

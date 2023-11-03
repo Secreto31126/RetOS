@@ -35,8 +35,7 @@ void setBoard(int snakeCount)
     uint64_t boardSizeNoMargins = BOARD_SIZE_NO_MARGINS; // just to avoid calculating it in every loop
     for (int i = 0; i < APPLE_COUNT; i++)
     {
-        unsigned int pos = randBetween(0, boardSizeNoMargins - i); // no objects will be placed on edges upon setting board.
-        unsigned int j = getNthEmpty(pos);
+        unsigned int j = getNthEmpty(randBetween(0, boardSizeNoMargins - i)); // no objects will be placed on edges upon setting board.
         if (j < boardSizeNoMargins)
         { // No objects will be added if board is full.
             board[0][j].toDraw = APPLE;
@@ -44,8 +43,7 @@ void setBoard(int snakeCount)
     }
     for (int i = 0; i < snakeCount; i++)
     {
-        unsigned int pos = randBetween(0, boardSizeNoMargins - i - APPLE_COUNT); // no objects will be placed on edges on setting board.
-        unsigned int j = getNthEmpty(pos);
+        unsigned int j = getNthEmpty(randBetween(0, boardSizeNoMargins - i - APPLE_COUNT)); // no objects will be placed on edges on setting board.
         if (j < boardSizeNoMargins)
         {
             board[0][j].player = i; // No objects will be added if board is full.
@@ -54,7 +52,7 @@ void setBoard(int snakeCount)
         }
         snakes[i].length = START_PLAYER_LENGTH;
         snakes[i].color = getHexColor();
-        snakes[i].direction = ((j % BOARD_HEIGHT) > (BOARD_WIDTH / 2)) ? LEFT : RIGHT; // This way you don't start moving towards the edge. Still won't spawn at the edge out of respect.
+        snakes[i].direction = ((j % BOARD_WIDTH) > (BOARD_WIDTH / 2)) ? LEFT : RIGHT; // This way you don't start moving towards the edge. Still won't spawn at the edge out of respect.
         snakes[i].alive = 1;
     }
     objects = APPLE_COUNT + snakeCount * START_PLAYER_LENGTH; // counts non-empty tiles, useful for resetting apples
@@ -72,7 +70,6 @@ unsigned int update(int snakeCount)
 {
     char toReturn = 0;
     tile lookingAt;
-    char aux[10];
     for (int i = 0; i < BOARD_HEIGHT; i++)
         for (int j = 0; j < BOARD_WIDTH; j++)
         {
@@ -87,7 +84,7 @@ unsigned int update(int snakeCount)
                 {
                     int nextX = j + parseDirX(snakes[lookingAt.player].direction);
                     int nextY = i + parseDirY(snakes[lookingAt.player].direction);
-                    if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].health != 0 && board[nextX][nextY].toDraw != BLANK))
+                    if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].health != 0 && board[nextX][nextY].toDraw != BLANK && board[nextX][nextY].toDraw != APPLE))
                     {
                         killSnake(lookingAt.player);
                         toReturn = lookingAt.player + 1;
@@ -148,7 +145,8 @@ void killSnake(unsigned int player)
     for (int i = 0; i < BOARD_SIZE; i++)
         if (board[0][i].player == player && board[0][i].health != 0)
         {
-            board[0][i].health = 1; // Tiles with health 1 will die on next read and be removed.
+            board[0][i].health = 1; // Tiles with health 1 and toDraw BLANK will be drawn as background and become NO_DRAW on next update loop
+            board[0][i].toDraw = BLANK;
         }
     snakes[player].alive = 0;
 }
@@ -163,8 +161,7 @@ void growSnake(unsigned int player)
 void makeApple()
 {
     uint64_t boardSizeNoMargins = BOARD_SIZE_NO_MARGINS;
-    unsigned int pos = randBetween(0, boardSizeNoMargins - objects); // no objects will be placed on edges on setting board.
-    unsigned int j = getNthEmpty(pos);
+    unsigned int j = getNthEmpty(randBetween(0, boardSizeNoMargins - objects)); // no objects will be placed on edges on setting board.
     if (j < boardSizeNoMargins)
     { // No objects will be added if board is full.
         board[0][j].toDraw = APPLE;
@@ -175,12 +172,12 @@ void makeApple()
 unsigned int getNthEmpty(unsigned int n)
 {
     unsigned int j;
-    for (j = 0; j < n && n < BOARD_SIZE_NO_MARGINS; j++)
+    for (j = 0; j <= n && n < BOARD_SIZE_NO_MARGINS; j++)
     {
         if ((board[0][j].toDraw == APPLE || !(board[0][j].health == 0 || (board[0][j].health == 1 && board[0][j].toDraw == BLANK)))) // inefficient to look through whole array. Also inefficient to ask for more random numbers if spot selected is occupied. This was chosen because our rng is not particularly random, so repeated calls not particularly good.
             n++;                                                                                                                     // only advances position if there is not an object on the board. This serves to select the n-th empty tile
     }
-    return j;
+    return j - 1;
 }
 char isHead(tile t)
 {

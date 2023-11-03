@@ -1,4 +1,6 @@
 #include "window.h"
+#include "painter.h"
+// #include "figures.h" //no longer used
 #include <stdarg.h>
 
 #define GET_HEX(a, r, g, b) (((a) << 24) + ((r) << 16) + ((g) << 8) + (b))
@@ -193,6 +195,8 @@ uint64_t drawWindow(Window w, uint64_t x, uint64_t y)
 Window getWindow(uint64_t width, uint64_t height, HexColor *pixels)
 {
     Window ans;
+    width = width ? width : 1;
+    height = height ? height : 1;
     ans.width = width;
     ans.height = height;
     ans.pixels = pixels;
@@ -202,4 +206,65 @@ Window getWindow(uint64_t width, uint64_t height, HexColor *pixels)
 void freeWindow(Window w)
 {
     free(w.pixels);
+}
+
+Window overlayOnWindow(Window w, ShapeFunction f, uint64_t xOffset, uint64_t yOffset, double xScaleFactor, double yScaleFactor, OVERLAY_MODE m)
+{
+    HexColor *toOverlay = w.pixels; // To avoid referencing within a loop
+    uint64_t height = w.height, width = w.width;
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            if (m == OPAQUE)
+                toOverlay[i * width + j] = f(j + xOffset, i + yOffset, xScaleFactor, yScaleFactor);
+            else
+                toOverlay[i * width + j] = mergeColor(toOverlay[i * width + j], f(j + xOffset, i + yOffset, xScaleFactor, yScaleFactor));
+        }
+    }
+    return w;
+}
+
+Window overlayFromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sourceHeight, HexColor *map, uint64_t xOffset, uint64_t yOffset, OVERLAY_MODE m)
+{
+    uint64_t width = w.width, height = w.height, screenW = getScreenWidth(), screenH = getScreenHeight();
+    HexColor *result = w.pixels;
+    double xScaleFactor = (double)sourceWidth / screenW, yScaleFactor = (double)sourceHeight / screenH;
+    int xIndex, yIndex = 0;
+    for (double i = yOffset * sourceHeight / screenH; i < sourceHeight && yIndex < height; i += yScaleFactor)
+    {
+        xIndex = 0;
+        for (double j = xOffset * sourceWidth / screenW; j < sourceWidth && xIndex < width; j += xScaleFactor)
+        {
+            if (m == OPAQUE)
+                result[xIndex + yIndex * width] = colorMapper(map, source[(int)(j) + (int)(i)*sourceWidth]);
+            else
+                result[xIndex + yIndex * width] = mergeColor(result[xIndex + yIndex * width], colorMapper(map, source[(int)(j) + (int)(i)*sourceWidth]));
+            xIndex++;
+        }
+        yIndex++;
+    }
+    return w;
+}
+
+Window fromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sourceHeight, HexColor *map, uint64_t xOffset, uint64_t yOffset, OVERLAY_MODE m)
+{
+    uint64_t width = w.width, height = w.height;
+    HexColor *result = w.pixels;
+    double xScaleFactor = (double)sourceWidth / width, yScaleFactor = (double)sourceHeight / height;
+    int xIndex, yIndex = 0;
+    for (double i = 0; i < sourceHeight && yIndex < height; i += yScaleFactor)
+    {
+        xIndex = 0;
+        for (double j = 0; j < sourceWidth && xIndex < width; j += xScaleFactor)
+        {
+            if (m == OPAQUE)
+                result[xIndex + yIndex * width] = colorMapper(map, source[(int)(j) + (int)(i)*sourceWidth]);
+            else
+                result[xIndex + yIndex * width] = mergeColor(result[xIndex + yIndex * width], colorMapper(map, source[(int)(j) + (int)(i)*sourceWidth]));
+            xIndex++;
+        }
+        yIndex++;
+    }
+    return w;
 }

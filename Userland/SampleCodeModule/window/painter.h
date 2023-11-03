@@ -12,8 +12,10 @@ void blank();
 char paintChar(char c, HexColor letterColor, HexColor highlightColor);
 // returns 0 if did not fit. 1 otherwise. String is still painted partially if can't fit. Reccomended action is call to blank(), then paint again.
 char paintString(char *c, HexColor letterColor, HexColor highlightColor);
-void setLineStart(char *s);
 void setSize(double s);
 void endPainter();
+uint64_t getCharPerLine();
+char willFit(char *s);
+void quickBlank();
 
 #endif

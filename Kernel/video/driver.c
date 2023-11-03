@@ -73,7 +73,7 @@ uint64_t drawFromArray(HexColor *array, uint32_t width, uint32_t height, uint32_
     if (x >= VBE_mode_info->width || y >= VBE_mode_info->height)
         return 0;
 
-    if (!x && !y && width >= VBE_mode_info->width && height >= VBE_mode_info->height)
+    if (!x && !y && width > VBE_mode_info->width && height > VBE_mode_info->height)
         return super_fast_fill_screen(array);
 
     uint64_t drawn = 0;

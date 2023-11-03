@@ -8,6 +8,6 @@ char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor h
 void drawCharToWindow(Window w, char c, HexColor letterColor, HexColor highlightColor);
 char **getFonts();           // returns an array of all font names as strings. Termination array has pointer null.
 char isFont(char *fontName); // returns 1 if the fontName is known, 0 otherwise.
-void initialize();
+void initializeFonts();
 
 #endif

@@ -1,4 +1,6 @@
+// @deprecated
 #include "window.h"
+#include "figures.h"
 
 HexColor redRectangleFigure()
 {
@@ -32,24 +34,9 @@ HexColor drawCircle(int x, int y, int w, int h)
         return 0xFF000000;
     return 0;
 }
-
-HexColor redCircle(int x, int y, int w, int h)
+HexColor RetOSBackground(int x, int y, double xScaleFactor, double yScaleFactor)
 {
-    return drawCircle(x, y, w, h) | HEX_RED;
-}
-
-HexColor drawEllipse(int x, int y)
-{
-    x -= 100;
-    y -= 25;
-    if ((x * x + 16 * (y * y)) < 10000)
-        return 0x50000000 | ((0xFFFFFF * x * y) & 0x00FFFFFF);
-    return 0;
-}
-
-HexColor RetOSbackground(int x, int y)
-{
-    if (!(x * y))
+    if (!((int)(x * xScaleFactor * y * yScaleFactor)))
         return 0;
-    return 0xFF000000 | ((((0xFFFFFF * x * y) & 0x00FFFFFF)) ^ 0x00FFFFFF);
+    return 0xFF000000 | ((((int)(0xFFFFFF * x * y * xScaleFactor * yScaleFactor) & 0x00FFFFFF)) ^ 0x00FFFFFF);
 }

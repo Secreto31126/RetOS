@@ -1,8 +1,13 @@
 #include "nstdlib.h"
 #define MAX_DIGITS_IN_LONG 20
 #define MAX_STDIN_STRING 256
+#define BLOCK 10
+#define null 0
 
 extern void halt_user();
+uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisManyChars);
+uint64_t concatFrom(char *s1, char *s2);
+void addToAllocated(char *address);
 
 void wait()
 {
@@ -70,6 +75,36 @@ uint64_t atoi(char *s)
         ret *= 10;
         ret += *s - '0';
         s++;
+    }
+    return ret;
+}
+uint64_t atoiHex(char *s)
+{
+    char maxLength = 8; // max number of hex digits in a uint64_t
+    uint64_t ret = 0;
+    while (maxLength)
+    {
+        maxLength--;
+        if (*s >= '0' && *s <= '9')
+        {
+            ret *= 16;
+            ret += *s - '0';
+            s++;
+        }
+        else if (*s >= 'A' && *s <= 'F')
+        {
+            ret *= 16;
+            ret += *s - 'A' + 10;
+            s++;
+        }
+        else if (*s >= 'a' && *s <= 'f')
+        {
+            ret *= 16;
+            ret += *s - 'a' + 10;
+            s++;
+        }
+        else
+            break;
     }
     return ret;
 }
@@ -231,7 +266,6 @@ uint64_t printf(char *format, ...)
     va_end(argp);
     return count;
 }
-uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisManyChars);
 /**
  * returns number of fields converted
  */
@@ -297,7 +331,6 @@ uint64_t insertString(char *startAddress, char *insertion)
 {
     return replaceWith(startAddress, insertion, 0);
 }
-uint64_t concatFrom(char *s1, char *s2);
 
 uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisManyChars)
 {
@@ -371,14 +404,266 @@ uint64_t pow(double base, uint64_t exponent)
         ans *= base;
     return ans;
 }
+
+char strCompare(char *a, char *b)
+{
+    while (*a && *a == *b)
+    {
+        a++;
+        b++;
+    }
+    int dist = (int)(unsigned char)(*a) - (int)(unsigned char)(*b);
+    return dist ? dist > 0 ? 1 : -1 : 0;
+}
+
 char strcmp(char *s1, char *s2)
 {
-    while (*s1 && *s2)
+    while (*s1 || *s2)
     {
-        if (*s1 != *s2)
+        if (*(s1++) != *(s2++))
             return 0;
-        s1++;
-        s2++;
     }
     return 1;
+}
+
+char isFirstWord(char *s1, char *firstWord)
+{
+    while ((*s1 && *s1 != ' ') || (*firstWord && *firstWord != ' '))
+        if (*(s1++) != *(firstWord++))
+            return 0;
+    return 1;
+}
+
+// User is responsible for ensuring receiver has enough memory allocated to receive a char
+char sPutChar(char *receiver, char c)
+{
+    while (*receiver)
+        receiver++;
+    *receiver = c;
+    *(receiver + 1) = 0;
+    return c;
+}
+
+// returns length of added string
+uint64_t sPuts(char *receiver, char *source)
+{
+    char count = 0;
+    while (*receiver)
+    {
+        receiver++;
+    }
+    while (*source)
+    {
+        *(receiver++) = *(source++);
+        count++;
+    }
+    *receiver = 0;
+    return count;
+}
+
+// Returns length of string added
+uint64_t addString(char **receiver, uint64_t *length, char *source, uint64_t *allocated)
+{
+    uint64_t len = strlen(source);
+    if ((*length + len) >= *allocated)
+    {
+        uint64_t toAdd = ((*length + len - *allocated) / BLOCK + 1) * BLOCK; // space that must be added, rounded to nearest block
+        *receiver = realloc(*receiver, *allocated, (*allocated + toAdd) * sizeof(char));
+        *allocated += toAdd;
+    }
+    sPuts(*receiver + *length - 1, source);
+    *length += len;
+    return len;
+}
+
+static char **allocatedPrints = null; // A pointer to pointers to char. Stores all allocated strings in sPrintf.
+static int allocatedPrintCount = 0;   // These serve to keep track of allocated memory in sPrintf and other functions that allocate strings, so as not to offload free responsibility to users.
+void addToAllocated(char *address)
+{
+    if (!(allocatedPrintCount % BLOCK))
+    {
+        allocatedPrints = realloc(allocatedPrints, allocatedPrintCount * sizeof(char *), (allocatedPrintCount + BLOCK) * sizeof(char *));
+    }
+    allocatedPrints[allocatedPrintCount++] = address;
+}
+
+void freePrints()
+{
+    for (int i = 0; i < allocatedPrintCount; i++)
+        free(allocatedPrints[i]);
+    free(allocatedPrints);
+    allocatedPrints = null;
+    allocatedPrintCount = 0;
+}
+
+/**
+ * returns formatted string
+ * User should call freePrints() to free memory allocated for returned string
+ */
+char *sPrintf(char *format, ...)
+{
+    va_list argp;
+    va_start(argp, format);
+    uint64_t allocated = BLOCK;
+    uint64_t count = 1; // counts null termination
+    char *toReturn = malloc(sizeof(char) * allocated);
+    *toReturn = 0;
+    addToAllocated(toReturn);
+    while (*format != 0 && *format != EOF)
+    {
+        if (count == allocated) // Always checks if resize is necessary before checking to add any characters. Prevents copying code in every single-character edition.
+        {
+            toReturn = realloc(toReturn, allocated, (allocated + BLOCK) * sizeof(char));
+            allocated += BLOCK;
+        }
+        if (*format == '%')
+        {
+            format++;
+            switch (*format)
+            {
+            case 'c':
+            {
+                sPutChar(toReturn, va_arg(argp, int));
+                count++;
+                break;
+            }
+            case 's':
+            {
+                addString(&toReturn, &count, va_arg(argp, char *), &allocated);
+                break;
+            }
+            case 'i':
+            case 'd':
+            {
+                char aux[MAX_DIGITS_IN_LONG];
+                addString(&toReturn, &count, itoa(va_arg(argp, int), aux, 10), &allocated);
+                break;
+            }
+            case 'u':
+            {
+                char aux[MAX_DIGITS_IN_LONG];
+                addString(&toReturn, &count, utoa(va_arg(argp, int), aux, 10), &allocated);
+                break;
+            }
+            case 'l':
+            {
+                char aux[MAX_DIGITS_IN_LONG];
+                addString(&toReturn, &count, ultoa(va_arg(argp, int), aux, 10), &allocated);
+                break;
+            }
+            default:
+            {
+                sPutChar(toReturn, '%');
+                break;
+            }
+            }
+        }
+        else
+        {
+            sPutChar(toReturn, *format);
+            count++;
+        }
+        format++;
+    }
+    va_end(argp);
+    toReturn = realloc(toReturn, allocated, count);
+    return toReturn;
+}
+
+uint64_t getMinutes()
+{
+    uint64_t hexedTime = get_unix_time();
+    return (hexedTime & 0xF) + (((hexedTime & 0xF0) >> 4) * 10);
+}
+
+uint64_t getHours()
+{
+    uint64_t hexedTime = get_unix_time();
+    return ((hexedTime & 0xF00) >> 8) + (((hexedTime & 0xF000) >> 12) * 10);
+}
+
+// User should call freePrints() to free memory allocated for returned string
+char *getTimeString()
+{
+    char *buffer = malloc(6 * sizeof(char)); // return string format will be 6 chars long. defining a value for this is unnecessary and confusing
+    addToAllocated(buffer);
+    uint64_t min = getMinutes(), hr = getHours();
+    char addedZeroFlag = 0;
+    if (hr < 10)
+    {
+        *buffer = '0';
+        addedZeroFlag = 1;
+    }
+    itoa(hr, buffer + addedZeroFlag, 10);
+    buffer += 2; // For the two digits added
+    *(buffer++) = ':';
+    addedZeroFlag = 0;
+    if (min < 10)
+    {
+        *buffer = '0';
+        addedZeroFlag = 1;
+    }
+    itoa(min, buffer + addedZeroFlag, 10);
+    buffer += 2; // For the two digits added
+    *buffer = 0;
+    return buffer - 5; // In total, buffer was shifted 5 spaces to format as 'HH:MM\0'
+}
+
+char isPrefix(char *prefix, char *word)
+{
+    while (*prefix)
+        if (*(prefix++) != *(word++))
+            return 0;
+    return 1;
+}
+
+char *concatUnlimited(char *s1, char *s2)
+{
+    uint64_t index = 0;
+    char *toReturn;
+    while (*s1)
+    {
+        if (!(index % BLOCK))
+            toReturn = realloc(toReturn, index * sizeof(char), (index + BLOCK) * sizeof(char));
+        *(toReturn + index++) = *s1;
+    }
+    while (*s2)
+    {
+        if (!(index % BLOCK))
+            toReturn = realloc(toReturn, index * sizeof(char), (index + BLOCK) * sizeof(char));
+        *(toReturn + index++) = *s2;
+    }
+    *(toReturn + index) = 0;
+    addToAllocated(toReturn);
+    return toReturn;
+}
+
+char strcmpHandleWhitespace(char *s1, char *s2)
+{
+    char wFlag = 0; //
+    while (*s1 || *s2)
+    {
+        while (wFlag && *s1 == ' ')
+            s1++;
+        while (wFlag && *s2 == ' ')
+            s2++;
+        wFlag = 0;
+        if (*s1 == ' ')
+        {
+            wFlag = 1;
+        }
+        if (*(s1++) != *(s2++))
+        {
+            printf("s1: \'%c\' ", *(s1 - 1));
+            printf("s2: \'%c\' \n", *(s2 - 1));
+            return 0;
+        }
+    }
+    return 1;
+}
+char *shiftToWord(char *s)
+{
+    while (*s == ' ')
+        s++;
+    return s;
 }

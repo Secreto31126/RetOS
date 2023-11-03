@@ -14,6 +14,7 @@ void putDeath(int snakeNumber);
 void drawBoard(frontSnake *snakes);
 void drawBackground();
 void freeColorMaps(int snakeCount, frontSnake *snakes);
+void shut();
 // default theme is windows
 static char *backgroundArray = windowsArray;
 static HexColor *backgroundColorMap = windowsColorMap;
@@ -89,7 +90,9 @@ int playSnake(uint16_t snakeCount)
             drawBoard(snakes);
         }
     }
+    beep(440);
     blank();
+    shut();
     // drawBackground();  // undecided between a blank background or the snake background.
     while (readChar()) // empties out buffer, in case player pressed a key while background was being cleared (not necessary, just prevents skipping the game over screen)
         ;

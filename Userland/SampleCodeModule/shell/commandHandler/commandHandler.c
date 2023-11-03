@@ -80,7 +80,15 @@ char *startSnake(char *commandParameters, char *mustRedraw)
 char *setSnakeTheme(char *commandParameters, char *mustRedraw)
 {
     char matchFlag = 0;
-    if (strcmp(commandParameters, "creation"))
+    if (strcmp(commandParameters, "windows"))
+    {
+        setBackgroundArray(windowsArray);
+        setBackgroundColorMap(windowsColorMap);
+        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, 0, classicApple, appleColorMap);
+        setDrawOptions(0, 0, 1, 0);
+        matchFlag = 1;
+    }
+    else if (strcmp(commandParameters, "creation"))
     {
         setBackgroundArray(creationArray);
         setBackgroundColorMap(creationColorMap);
@@ -94,14 +102,6 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
         setBackgroundColorMap(marioColorMap);
         setSnakeDrawing(BIG_DRAW_SIZE, goomba, goomba, goomba, goomba, marioItem, marioItemColorMap);
         setDrawOptions(1, 0, 0, 0);
-        matchFlag = 1;
-    }
-    else if (strcmp(commandParameters, "windows"))
-    {
-        setBackgroundArray(windowsArray);
-        setBackgroundColorMap(windowsColorMap);
-        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, 0, classicApple, appleColorMap);
-        setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
     /* comentado temporalmente porque no alcanza el espacio

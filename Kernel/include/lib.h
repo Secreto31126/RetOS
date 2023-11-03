@@ -20,7 +20,9 @@ extern void halt_once(void);
 extern char dump_reg_string[360];
 /**
  * @brief Dump registers value into dump_reg_string
+ *
+ * @return uint64_t The string length
  */
-void dump_regs(void);
+extern uint64_t dump_regs(void);
 
 #endif

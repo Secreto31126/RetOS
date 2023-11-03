@@ -49,11 +49,12 @@ typedef struct Window
 
 uint64_t screenWidth();
 uint64_t screenHeight();
+uint64_t drawWindow(Window w, uint64_t x, uint64_t y);
+uint64_t clear();
 HexColor *toHexArray(char *source, HexColor *result, int width, int height, int resultWidth, int resultHeight, int colorCount, ...);
 void drawFromHexArray(Window w, HexColor *source, int sourceWidth, int sourceHeight, int x, int y, double xScaleFactor, double yScaleFactor);
 uint64_t getScreenWidth();
 uint64_t getScreenHeight();
-uint64_t drawWindow(Window w, uint64_t x, uint64_t y);
 Window getWindow(uint64_t width, uint64_t height, HexColor *pixels);
 Window rotateBy90(Window w);
 Window rotateBy180(Window w);

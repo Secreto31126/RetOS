@@ -48,6 +48,27 @@ static uint8_t mergeColor(uint8_t background, uint8_t overlay, uint8_t opacity)
     return (background * (1 - op) + overlay * op);
 }
 
+void drawShape(ShapeFunction f, int x, int y, int xRange, int yRange)
+{
+    drawScaledShape(f, x, y, xRange, yRange, 1, 1);
+}
+
+void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor)
+{
+    if (!xScaleFactor || !yScaleFactor)
+        return;
+
+    for (int i = 0; i < yRange && i < VBE_mode_info->height; i++)
+    {
+        for (int j = 0; j < xRange && j < VBE_mode_info->width; j++)
+        {
+            uint32_t r = f(j / xScaleFactor, i / yScaleFactor, xRange, yRange);
+            if (r & 0xFF000000)
+                putPixel(r, x + j, y + i);
+        }
+    }
+}
+
 uint64_t super_fast_fill_screen(HexColor *array)
 {
     framebuffer_element *framebuffer = FRAMEBUFFER;

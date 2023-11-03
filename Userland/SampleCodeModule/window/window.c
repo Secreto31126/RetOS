@@ -192,6 +192,12 @@ uint64_t drawWindow(Window w, uint64_t x, uint64_t y)
 {
     return draw(w.pixels, ((w.width << 16) & 0xFFFF0000) | (w.height & 0xFFFF), ((x << 16) & 0xFFFF0000) | (y & 0xFFFF));
 }
+
+uint64_t clear()
+{
+    return draw(0, 0, 0);
+}
+
 Window getWindow(uint64_t width, uint64_t height, HexColor *pixels)
 {
     Window ans;

@@ -8,6 +8,14 @@ VBEInfo *VBE_mode_info = (VBEInfo *)0x5C00; // hardcoded
 #define GET_GREEN(x) (((x) >> 8) & 0xFF)
 #define GET_BLUE(x) ((x) & 0xFF)
 
+/**
+ * @brief Only needed for the sizeof :)
+ */
+typedef struct
+{
+    char i, d, k;
+} framebuffer_elements;
+
 int putPixel(HexColor hexColor, uint64_t x, uint64_t y)
 {
     return putPixelStd(GET_OPACITY(hexColor), GET_RED(hexColor), GET_GREEN(hexColor), GET_BLUE(hexColor), x, y);
@@ -64,14 +72,6 @@ uint64_t drawFromArray(HexColor *array, uint32_t width, uint32_t height, uint32_
 
     return drawn;
 }
-
-/**
- * @brief Only needed for the sizeof :)
- */
-typedef struct
-{
-    char i, d, k;
-} framebuffer_elements;
 
 void clear_screen()
 {

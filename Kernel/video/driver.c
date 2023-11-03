@@ -34,7 +34,7 @@ int putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint6
     return 1;
 }
 
-uint8_t mergeColor(uint8_t background, uint8_t overlay, uint8_t opacity)
+static uint8_t mergeColor(uint8_t background, uint8_t overlay, uint8_t opacity)
 {
     if (!opacity)
         return background;

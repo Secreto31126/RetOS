@@ -42,6 +42,6 @@ typedef struct
 }
 __attribute__((packed)) VBEInfo;
 
-uint8_t mergeColor(uint8_t background, uint8_t overlay, uint8_t opacity);
+static uint8_t mergeColor(uint8_t background, uint8_t overlay, uint8_t opacity);
 
 #endif

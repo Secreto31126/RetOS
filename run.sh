@@ -46,7 +46,7 @@ then
     make clean -CToolchain > /dev/null
     make clean > /dev/null
 else
-    sudo qemu-system-x86_64 -hda "$path/Image/x64BareBonesImage.qcow2" -m 512 -d int -soundhw pcspk
+    sudo qemu-system-x86_64 -hda "$path/Image/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk
     make clean -CToolchain > /dev/null
     make clean > /dev/null
 fi

@@ -36,7 +36,7 @@ void startModules(char error)
         case '2':
         {
             blank();
-            paintString(sPrintf("Time is %s.\nPress any key to return to module selector.", getTimeString()), -1, 0);
+            paintString(sPrintf("Time is %s.\n\nPress any key to return to module selector.", getTimeString()), -1, 0);
             freePrints();
             getChar();
             blank();
@@ -45,7 +45,12 @@ void startModules(char error)
         }
         case '3':
         {
-            // Haven't gotten this far yet
+            blank();
+            paintString(sPrintf("%s\n\nPress any key to return to module selector.", getDumpString()), -1, 0);
+            freePrints();
+            getChar();
+            blank();
+            setEnvironment();
             break;
         }
         default:

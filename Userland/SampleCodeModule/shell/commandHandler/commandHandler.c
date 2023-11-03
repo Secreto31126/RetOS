@@ -64,12 +64,13 @@ char *getHelp(char *commandParameters, char *mustRedraw)
 char *startSnake(char *commandParameters, char *mustRedraw)
 {
     char *formatString = "Player %d won. Returning to shell";
-    if (strcmp("", commandParameters) || strcmp("1", commandParameters))
+    int i;
+    if (strcmp("", commandParameters) || (i = atoi(commandParameters)) == 1)
     {
         *mustRedraw = 1;
         return sPrintf(formatString, playSnake(1));
     }
-    if (strcmp("2", commandParameters))
+    if (i == 2)
     {
         *mustRedraw = 1;
         return sPrintf(formatString, playSnake(2));

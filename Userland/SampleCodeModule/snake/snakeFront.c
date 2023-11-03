@@ -1,6 +1,6 @@
 #include "snake.h"
 #include "snakePrivate.h"
-#include "sound.h"
+#include "./../piano/sound.h"
 #include "./drawings/backgroundArrays.h"
 #include "drawings/snakeDrawings.h"
 
@@ -44,7 +44,7 @@ void drawBackgroundWithParameters(Window w, uint64_t xOffset, uint64_t yOffset)
 }
 int playSnake(uint16_t snakeCount)
 {
-    setSeed(get_tick);
+    setSeed(get_tick());
     char gameOver = 0;
     int deadSnake = 0;
     uint16_t deathCount = 0;
@@ -90,9 +90,11 @@ int playSnake(uint16_t snakeCount)
             drawBoard(snakes);
         }
     }
+
     play(440);
     blank();
     shut();
+
     // drawBackground();  // undecided between a blank background or the snake background.
     while (readChar()) // empties out buffer, in case player pressed a key while background was being cleared (not necessary, just prevents skipping the game over screen)
         ;

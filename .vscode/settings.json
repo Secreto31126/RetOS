@@ -1,3 +1,8 @@
 {
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "files.associations": {
+        "*.rmd": "markdown",
+        "sound.h": "c"
+    },
+    "workbench.colorTheme": "Monokai"
 }

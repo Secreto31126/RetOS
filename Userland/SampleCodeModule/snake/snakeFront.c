@@ -1,5 +1,6 @@
 #include "snake.h"
 #include "snakePrivate.h"
+#include "sound.h"
 #include "./drawings/backgroundArrays.h"
 #include "drawings/snakeDrawings.h"
 
@@ -14,7 +15,6 @@ void putDeath(int snakeNumber);
 void drawBoard(frontSnake *snakes);
 void drawBackground();
 void freeColorMaps(int snakeCount, frontSnake *snakes);
-void shut();
 // default theme is windows
 static char *backgroundArray = windowsArray;
 static HexColor *backgroundColorMap = windowsColorMap;
@@ -90,7 +90,7 @@ int playSnake(uint16_t snakeCount)
             drawBoard(snakes);
         }
     }
-    beep(440);
+    play(440);
     blank();
     shut();
     // drawBackground();  // undecided between a blank background or the snake background.

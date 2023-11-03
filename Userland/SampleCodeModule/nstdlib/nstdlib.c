@@ -2,9 +2,11 @@
 #define MAX_DIGITS_IN_LONG 20
 #define MAX_STDIN_STRING 256
 #define BLOCK 10
+#define BIG_BLOCK 400
 #define null 0
 
 extern void halt_user();
+extern uint64_t get_dump(char *buffer, uint64_t n);
 uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisManyChars);
 uint64_t concatFrom(char *s1, char *s2);
 void addToAllocated(char *address);
@@ -12,6 +14,30 @@ void addToAllocated(char *address);
 void wait()
 {
     halt_user();
+}
+
+char *getDumpString()
+{
+    uint64_t length = BIG_BLOCK;
+    char *c = malloc(length * sizeof(char));
+    char lastAdded = 0;
+    if ((lastAdded = get_dump(c + length - BIG_BLOCK, BIG_BLOCK)))
+    {
+        if (lastAdded >= length)
+        {
+            c = realloc(c, length, length + BIG_BLOCK);
+            length += BIG_BLOCK;
+            while ((lastAdded = get_dump(c + length - BIG_BLOCK, BIG_BLOCK)) == BIG_BLOCK) // adds BLOCK characters to the end of c until get_dump no longer has BLOCK characters to add
+            {
+                c = realloc(c, length, length + BIG_BLOCK);
+                length += BIG_BLOCK;
+            }
+        }
+        char *toReturn = sPrintf("The dump generated:\n%s", c);
+        free(c);
+        return toReturn;
+    }
+    return "No dump was generated. Press alt to generate a dump of the instant of pressing.";
 }
 
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize)

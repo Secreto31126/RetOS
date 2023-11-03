@@ -47,5 +47,6 @@ char *concatUnlimited(char *s1, char *s2);
 void addToAllocated(char *address);
 char strcmpHandleWhitespace(char *s1, char *s2);
 char *shiftToWord(char *s);
+char *getDumpString();
 
 #endif

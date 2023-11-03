@@ -693,3 +693,16 @@ char *shiftToWord(char *s)
         s++;
     return s;
 }
+
+char timeHasPassed(uint64_t start, uint64_t unit)
+{
+    return (get_tick() - start) > unit;
+}
+void sleep(uint64_t ticks)
+{
+    uint64_t time = get_tick();
+    while (!timeHasPassed(time, ticks))
+    {
+        wait();
+    }
+}

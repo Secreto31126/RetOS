@@ -23,11 +23,6 @@ static char redrawBeforeTurn = 1; // currently unused
 static char redrawBeforeHead = 0;
 static snakeDrawing currentDrawing = {DRAW_SIZE, classicHeadUp, classicOther, classicTail, 0, classicApple, appleColorMap}; // turn currently unused
 
-char timeHasPassed(uint64_t start, uint64_t unit)
-{
-    return (get_tick() - start) > unit;
-}
-
 // Old draw modes commented porque me dio pena borrarlos :D
 void drawBackgroundWithParameters(Window w, uint64_t xOffset, uint64_t yOffset)
 {
@@ -43,7 +38,7 @@ void drawBackgroundWithParameters(Window w, uint64_t xOffset, uint64_t yOffset)
 }
 int playSnake(uint16_t snakeCount)
 {
-    setSeed(get_tick);
+    setSeed(get_tick());
     char gameOver = 0;
     int deadSnake = 0;
     uint16_t deathCount = 0;

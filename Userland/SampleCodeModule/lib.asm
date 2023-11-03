@@ -51,7 +51,7 @@ get_screen_size:
     int 80h
     ret
 
-; void beep(uint64_t frequency, uint64_t duration)
+; void beep(uint64_t frequency)
 beep:
     mov rax, 7
     int 80h

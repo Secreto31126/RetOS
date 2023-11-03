@@ -12,8 +12,8 @@ extern int print_sys(unsigned int fd, char *str, unsigned long long len);
 extern int read_sys(unsigned int fd, char *str, unsigned long long len);
 extern unsigned long long get_unix_time(void);
 extern void *malloc(uint64_t size);
-void free(void *ptr);
-void beep(uint32_t freq);
+extern void free(void *ptr);
+extern void beep(uint32_t freq);
 
 // library
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize);

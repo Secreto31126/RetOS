@@ -114,14 +114,13 @@ void blank()
 {
     xPointer = 0;
     yPointer = 0;
-    Window blanker = getWindow(w, h, malloc(w * h * sizeof(HexColor)));
-    char blackPixel = 0;
-    toHexArray(&blackPixel, blanker.pixels, 1, 1, w, h, 1, 0xFF000000);
-    drawWindow(blanker, 0, 0);
-    // freeWindow(blanker);
-    free(blanker.pixels);
+    clear();
 }
 // Only use if the only input to screen has been the painter
+/**
+ * @deprecated
+ * clearing the whole screen via kernel is now significantly faster
+ */
 void quickBlank()
 {
     xToErase += TRUE_LETTER_WIDTH * size;

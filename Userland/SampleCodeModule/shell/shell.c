@@ -97,7 +97,7 @@ void paintStringOrWarp(char *s)
         warpOneLine();
         while (!willFit(buffer))
             warpOneLine();
-        quickBlank();
+        blank();
         paintString(buffer, letterColor, highlightColor);
     }
     else
@@ -148,7 +148,7 @@ void warpOneLine()
 void warpAndRedraw()
 {
     warpOneLine();
-    quickBlank();
+    blank();
     paintString(buffer, letterColor, highlightColor);
 }
 void setLetterColor(HexColor color) // command handler is responsible for setting mustRedraw to 1
@@ -166,7 +166,7 @@ void resize(double size) // command handler is responsible for setting mustRedra
 
 void clearShell()
 {
-    quickBlank();
+    blank();
     index = 0;
     buffer[index] = 0;
     commandIndex = 0;

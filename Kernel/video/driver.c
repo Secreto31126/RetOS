@@ -93,7 +93,7 @@ void clear_screen()
     uint64_t size = VBE_mode_info->width * VBE_mode_info->height;
     uint64_t *end = (uint64_t *)(FRAMEBUFFER + size);
 
-    uint64_t *i = VBE_mode_info->framebuffer;
+    uint64_t *i = (uint64_t *)FRAMEBUFFER;
     while (i < end - 1)
     {
         *(i++) = 0;

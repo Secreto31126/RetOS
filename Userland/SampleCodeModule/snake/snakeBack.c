@@ -87,7 +87,7 @@ unsigned int update(int snakeCount, int *deathCount, char *madeApple)
                     if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].health != 0 && board[nextX][nextY].toDraw != BLANK && board[nextX][nextY].toDraw != APPLE))
                     {
                         killSnake(lookingAt.player);
-                        *deathCount++;
+                        (*deathCount)++;
                         toReturn = lookingAt.player + 1;
                     }
                     else

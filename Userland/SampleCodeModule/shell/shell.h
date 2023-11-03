@@ -20,5 +20,6 @@ void setLetterColor(HexColor color);
 void resize(double size);
 void warpNLines(uint64_t lines);
 void clearShell();
+void paintStringOrWarp(char *s);
 
 #endif

@@ -6,68 +6,91 @@ void paintStringOrWarp(char *s);
 
 void startPiano()
 {
+    quickBlank();
+    paintStringOrWarp("Welcome to the piano!\n\n");
+    paintStringOrWarp("Press 'q' to exit.\n");
+    // PianoNote * notes = malloc(sizeof(PianoNote) * 12);
     char note;
-    while ((note = getchar()) != 'q')
+    while ((note = readChar()) != 'q')
     {
         switch (note)
         {
         case 'z':
-            play(261);
+            playFor(261, 1);
+            note = 0;
             break;
         case 's':
-            play(277);
+            playFor(277, 1);
+            note = 0;
             break;
         case 'x':
-            play(293);
+            playFor(293, 1);
+            note = 0;
             break;
         case 'd':
-            play(311);
+            playFor(311, 1);
+            note = 0;
             break;
         case 'c':
-            play(329);
+            playFor(329, 1);
+            note = 0;
             break;
         case 'v':
-            play(349);
+            playFor(349, 1);
+            note = 0;
             break;
         case 'g':
-            play(369);
+            playFor(369, 1);
+            note = 0;
             break;
         case 'b':
-            play(392);
+            playFor(392, 1);
+            note = 0;
             break;
         case 'h':
-            play(415);
+            playFor(415, 1);
+            note = 0;
             break;
         case 'n':
-            play(440);
+            playFor(440, 1);
+            note = 0;
             break;
         case 'j':
-            play(466);
+            playFor(466, 1);
+            note = 0;
             break;
         case 'm':
-            play(493);
+            playFor(493, 1);
+            note = 0;
             break;
         case '1':
-            imperialMarch();
+            imperial_march();
+            note = 0;
             break;
         case '2':
             hes_a_pirate();
+            note = 0;
             break;
         case '3':
             outer_wilds();
+            note = 0;
             break;
         case '4':
             do_i_wanna_know();
+            note = 0;
             break;
         case '5':
             whistle_stop();
+            note = 0;
             break;
         case '6':
             here_comes_the_sun();
+            note = 0;
             break;
         default:
             shut();
             break;
         }
     }
+    blank();
 }

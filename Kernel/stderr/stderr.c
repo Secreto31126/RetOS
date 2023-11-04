@@ -47,10 +47,7 @@ uint16_t write_stderr(uint8_t *buf, uint16_t len)
     int i = 0;
     while (i < len)
     {
-        if (buf[i])
-        {
-            putc(buf[i++]);
-        }
+        putc(buf[i++]);
     }
 
     return i;

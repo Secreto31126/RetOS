@@ -10,6 +10,7 @@
 
     global zero_division_exception_handler
     global invalid_opcode_exception_handler
+    global sus_exception_handler
 
     global tick_handler
     global keyboard_handler
@@ -67,6 +68,9 @@ zero_division_exception_handler:
 ; void invalid_opcode_exception_handler(void);
 invalid_opcode_exception_handler:
 	exception_handler 6
+
+sus_exception_handler:
+	exception_handler 0x20
 
 ; void tick_handler(void);
 tick_handler:

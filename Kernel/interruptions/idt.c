@@ -52,6 +52,10 @@ static void set_idt_entry(int interrupt_number, InterruptionHandler handler, int
 
 void initialize_idt()
 {
+    for (int i = 0; i < 0x20; i++)
+        if (i != 0 && i != 6)
+            set_idt_entry(i, sus_exception_handler, ACS_INT);
+
     set_idt_entry(0x00, zero_division_exception_handler, ACS_INT);
     set_idt_entry(0x06, invalid_opcode_exception_handler, ACS_INT);
     set_idt_entry(0x20, tick_handler, ACS_INT);

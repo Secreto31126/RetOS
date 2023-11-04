@@ -19,6 +19,12 @@ void exception_manager(uint8_t exception)
     if (exception == 0 || exception == 6)
         exceptions++;
     error_code = exception;
+
+    beep(440);
+    BSOD(error_code);
+    BSOD(error_code);
+    BSOD(error_code);
+    clear_screen();
 }
 
 uint64_t get_exceptions_count()

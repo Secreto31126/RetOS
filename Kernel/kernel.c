@@ -102,13 +102,6 @@ void *initializeKernelBinary()
 
 int main()
 {
-	if (get_exceptions_count())
-	{
-		BSOD(latest_error_code());
-		sleep_ticks(18 * 5);
-		clear_screen();
-	}
-
 	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
 	ncNewline();
 

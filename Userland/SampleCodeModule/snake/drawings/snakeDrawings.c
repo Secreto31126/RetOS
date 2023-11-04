@@ -1,5 +1,6 @@
 #include "snakeDrawings.h"
 #include "./../snake.h"
+#include "./../../window/window.h"
 #define E (MAX_SNAKE_COLORS - 1)
 #define B 0
 #define APPLE_BROWN 0xFF452C09

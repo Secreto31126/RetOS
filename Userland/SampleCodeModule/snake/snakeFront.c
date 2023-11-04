@@ -2,7 +2,9 @@
 #include "snakePrivate.h"
 #include "./drawings/backgroundArrays.h"
 #include "drawings/snakeDrawings.h"
-
+#include "./../window/window.h"
+#define MAX_SCORE_LENGTH 4
+#define MAX_LETTER_SIZE 5
 typedef struct frontSnake
 {
     DIRECTION nextMove;
@@ -14,12 +16,14 @@ void putDeath(int snakeNumber);
 void drawBoard(frontSnake *snakes);
 void drawBackground();
 void freeColorMaps(int snakeCount, frontSnake *snakes);
+void drawScore(uint64_t score);
+void drawTextBackground(uint64_t size);
 // default theme is windows
 static char *backgroundArray = windowsArray;
 static HexColor *backgroundColorMap = windowsColorMap;
 static char redrawBeforeBody = 0;
 static char redrawBeforeTail = 1;
-static char redrawBeforeTurn = 1; // currently unused
+static char redrawBeforeTurn = 1;
 static char redrawBeforeHead = 0;
 static snakeDrawing currentDrawing = {DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap}; // turn currently unused
 
@@ -38,6 +42,8 @@ void drawBackgroundWithParameters(Window w, uint64_t xOffset, uint64_t yOffset)
 }
 int playSnake(uint16_t snakeCount)
 {
+    uint64_t oldSize = getSize();
+    uint64_t score = 0;
     setSeed(get_tick());
     char gameOver = 0;
     int deadSnake = 0;
@@ -62,9 +68,21 @@ int playSnake(uint16_t snakeCount)
     uint64_t time = get_tick();
     while (!gameOver)
     {
+        drawScore(score);
         char c;
         while ((c = readChar()))
         {
+            uint64_t size;
+            if (c == '+' && (size = (getSize() + 1)) < MAX_LETTER_SIZE)
+            {
+                drawTextBackground(size);
+                setSize(size);
+            }
+            else if (c == '-' && (size = (getSize() - 1)) >= 1)
+            {
+                drawTextBackground(size);
+                setSize(size);
+            }
             doMovement(c, snakes);
         }
         if (timeHasPassed(time, MOVE_INTERVAL))
@@ -86,8 +104,9 @@ int playSnake(uint16_t snakeCount)
     }
     blank();
     // drawBackground();  // undecided between a blank background or the snake background.
-    while (readChar()) // empties out buffer, in case player pressed a key while background was being cleared (not necessary, just prevents skipping the game over screen)
+    while (readChar()) // empties out buffer, in case player pressed a key while background was being cleared (not necessary, just prevents skipping the game-over screen)
         ;
+    setSize(oldSize);
     paintString("Game Over. Press a key to return to shell.", 0xFF000000 | HEX_RED, 0xFF | HEX_BLACK);
     getChar();
     freeColorMaps(snakeCount, snakes);
@@ -252,4 +271,24 @@ void setSnakeDrawing(char drawSize, char *headDrawing, char *bodyDrawing, char *
     currentDrawing.turnDrawing = turnDrawing;
     currentDrawing.growItemDrawing = growItemDrawing;
     currentDrawing.growItemColorMap = growItemColorMap;
+}
+
+void drawScore(uint64_t score)
+{
+    char aux[MAX_SCORE_LENGTH];
+    uint64_t max = (pow(10, MAX_SCORE_LENGTH) - 1);
+    score = score > max ? max : score;
+    drawStringAt(itoa(score, aux, 10), SCORE_COLOR, 0, 0, 0);
+}
+
+void drawTextBackground(uint64_t size)
+{
+    uint64_t widthSpan = TRUE_LETTER_WIDTH * size, heightSpan = TRUE_LETTER_HEIGHT * size, tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
+    Window stamp = getWindow(tileWidth, tileHeight, malloc(sizeof(HexColor) * tileWidth * tileHeight));
+    for (int i = 0; i < heightSpan; i += tileHeight)
+    {
+        for (int j = 0; j < widthSpan; j += tileWidth)
+            drawBackgroundWithParameters(stamp, j, i);
+    }
+    freeWindow(stamp);
 }

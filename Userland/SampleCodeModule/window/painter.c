@@ -13,11 +13,17 @@ void startPainter(uint64_t width, uint64_t height)
 }
 void setSize(double s)
 {
+    if (size < 1.0 || size > 9.0)
+        return;
     size = s;
     stamp.width = TRUE_LETTER_WIDTH * size;
     stamp.height = TRUE_LETTER_HEIGHT * size;
     free(stamp.pixels);
     stamp.pixels = malloc(((int)(TRUE_LETTER_HEIGHT * size)) * ((int)(TRUE_LETTER_WIDTH * size)) * sizeof(HexColor));
+}
+uint64_t getSize()
+{
+    return (uint64_t)(size + 0.5);
 }
 void newLine()
 {

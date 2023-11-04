@@ -8,18 +8,18 @@
 	extern getStackBase
 	extern main
 
-    global zero_division_exception_handler
-    global invalid_opcode_exception_handler
-    global sus_exception_handler
+	global zero_division_exception_handler
+	global invalid_opcode_exception_handler
+	global sus_exception_handler
 
-    global tick_handler
-    global keyboard_handler
-    global cascade_pic
-    global even_ports_handler
-    global odd_ports_handler
-    global usb_handler
+	global tick_handler
+	global keyboard_handler
+	global cascade_pic
+	global even_ports_handler
+	global odd_ports_handler
+	global usb_handler
 
-    global syscall_handler
+	global syscall_handler
 
 ; Learnt this trick from pure64.asm
 %include "macro.s"
@@ -43,8 +43,8 @@
 	pushall
 	mov		rdi, %1
 	call	pic_manager
-    mov     al, 0x20
-    out     0x20, al
+	mov		al, 0x20
+	out		0x20, al
 	popall
 	iretq
 %endmacro
@@ -53,10 +53,10 @@
 	pushall
 	mov		rdi, %1
 	call	pic_manager
-	mov     al, 0x20
-	out     0xA0, al
-	mov     al, 0x20
-	out     0x20, al
+	mov		al, 0x20
+	out		0xA0, al
+	mov		al, 0x20
+	out		0x20, al
 	popall
 	iretq
 %endmacro

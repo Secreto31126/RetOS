@@ -31,7 +31,7 @@
 	mov		rdi, %1
 	call	exception_manager
 
-	mov	dword	[rsp + 8], 0x400000
+	mov	dword	[rsp], 0x400000
 	call	getStackBase
 	mov		[rsp + 8 * 3], rax
 

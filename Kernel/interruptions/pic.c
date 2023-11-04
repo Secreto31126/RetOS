@@ -88,6 +88,9 @@ static void keyboard_handler()
         }
         else
         {
+            if (!IS_RELEASE(scancode))
+                return;
+
             write_stderr(dump_reg_string, dump_regs() + 1);
         }
     }

@@ -62,8 +62,11 @@ int playSnake(uint16_t snakeCount)
         snakes[i].colorMap[0] = 0x00000000;                              // First color is reserved for transparency
         snakes[i].colorMap[MAX_SNAKE_COLORS - 1] = 0xFF000000 | HEX_RED; // Last color is reserved for eyes, always red
     }
+    play(80);
     drawBackground();
+    play(300);
     drawBoard(snakes);
+    shut();
 
     uint64_t time = get_tick();
     while (!gameOver)

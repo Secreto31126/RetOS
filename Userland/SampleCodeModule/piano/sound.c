@@ -27,7 +27,7 @@
 #define B4 988
 #define C5 1046
 
-// #define playFor(f, d) \
+// #define MEEP(f, d) \
 //     beep(f);          \
 //     sleep_ticks(d);
 
@@ -296,31 +296,19 @@ void do_i_wanna_know()
     beep(SHH);
 }
 
-void whistle_stop()
+void sports_center()
 {
-    playFor(A4sus, 6);
-    playFor(D3, 3);
-    playFor(G3, 6);
-    playFor(D3, 3);
-    playFor(G3, 3);
-    playFor(C3, 3);
-    playFor(G3, 9);
+    playFor(G4, 3);
+    playFor(F4, 3);
+    playFor(G4, 3);
 
-    playFor(SHH, 9);
+    playFor(SHH, 7);
 
-    playFor(D3sus, 3);
-    playFor(G3, 3);
-    playFor(C3, 3);
-    playFor(G3, 9);
+    playFor(G4, 3);
+    playFor(F4, 3);
+    playFor(G4, 3);
 
-    playFor(SHH, 9);
-
-    playFor(D3sus, 3);
-    playFor(G3, 3);
-    playFor(C3, 3);
-    playFor(G3, 9);
-
-    beep(SHH);
+    shut();
 }
 
 void here_comes_the_sun()

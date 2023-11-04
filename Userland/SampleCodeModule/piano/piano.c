@@ -80,7 +80,7 @@ void startPiano()
             note = 0;
             break;
         case '5':
-            whistle_stop();
+            sports_center();
             note = 0;
             break;
         case '6':

@@ -85,15 +85,7 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     {
         setBackgroundArray(windowsArray);
         setBackgroundColorMap(windowsColorMap);
-        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, 0, classicApple, appleColorMap);
-        setDrawOptions(0, 0, 1, 0);
-        matchFlag = 1;
-    }
-    else if (strcmp(commandParameters, "creation"))
-    {
-        setBackgroundArray(creationArray);
-        setBackgroundColorMap(creationColorMap);
-        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, 0, classicApple, appleColorMap);
+        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap);
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
@@ -101,11 +93,19 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     {
         setBackgroundArray(marioArray);
         setBackgroundColorMap(marioColorMap);
-        setSnakeDrawing(BIG_DRAW_SIZE, goomba, goomba, goomba, goomba, marioItem, marioItemColorMap);
-        setDrawOptions(1, 0, 0, 0);
+        setSnakeDrawing(BIG_DRAW_SIZE, goomba, goomba, goomba, pipe, marioItem, marioItemColorMap);
+        setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }
     /* comentado temporalmente porque no alcanza el espacio
+    else if (strcmp(commandParameters, "creation"))
+    {
+        setBackgroundArray(creationArray);
+        setBackgroundColorMap(creationColorMap);
+        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap);
+        setDrawOptions(0, 0, 1, 0);
+        matchFlag = 1;
+    }
     else if (strcmp(commandParameters, "pong"))
     {
         setBackgroundArray(pongArray);
@@ -119,8 +119,8 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     {
         setBackgroundArray(camelotArray);
         setBackgroundColorMap(camelotColorMap);
-        setSnakeDrawing(BIG_DRAW_SIZE, stone, stone, stone, stone, excalibur, excaliburColorMap);
-        setDrawOptions(1, 0, 0, 0);
+        setSnakeDrawing(BIG_DRAW_SIZE, stone, stone, stone, catapult, excalibur, excaliburColorMap);
+        setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }
     if (matchFlag)

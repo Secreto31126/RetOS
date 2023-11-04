@@ -21,6 +21,7 @@ snakeDrawing getCurrentDrawing();
 
 extern char classicHeadUp[DRAW_SIZE][DRAW_SIZE];
 extern char classicOther[DRAW_SIZE][DRAW_SIZE];
+extern char classicTurn[DRAW_SIZE][DRAW_SIZE];
 extern char classicTail[DRAW_SIZE][DRAW_SIZE];
 extern char classicApple[DRAW_SIZE][DRAW_SIZE];
 extern char background[DRAW_SIZE][DRAW_SIZE];
@@ -28,8 +29,10 @@ extern char goomba[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 extern HexColor appleColorMap[];
 extern HexColor marioItemColorMap[];
 extern char marioItem[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
+extern char pipe[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 extern HexColor excaliburColorMap[];
 extern char excalibur[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 extern char stone[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
+extern char catapult[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 
 #endif

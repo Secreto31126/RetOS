@@ -174,7 +174,7 @@ Window rotateBy180(Window w)
     {
         for (int j = 0; j < width; j++)
         {
-            swap(w, i, j, height - i - 1, j);
+            swap(w, i, j, height - i - 1, width - j - 1);
         }
     }
     return w;

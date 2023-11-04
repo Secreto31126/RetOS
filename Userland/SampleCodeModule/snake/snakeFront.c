@@ -21,7 +21,7 @@ static char redrawBeforeBody = 0;
 static char redrawBeforeTail = 1;
 static char redrawBeforeTurn = 1; // currently unused
 static char redrawBeforeHead = 0;
-static snakeDrawing currentDrawing = {DRAW_SIZE, classicHeadUp, classicOther, classicTail, 0, classicApple, appleColorMap}; // turn currently unused
+static snakeDrawing currentDrawing = {DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap}; // turn currently unused
 
 // Old draw modes commented porque me dio pena borrarlos :D
 void drawBackgroundWithParameters(Window w, uint64_t xOffset, uint64_t yOffset)
@@ -158,6 +158,12 @@ void drawBoard(frontSnake *snakes)
                 if (redrawBeforeTail)
                     drawBackgroundWithParameters(stamp, j, i); // Since the tail has transparency, the background must be redrawn before drawing tail if the head has color where the tail is transparent.
                 source = currentDrawing.tailDrawing;
+                fromCharArray(stamp, source, drawSize, drawSize, snakes[board[address].player].colorMap, 0, 0, OPAQUE);
+                break;
+            case TURN:
+                if (redrawBeforeTurn)
+                    drawBackgroundWithParameters(stamp, j, i); // Since the tail has transparency, the background must be redrawn before drawing tail if the head has color where the tail is transparent.
+                source = currentDrawing.turnDrawing;
                 fromCharArray(stamp, source, drawSize, drawSize, snakes[board[address].player].colorMap, 0, 0, OPAQUE);
                 break;
             case BODY:

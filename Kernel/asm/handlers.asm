@@ -24,6 +24,10 @@
 ; Learnt this trick from pure64.asm
 %include "macro.s"
 
+pain_manager:
+	hlt
+	jmp		pain_manager
+
 %macro exception_handler 1
 	call	dump_regs
 	mov		rdi, [rsp]
@@ -32,9 +36,12 @@
 	mov		rdi, %1
 	call	exception_manager
 
-	mov	dword	[rsp], 0x400000
-	call	getStackBase
-	mov		[rsp + 8 * 3], rax
+	mov		qword [rsp], pain_manager
+
+	call 	getStackBase
+	mov		qword	[rax], pain_manager
+	sub		rax, 8
+	mov 	[rsp + 8 * 3], rax
 
 	iretq
 %endmacro
@@ -70,7 +77,7 @@ invalid_opcode_exception_handler:
 	exception_handler 6
 
 sus_exception_handler:
-	exception_handler 0x20
+	exception_handler -1
 
 ; void tick_handler(void);
 tick_handler:

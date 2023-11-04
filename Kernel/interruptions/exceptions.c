@@ -24,6 +24,18 @@ void exception_manager(uint8_t exception)
     BSOD(error_code);
     BSOD(error_code);
     BSOD(error_code);
+    beep(0);
+
+    // If weird exception, suicide
+    if (exception != 0 && exception != 6)
+    {
+        while (1)
+        {
+            unset_interrupt_flag();
+            halt_once();
+        }
+    }
+
     clear_screen();
 }
 

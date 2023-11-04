@@ -33,11 +33,10 @@ char *getDumpString()
                 length += BIG_BLOCK;
             }
         }
-        char *toReturn = sPrintf("The dump generated:\n%s", c);
-        free(c);
-        return toReturn;
+        addToAllocated(c);
+        return c;
     }
-    return "No dump was generated. Press alt to generate a dump of the instant of pressing.";
+    return "";
 }
 
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize)

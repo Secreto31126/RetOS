@@ -168,7 +168,10 @@ char *clearTheShell(char *commandParameters, char *mustRedraw)
 }
 char *readMeTheDump(char *commandParameters, char *mustRedraw)
 {
-    return getDumpString();
+    char *c = getDumpString();
+    if (strcmp(c, ""))
+        return "No dump generated. Press 'alt' to generate a dump of the instant of pressing.";
+    return sPrintf("The dump generated:\n%s", c);
 }
 void initializeCommands()
 {

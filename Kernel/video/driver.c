@@ -94,7 +94,17 @@ uint64_t super_fast_fill_screen(HexColor *array)
 
             if (++tracker >= 8)
             {
-                *writer++ = output;
+                // *writer++ = output;
+                // Wut?
+                ((char *)writer)[0] = (output >> 56) & 0xFF;
+                ((char *)writer)[1] = (output >> 48) & 0xFF;
+                ((char *)writer)[2] = (output >> 40) & 0xFF;
+                ((char *)writer)[3] = (output >> 32) & 0xFF;
+                ((char *)writer)[4] = (output >> 24) & 0xFF;
+                ((char *)writer)[5] = (output >> 16) & 0xFF;
+                ((char *)writer)[6] = (output >> 8) & 0xFF;
+                ((char *)writer)[7] = (output >> 0) & 0xFF;
+                writer++;
                 tracker = 0;
                 output = 0;
             }

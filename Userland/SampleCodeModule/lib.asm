@@ -7,8 +7,8 @@
     global get_screen_size
     global beep
     global get_tick
-    global halt_user
     global get_dump
+    global halt_user
 
 ; int read_sys(unsigned int fd, char *str, size_t len);
 read_sys:
@@ -65,10 +65,12 @@ get_tick:
     ret
 
 get_dump:
-    mov rax,9
+    mov rax, 9
     int 80h,
     ret
 
+; void halt_user();
 halt_user:
-    hlt
+    mov rax, 0xA
+    int 80h
     ret

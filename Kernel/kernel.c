@@ -102,8 +102,6 @@ void *initializeKernelBinary()
 
 int main()
 {
-	int i = 1 / 0;
-
 	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
 	ncNewline();
 

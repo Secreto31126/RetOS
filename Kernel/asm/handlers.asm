@@ -36,11 +36,9 @@ pain_manager:
 	mov		rdi, %1
 	call	exception_manager
 
-	mov		qword [rsp], pain_manager
+	mov		qword [rsp], 0x400000
 
 	call 	getStackBase
-	mov		qword	[rax], pain_manager
-	sub		rax, 8
 	mov 	[rsp + 8 * 3], rax
 
 	iretq

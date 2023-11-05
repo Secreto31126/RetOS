@@ -9,6 +9,7 @@
     global get_tick
     global halt_user
     global get_dump
+    global invalidOpcode
 
 ; int read_sys(unsigned int fd, char *str, size_t len);
 read_sys:
@@ -71,4 +72,8 @@ get_dump:
 
 halt_user:
     hlt
+    ret
+
+invalidOpcode:
+    notValidOpcode
     ret

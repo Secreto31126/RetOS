@@ -229,8 +229,8 @@ void drawBoard(frontSnake *snakes)
 
 void drawBackground()
 {
-    uint64_t tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
     uint64_t h = getScreenHeight(), w = getScreenWidth();
+    /*uint64_t tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
     Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
     for (int i = 0; i < h; i += tileHeight)
     {
@@ -240,6 +240,11 @@ void drawBackground()
             drawWindow(stamp, j, i); // Since the tail has transparency, the background must be redrawn before drawing tail.
         }
     }
+    */
+    Window wholeScreen = getWindow(w, h, malloc(h * w * sizeof(HexColor)));
+    overlayFromCharArray(wholeScreen, backgroundArray, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, backgroundColorMap, 0, 0, OPAQUE);
+    quickDraw(wholeScreen);
+    freeWindow(wholeScreen);
 }
 
 void setBackgroundArray(char *newBackground)

@@ -192,6 +192,13 @@ uint64_t drawWindow(Window w, uint64_t x, uint64_t y)
 {
     return draw(w.pixels, ((w.width << 16) & 0xFFFF0000) | (w.height & 0xFFFF), ((x << 16) & 0xFFFF0000) | (y & 0xFFFF));
 }
+uint64_t quickDraw(Window w)
+{
+    uint64_t width = getScreenWidth(), height = getScreenHeight();
+    if (w.width < width || w.height < height)
+        return drawWindow(w, 0, 0); // will not paste to screen windows that do not cover the whole screen.
+    return draw(w.pixels, 0, -1);   // when receiving size parameters that exceed both screen width and height, kernel is configured to quickly copy the entire hexcolor array to the screen, as an optimization.
+}
 
 uint64_t clear()
 {

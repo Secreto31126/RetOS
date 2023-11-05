@@ -77,14 +77,17 @@ uint64_t super_fast_fill_screen(HexColor *array)
     uint64_t height = VBE_mode_info->height;
     uint64_t size = width * height;
 
+    if (!size)
+        return 0;
+
     uint64_t output = 0;
     uint8_t tracker = 0;
     uint64_t *writer = (uint64_t *)framebuffer;
 
-    // Loop and write 8 pixels at a time
-    for (uint64_t i = 0; i < size - 8; i++)
+    uint64_t i = 0;
+    while (i + 8 < size)
     {
-        uint32_t color = (uint32_t)(array[i]);
+        uint32_t color = (uint32_t)(array[i++]);
 
         // Revert the pixel order and save them in the output
         for (uint64_t j = 0; j < 3; j++)
@@ -102,13 +105,10 @@ uint64_t super_fast_fill_screen(HexColor *array)
         }
     }
 
-    uint64_t mini_screen = width < 8 ? width : 8;
-    HexColor *end = array + (size > 8 ? size - 8 : 0);
-
-    for (uint64_t i = 0; i < mini_screen; i++)
+    while (i < size)
     {
-        HexColor color = end[i];
-        putPixelStd(-1, GET_RED(color), GET_GREEN(color), GET_BLUE(color), width + i - mini_screen, height - 1);
+        HexColor color = array[i++];
+        putPixelStd(-1, GET_RED(color), GET_GREEN(color), GET_BLUE(color), i % width, i / height);
     }
 
     return size;

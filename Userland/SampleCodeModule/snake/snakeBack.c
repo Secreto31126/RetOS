@@ -120,7 +120,7 @@ unsigned int update(int snakeCount, int *deathCount, int *madeApple)
                 }
                 else
                 {
-                    board[i][j].toDraw = NO_DRAW; // No need to update unmoving parts until they die.
+                    // board[i][j].toDraw = NO_DRAW; // No real need to update unmoving parts until they die. This is commented because redrawing them anyways is not too inefficient and lets us keep scoreboard on top of playBoard (snake can run-over scoreboard without being erased)
                 }
                 board[i][j].health--; // All snake parts lose one 'health' per movement. This way, parts remain for as many movements as the snake is long, giving the appearance of a continuous snake. Using players to uniformly color snakes reinforces this
                 if (board[i][j].health == 1)
@@ -131,7 +131,7 @@ unsigned int update(int snakeCount, int *deathCount, int *madeApple)
                 if (board[i][j].health == 0)
                     board[i][j].toDraw = BLANK;
             }
-            else if (lookingAt.toDraw != APPLE) // apples redrawn at every turn currently. Prevents not drawing new apples
+            else if (lookingAt.toDraw == BLANK) // only blanks should be turned to NO_DRAW when at health 0
             {
                 board[i][j].toDraw = NO_DRAW;
             }

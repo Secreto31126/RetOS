@@ -6,7 +6,7 @@ void paintStringOrWarp(char *s);
 
 void startPiano()
 {
-    quickBlank();
+    blank();
     paintStringOrWarp("Welcome to the piano!\n\n");
     paintStringOrWarp("Press 'q' to exit.\n");
     // PianoNote * notes = malloc(sizeof(PianoNote) * 12);

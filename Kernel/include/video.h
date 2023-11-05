@@ -78,13 +78,6 @@ uint64_t drawScaledShape(ShapeFunction f, uint32_t width, uint32_t height, uint3
  */
 uint64_t super_fast_fill_screen_array(HexColor *array);
 /**
- * @brief The name says it all. For performance gains, it ignores the alpha channel
- *
- * @param array The array to draw to full screen
- * @return uint64_t The number of pixels drawn (width * height)
- */
-uint64_t super_fast_fill_screen(HexColor *array);
-/**
  * @brief Receives an array, its dimensions, and the position to draw the top-left corner from
  *
  * @param array The array to draw

@@ -11,7 +11,7 @@ void update_header()
 {
     char header[] = "\bRetOS\b\eExceptions: \t\t\t\t\e00:00";
     update_header_clock(header);
-    update_header_counter(header);
+    // update_header_counter(header);
     ncPrintHeader(header);
 }
 

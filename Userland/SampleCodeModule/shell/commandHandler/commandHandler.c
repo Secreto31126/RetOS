@@ -9,7 +9,7 @@
 #include "./../../piano/piano.h"
 #include "./../../piano/sound.h"
 #define BLOCK 5
-#define MAX_LETTER_SIZE 10
+#define MAX_LETTER_SIZE 5
 
 static command *commands;
 static uint64_t commandCount = 0;

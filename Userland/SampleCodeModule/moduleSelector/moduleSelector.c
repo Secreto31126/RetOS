@@ -44,7 +44,7 @@ void startModules()
             if (strcmp(c, ""))
                 paintString("No dump has been generated. Press 'alt' to generate a dump of the instant of pressing.\n\nPress any key to return to module selector.", -1, 0);
             else
-                paintString(sPrintf("%s\n\nPress any key to return to module selector.", getDumpString()), -1, 0);
+                paintString(sPrintf("%s\n\nPress any key to return to module selector.", c), -1, 0);
             freePrints();
             getChar();
             blank();

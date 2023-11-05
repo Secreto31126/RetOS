@@ -85,7 +85,8 @@ uint64_t super_fast_fill_screen(HexColor *array)
     uint64_t *writer = (uint64_t *)framebuffer;
 
     uint64_t i = 0;
-    while (i + 8 < size)
+    uint64_t mod = size % 8;
+    while (i < size - mod)
     {
         uint32_t color = (uint32_t)(array[i++]);
 

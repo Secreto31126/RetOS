@@ -50,7 +50,8 @@ void setBoard(int snakeCount);
 void setDirection(unsigned int playerNumber, DIRECTION direction);
 tile *getBoard();
 snake *getSnakes();
-unsigned int update();
+unsigned int update(int snakeCount, int *deathCount, int *madeApple);
+extern uint64_t get_tick();
 void freeBack();
 
 #endif

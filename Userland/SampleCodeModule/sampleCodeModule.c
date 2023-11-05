@@ -5,6 +5,7 @@
 #include "shell/shell.h"
 #include "snake/snake.h"
 #include "moduleSelector/moduleSelector.h"
+#include "piano/piano.h"
 
 int main()
 {

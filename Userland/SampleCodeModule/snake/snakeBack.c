@@ -1,6 +1,7 @@
 #include "snake.h"
 #include "snakePrivate.h"
 #include "random.h"
+#include "./../piano/sound.h"
 
 #define EMPTY 0
 #define BOARD_SIZE (BOARD_HEIGHT * BOARD_WIDTH)
@@ -68,7 +69,7 @@ void setDirection(unsigned int playerNumber, DIRECTION direction)
 }
 
 // returns 0 if no players died. Returns the player player if a player died.
-unsigned int update(int snakeCount)
+unsigned int update(int snakeCount, int *deathCount, int *madeApple)
 {
     char toReturn = 0;
     tile lookingAt;
@@ -89,14 +90,17 @@ unsigned int update(int snakeCount)
                     if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].health != 0 && board[nextX][nextY].toDraw != BLANK && board[nextX][nextY].toDraw != APPLE))
                     {
                         killSnake(lookingAt.player);
+                        (*deathCount)++;
                         toReturn = lookingAt.player + 1;
                     }
                     else
                     {
                         if (board[nextY][nextX].toDraw == APPLE)
                         {
+                            play(390);
                             growSnake(lookingAt.player);
                             makeApple();
+                            *madeApple = 1;
                         }
                         snakes[lookingAt.player].nextHeadCoordinates[0] = nextX;
                         snakes[lookingAt.player].nextHeadCoordinates[1] = nextY;

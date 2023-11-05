@@ -1,5 +1,6 @@
 #include "snake.h"
 #include "snakePrivate.h"
+#include "./../piano/sound.h"
 #include "./drawings/backgroundArrays.h"
 #include "drawings/snakeDrawings.h"
 #include "./../window/window.h"
@@ -62,12 +63,16 @@ int playSnake(uint16_t snakeCount)
         snakes[i].colorMap[0] = 0x00000000;                              // First color is reserved for transparency
         snakes[i].colorMap[MAX_SNAKE_COLORS - 1] = 0xFF000000 | HEX_RED; // Last color is reserved for eyes, always red
     }
+    play(80);
     drawBackground();
+    play(300);
     drawBoard(snakes);
+    shut();
 
     uint64_t time = get_tick();
     while (!gameOver)
     {
+        shut(); // stops any noises that begun on previous update loop
         drawScore(score);
         char c;
         while ((c = readChar()))
@@ -91,18 +96,27 @@ int playSnake(uint16_t snakeCount)
             for (int i = 0; i < snakeCount; i++)
                 if (snakes[i].nextMove != NONE)
                     setDirection(i, snakes[i].nextMove);
-
-            if ((deadSnake = update(snakeCount)))
+            int deaths = 0;
+            int madeApple = 0;
+            if ((deadSnake = update(snakeCount, &deaths, &madeApple)))
             {
                 putDeath(deadSnake);
-                deathCount++;
+                deathCount += deaths;
                 if (deathCount >= snakeCount)
                     gameOver = 1;
+            }
+            if (madeApple)
+            {
+                play(330);
             }
             drawBoard(snakes);
         }
     }
+
+    play(440);
     blank();
+    shut();
+
     // drawBackground();  // undecided between a blank background or the snake background.
     while (readChar()) // empties out buffer, in case player pressed a key while background was being cleared (not necessary, just prevents skipping the game-over screen)
         ;

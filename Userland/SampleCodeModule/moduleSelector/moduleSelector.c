@@ -5,6 +5,7 @@
 #include "./../window/window.h"
 #include "./../window/fontInterface.h"
 #include "./../nstdlib/nstdlib.h"
+#include "./../piano/sound.h"
 
 static const char prompt[] = "You are now in the module selector.\nPress 1 to continue to shell.\nPress 2 to get the current time.\nPress 3 to dump all registers.\nPress 4 to test exceptions.\nPress 5 to end program (shut down).\n";
 void setEnvironment();
@@ -13,6 +14,7 @@ void startModules()
 {
     initializeFonts();
     startPainter(getScreenWidth(), getScreenHeight());
+    sports_center();
     setEnvironment();
     initializeCommands();
     char c;

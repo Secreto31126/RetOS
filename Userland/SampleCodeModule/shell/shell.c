@@ -27,7 +27,6 @@ char shellStart()
     index += sPuts(buffer, shellIntro);
     paintString(buffer, letterColor, highlightColor);
     paintLineStart();
-
     char c;
     while ((c = getChar()) != '\n' || !strcmp(commandBuffer, "exit"))
     {
@@ -127,7 +126,7 @@ char *passCommand(char *toPass)
             toReturn = sPrintf("%s\n%s\n%s", buffer, toPaint, lineStart);
         index = 0;
         buffer[index] = 0;
-        if (willFit(toReturn))
+        if (willFit(toReturn)) // so as not to blank when it won't fit, as the painting functions will blank anyways
             blank();
         return toReturn;
     }

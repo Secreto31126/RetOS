@@ -8,7 +8,7 @@
 #include "./../shell.h"
 #include "./../../piano/piano.h"
 #include "./../../piano/sound.h"
-#define BLOCK 10
+#define BLOCK 5
 #define MAX_LETTER_SIZE 10
 
 static command *commands;
@@ -48,8 +48,17 @@ char *getHelp(char *commandParameters, char *mustRedraw)
     {
         char *toReturn = "Help menu:\n";
         for (int i = 0; i < commandCount; i++)
+        {
             toReturn = sPrintf("%s\n%s", toReturn, commands[i].help);
-        toReturn = sPrintf("::%s\nEnd of help menu.", toReturn);
+            if (!(i % BLOCK)) // creates a copy of current string, frees all auxiliary strings, adds copy to string to be freed
+            {
+                uint64_t len = strlen(toReturn);
+                toReturn = realloc(toReturn, len, len);
+                freePrints();
+                addToAllocated(toReturn);
+            }
+        }
+        toReturn = sPrintf("%s\nEnd of help menu.", toReturn);
         toReturn = realloc(toReturn, strlen(toReturn) * sizeof(char), strlen(toReturn) * sizeof(char)); // creates a string not in freePrints.
         freePrints();                                                                                   // frees all non-returned auxiliary strings created by sPrintf
         addToAllocated(toReturn);                                                                       // ensures toReturn can be freed by nstdlib upon next call to freePrints

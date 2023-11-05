@@ -492,7 +492,7 @@ uint64_t addString(char **receiver, uint64_t *length, char *source, uint64_t *al
     uint64_t len = strlen(source);
     if ((*length + len) >= *allocated)
     {
-        uint64_t toAdd = ((*length + len - *allocated) / BLOCK + 1) * BLOCK; // space that must be added, rounded to nearest block
+        uint64_t toAdd = ((*length + len - *allocated) / BLOCK) * BLOCK + BLOCK; // space that must be added, rounded to nearest block
         *receiver = realloc(*receiver, *allocated, (*allocated + toAdd) * sizeof(char));
         *allocated += toAdd;
     }

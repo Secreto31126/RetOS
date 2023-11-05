@@ -113,8 +113,9 @@ uint64_t super_fast_fill_screen(HexColor *array)
 
     while (i < size)
     {
-        HexColor color = array[i++];
-        putPixelStd(-1, GET_RED(color), GET_GREEN(color), GET_BLUE(color), i % width, i / height);
+        HexColor color = array[i];
+        putPixelStd(-1, GET_RED(color), GET_GREEN(color), GET_BLUE(color), i % width, i / width);
+        i++;
     }
 
     return size;

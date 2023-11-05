@@ -1,8 +1,10 @@
 #ifndef SDRAW_H
 #define SDRAW_H
-#include "./../../window/window.h"
 #define DRAW_SIZE 12
 #define BIG_DRAW_SIZE 24
+#define TEXT_BOARD_WIDTH 36
+#define TEXT_BOARD_HEIGHT 24
+#include "./../../window/window.h"
 typedef struct snakeDrawing
 {
     int drawSize;
@@ -21,6 +23,7 @@ snakeDrawing getCurrentDrawing();
 
 extern char classicHeadUp[DRAW_SIZE][DRAW_SIZE];
 extern char classicOther[DRAW_SIZE][DRAW_SIZE];
+extern char classicTurn[DRAW_SIZE][DRAW_SIZE];
 extern char classicTail[DRAW_SIZE][DRAW_SIZE];
 extern char classicApple[DRAW_SIZE][DRAW_SIZE];
 extern char background[DRAW_SIZE][DRAW_SIZE];
@@ -28,8 +31,12 @@ extern char goomba[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 extern HexColor appleColorMap[];
 extern HexColor marioItemColorMap[];
 extern char marioItem[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
+extern char pipe[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 extern HexColor excaliburColorMap[];
 extern char excalibur[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 extern char stone[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
+extern char catapult[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
+extern char textBoard[TEXT_BOARD_HEIGHT][TEXT_BOARD_WIDTH];
+extern HexColor textBoardColorMap[];
 
 #endif

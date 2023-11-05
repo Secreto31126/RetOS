@@ -22,7 +22,6 @@ int putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint6
 
     if (x >= VBE_mode_info->width || y >= VBE_mode_info->height)
         return 0;
-
     framebuffer_element *framebuffer = FRAMEBUFFER;
 
     uint64_t offset = x + y * VBE_mode_info->width;
@@ -178,6 +177,56 @@ uint64_t super_fast_fill_screen_array(HexColor *array)
         HexColor color = array[i];
         putPixelStd(-1, GET_RED(color), GET_GREEN(color), GET_BLUE(color), i % width, i / width);
         i++;
+    }
+
+    return size;
+}
+
+uint64_t super_fast_fill_screen(HexColor *array)
+{
+    framebuffer_element *framebuffer = FRAMEBUFFER;
+
+    uint64_t width = VBE_mode_info->width;
+    uint64_t height = VBE_mode_info->height;
+    uint64_t size = width * height;
+
+    // Loop and write 8 pixels at a time
+    for (uint64_t i = 0; i < size - 8; i += 8)
+    {
+        uint64_t *writer = (uint64_t *)(framebuffer + i);
+
+        uint64_t output = 0;
+        uint8_t tracker = 0;
+
+        // Pixels are drawn in packages of ~2,5 pixels
+        for (uint64_t j = 0; j < 8; j++)
+        {
+            uint64_t color = (uint64_t)(array[i + j]);
+
+            // Revert the pixel order and save them in the output
+            for (uint64_t k = 0; k < 3; k++)
+            {
+                output <<= 8;
+                output |= color & 0xFF;
+                color >>= 8;
+
+                if (++tracker >= 8)
+                {
+                    *writer++ = output;
+                    tracker = 0;
+                    output = 0;
+                }
+            }
+        }
+    }
+
+    uint64_t mini_screen = width < 8 ? width : 8;
+    HexColor *end = array[size > 8 ? size - 8 : 0];
+
+    for (uint64_t i = 0; i < mini_screen; i++)
+    {
+        HexColor color = end[i];
+        putPixelStd(-1, GET_RED(color), GET_GREEN(color), GET_BLUE(color), width + i - mini_screen, height - 1);
     }
 
     return size;

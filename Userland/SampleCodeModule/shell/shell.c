@@ -6,7 +6,6 @@ void warpAndRedraw();
 void warpOneLine();
 char *passCommand(char *toPass);
 void paintLineStart();
-void paintStringOrWarp(char *s);
 void paintCharOrWarp(char c);
 static char *buffer, *commandBuffer;
 static uint64_t index, commandIndex;

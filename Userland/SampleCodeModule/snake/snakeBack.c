@@ -1,6 +1,7 @@
 #include "snake.h"
 #include "snakePrivate.h"
 #include "random.h"
+#include "./../piano/sound.h"
 
 #define EMPTY 0
 #define BOARD_SIZE (BOARD_HEIGHT * BOARD_WIDTH)
@@ -19,6 +20,7 @@ void killSnake(unsigned int player);
 void growSnake(unsigned int player);
 void makeApple();
 void setNewHeads(int snakeCount);
+DIRECTION parseTurn(DIRECTION comingFrom, DIRECTION goingTo);
 
 void setBoard(int snakeCount)
 {
@@ -30,6 +32,7 @@ void setBoard(int snakeCount)
         board[0][i].player = 0;
         board[0][i].toDraw = NO_DRAW;
         board[0][i].drawDirection = UP;
+        board[0][i].trueDirection = UP;
     }
 
     uint64_t boardSizeNoMargins = BOARD_SIZE_NO_MARGINS; // just to avoid calculating it in every loop
@@ -66,7 +69,7 @@ void setDirection(unsigned int playerNumber, DIRECTION direction)
 }
 
 // returns 0 if no players died. Returns the player player if a player died.
-unsigned int update(int snakeCount)
+unsigned int update(int snakeCount, int *deathCount, int *madeApple)
 {
     char toReturn = 0;
     tile lookingAt;
@@ -87,32 +90,48 @@ unsigned int update(int snakeCount)
                     if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].health != 0 && board[nextX][nextY].toDraw != BLANK && board[nextX][nextY].toDraw != APPLE))
                     {
                         killSnake(lookingAt.player);
+                        (*deathCount)++;
                         toReturn = lookingAt.player + 1;
                     }
                     else
                     {
                         if (board[nextY][nextX].toDraw == APPLE)
                         {
+                            play(390);
                             growSnake(lookingAt.player);
                             makeApple();
+                            *madeApple = 1;
                         }
                         snakes[lookingAt.player].nextHeadCoordinates[0] = nextX;
                         snakes[lookingAt.player].nextHeadCoordinates[1] = nextY;
-                        board[i][j].toDraw = BODY;
-                        board[i][j].drawDirection = snakes[lookingAt.player].direction;
+                        DIRECTION dir = snakes[lookingAt.player].direction;
+                        board[i][j].trueDirection = dir;
+                        if (lookingAt.drawDirection == dir)
+                        {
+                            board[i][j].toDraw = BODY;
+                            board[i][j].drawDirection = dir;
+                        }
+                        else
+                        {
+                            board[i][j].toDraw = TURN;
+                            board[i][j].drawDirection = parseTurn(board[i][j].drawDirection, dir);
+                        }
                     }
                 }
                 else
                 {
-                    board[i][j].toDraw = NO_DRAW; // No need to update unmoving parts until they die.
+                    // board[i][j].toDraw = NO_DRAW; // No real need to update unmoving parts until they die. This is commented because redrawing them anyways is not too inefficient and lets us keep scoreboard on top of playBoard (snake can run-over scoreboard without being erased)
                 }
                 board[i][j].health--; // All snake parts lose one 'health' per movement. This way, parts remain for as many movements as the snake is long, giving the appearance of a continuous snake. Using players to uniformly color snakes reinforces this
                 if (board[i][j].health == 1)
+                {
                     board[i][j].toDraw = TAIL;
+                    board[i][j].drawDirection = board[i][j].trueDirection;
+                }
                 if (board[i][j].health == 0)
                     board[i][j].toDraw = BLANK;
             }
-            else if (lookingAt.toDraw != APPLE) // apples redrawn at every turn currently. Prevents not drawing new apples
+            else if (lookingAt.toDraw == BLANK) // only blanks should be turned to NO_DRAW when at health 0
             {
                 board[i][j].toDraw = NO_DRAW;
             }
@@ -174,8 +193,8 @@ unsigned int getNthEmpty(unsigned int n)
     unsigned int j;
     for (j = 0; j <= n && n < BOARD_SIZE_NO_MARGINS; j++)
     {
-        if ((board[0][j].toDraw == APPLE || !(board[0][j].health == 0 || (board[0][j].health == 1 && board[0][j].toDraw == BLANK)))) // inefficient to look through whole array. Also inefficient to ask for more random numbers if spot selected is occupied. This was chosen because our rng is not particularly random, so repeated calls not particularly good.
-            n++;                                                                                                                     // only advances position if there is not an object on the board. This serves to select the n-th empty tile
+        if ((board[0][j].toDraw == APPLE || board[0][j].toDraw == TAIL || !(board[0][j].health == 0 || (board[0][j].health == 1 && board[0][j].toDraw == BLANK)))) // inefficient to look through whole array. Also inefficient to ask for more random numbers if spot selected is occupied. This was chosen because our rng is not particularly random, so repeated calls not particularly good.
+            n++;                                                                                                                                                   // only advances position if there is not an object on the board. This serves to select the n-th empty tile
     }
     return j - 1;
 }
@@ -210,4 +229,45 @@ tile *getBoard()
 snake *getSnakes()
 {
     return snakes;
+}
+DIRECTION parseTurn(DIRECTION comingFrom, DIRECTION goingTo)
+{
+    switch (comingFrom)
+    {
+    case UP:
+    {
+        if (goingTo == RIGHT)
+            return UP;
+        else if (goingTo == LEFT)
+            return RIGHT;
+        break;
+    }
+    case DOWN:
+    {
+        if (goingTo == RIGHT)
+            return LEFT;
+        else if (goingTo == LEFT)
+            return DOWN;
+        break;
+    }
+    case LEFT:
+    {
+        if (goingTo == UP)
+            return LEFT;
+        else if (goingTo == DOWN)
+            return UP;
+        break;
+    }
+    case RIGHT:
+    {
+        if (goingTo == UP)
+            return DOWN;
+        else if (goingTo == DOWN)
+            return RIGHT;
+        break;
+    }
+    default:
+        return UP; // should never be here, as turns from opposite directions do not exist
+        break;
+    }
 }

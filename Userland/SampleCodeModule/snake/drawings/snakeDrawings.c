@@ -1,5 +1,6 @@
 #include "snakeDrawings.h"
 #include "./../snake.h"
+#include "./../../window/window.h"
 #define E (MAX_SNAKE_COLORS - 1)
 #define B 0
 #define APPLE_BROWN 0xFF452C09
@@ -29,6 +30,19 @@ char classicOther[DRAW_SIZE][DRAW_SIZE] = {
     {1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1},
     {1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1},
     {1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1},
+    {1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1},
+    {1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1},
+    {1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1}};
+char classicTurn[DRAW_SIZE][DRAW_SIZE] = {
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+    {1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 2, 1, 1, 1, 1, 2, 2, 2, 2},
     {1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1},
     {1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1},
     {1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1}};
@@ -122,6 +136,30 @@ char marioItem[BIG_DRAW_SIZE][BIG_DRAW_SIZE] = {{B, B, B, B, B, B, B, B, B, B, B
                                                 {B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B},
                                                 {B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B},
                                                 {B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B}};
+char pipe[BIG_DRAW_SIZE][BIG_DRAW_SIZE] = {{B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, 1, 1, 1, 1, 1},
+                                           {B, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, B, B, B, B, B, B, B, B, 1, 2, 2, 2, 2},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, B, B, B, B, B, B, B, B, B, B, B, B, B},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, B, B, B, B, B, B, B, B, B, B, B, B, B},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, B, B, B, B, B, B, B, B, B, B, B, B, B},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, B, B, B, B, B, B, B, B, B, B, B, B, B},
+                                           {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, B, B, B, B, B, B, B, B, B, B, B, B, B},
+                                           {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, B, B, B, B, B, B, B, B, B, B, B, B},
+                                           {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, B, B, B, B, B, B, B, B, B, B, B, B},
+                                           {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, B, B, B, B, B, B, B, B, B, B, B, B},
+                                           {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, B, B, B, B, B, B, B, B, B, B, B, B},
+                                           {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, B, B, B, B, B, B, B, B, B, B, B, B},
+                                           {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, B, B, B, B, B, B, B, B, B, B, B, B}};
 HexColor excaliburColorMap[] = {0x00000000, 0xffd4a937, 0xff000000, 0xffe3cc78, 0xffab4c30, 0xff7a3321, 0xffa4852a, 0xff251110, 0xff55342f, 0xff5b6483, 0xff7e83a4, 0xffc2c4d3, 0xffa5a8bd, 0xff999eb4, 0xff434b62};
 char excalibur[BIG_DRAW_SIZE][BIG_DRAW_SIZE] = {{B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B},
                                                 {B, B, B, B, B, B, B, B, B, B, B, 1, 2, 3, B, B, B, B, B, B, B, B, B, B},
@@ -171,3 +209,27 @@ char stone[BIG_DRAW_SIZE][BIG_DRAW_SIZE] = {{B, B, B, B, B, B, B, B, B, B, B, B,
                                             {B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B},
                                             {B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B},
                                             {B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B}};
+char catapult[BIG_DRAW_SIZE][BIG_DRAW_SIZE] = {{B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, B, B, B, B, B, B, B, B, 1, B, B, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, B, B, 2, 2, B, B, B, B, 1, B, B, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, B, B, 2, 2, B, B, B, 2, 1, B, B, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, B, 1, 1, 2, B, B, B, 2, 1, B, B, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, B, 1, 1, 2, 2, B, B, 2, 1, B, B, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, B, B, 1, 1, 2, B, B, B, 1, 1, B, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, B, B, 1, 1, 1, B, B, B, 1, 1, B, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, B, B, 1, 1, 1, 1, B, B, 1, 1, B, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, B, B, B, B, B, 1, 1, B, 1, 1, 1, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, 1, 1, B, B, B, B, 1, 1, 1, B, 1, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, 1, 1, B, B, B, B, B, 1, 1, B, 1, 1, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, 1, 2, 1, 1, 1, 1, 1, 1, 1, B, B, 1, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, 1, B, 3, 1, 1, 1, 1, 1, 3, B, 1, 1, 1, B, B, B, B, B},
+                                               {B, B, B, B, B, 3, 3, B, 3, 3, 3, 3, 3, 3, 3, B, 3, 3, 3, 3, B, B, B, B},
+                                               {B, B, B, B, B, 3, 2, B, 2, 3, 3, 3, 3, 3, 2, B, B, 3, 3, 3, B, B, B, B},
+                                               {B, B, B, B, B, 3, 2, B, 2, 3, 3, 3, 3, 3, 2, B, 2, 3, 3, 3, B, B, B, B},
+                                               {B, B, B, B, B, B, 3, 2, 3, B, B, B, B, B, 3, B, 4, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, B, B, B, B, B, B, B, B, 3, B, B, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B},
+                                               {B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B}};

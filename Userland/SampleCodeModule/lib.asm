@@ -8,6 +8,8 @@
     global beep
     global get_tick
     global halt_user
+    global get_dump
+    global invalidOpcode
 
 ; int read_sys(unsigned int fd, char *str, size_t len);
 read_sys:
@@ -51,7 +53,7 @@ get_screen_size:
     int 80h
     ret
 
-; void beep(uint64_t frequency, uint64_t duration)
+; void beep(uint64_t frequency)
 beep:
     mov rax, 7
     int 80h
@@ -63,6 +65,15 @@ get_tick:
     int 80h
     ret
 
+get_dump:
+    mov rax,9
+    int 80h,
+    ret
+
 halt_user:
     hlt
+    ret
+
+invalidOpcode:
+    notValidOpcode
     ret

@@ -3,19 +3,8 @@
 
 #include <stdint.h>
 
-/**
- * @brief A color in the format 0xAARRGGBB
- */
 typedef uint32_t HexColor;
-/**
- * @brief A function that receives coordinates and returns a HexColor
- *
- * @param x The x coordinate of the pixel
- * @param y The y coordinate of the pixel
- * @param w The width of the shape
- * @param h The height of the shape
- */
-typedef HexColor (*ShapeFunction)(int x, int y, int w, int h);
+typedef HexColor (*ShapeFunction)(int, int, int, int);
 
 /**
  * @brief Shorthand for
@@ -39,44 +28,12 @@ int putPixel(HexColor hexColor, uint64_t x, uint64_t y);
  * @return int 1 on success, 0 if failed
  */
 int putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint64_t x, uint64_t y);
-/**
- * @brief The name says it all. For performance gains, it ignores the alpha channel
- *
- * @param array The ShapeFunction to draw to full screen
- * @return uint64_t The number of pixels drawn (width * height)
+/***
+ * ShapeFunction receives coordinates (two integers), and returns a HexColor of form
+ * 0xOORRGGBB. Where OO is the opacity for that pixel, and RRGGBB a HexColor
  */
-uint64_t super_fast_fill_screen_shape(ShapeFunction f);
-/**
- * @brief Draws a shape to the screen
- *
- * @param f The ShapeFunction to draw
- * @param width The width of the shape
- * @param height The height of the shape
- * @param x The x coordinate of the top-left corner
- * @param y The y coordinate of the top-left corner
- * @return uint64_t The number of pixels drawn
- */
-uint64_t drawShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y);
-/**
- * @brief Draws a scaled shape to the screen
- *
- * @param f The ShapeFunction to draw
- * @param width The width of the shape
- * @param height The height of the shape
- * @param x The x coordinate of the top-left corner
- * @param y The y coordinate of the top-left corner
- * @param xScaleFactor The factor to scale the width by
- * @param yScaleFactor The factor to scale the height by
- * @return uint64_t The number of pixels drawn
- */
-uint64_t drawScaledShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y, double xScaleFactor, double yScaleFactor);
-/**
- * @brief The name says it all. For performance gains, it ignores the alpha channel
- *
- * @param array The array to draw to full screen
- * @return uint64_t The number of pixels drawn (width * height)
- */
-uint64_t super_fast_fill_screen_array(HexColor *array);
+void drawShape(ShapeFunction f, int x, int y, int xRange, int yRange);
+void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor);
 /**
  * @brief The name says it all. For performance gains, it ignores the alpha channel
  *
@@ -92,7 +49,7 @@ uint64_t super_fast_fill_screen(HexColor *array);
  * @param height The height of the array
  * @param x The x coordinate of the top-left corner
  * @param y The y coordinate of the top-left corner
- * @return uint64_t The number of pixels drawn
+ * @return uint64_t 1 on success, 0 if failed
  */
 uint64_t drawFromArray(HexColor *array, uint32_t width, uint32_t height, uint32_t x, uint32_t y);
 /**

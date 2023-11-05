@@ -45,9 +45,67 @@ static uint8_t mergeColor(uint8_t background, uint8_t overlay, uint8_t opacity)
     return (background * (1 - op) + overlay * op);
 }
 
+static uint64_t super_fast_fill_shape(ShapeFunction f)
+{
+    uint64_t width = VBE_mode_info->width;
+    uint64_t height = VBE_mode_info->height;
+    uint64_t size = width * height;
+
+    if (!size)
+        return 0;
+
+    uint64_t output = 0;
+    uint8_t tracker = 0;
+    uint64_t *writer = (uint64_t *)FRAMEBUFFER;
+
+    uint64_t i = 0;
+    uint64_t mod = size % 8;
+    while (i < size - mod)
+    {
+        uint32_t color = (uint32_t)(f(i % width, i / width, width, height));
+        i++;
+
+        // Revert the pixel order and save them in the output
+        for (uint64_t j = 0; j < 3; j++)
+        {
+            output <<= 8;
+            output += color & 0xFF;
+            color >>= 8;
+
+            if (++tracker >= 8)
+            {
+                // *writer++ = output;
+                // Wut?
+                ((char *)writer)[0] = (output >> 56) & 0xFF;
+                ((char *)writer)[1] = (output >> 48) & 0xFF;
+                ((char *)writer)[2] = (output >> 40) & 0xFF;
+                ((char *)writer)[3] = (output >> 32) & 0xFF;
+                ((char *)writer)[4] = (output >> 24) & 0xFF;
+                ((char *)writer)[5] = (output >> 16) & 0xFF;
+                ((char *)writer)[6] = (output >> 8) & 0xFF;
+                ((char *)writer)[7] = (output >> 0) & 0xFF;
+                writer++;
+                tracker = 0;
+                output = 0;
+            }
+        }
+    }
+
+    while (i < size)
+    {
+        HexColor color = f(i % width, i / width, width, height);
+        putPixelStd(-1, GET_RED(color), GET_GREEN(color), GET_BLUE(color), i % width, i / width);
+        i++;
+    }
+
+    return size;
+}
+
 void drawShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y)
 {
-    drawScaledShape(f, x, y, xRange, yRange, 1, 1);
+    if (!x && !y && width > VBE_mode_info->width && height > VBE_mode_info->height)
+        return super_fast_fill_shape(f);
+
     drawScaledShape(f, width, height, x, y, 1, 1);
 }
 

@@ -25,21 +25,6 @@ typedef enum OVERLAY_MODE
 typedef uint32_t HexColor;
 typedef HexColor (*ShapeFunction)(int, int, double, double); // First two are the x and y coordinates regarding the origin. The second two are scale factors of the shape
 
-typedef enum L_R_ALIGNMENT
-{
-    FIT_TO_SCREEN_L_R,
-    ALIGN_LEFT,
-    ALIGN_RIGHT,
-    ALIGN_CENTER_L_R
-} L_R_ALIGNMENT;
-typedef enum T_B_ALIGNMENT
-{
-    FIT_TO_SCREEN_T_B,
-    ALIGN_TOP,
-    ALIGN_BOTTOM,
-    ALIGN_CENTER_T_B
-} T_B_ALIGNMENT;
-
 typedef struct Window
 {
     uint64_t width;
@@ -64,5 +49,6 @@ void freeWindow(Window w);
 Window overlayOnWindow(Window w, ShapeFunction f, uint64_t xOffset, uint64_t yOffset, double xScaleFactor, double yScaleFactor, OVERLAY_MODE m);
 Window overlayFromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sourceHeight, HexColor *map, uint64_t xOffset, uint64_t yOffset, OVERLAY_MODE m);
 Window fromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sourceHeight, HexColor *map, uint64_t xOffset, uint64_t yOffset, OVERLAY_MODE m);
+uint64_t quickDraw(Window w);
 
 #endif

@@ -2,6 +2,8 @@
 #define SNKP_H
 
 #define BACKGROUND_COLOR 0x00000000
+#define SCORE_BOARD_TILES_X 4
+#define SCORE_BOARD_TILES_Y 2
 
 #include "./../window/fontInterface.h"
 #include "./../window/window.h"
@@ -24,10 +26,7 @@ typedef enum TO_DRAW
     HEAD,
     BODY,
     TAIL,
-    B_L_TURN,
-    B_R_TURN,
-    T_L_TURN,
-    T_R_TURN,
+    TURN,
     APPLE, // apple was taken
 } TO_DRAW;
 
@@ -38,7 +37,6 @@ typedef struct
     uint64_t color;
     char alive;
     char nextHeadCoordinates[2];
-    DIRECTION lastMove; // Currently unused, for drawing more complex snakes
 } snake;
 
 typedef struct tile
@@ -46,6 +44,7 @@ typedef struct tile
     char player;
     unsigned int health;
     TO_DRAW toDraw;
+    DIRECTION trueDirection;
     DIRECTION drawDirection;
 } tile;
 
@@ -53,7 +52,7 @@ void setBoard(int snakeCount);
 void setDirection(unsigned int playerNumber, DIRECTION direction);
 tile *getBoard();
 snake *getSnakes();
-unsigned int update();
+unsigned int update(int snakeCount, int *deathCount, int *madeApple);
 extern uint64_t get_tick();
 void freeBack();
 

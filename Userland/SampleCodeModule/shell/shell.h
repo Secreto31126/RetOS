@@ -10,6 +10,7 @@
 #include "./../snake/snake.h"
 #include "./../snake/drawings/backgroundArrays.h"
 #include "./../snake/drawings/snakeDrawings.h"
+#include "./../piano/piano.h"
 
 #define MAX_COMMAND_LENGTH 90
 
@@ -19,5 +20,6 @@ void setLetterColor(HexColor color);
 void resize(double size);
 void warpNLines(uint64_t lines);
 void clearShell();
+void paintStringOrWarp(char *s);
 
 #endif

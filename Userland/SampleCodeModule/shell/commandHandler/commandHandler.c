@@ -6,6 +6,8 @@
 #include "./../../snake/drawings/backgroundArrays.h"
 #include "./../../snake/drawings/snakeDrawings.h"
 #include "./../shell.h"
+#include "./../../piano/piano.h"
+#include "./../../piano/sound.h"
 #define BLOCK 10
 #define MAX_LETTER_SIZE 10
 
@@ -64,12 +66,13 @@ char *getHelp(char *commandParameters, char *mustRedraw)
 char *startSnake(char *commandParameters, char *mustRedraw)
 {
     char *formatString = "Player %d won. Returning to shell";
-    if (strcmp("", commandParameters) || strcmp("1", commandParameters))
+    int i;
+    if (strcmp("", commandParameters) || (i = atoi(commandParameters)) == 1)
     {
         *mustRedraw = 1;
         return sPrintf(formatString, playSnake(1));
     }
-    if (strcmp("2", commandParameters))
+    if (i == 2)
     {
         *mustRedraw = 1;
         return sPrintf(formatString, playSnake(2));
@@ -84,15 +87,7 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     {
         setBackgroundArray(windowsArray);
         setBackgroundColorMap(windowsColorMap);
-        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, 0, classicApple, appleColorMap);
-        setDrawOptions(0, 0, 1, 0);
-        matchFlag = 1;
-    }
-    else if (strcmp(commandParameters, "creation"))
-    {
-        setBackgroundArray(creationArray);
-        setBackgroundColorMap(creationColorMap);
-        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, 0, classicApple, appleColorMap);
+        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap);
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
@@ -100,11 +95,19 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     {
         setBackgroundArray(marioArray);
         setBackgroundColorMap(marioColorMap);
-        setSnakeDrawing(BIG_DRAW_SIZE, goomba, goomba, goomba, goomba, marioItem, marioItemColorMap);
-        setDrawOptions(1, 0, 0, 0);
+        setSnakeDrawing(BIG_DRAW_SIZE, goomba, goomba, goomba, pipe, marioItem, marioItemColorMap);
+        setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }
     /* comentado temporalmente porque no alcanza el espacio
+    else if (strcmp(commandParameters, "creation"))
+    {
+        setBackgroundArray(creationArray);
+        setBackgroundColorMap(creationColorMap);
+        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap);
+        setDrawOptions(0, 0, 1, 0);
+        matchFlag = 1;
+    }
     else if (strcmp(commandParameters, "pong"))
     {
         setBackgroundArray(pongArray);
@@ -113,15 +116,15 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
-    */
     else if (strcmp(commandParameters, "camelot"))
     {
         setBackgroundArray(camelotArray);
         setBackgroundColorMap(camelotColorMap);
-        setSnakeDrawing(BIG_DRAW_SIZE, stone, stone, stone, stone, excalibur, excaliburColorMap);
-        setDrawOptions(1, 0, 0, 0);
+        setSnakeDrawing(BIG_DRAW_SIZE, stone, stone, stone, catapult, excalibur, excaliburColorMap);
+        setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }
+    */
     if (matchFlag)
         return "Theme set.";
     return sPrintf("No theme matching %s was found.", commandParameters);
@@ -165,13 +168,71 @@ char *clearTheShell(char *commandParameters, char *mustRedraw)
         clearShell();
     return "";
 }
+char *readMeTheDump(char *commandParameters, char *mustRedraw)
+{
+    char *c = getDumpString();
+    if (strcmp(c, ""))
+        return "No dump generated. Press 'alt' to generate a dump of the instant of pressing.";
+    return sPrintf("The dump generated:\n%s", c);
+}
+char *playThePiano(char *commandParameters, char *mustRedraw)
+{
+    *mustRedraw = 1;
+    startPiano();
+    return "Now exiting the yellow submarine.";
+}
+char *singToMe(char *commandParameters, char *mustRedraw)
+{
+    char match = 0;
+    if (strcmp(commandParameters, "imperial-march"))
+    {
+        imperial_march();
+        match = 1;
+    }
+    else if (strcmp(commandParameters, "hes-a-pirate"))
+    {
+        hes_a_pirate();
+        match = 1;
+    }
+    else if (strcmp(commandParameters, "outer-wilds"))
+    {
+        outer_wilds();
+        match = 1;
+    }
+    else if (strcmp(commandParameters, "do-i-wanna-know"))
+    {
+        do_i_wanna_know();
+        match = 1;
+    }
+    else if (strcmp(commandParameters, "sports-center"))
+    {
+        sports_center();
+        match = 1;
+    }
+    else if (strcmp(commandParameters, "here-comes-the-sun"))
+    {
+        here_comes_the_sun();
+        match = 1;
+    }
+    if (match)
+        return "Song is over. Now it's your turn.";
+    return "Found no matching song.";
+}
+char *repeat(char *commandParameters, char *mustRedraw)
+{
+    return commandParameters;
+}
 void initializeCommands()
 {
     addCommand("help", "Help display for help module.\nFormat(s): 'help' | 'help' [MODULE_NAME]\nDisplays the help displays for all modules or the module specified.", getHelp);
     addCommand("snake", "Help display for snake module.\nFormat(s): 'snake' | 'snake [PLAYERS]'\nStarts the snake module. If PLAYERS is greater than two, game will be initialized with two players. If no PLAYERS parameter is given, game will be initialized with one player.", startSnake);
-    addCommand("set-theme", "Help display for set theme module.\nFormat: 'set-theme [THEME]'\nSets the theme of the snake game to the specified theme.\nCurrently supported themes are:\nmario windows camelot creation pong", setSnakeTheme);
+    addCommand("set-theme", "Help display for set theme module.\nFormat: 'set-theme [THEME]'\nSets the theme of the snake game to the specified theme.\nCurrently supported themes are:\nmario windows camelot* creation* pong*", setSnakeTheme);
     addCommand("set-size", "Help display for set size module.\nFormat: 'set-size [NUMBER]'\nSets the size of the shell to the specified integer.", changeLetterSize);
     addCommand("set-letter-color", "Help display for set letter color module.\nFormat: 'set-letter-color [HEX_COLOR]'\nSets the letter color of the shell to the specified integer.", changeLetterColor);
     addCommand("set-highlight-color", "Help display for set highlight color.\nFormat: 'set-highlight-color [HEX_COLOR]'\nSets the highlight color of the shell to the specified integer.", changehighlightColor);
     addCommand("clear", "Help display for clear module. \n Format(s): 'clear' | 'clear [LINES]'\nClears the shell or the number or shifts up the number of lines indicated.", clearTheShell);
+    addCommand("dump", "Help display for dump module.\n Format: 'dump'\nDisplays a dump if one has been generated by pressing the 'alt' key. Indicates no dump has been generated otherwise.", readMeTheDump);
+    addCommand("piano", "Help display for piano module.\nFormat: 'piano'\nStarts the piano module.\nPiano keys: z = Do, s = Do#, x = Re, d = Re#, c = mi, v = Fa, g = Fa#, b = Sol, h = Sol#, n = La, j = La#, m = Si\n", playThePiano);
+    addCommand("sing", "Help display for sing module.\nFormat: 'sing [SONG_NAME]'\nSings a song. Currently recognized songs are:\n'imperial-march' 'hes-a-pirate' 'outer-wilds' 'do-i-wanna-know' 'sports-center' 'here-comes-the-sun'.", singToMe);
+    addCommand("echo", "Help display for the echo module.\nFormat: 'echo [TO_ECHO]'\nIt repeats what you input.", repeat);
 }

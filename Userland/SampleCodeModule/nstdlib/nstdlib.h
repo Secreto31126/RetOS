@@ -10,9 +10,11 @@
 // syscalls
 extern int print_sys(unsigned int fd, char *str, unsigned long long len);
 extern int read_sys(unsigned int fd, char *str, unsigned long long len);
+extern uint64_t get_tick();
 extern unsigned long long get_unix_time(void);
 extern void *malloc(uint64_t size);
-void free(void *ptr);
+extern void free(void *ptr);
+extern void beep(uint32_t freq);
 
 // library
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize);
@@ -47,5 +49,8 @@ char *concatUnlimited(char *s1, char *s2);
 void addToAllocated(char *address);
 char strcmpHandleWhitespace(char *s1, char *s2);
 char *shiftToWord(char *s);
+char *getDumpString();
+char timeHasPassed(uint64_t start, uint64_t unit);
+void sleep(uint64_t ticks);
 
 #endif

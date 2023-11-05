@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <header.h>
 #include <memory.h>
+#include <images.h>
 #include <console.h>
 #include <localization.h>
 

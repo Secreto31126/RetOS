@@ -45,7 +45,7 @@ static uint8_t mergeColor(uint8_t background, uint8_t overlay, uint8_t opacity)
     return (background * (1 - op) + overlay * op);
 }
 
-static uint64_t super_fast_fill_shape(ShapeFunction f)
+uint64_t super_fast_fill_screen_shape(ShapeFunction f)
 {
     uint64_t width = VBE_mode_info->width;
     uint64_t height = VBE_mode_info->height;
@@ -104,7 +104,7 @@ static uint64_t super_fast_fill_shape(ShapeFunction f)
 uint64_t drawShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y)
 {
     if (!x && !y && width > VBE_mode_info->width && height > VBE_mode_info->height)
-        return super_fast_fill_shape(f);
+        return super_fast_fill_screen_shape(f);
 
     return drawScaledShape(f, width, height, x, y, 1, 1);
 }
@@ -128,7 +128,7 @@ uint64_t drawScaledShape(ShapeFunction f, uint32_t width, uint32_t height, uint3
     return drawn;
 }
 
-uint64_t super_fast_fill_screen(HexColor *array)
+uint64_t super_fast_fill_screen_array(HexColor *array)
 {
     uint64_t width = VBE_mode_info->width;
     uint64_t height = VBE_mode_info->height;
@@ -195,7 +195,7 @@ uint64_t drawFromArray(HexColor *array, uint32_t width, uint32_t height, uint32_
         return 0;
 
     if (!x && !y && width > VBE_mode_info->width && height > VBE_mode_info->height)
-        return super_fast_fill_screen(array);
+        return super_fast_fill_screen_array(array);
 
     uint64_t drawn = 0;
     for (uint32_t i = 0; i < height && i < VBE_mode_info->height; i++)

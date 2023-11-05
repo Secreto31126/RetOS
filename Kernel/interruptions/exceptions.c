@@ -20,13 +20,10 @@ void exception_manager(uint8_t exception)
         exceptions++;
     error_code = exception;
 
-    ncPrint("[EXCEPTION] ");
-    ncPrintDec(exception);
-    ncNewline();
-
     BSOD(exception);
-    BSOD(exception);
-    BSOD(exception);
+    set_interrupt_flag();
+    sleep_ticks(18 * 3);
+    unset_interrupt_flag();
 
     // If weird exception, suicide
     if (exception != 0 && exception != 6)

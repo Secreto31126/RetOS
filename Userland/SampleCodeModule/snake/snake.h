@@ -10,6 +10,8 @@
 #define START_PLAYER_LENGTH 3 // MUST BE GREATER THAN 1 (Will work anyways, but lone heads might render as tails, don't test it)
 #define MOVE_INTERVAL 2
 #define MAX_SNAKE_COLORS 6
+#define APPLE_POINTS 15
+#define SCORE_COLOR (0xFF000000 | HEX_RED)
 
 int playSnake(uint16_t snakeCount); // return value is number of last snake to die
 void setTheme();

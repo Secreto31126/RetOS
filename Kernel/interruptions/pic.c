@@ -38,14 +38,18 @@ static void keyboard_handler()
     // Read the scancode from the keyboard controller
     uint8_t scancode = input_byte(0x60);
 
-    // ncPrintHex(scancode);
-    // ncTab();
+    ncPrintHex(scancode);
+    ncTab();
 
     stdkey_keyevent(scancode);
 
     // If esc key
     if (scancode == 1)
     {
+        // Cause a opcode exception
+        // char code[] = "👀👀👀";
+        // ((void (*)(void))code)();
+        // int i = 1 / 0;
         toggle_language();
         return;
     }
@@ -88,7 +92,11 @@ static void keyboard_handler()
         }
         else
         {
+            if (!IS_RELEASE(scancode))
+                return;
+
             write_stderr(dump_reg_string, dump_regs() + 1);
+            return;
         }
     }
 

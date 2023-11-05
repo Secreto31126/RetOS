@@ -5,4 +5,8 @@
         "sound.h": "c"
     },
     "workbench.colorTheme": "Monokai"
+
+        "snakedrawings.h": "c"
+    }
+
 }

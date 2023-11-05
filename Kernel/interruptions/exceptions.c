@@ -19,6 +19,23 @@ void exception_manager(uint8_t exception)
     if (exception == 0 || exception == 6)
         exceptions++;
     error_code = exception;
+
+    BSOD(exception);
+    set_interrupt_flag();
+    sleep_ticks(18 * 3);
+    unset_interrupt_flag();
+
+    // If weird exception, suicide
+    if (exception != 0 && exception != 6)
+    {
+        while (1)
+        {
+            unset_interrupt_flag();
+            halt_once();
+        }
+    }
+
+    clear_screen();
 }
 
 uint64_t get_exceptions_count()

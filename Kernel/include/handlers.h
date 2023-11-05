@@ -13,6 +13,7 @@ extern void zero_division_exception_handler(void);
  * so dump_reg_string is setted.
  */
 extern void invalid_opcode_exception_handler(void);
+extern void sus_exception_handler(void);
 extern void tick_handler(void);
 extern void keyboard_handler(void);
 extern void cascade_pic(void);

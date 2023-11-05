@@ -1,7 +1,6 @@
 #include "snake.h"
 #include "snakePrivate.h"
 #include "random.h"
-#include "./../piano/sound.h"
 
 #define EMPTY 0
 #define BOARD_SIZE (BOARD_HEIGHT * BOARD_WIDTH)
@@ -97,7 +96,6 @@ unsigned int update(int snakeCount, int *deathCount, int *madeApple)
                     {
                         if (board[nextY][nextX].toDraw == APPLE)
                         {
-                            play(390);
                             growSnake(lookingAt.player);
                             makeApple();
                             *madeApple = 1;

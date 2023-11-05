@@ -44,6 +44,7 @@ char *handleCommand(char *command, char *mustRedraw)
 // prints will be freed after calling this function. returned string is not freed.
 char *getHelp(char *commandParameters, char *mustRedraw)
 {
+    freePrints();
     if (strcmpHandleWhitespace("", commandParameters)) // if the command is just 'help', all help menus are printed
     {
         char *toReturn = "Help menu:\n";

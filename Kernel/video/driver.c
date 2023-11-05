@@ -82,26 +82,22 @@ uint64_t super_fast_fill_screen(HexColor *array)
     uint64_t *writer = (uint64_t *)framebuffer;
 
     // Loop and write 8 pixels at a time
-    for (uint64_t i = 0; i < size - 8; i += 8)
+    for (uint64_t i = 0; i < size - 8; i++)
     {
-        // Pixels are drawn in packages of ~2,5 pixels
-        for (uint64_t j = 0; j < 8; j++)
+        uint32_t color = (uint32_t)(array[i]);
+
+        // Revert the pixel order and save them in the output
+        for (uint64_t j = 0; j < 3; j++)
         {
-            uint32_t color = (uint32_t)(array[i + j]);
+            output <<= 8;
+            output += color & 0xFF;
+            color >>= 8;
 
-            // Revert the pixel order and save them in the output
-            for (uint64_t k = 0; k < 3; k++)
+            if (++tracker >= 8)
             {
-                output <<= 8;
-                output += color & 0xFF;
-                color >>= 8;
-
-                if (++tracker >= 8)
-                {
-                    *writer++ = output;
-                    tracker = 0;
-                    output = 0;
-                }
+                *writer++ = output;
+                tracker = 0;
+                output = 0;
             }
         }
     }

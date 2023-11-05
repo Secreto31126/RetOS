@@ -220,7 +220,7 @@ char *singToMe(char *commandParameters, char *mustRedraw)
 }
 char *repeat(char *commandParameters, char *mustRedraw)
 {
-    return commandParameters;
+    return strcmp(commandParameters, "") ? " " : commandParameters;
 }
 void initializeCommands()
 {

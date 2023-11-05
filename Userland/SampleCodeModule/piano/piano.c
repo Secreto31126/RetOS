@@ -90,5 +90,4 @@ void startPiano()
             break;
         }
     }
-    blank();
 }

@@ -533,7 +533,6 @@ char *sPrintf(char *format, ...)
     uint64_t count = 1; // counts null termination
     char *toReturn = malloc(sizeof(char) * allocated);
     *toReturn = 0;
-    addToAllocated(toReturn);
     while (*format != 0 && *format != EOF)
     {
         if (count == allocated) // Always checks if resize is necessary before checking to add any characters. Prevents copying code in every single-character edition.
@@ -592,6 +591,7 @@ char *sPrintf(char *format, ...)
     }
     va_end(argp);
     toReturn = realloc(toReturn, allocated, count);
+    addToAllocated(toReturn);
     return toReturn;
 }
 

@@ -73,7 +73,3 @@ get_dump:
 halt_user:
     hlt
     ret
-
-invalidOpcode:
-    notValidOpcode
-    ret

@@ -108,7 +108,7 @@ uint64_t super_fast_fill_screen(HexColor *array)
     }
 
     uint64_t mini_screen = width < 8 ? width : 8;
-    HexColor *end = array[size > 8 ? size - 8 : 0];
+    HexColor *end = array + (size > 8 ? size - 8 : 0);
 
     for (uint64_t i = 0; i < mini_screen; i++)
     {

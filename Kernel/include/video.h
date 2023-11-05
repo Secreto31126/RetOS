@@ -40,8 +40,8 @@ int putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint6
  * ShapeFunction receives coordinates (two integers), and returns a HexColor of form
  * 0xOORRGGBB. Where OO is the opacity for that pixel, and RRGGBB a HexColor
  */
-void drawShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y);
-void drawScaledShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y, double xScaleFactor, double yScaleFactor);
+uint64_t drawShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y);
+uint64_t drawScaledShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y, double xScaleFactor, double yScaleFactor);
 /**
  * @brief The name says it all. For performance gains, it ignores the alpha channel
  *

@@ -101,28 +101,31 @@ static uint64_t super_fast_fill_shape(ShapeFunction f)
     return size;
 }
 
-void drawShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y)
+uint64_t drawShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y)
 {
     if (!x && !y && width > VBE_mode_info->width && height > VBE_mode_info->height)
         return super_fast_fill_shape(f);
 
-    drawScaledShape(f, width, height, x, y, 1, 1);
+    return drawScaledShape(f, width, height, x, y, 1, 1);
 }
 
-void drawScaledShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y, double xScaleFactor, double yScaleFactor)
+uint64_t drawScaledShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y, double xScaleFactor, double yScaleFactor)
 {
     if (!xScaleFactor || !yScaleFactor)
         return;
 
+    uint64_t drawn = 0;
     for (int i = 0; i < height && i < VBE_mode_info->height; i++)
     {
         for (int j = 0; j < width && j < VBE_mode_info->width; j++)
         {
             uint32_t r = f(j / xScaleFactor, i / yScaleFactor, width, height);
             if (r & 0xFF000000)
-                putPixel(r, x + j, y + i);
+                drawn += putPixel(r, x + j, y + i);
         }
     }
+
+    return drawn;
 }
 
 uint64_t super_fast_fill_screen(HexColor *array)

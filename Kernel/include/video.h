@@ -4,7 +4,15 @@
 #include <stdint.h>
 
 typedef uint32_t HexColor;
-typedef HexColor (*ShapeFunction)(int, int, int, int);
+/**
+ * @brief A function that receives coordinates and returns a HexColor
+ *
+ * @param x The x coordinate of the pixel
+ * @param y The y coordinate of the pixel
+ * @param w The width of the shape
+ * @param h The height of the shape
+ */
+typedef HexColor (*ShapeFunction)(int x, int y, int w, int h);
 
 /**
  * @brief Shorthand for
@@ -32,8 +40,8 @@ int putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint6
  * ShapeFunction receives coordinates (two integers), and returns a HexColor of form
  * 0xOORRGGBB. Where OO is the opacity for that pixel, and RRGGBB a HexColor
  */
-void drawShape(ShapeFunction f, int x, int y, int xRange, int yRange);
-void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor);
+void drawShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y);
+void drawScaledShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y, double xScaleFactor, double yScaleFactor);
 /**
  * @brief The name says it all. For performance gains, it ignores the alpha channel
  *

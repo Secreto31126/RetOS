@@ -45,21 +45,22 @@ static uint8_t mergeColor(uint8_t background, uint8_t overlay, uint8_t opacity)
     return (background * (1 - op) + overlay * op);
 }
 
-void drawShape(ShapeFunction f, int x, int y, int xRange, int yRange)
+void drawShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y)
 {
     drawScaledShape(f, x, y, xRange, yRange, 1, 1);
+    drawScaledShape(f, width, height, x, y, 1, 1);
 }
 
-void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, double xScaleFactor, double yScaleFactor)
+void drawScaledShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y, double xScaleFactor, double yScaleFactor)
 {
     if (!xScaleFactor || !yScaleFactor)
         return;
 
-    for (int i = 0; i < yRange && i < VBE_mode_info->height; i++)
+    for (int i = 0; i < height && i < VBE_mode_info->height; i++)
     {
-        for (int j = 0; j < xRange && j < VBE_mode_info->width; j++)
+        for (int j = 0; j < width && j < VBE_mode_info->width; j++)
         {
-            uint32_t r = f(j / xScaleFactor, i / yScaleFactor, xRange, yRange);
+            uint32_t r = f(j / xScaleFactor, i / yScaleFactor, width, height);
             if (r & 0xFF000000)
                 putPixel(r, x + j, y + i);
         }

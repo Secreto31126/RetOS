@@ -96,8 +96,9 @@ void paintStringOrWarp(char *s, char ask)
     {
         if (ask)
         {
-            uint64_t pos = getScreenHeight() - TRUE_LETTER_HEIGHT * getSize();
-            drawStringAt("The output of this command will not fit. Press any key to continue output.", 0xFF000000, 0xFFFFFFFF, 0, pos);
+            char *prompt = "The output of this command will not fit. Press any key to continue output.";
+            uint64_t pos = getScreenHeight() - TRUE_LETTER_HEIGHT * getSize() * (strlen(prompt) / getCharPerLine() + 1);
+            drawStringAt(prompt, 0xFF000000, 0xFFFFFFFF, 0, pos);
             getChar();
             warpNLines(MOVE_BY);
             while (!willFit(buffer))
@@ -105,7 +106,7 @@ void paintStringOrWarp(char *s, char ask)
                 warpNLines(MOVE_BY);
                 blank();
                 paintString(buffer, letterColor, highlightColor);
-                drawStringAt("The output of this command will not fit. Press any key to continue output.", 0xFF000000, 0xFFFFFFFF, 0, pos);
+                drawStringAt(prompt, 0xFF000000, 0xFFFFFFFF, 0, pos);
                 getChar();
             }
             blank();

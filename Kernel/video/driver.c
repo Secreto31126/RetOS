@@ -23,12 +23,9 @@ int putPixelStd(uint8_t opacity, uint8_t red, uint8_t green, uint8_t blue, uint6
     if (x >= VBE_mode_info->width || y >= VBE_mode_info->height)
         return 0;
 
-    if (!VBE_mode_info->bpp)
-        return 0;
-
     framebuffer_element *framebuffer = FRAMEBUFFER;
 
-    uint64_t offset = x + y * VBE_mode_info->pitch / (VBE_mode_info->bpp / 8);
+    uint64_t offset = x + y * VBE_mode_info->width;
     framebuffer_element old_pixel = framebuffer[offset];
     framebuffer_element new_pixel = {
         .b = mergeColor(old_pixel.b, blue, opacity),

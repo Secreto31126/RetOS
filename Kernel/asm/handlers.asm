@@ -8,20 +8,25 @@
 	extern getStackBase
 	extern main
 
-    global zero_division_exception_handler
-    global invalid_opcode_exception_handler
+	global zero_division_exception_handler
+	global invalid_opcode_exception_handler
+	global sus_exception_handler
 
-    global tick_handler
-    global keyboard_handler
-    global cascade_pic
-    global even_ports_handler
-    global odd_ports_handler
-    global usb_handler
+	global tick_handler
+	global keyboard_handler
+	global cascade_pic
+	global even_ports_handler
+	global odd_ports_handler
+	global usb_handler
 
-    global syscall_handler
+	global syscall_handler
 
 ; Learnt this trick from pure64.asm
 %include "macro.s"
+
+pain_manager:
+	hlt
+	jmp		pain_manager
 
 %macro exception_handler 1
 	call	dump_regs
@@ -31,9 +36,10 @@
 	mov		rdi, %1
 	call	exception_manager
 
-	mov	dword	[rsp + 8], 0x400000
-	call	getStackBase
-	mov		[rsp + 8 * 3], rax
+	mov		qword [rsp], 0x400000
+
+	call 	getStackBase
+	mov 	[rsp + 8 * 3], rax
 
 	iretq
 %endmacro
@@ -42,8 +48,8 @@
 	pushall
 	mov		rdi, %1
 	call	pic_manager
-    mov     al, 0x20
-    out     0x20, al
+	mov		al, 0x20
+	out		0x20, al
 	popall
 	iretq
 %endmacro
@@ -52,10 +58,10 @@
 	pushall
 	mov		rdi, %1
 	call	pic_manager
-	mov     al, 0x20
-	out     0xA0, al
-	mov     al, 0x20
-	out     0x20, al
+	mov		al, 0x20
+	out		0xA0, al
+	mov		al, 0x20
+	out		0x20, al
 	popall
 	iretq
 %endmacro
@@ -67,6 +73,9 @@ zero_division_exception_handler:
 ; void invalid_opcode_exception_handler(void);
 invalid_opcode_exception_handler:
 	exception_handler 6
+
+sus_exception_handler:
+	exception_handler -1
 
 ; void tick_handler(void);
 tick_handler:

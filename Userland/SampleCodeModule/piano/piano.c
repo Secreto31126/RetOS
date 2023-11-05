@@ -2,8 +2,6 @@
 
 static uint8_t exit = 0;
 
-void paintStringOrWarp(char *s);
-
 void startPiano()
 {
     blank();

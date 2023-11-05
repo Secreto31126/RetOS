@@ -1,15 +1,17 @@
 #include "shell.h"
 #include "commandHandler/commandHandler.h"
 #define BLOCK 50
+#define MOVE_BY 8
 void warpNLines(uint64_t n);
 void warpAndRedraw();
 void warpOneLine();
 char *passCommand(char *toPass);
 void paintLineStart();
 void paintCharOrWarp(char c);
+void paintStringOrWarp(char *s, char ask);
 static char *buffer, *commandBuffer;
 static uint64_t index, commandIndex;
-static HexColor letterColor = 0xFF000000 | HEX_WHITE, highlightColor = 0x00000000 | HEX_BLACK;
+static HexColor letterColor = 0xFF000000 | HEX_WHITE, highlightColor = 0xFF000000 | HEX_BLACK;
 static const char *lineStart = ":~ ";
 static const char *shellIntro = "You are now in shell:\n";
 static char fromLastEnter = 0;
@@ -49,7 +51,7 @@ char shellStart()
             if (c == '\n')
             {
                 fromLastEnter = 0;
-                addStringToBuffer(passCommand(commandBuffer));
+                addStringToBuffer(passCommand(commandBuffer), 1);
                 freePrints();
                 commandIndex = 0;
             }
@@ -77,26 +79,46 @@ void addCharToBuffer(char c)
     buffer[index] = 0;
     paintCharOrWarp(c);
 }
-void addStringToBuffer(char *s)
+void addStringToBuffer(char *s, char ask)
 {
     //  paintString(s, 0xffff0000, 0xff00ff00);
     char *aux = s;
     while (*aux)
         buffer[index++] = *(aux++);
     buffer[index] = 0;
-    paintStringOrWarp(s);
+    paintStringOrWarp(s, ask);
 }
-void paintStringOrWarp(char *s)
+void paintStringOrWarp(char *s, char ask)
 {
     if (strcmp(s, ""))
         return;
     if (!willFit(buffer))
     {
-        warpOneLine();
-        while (!willFit(buffer))
+        if (ask)
+        {
+            uint64_t pos = getScreenHeight() - TRUE_LETTER_HEIGHT * getSize();
+            drawStringAt("The output of this command will not fit. Press any key to continue output.", 0xFF000000, 0xFFFFFFFF, 0, pos);
+            getChar();
+            warpNLines(MOVE_BY);
+            while (!willFit(buffer))
+            {
+                warpNLines(MOVE_BY);
+                blank();
+                paintString(buffer, letterColor, highlightColor);
+                drawStringAt("The output of this command will not fit. Press any key to continue output.", 0xFF000000, 0xFFFFFFFF, 0, pos);
+                getChar();
+            }
+            blank();
+            paintString(buffer, letterColor, highlightColor);
+        }
+        else
+        {
             warpOneLine();
-        blank();
-        paintString(buffer, letterColor, highlightColor);
+            while (!willFit(buffer))
+                warpOneLine();
+            blank();
+            paintString(buffer, letterColor, highlightColor);
+        }
     }
     else
         paintString(s, letterColor, highlightColor);

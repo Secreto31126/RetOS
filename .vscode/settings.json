@@ -2,6 +2,7 @@
     "editor.formatOnSave": true,
     "files.associations": {
         "*.rmd": "markdown",
-        "sound.h": "c"
+        "sound.h": "c",
+        "piano.h": "c"
     },
 }

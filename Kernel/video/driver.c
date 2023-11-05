@@ -68,8 +68,6 @@ void drawScaledShape(ShapeFunction f, int x, int y, int xRange, int yRange, doub
 
 uint64_t super_fast_fill_screen(HexColor *array)
 {
-    framebuffer_element *framebuffer = FRAMEBUFFER;
-
     uint64_t width = VBE_mode_info->width;
     uint64_t height = VBE_mode_info->height;
     uint64_t size = width * height;
@@ -79,7 +77,7 @@ uint64_t super_fast_fill_screen(HexColor *array)
 
     uint64_t output = 0;
     uint8_t tracker = 0;
-    uint64_t *writer = (uint64_t *)framebuffer;
+    uint64_t *writer = (uint64_t *)FRAMEBUFFER;
 
     uint64_t i = 0;
     uint64_t mod = size % 8;

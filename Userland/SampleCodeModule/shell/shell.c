@@ -200,17 +200,17 @@ void warpNLines(uint64_t n) // char or char* you want to add must be in buffer a
     int i = 0, j, k = 0;
     while (n)
     {
-        if (!buffer[k + 1])
-        {
-            index = 0;
-            buffer[index] = 0;
-            break;
-        }
         for (i = 0; i < max && buffer[k + i] && buffer[k + i] != '\n'; i++)
             ;
         n--;
         i++;
         k += i;
+        if (!buffer[k - 1])
+        {
+            index = 0;
+            buffer[index] = 0;
+            return;
+        }
     }
     for (j = k; buffer[j]; j++)
         buffer[j - k] = buffer[j];

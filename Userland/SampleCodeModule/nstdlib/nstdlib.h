@@ -45,6 +45,7 @@ uint64_t getMinutes();
 char *getTimeString();
 void freePrints();
 char *concatUnlimited(char *s1, char *s2);
+uint64_t concatFrom(char *sEnd, char *sAdd);
 // tracks allocated strings. All tracked strings freed upon call to freePrints.
 void addToAllocated(char *address);
 char strcmpHandleWhitespace(char *s1, char *s2);

@@ -36,6 +36,7 @@ char *getDumpString()
         addToAllocated(c);
         return c;
     }
+    free(c);
     return "";
 }
 

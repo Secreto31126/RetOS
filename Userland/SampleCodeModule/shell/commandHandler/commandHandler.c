@@ -9,7 +9,7 @@
 #include "./../../piano/piano.h"
 #include "./../../piano/sound.h"
 #define BLOCK 5
-#define MAX_LETTER_SIZE 5
+#define MAX_LETTER_SIZE 4
 
 static command *commands;
 static uint64_t commandCount = 0;
@@ -160,9 +160,12 @@ char *changeLetterColor(char *commandParameters, char *mustRedraw)
 char *changeLetterSize(char *commandParameters, char *mustRedraw)
 {
     uint64_t newSize = atoi(commandParameters);
-    if (newSize == 0 || newSize >= MAX_LETTER_SIZE)
+    if (newSize < 0 || newSize > MAX_LETTER_SIZE)
         return "Invalid letter size.";
-    resize((double)newSize);
+    if (!newSize) // would be nice to actually handle doubles, however, no parseDouble function can be made (reasonably easily) if SSE registers cannot be used to return the value.
+        resize(0.5);
+    else
+        resize((double)newSize);
     *mustRedraw = 1;
     return "Size set";
 }
@@ -237,7 +240,7 @@ void initializeCommands()
     addCommand("help", "Help display for help module.\nFormat(s): 'help' | 'help' [MODULE_NAME]\nDisplays the help displays for all modules or the module specified.", getHelp);
     addCommand("snake", "Help display for snake module.\nFormat(s): 'snake' | 'snake [PLAYERS]'\nStarts the snake module. If PLAYERS is greater than two, game will be initialized with two players. If no PLAYERS parameter is given, game will be initialized with one player.", startSnake);
     addCommand("set-theme", "Help display for set theme module.\nFormat: 'set-theme [THEME]'\nSets the theme of the snake game to the specified theme.\nCurrently supported themes are:\nmario windows camelot* creation* pong*", setSnakeTheme);
-    addCommand("set-size", "Help display for set size module.\nFormat: 'set-size [NUMBER]'\nSets the size of the shell to the specified integer.", changeLetterSize);
+    addCommand("set-size", "Help display for set size module.\nFormat: 'set-size [NUMBER]'\nSets the size of the shell to the specified integer. Maximum accepted size is 4, anything larger is illegible. Only positive integer sizes are accepted. Size 0 will set the size to 0.5", changeLetterSize);
     addCommand("set-letter-color", "Help display for set letter color module.\nFormat: 'set-letter-color [HEX_COLOR]'\nSets the letter color of the shell to the specified integer.", changeLetterColor);
     addCommand("set-highlight-color", "Help display for set highlight color.\nFormat: 'set-highlight-color [HEX_COLOR]'\nSets the highlight color of the shell to the specified integer.", changehighlightColor);
     addCommand("clear", "Help display for clear module. \n Format(s): 'clear' | 'clear [LINES]'\nClears the shell or the number or shifts up the number of lines indicated.", clearTheShell);

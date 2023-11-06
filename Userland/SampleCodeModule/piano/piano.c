@@ -79,7 +79,7 @@ void startPiano()
             {
                 char index = note - '1';
                 songs[index].song();
-                paintStringOrWarp(songs[index].name);
+                paintString(songs[index].name, -1, 0);
             }
             shut();
             break;

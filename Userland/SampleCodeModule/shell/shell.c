@@ -94,25 +94,22 @@ void paintStringOrWarp(char *s, char ask)
         return;
     if (!willFit(buffer))
     {
-        if (ask)
+        if (ask) // informs user output does not fit, waits for input, warps output, if it still does not fit, continues informing and waiting for input and warping
         {
             char *prompt = "The output of this command will not fit. Press any key to continue output.";
             uint64_t pos = getScreenHeight() - TRUE_LETTER_HEIGHT * getSize() * (strlen(prompt) / getCharPerLine() + 1);
-            drawStringAt(prompt, 0xFF000000, 0xFFFFFFFF, 0, pos);
-            getChar();
-            warpNLines(MOVE_BY);
-            while (!willFit(buffer))
+            do
             {
-                warpNLines(MOVE_BY);
                 blank();
                 paintString(buffer, letterColor, highlightColor);
                 drawStringAt(prompt, 0xFF000000, 0xFFFFFFFF, 0, pos);
                 getChar();
-            }
+                warpNLines(MOVE_BY);
+            } while (!willFit(buffer));
             blank();
             paintString(buffer, letterColor, highlightColor);
         }
-        else
+        else // simply warps the output
         {
             warpOneLine();
             while (!willFit(buffer))

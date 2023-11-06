@@ -12,7 +12,7 @@ typedef struct frontSnake
     HexColor *colorMap;
 } frontSnake;
 
-void doMovement(char c, frontSnake *snakes);
+void doMovement(char c, uint16_t snakeCount, frontSnake *snakes);
 void putDeath(int snakeNumber);
 void drawBoard(frontSnake *snakes);
 void drawBackground();
@@ -51,7 +51,7 @@ int playSnake(uint16_t snakeCount)
     uint16_t deathCount = 0;
     setBoard(snakeCount);
 
-    frontSnake *snakes = malloc(2 * sizeof(frontSnake)); // Still saves space for second snake. Simpler than checking snakeCount for every non-complex operation
+    frontSnake *snakes = malloc(snakeCount * sizeof(frontSnake)); // Still saves space for second snake. Simpler than checking snakeCount for every non-complex operation
     for (int i = 0; i < snakeCount; i++)
     {
         snakes[i].nextMove = NONE;
@@ -88,7 +88,7 @@ int playSnake(uint16_t snakeCount)
                 drawTextBackground(size + 1, MAX_SCORE_LENGTH);
                 setSize(size);
             }
-            doMovement(c, snakes);
+            doMovement(c, snakeCount, snakes);
         }
         if (timeHasPassed(time, MOVE_INTERVAL))
         {
@@ -135,36 +135,51 @@ void putDeath(int snakeNumber)
 {
 }
 
-void doMovement(char c, frontSnake *snakes)
+void doMovement(char c, uint16_t snakeCount, frontSnake *snakes)
 {
     switch (c)
     {
     case 'w':
         snakes[0].nextMove = UP;
-        break;
+        return;
     case 'a':
         snakes[0].nextMove = LEFT;
-        break;
+        return;
     case 's':
         snakes[0].nextMove = DOWN;
-        break;
+        return;
     case 'd':
         snakes[0].nextMove = RIGHT;
-        break;
-    case 'i':
-        snakes[1].nextMove = UP;
-        break;
-    case 'j':
-        snakes[1].nextMove = LEFT;
-        break;
-    case 'k':
-        snakes[1].nextMove = DOWN;
-        break;
-    case 'l':
-        snakes[1].nextMove = RIGHT;
-        break;
+        return;
     default:
         break;
+    }
+    if (snakeCount >= 2)
+    {
+        switch (c)
+        {
+        case 'i':
+            snakes[1].nextMove = UP;
+            return;
+        case 'j':
+            snakes[1].nextMove = LEFT;
+            return;
+        case 'k':
+            snakes[1].nextMove = DOWN;
+            return;
+        case 'l':
+            snakes[1].nextMove = RIGHT;
+            return;
+        default:
+            break;
+        }
+    }
+    if (snakeCount >= 3)
+    {
+        if (c == 'v' || c == ' ')
+            snakes[2].nextMove = (snakes[2].nextMove + 1) % NUMBER_OF_DIRECTIONS;
+        else if (c == 'b')
+            snakes[2].nextMove = (snakes[2].nextMove + NUMBER_OF_DIRECTIONS - 1) % NUMBER_OF_DIRECTIONS; // because c modulus doesn't handle negatives properly
     }
 }
 
@@ -208,6 +223,8 @@ void drawBoard(frontSnake *snakes)
                 fromCharArray(stamp, source, drawSize, drawSize, snakes[board[address].player].colorMap, 0, 0, OPAQUE);
                 break;
             case APPLE:
+                if (!board[address].health)
+                    continue;
                 source = currentDrawing.growItemDrawing;
                 fromCharArray(stamp, source, drawSize, drawSize, currentDrawing.growItemColorMap, 0, 0, OPAQUE);
                 break;
@@ -216,6 +233,12 @@ void drawBoard(frontSnake *snakes)
                 continue;
                 break;
             case NO_DRAW:
+                /* uncomment to visualize what is not being drawn
+                    source = currentDrawing.growItemDrawing;
+                    HexColor allRed[] = {0xFFFF0000, 0xFFFF0000, 0xFFFF0000, 0xFFFF0000, 0xFFFF0000, 0xFFFF0000, 0xFFFF0000, 0xFFFF0000, 0xFFFF0000, 0xFFFF0000, 0xFFFF0000};
+                    fromCharArray(stamp, source, drawSize, drawSize, allRed, 0, 0, OPAQUE);
+                    break;
+                */
             default:
                 continue;
                 break;

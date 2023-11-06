@@ -1,15 +1,17 @@
 #include "shell.h"
 #include "commandHandler/commandHandler.h"
 #define BLOCK 50
+#define MOVE_BY 8
 void warpNLines(uint64_t n);
 void warpAndRedraw();
 void warpOneLine();
 char *passCommand(char *toPass);
 void paintLineStart();
 void paintCharOrWarp(char c);
+void paintStringOrWarp(char *s, char ask);
 static char *buffer, *commandBuffer;
 static uint64_t index, commandIndex;
-static HexColor letterColor = 0xFF000000 | HEX_WHITE, highlightColor = 0x00000000 | HEX_BLACK;
+static HexColor letterColor = 0xFF000000 | HEX_WHITE, highlightColor = 0xFF000000 | HEX_BLACK;
 static const char *lineStart = ":~ ";
 static const char *shellIntro = "You are now in shell:\n";
 static char fromLastEnter = 0;
@@ -27,7 +29,6 @@ char shellStart()
     index += sPuts(buffer, shellIntro);
     paintString(buffer, letterColor, highlightColor);
     paintLineStart();
-
     char c;
     while ((c = getChar()) != '\n' || !strcmp(commandBuffer, "exit"))
     {
@@ -50,10 +51,10 @@ char shellStart()
             if (c == '\n')
             {
                 fromLastEnter = 0;
-                addStringToBuffer(passCommand(commandBuffer));
-                freePrints();
-                commandIndex = 0;
-            }
+                addStringToBuffer(passCommand(commandBuffer), 1); // Nota: las instrucciones del TPE especifican que la shell debe moverse hacia arriba si se excede su espacio para texto.
+                freePrints();                                     // No se especifica el comportamiento esperado si el retorno de un 'comando' es mayor al espacio de la shell.
+                commandIndex = 0;                                 // El comportamiento default es simplemente no imprimir el retorno completo. Esto es lo que ocurre si a passCommand se le da parámetro 'ask' 0.
+            }                                                     // De lo contrario, se imprimirá moviendo hacia arriba de a MOVE_BY líneas, requiriendo input del usuario.
             else
             {
                 addCharToBuffer(c);
@@ -78,26 +79,44 @@ void addCharToBuffer(char c)
     buffer[index] = 0;
     paintCharOrWarp(c);
 }
-void addStringToBuffer(char *s)
+void addStringToBuffer(char *s, char ask)
 {
     //  paintString(s, 0xffff0000, 0xff00ff00);
     char *aux = s;
     while (*aux)
         buffer[index++] = *(aux++);
     buffer[index] = 0;
-    paintStringOrWarp(s);
+    paintStringOrWarp(s, ask);
 }
-void paintStringOrWarp(char *s)
+void paintStringOrWarp(char *s, char ask)
 {
     if (strcmp(s, ""))
         return;
     if (!willFit(buffer))
     {
-        warpOneLine();
-        while (!willFit(buffer))
+        if (ask) // informs user output does not fit, waits for input, warps output, if it still does not fit, continues informing and waiting for input and warping
+        {
+            char *prompt = "The output of this command will not fit. Press any key to continue output.";
+            uint64_t pos = getScreenHeight() - TRUE_LETTER_HEIGHT * getSize() * (strlen(prompt) / getCharPerLine() + 1);
+            do
+            {
+                blank();
+                paintString(buffer, letterColor, highlightColor);
+                drawStringAt(prompt, 0xFF000000, 0xFFFFFFFF, 0, pos);
+                getChar();
+                warpNLines(MOVE_BY);
+            } while (!willFit(buffer));
+            blank();
+            paintString(buffer, letterColor, highlightColor);
+        }
+        else // simply warps the output
+        {
             warpOneLine();
-        blank();
-        paintString(buffer, letterColor, highlightColor);
+            while (!willFit(buffer))
+                warpOneLine();
+            blank();
+            paintString(buffer, letterColor, highlightColor);
+        }
     }
     else
         paintString(s, letterColor, highlightColor);
@@ -127,7 +146,7 @@ char *passCommand(char *toPass)
             toReturn = sPrintf("%s\n%s\n%s", buffer, toPaint, lineStart);
         index = 0;
         buffer[index] = 0;
-        if (willFit(toReturn))
+        if (willFit(toReturn)) // so as not to blank when it won't fit, as the painting functions will blank anyways
             blank();
         return toReturn;
     }
@@ -184,13 +203,14 @@ void warpNLines(uint64_t n) // char or char* you want to add must be in buffer a
         for (i = 0; i < max && buffer[k + i] && buffer[k + i] != '\n'; i++)
             ;
         n--;
-        if (!buffer[k + 1])
+        i++;
+        k += i;
+        if (!buffer[k - 1])
         {
             index = 0;
             buffer[index] = 0;
+            return;
         }
-        i++;
-        k += i;
     }
     for (j = k; buffer[j]; j++)
         buffer[j - k] = buffer[j];

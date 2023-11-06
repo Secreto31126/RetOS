@@ -13,13 +13,13 @@ void startPainter(uint64_t width, uint64_t height)
 }
 void setSize(double s)
 {
-    if (size < 1.0 || size > 9.0)
+    if (s < 0.49 || s > 9.0)
         return;
     size = s;
     stamp.width = TRUE_LETTER_WIDTH * size;
     stamp.height = TRUE_LETTER_HEIGHT * size;
     free(stamp.pixels);
-    stamp.pixels = malloc(((int)(TRUE_LETTER_HEIGHT * size)) * ((int)(TRUE_LETTER_WIDTH * size)) * sizeof(HexColor));
+    stamp.pixels = malloc(((int)(TRUE_LETTER_HEIGHT * size)) * ((int)(TRUE_LETTER_WIDTH * size)) * sizeof(HexColor)); // realloc unnecessary, as all characters are only temporarily stamped
 }
 uint64_t getSize()
 {
@@ -61,12 +61,13 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
         return 1;
     }
     if ((xPointer + TRUE_LETTER_WIDTH * size) > w || c == '\n')
-        if ((yPointer + TRUE_LETTER_HEIGHT * size * 2) > h) // *2 because letters are drawn from cursor downwards, so otherwise last line would have its top on the bottom of the screen
+        if ((yPointer + TRUE_LETTER_HEIGHT * size * 2) > h) // *2 because letters are drawn from cursor downwards and to the right, so otherwise last line would have its top on the bottom of the screen
             return 0;
         else
         {
             newLine();
-            return 1;
+            if (c == '\n')
+                return 1;
         }
     drawCharAt(c, letterColor, highlightColor, xPointer, yPointer);
     moveCursor();

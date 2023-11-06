@@ -1,12 +1,27 @@
 #include "./piano.h"
 
 static uint8_t exit = 0;
+static Songs *songs;
 
 void paintStringOrWarp(char *s);
 
 void startPiano()
 {
-    quickBlank();
+    blank();
+    if ((songs = malloc(sizeof(Songs) * 6)) != 0)
+    {
+        songs[0] = imperial_march;
+        songs[1] = hes_a_pirate;
+        songs[2] = outer_wilds;
+        songs[3] = do_i_wanna_know;
+        songs[4] = sports_center;
+        songs[5] = here_comes_the_sun;
+    }
+    else
+    {
+        paintStringOrWarp("Error allocating memory for songs.\n");
+        return;
+    }
     paintStringOrWarp("Welcome to the piano!\n\n");
     paintStringOrWarp("Press 'q' to exit.\n");
     // PianoNote * notes = malloc(sizeof(PianoNote) * 12);
@@ -16,81 +31,70 @@ void startPiano()
         switch (note)
         {
         case 'z':
-            playFor(261, 1);
-            note = 0;
+            play(261);
+            paintStringOrWarp("Do\n");
             break;
         case 's':
-            playFor(277, 1);
-            note = 0;
+            play(277);
+            paintStringOrWarp("Do#\n");
             break;
         case 'x':
-            playFor(293, 1);
-            note = 0;
+            play(293);
+            paintStringOrWarp("Re\n");
             break;
         case 'd':
-            playFor(311, 1);
-            note = 0;
+            play(311);
+            paintStringOrWarp("Re#\n");
             break;
         case 'c':
-            playFor(329, 1);
-            note = 0;
+            play(329);
+            paintStringOrWarp("Mi\n");
             break;
         case 'v':
-            playFor(349, 1);
-            note = 0;
+            play(349);
+            paintStringOrWarp("Fa\n");
             break;
         case 'g':
-            playFor(369, 1);
-            note = 0;
+            play(369);
+            paintStringOrWarp("Fa#\n");
             break;
         case 'b':
-            playFor(392, 1);
-            note = 0;
+            play(392);
+            paintStringOrWarp("Sol\n");
             break;
         case 'h':
-            playFor(415, 1);
-            note = 0;
+            play(415);
+            paintStringOrWarp("Sol#\n");
             break;
         case 'n':
-            playFor(440, 1);
-            note = 0;
+            play(440);
+            paintStringOrWarp("La\n");
             break;
         case 'j':
-            playFor(466, 1);
-            note = 0;
+            play(466);
+            paintStringOrWarp("La#\n");
             break;
         case 'm':
-            playFor(493, 1);
-            note = 0;
+            play(493);
+            paintStringOrWarp("Si\n");
             break;
-        case '1':
-            imperial_march();
-            note = 0;
-            break;
-        case '2':
-            hes_a_pirate();
-            note = 0;
-            break;
-        case '3':
-            outer_wilds();
-            note = 0;
-            break;
-        case '4':
-            do_i_wanna_know();
-            note = 0;
-            break;
-        case '5':
-            sports_center();
-            note = 0;
-            break;
-        case '6':
-            here_comes_the_sun();
-            note = 0;
+        case ',':
+            play(523);
+            paintStringOrWarp("Do\n");
             break;
         default:
+            if (note > '0' && note <= '6')
+            {
+                songs[note - '1']();
+            }
             shut();
             break;
         }
+        while ((note == readChar()) && (note != 0))
+        {
+            halt_user();
+        }
+        shut();
     }
     blank();
 }

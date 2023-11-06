@@ -397,10 +397,3 @@ void playSwitch(uint32_t *freqs, uint32_t cant, uint32_t length)
     }
     shut();
 }
-
-sleep(uint32_t ticks)
-{
-    int start = get_tick();
-    while (get_tick() - start < ticks)
-        halt_user();
-}

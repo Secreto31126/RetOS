@@ -12,5 +12,6 @@
 // } PianoKey;
 
 void startPiano();
+typedef void (*Songs)();
 
 #endif

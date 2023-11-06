@@ -6,6 +6,7 @@
 #include "./../window/fontInterface.h"
 #include "./../nstdlib/nstdlib.h"
 #include "./../piano/sound.h"
+#include "./../snake/drawings/drawingsManager.h"
 
 static const char prompt[] = "You are now in the module selector.\nPress 1 to continue to shell.\nPress 2 to get the current time.\nPress 3 to dump all registers.\nPress 4 to test exceptions.\nPress 5 to end program (shut down).\n";
 void setEnvironment();
@@ -15,6 +16,7 @@ void startModules()
     initializeFonts();
     startPainter(getScreenWidth(), getScreenHeight());
     // sports_center(); // por ahora no :D
+    initializeDrawings();
     setEnvironment();
     initializeCommands();
     char c;
@@ -81,6 +83,7 @@ void startModules()
     blank();
     endPainter();
     freeCommands();
+    freeDrawings();
 }
 
 void setEnvironment()

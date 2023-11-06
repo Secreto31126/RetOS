@@ -1,7 +1,7 @@
 #include "snake.h"
 #include "snakePrivate.h"
 #include "./../piano/sound.h"
-#include "./drawings/backgroundArrays.h"
+#include "drawings/drawingsManager.h"
 #include "drawings/snakeDrawings.h"
 #include "./../window/window.h"
 #define MAX_SCORE_LENGTH 4
@@ -20,8 +20,8 @@ void freeColorMaps(int snakeCount, frontSnake *snakes);
 void drawScore(uint64_t score);
 void drawTextBackground(uint64_t size, uint64_t textLength);
 // default theme is windows
-static char *backgroundArray = windowsArray;
-static HexColor *backgroundColorMap = windowsColorMap;
+static char *backgroundArray = 0;
+static HexColor *backgroundColorMap = 0;
 static char redrawBeforeBody = 0;
 static char redrawBeforeTail = 1;
 static char redrawBeforeTurn = 1;

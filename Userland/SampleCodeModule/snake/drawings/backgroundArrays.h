@@ -1,5 +1,6 @@
 #ifndef BCKG_H
 #define BCKG_H
+/*
 #define BACKGROUND_WIDTH 102
 #define BACKGROUND_HEIGHT 77
 #include "./../../window/window.h"
@@ -15,5 +16,5 @@ extern char creationArray[BACKGROUND_HEIGHT][BACKGROUND_WIDTH];
 extern HexColor camelotColorMap[];
 extern char camelotArray[BACKGROUND_HEIGHT][BACKGROUND_WIDTH];
 HexColor colorMapper(HexColor *colorMap, int code);
-
+*/
 #endif

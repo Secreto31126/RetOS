@@ -8,7 +8,6 @@
 #include "./../window/fontInterface.h"
 #include "./../window/window.h"
 #include "./../window/painter.h"
-// #include "./../window/figures.h" // no longer used
 #include "random.h"
 
 typedef enum DIRECTION
@@ -27,7 +26,7 @@ typedef enum TO_DRAW
     BODY,
     TAIL,
     TURN,
-    APPLE, // apple was taken
+    APPLE,
 } TO_DRAW;
 
 typedef struct

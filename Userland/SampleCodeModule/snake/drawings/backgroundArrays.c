@@ -1,11 +1,5 @@
 #include "backgroundArrays.h"
-
-HexColor colorMapper(HexColor *colorMap, int code)
-{
-    return colorMap[code];
-}
-
-/*All hex values and arrays below were created from jpg images linked on each item using an image parser written in Java*/
+/*All hex values and arrays below were created from jpg images linked on each item using an image parser written in Java
 // https://www.newegg.com/insider/wp-content/uploads/windows_xp_bliss-wide.jpg
 HexColor windowsColorMap[] = {0xff64a6fe, 0xffa1cdfe, 0xfff9fefe, 0xff3a8dfe, 0xff90a0a6, 0xff78a520, 0xff3b5c13, 0xff9ecf26, 0xff6d7cb1, 0xff4156a5, 0xff345506, 0xff6d9a17, 0xff17270b};
 char windowsArray[BACKGROUND_HEIGHT][BACKGROUND_WIDTH] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},

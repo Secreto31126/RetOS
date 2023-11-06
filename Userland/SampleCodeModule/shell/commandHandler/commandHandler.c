@@ -3,7 +3,7 @@
 #include "./../../snake/snake.h"
 #include "./../../nstdlib/nstdlib.h"
 #include "./../../snake/snake.h"
-#include "./../../snake/drawings/backgroundArrays.h"
+#include "./../../snake/drawings/drawingsManager.h"
 #include "./../../snake/drawings/snakeDrawings.h"
 #include "./../shell.h"
 #include "./../../piano/piano.h"
@@ -13,6 +13,7 @@
 
 static command *commands;
 static uint64_t commandCount = 0;
+static themeSet = 0;
 
 void freeCommands()
 {
@@ -71,6 +72,14 @@ char *startSnake(char *commandParameters, char *mustRedraw)
 {
     char *formatString = "Player %d won. Returning to shell";
     int i;
+    if (!themeSet)
+    {
+        setBackgroundArray(windowsArray);
+        setBackgroundColorMap(windowsColorMap);
+        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap);
+        setDrawOptions(0, 0, 1, 0);
+        themeSet = 1;
+    }
     if (strcmp("", commandParameters) || (i = atoi(commandParameters)) == 1)
     {
         *mustRedraw = 1;
@@ -130,7 +139,10 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     }
     */
     if (matchFlag)
+    {
+        themeSet = 1;
         return "Theme set.";
+    }
     return sPrintf("No theme matching %s was found.", commandParameters);
 }
 

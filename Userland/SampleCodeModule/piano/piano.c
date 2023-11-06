@@ -3,11 +3,8 @@
 static uint8_t exit = 0;
 static Songs *songs;
 
-void paintStringOrWarp(char *s);
-
 void startPiano()
 {
-    quickBlank();
     if ((songs = malloc(sizeof(Songs) * 6)) != 0)
     {
         songs[0] = imperial_march;
@@ -19,14 +16,14 @@ void startPiano()
     }
     else
     {
-        paintStringOrWarp("Error allocating memory for songs.\n");
+        paintString("Error allocating memory for songs.\n", -1, 0);
         return;
     }
-    paintStringOrWarp("Welcome to the piano!\n\n");
-    paintStringOrWarp("Press 'q' to exit.\n");
     // PianoNote * notes = malloc(sizeof(PianoNote) * 12);
+    blank();
+    paintString("Welcome to the piano!\n\nPress 'q' to exit.\n", -1, 0);
     char note;
-    while ((note = readChar()) != 'q')
+    while ((note = getChar()) != 'q')
     {
         switch (note)
         {
@@ -96,5 +93,4 @@ void startPiano()
         }
         shut();
     }
-    blank();
 }

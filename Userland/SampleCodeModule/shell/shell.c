@@ -51,10 +51,10 @@ char shellStart()
             if (c == '\n')
             {
                 fromLastEnter = 0;
-                addStringToBuffer(passCommand(commandBuffer), 1);
-                freePrints();
-                commandIndex = 0;
-            }
+                addStringToBuffer(passCommand(commandBuffer), 1); // Nota: las instrucciones del TPE especifican que la shell debe moverse hacia arriba si se excede su espacio para texto.
+                freePrints();                                     // No se especifica el comportamiento esperado si el retorno de un 'comando' es mayor al espacio de la shell.
+                commandIndex = 0;                                 // El comportamiento default es simplemente no imprimir el retorno completo. Esto es lo que ocurre si a passCommand se le da parámetro 'ask' 0.
+            }                                                     // De lo contrario, se imprimirá moviendo hacia arriba de a MOVE_BY líneas, requiriendo input del usuario.
             else
             {
                 addCharToBuffer(c);

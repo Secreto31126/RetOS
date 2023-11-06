@@ -12,6 +12,10 @@
 // } PianoKey;
 
 void startPiano();
-typedef void (*Songs)();
+typedef struct
+{
+    void (*song)();
+    char *name;
+} Songs;
 
 #endif

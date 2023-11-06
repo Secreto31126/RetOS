@@ -10,12 +10,7 @@ void startPiano()
     blank();
     if ((songs = malloc(sizeof(Songs) * 6)) != 0)
     {
-        songs[0] = imperial_march;
-        songs[1] = hes_a_pirate;
-        songs[2] = outer_wilds;
-        songs[3] = do_i_wanna_know;
-        songs[4] = sports_center;
-        songs[5] = here_comes_the_sun;
+        addSongs();
     }
     else
     {
@@ -85,7 +80,9 @@ void startPiano()
         default:
             if (note > '0' && note <= '6')
             {
-                songs[note - '1']();
+                char index = note - '1';
+                songs[index].song();
+                paintStringOrWarp(songs[index].name);
             }
             shut();
             break;
@@ -96,5 +93,22 @@ void startPiano()
         }
         shut();
     }
+    free(songs);
     blank();
+}
+
+void addSongs()
+{
+    songs[0].song = imperial_march;
+    songs[0].name = "Imperial March";
+    songs[1].song = hes_a_pirate;
+    songs[1].name = "He's a Pirate";
+    songs[2].song = outer_wilds;
+    songs[2].name = "Outer Wilds";
+    songs[3].song = do_i_wanna_know;
+    songs[3].name = "Do I Wanna Know";
+    songs[4].song = sports_center;
+    songs[4].name = "Sports Center";
+    songs[5].song = here_comes_the_sun;
+    songs[5].name = "Here Comes the Sun";
 }

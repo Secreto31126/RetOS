@@ -18,7 +18,7 @@ void drawBoard(frontSnake *snakes);
 void drawBackground();
 void freeColorMaps(int snakeCount, frontSnake *snakes);
 void drawScore(uint64_t score);
-void drawTextBackground(uint64_t size);
+void drawTextBackground(uint64_t size, uint64_t textLength);
 // default theme is windows
 static char *backgroundArray = windowsArray;
 static HexColor *backgroundColorMap = windowsColorMap;
@@ -80,12 +80,12 @@ int playSnake(uint16_t snakeCount)
             uint64_t size;
             if (c == '+' && (size = (getSize() + 1)) < MAX_LETTER_SIZE)
             {
-                drawTextBackground(size);
+                drawTextBackground(size, MAX_SCORE_LENGTH);
                 setSize(size);
             }
             else if (c == '-' && (size = (getSize() - 1)) >= 1)
             {
-                drawTextBackground(size);
+                drawTextBackground(size + 1, MAX_SCORE_LENGTH);
                 setSize(size);
             }
             doMovement(c, snakes);
@@ -107,6 +107,8 @@ int playSnake(uint16_t snakeCount)
             }
             if (madeApple)
             {
+                score += APPLE_POINTS;
+                drawTextBackground(getSize(), MAX_SCORE_LENGTH);
                 play(330);
             }
             drawBoard(snakes);
@@ -300,13 +302,13 @@ void drawScore(uint64_t score)
     drawStringAt(itoa(score, aux, 10), SCORE_COLOR, 0, 0, 0);
 }
 
-void drawTextBackground(uint64_t size)
+void drawTextBackground(uint64_t size, uint64_t textLength)
 {
-    uint64_t widthSpan = TRUE_LETTER_WIDTH * size, heightSpan = TRUE_LETTER_HEIGHT * size, tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
+    uint64_t widthSpan = TRUE_LETTER_WIDTH * size * textLength, heightSpan = TRUE_LETTER_HEIGHT * size, tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
     Window stamp = getWindow(tileWidth, tileHeight, malloc(sizeof(HexColor) * tileWidth * tileHeight));
-    for (int i = 0; i < heightSpan; i += tileHeight)
+    for (int i = 0; i <= heightSpan; i += tileHeight)
     {
-        for (int j = 0; j < widthSpan; j += tileWidth)
+        for (int j = 0; j <= widthSpan; j += tileWidth)
             drawBackgroundWithParameters(stamp, j, i);
     }
     freeWindow(stamp);

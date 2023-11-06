@@ -7,7 +7,7 @@ void paintStringOrWarp(char *s);
 
 void startPiano()
 {
-    blank();
+    quickBlank();
     if ((songs = malloc(sizeof(Songs) * 6)) != 0)
     {
         songs[0] = imperial_march;

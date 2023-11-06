@@ -2,6 +2,8 @@
 #define SNKP_H
 
 #define BACKGROUND_COLOR 0x00000000
+#define SCORE_BOARD_TILES_X 4
+#define SCORE_BOARD_TILES_Y 2
 
 #include "./../window/fontInterface.h"
 #include "./../window/window.h"

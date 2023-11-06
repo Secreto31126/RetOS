@@ -293,5 +293,5 @@ static HexColor drawer(int x, int y, int w, int h)
 void BSOD(int error_code)
 {
     draw_error_code = error_code;
-    drawShape(drawer, 0, 0, get_width(), get_height());
+    drawShape(drawer, -1, -1, 0, 0);
 }

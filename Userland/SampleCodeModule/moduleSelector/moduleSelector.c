@@ -14,7 +14,7 @@ void startModules()
 {
     initializeFonts();
     startPainter(getScreenWidth(), getScreenHeight());
-    sports_center();
+    // sports_center(); // por ahora no :D
     setEnvironment();
     initializeCommands();
     char c;

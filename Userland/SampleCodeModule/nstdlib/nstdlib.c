@@ -36,6 +36,7 @@ char *getDumpString()
         addToAllocated(c);
         return c;
     }
+    free(c);
     return "";
 }
 
@@ -492,7 +493,7 @@ uint64_t addString(char **receiver, uint64_t *length, char *source, uint64_t *al
     uint64_t len = strlen(source);
     if ((*length + len) >= *allocated)
     {
-        uint64_t toAdd = ((*length + len - *allocated) / BLOCK + 1) * BLOCK; // space that must be added, rounded to nearest block
+        uint64_t toAdd = ((*length + len - *allocated) / BLOCK) * BLOCK + BLOCK; // space that must be added, rounded to nearest block
         *receiver = realloc(*receiver, *allocated, (*allocated + toAdd) * sizeof(char));
         *allocated += toAdd;
     }
@@ -533,7 +534,6 @@ char *sPrintf(char *format, ...)
     uint64_t count = 1; // counts null termination
     char *toReturn = malloc(sizeof(char) * allocated);
     *toReturn = 0;
-    addToAllocated(toReturn);
     while (*format != 0 && *format != EOF)
     {
         if (count == allocated) // Always checks if resize is necessary before checking to add any characters. Prevents copying code in every single-character edition.
@@ -592,6 +592,7 @@ char *sPrintf(char *format, ...)
     }
     va_end(argp);
     toReturn = realloc(toReturn, allocated, count);
+    addToAllocated(toReturn);
     return toReturn;
 }
 

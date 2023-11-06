@@ -2,16 +2,12 @@
 
 static uint8_t exit = 0;
 
-void paintStringOrWarp(char *s);
-
 void startPiano()
 {
     blank();
-    paintStringOrWarp("Welcome to the piano!\n\n");
-    paintStringOrWarp("Press 'q' to exit.\n");
-    // PianoNote * notes = malloc(sizeof(PianoNote) * 12);
+    paintString("Welcome to the piano!\n\nPress 'q' to exit.\n", -1, 0);
     char note;
-    while ((note = readChar()) != 'q')
+    while ((note = getChar()) != 'q')
     {
         switch (note)
         {
@@ -92,5 +88,4 @@ void startPiano()
             break;
         }
     }
-    blank();
 }

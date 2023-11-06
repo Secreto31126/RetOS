@@ -29,55 +29,55 @@ void startPiano()
         {
         case 'z':
             play(261);
-            paintStringOrWarp("Do\n");
+            paintString("Do\n", -1, 0);
             break;
         case 's':
             play(277);
-            paintStringOrWarp("Do#\n");
+            paintString("Do#\n", -1, 0);
             break;
         case 'x':
             play(293);
-            paintStringOrWarp("Re\n");
+            paintString("Re\n", -1, 0);
             break;
         case 'd':
             play(311);
-            paintStringOrWarp("Re#\n");
+            paintString("Re#\n", -1, 0);
             break;
         case 'c':
             play(329);
-            paintStringOrWarp("Mi\n");
+            paintString("Mi\n", -1, 0);
             break;
         case 'v':
             play(349);
-            paintStringOrWarp("Fa\n");
+            paintString("Fa\n", -1, 0);
             break;
         case 'g':
             play(369);
-            paintStringOrWarp("Fa#\n");
+            paintString("Fa#\n", -1, 0);
             break;
         case 'b':
             play(392);
-            paintStringOrWarp("Sol\n");
+            paintString("Sol\n", -1, 0);
             break;
         case 'h':
             play(415);
-            paintStringOrWarp("Sol#\n");
+            paintString("Sol#\n", -1, 0);
             break;
         case 'n':
             play(440);
-            paintStringOrWarp("La\n");
+            paintString("La\n", -1, 0);
             break;
         case 'j':
             play(466);
-            paintStringOrWarp("La#\n");
+            paintString("La#\n", -1, 0);
             break;
         case 'm':
             play(493);
-            paintStringOrWarp("Si\n");
+            paintString("Si\n", -1, 0);
             break;
         case ',':
             play(523);
-            paintStringOrWarp("Do\n");
+            paintString("Do\n", -1, 0);
             break;
         default:
             if (note > '0' && note <= '6')

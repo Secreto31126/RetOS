@@ -76,10 +76,10 @@ char *startSnake(char *commandParameters, char *mustRedraw)
         *mustRedraw = 1;
         return sPrintf(formatString, playSnake(1));
     }
-    if (i == 2)
+    if (i) // if 0, either input was 0 or invalid. Either way, input is not valid
     {
         *mustRedraw = 1;
-        return sPrintf(formatString, playSnake(2));
+        return sPrintf(formatString, playSnake(i > 3 ? 3 : i)); // we support a third player, it is controlled with the spacebar
     }
     return "Invalid snake parameter";
 }
@@ -89,34 +89,33 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     char matchFlag = 0;
     if (strcmp(commandParameters, "windows"))
     {
-        setBackgroundArray(windowsArray);
+        setBackgroundArray((char *)windowsArray);
         setBackgroundColorMap(windowsColorMap);
-        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap);
+        setSnakeDrawing(DRAW_SIZE, (char *)classicHeadUp, (char *)classicOther, (char *)classicTail, (char *)classicTurn, (char *)classicApple, (HexColor *)appleColorMap);
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
     else if (strcmp(commandParameters, "mario"))
     {
-        setBackgroundArray(marioArray);
+        setBackgroundArray((char *)marioArray);
         setBackgroundColorMap(marioColorMap);
-        setSnakeDrawing(BIG_DRAW_SIZE, goomba, goomba, goomba, pipe, marioItem, marioItemColorMap);
+        setSnakeDrawing(BIG_DRAW_SIZE, (char *)goomba, (char *)goomba, (char *)goomba, (char *)pipe, (char *)marioItem, (HexColor *)marioItemColorMap);
         setDrawOptions(1, 0, 1, 1);
-        matchFlag = 1;
-    }
-    /* comentado temporalmente porque no alcanza el espacio
-    else if (strcmp(commandParameters, "creation"))
-    {
-        setBackgroundArray(creationArray);
-        setBackgroundColorMap(creationColorMap);
-        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap);
-        setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
     else if (strcmp(commandParameters, "pong"))
     {
         setBackgroundArray(pongArray);
         setBackgroundColorMap(pongColorMap);
-        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, 0, classicApple, appleColorMap);
+        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap);
+        setDrawOptions(0, 0, 1, 0);
+        matchFlag = 1;
+    }
+    else if (strcmp(commandParameters, "creation"))
+    {
+        setBackgroundArray(creationArray);
+        setBackgroundColorMap(creationColorMap);
+        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap);
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
@@ -128,7 +127,14 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
         setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }
-    */
+    else if (strcmp(commandParameters, "idyllic"))
+    {
+        setBackgroundArray(idyllicArray);
+        setBackgroundColorMap(idyllicColorMap);
+        setSnakeDrawing(BIG_DRAW_SIZE, wyvHead, wyvBody, wyvTail, wyvTurn, guide, guideColorMap);
+        setDrawOptions(1, 1, 1, 1);
+        matchFlag = 1;
+    }
     if (matchFlag)
         return "Theme set.";
     return sPrintf("No theme matching %s was found.", commandParameters);
@@ -136,7 +142,7 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
 
 char *changehighlightColor(char *commandParameters, char *mustRedraw)
 {
-    if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
+    if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
         return "Hex value given not valid.";
     setHighlightColor(atoiHex(commandParameters)); // will read until an invalid character is found or 8 characters have been read. If an invalid character was found, what was read so far will be set as the color.
     *mustRedraw = 1;
@@ -144,9 +150,9 @@ char *changehighlightColor(char *commandParameters, char *mustRedraw)
 }
 char *changeLetterColor(char *commandParameters, char *mustRedraw)
 {
-    if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
+    if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
         return "Hex value given not valid.";
-    uint64_t hex = 0;
+    // uint64_t hex = 0;
     setLetterColor(atoiHex(commandParameters));
     *mustRedraw = 1;
     return "Letter color set";
@@ -233,7 +239,7 @@ void initializeCommands()
 {
     addCommand("help", "Help display for help module.\nFormat(s): 'help' | 'help' [MODULE_NAME]\nDisplays the help displays for all modules or the module specified.", getHelp);
     addCommand("snake", "Help display for snake module.\nFormat(s): 'snake' | 'snake [PLAYERS]'\nStarts the snake module. If PLAYERS is greater than two, game will be initialized with two players. If no PLAYERS parameter is given, game will be initialized with one player.", startSnake);
-    addCommand("set-theme", "Help display for set theme module.\nFormat: 'set-theme [THEME]'\nSets the theme of the snake game to the specified theme.\nCurrently supported themes are:\nmario windows camelot* creation* pong*", setSnakeTheme);
+    addCommand("set-theme", "Help display for set theme module.\nFormat: 'set-theme [THEME]'\nSets the theme of the snake game to the specified theme.\nCurrently supported themes are:\nmario windows camelot creation pong idyllic", setSnakeTheme);
     addCommand("set-size", "Help display for set size module.\nFormat: 'set-size [NUMBER]'\nSets the size of the shell to the specified integer. Maximum accepted size is 4, anything larger is illegible. Only positive integer sizes are accepted. Size 0 will set the size to 0.5", changeLetterSize);
     addCommand("set-letter-color", "Help display for set letter color module.\nFormat: 'set-letter-color [HEX_COLOR]'\nSets the letter color of the shell to the specified integer.", changeLetterColor);
     addCommand("set-highlight-color", "Help display for set highlight color.\nFormat: 'set-highlight-color [HEX_COLOR]'\nSets the highlight color of the shell to the specified integer.", changehighlightColor);

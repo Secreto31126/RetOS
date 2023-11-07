@@ -32,47 +32,55 @@ char shellStart()
     paintString(buffer, letterColor, highlightColor);
     paintLineStart();
     char c;
-    while ((c = getChar()) != '\n' || !strcmp(commandBuffer, "exit"))
+    while (1)
     {
-        if (c == '\b')
+        drawStringAt(getTimeString(), 0xFFFFFFFF, 0xFF000000, 0, 0);
+        wait();
+        if ((c = readChar()))
         {
-            if (!fromLastEnter || !index)
+            if (c == '\n' && strcmp(commandBuffer, "exit"))
             {
-                continue;
+                blank();
+                free(commandBuffer);
+                free(buffer);
+                freePrints();
+                return 1;
+            }
+            if (c == '\b')
+            {
+                if (!fromLastEnter || !index)
+                {
+                    continue;
+                }
+                else
+                {
+                    paintChar(c, letterColor, highlightColor);
+                    index--;
+                    commandIndex--;
+                    fromLastEnter--;
+                }
             }
             else
             {
-                paintChar(c, letterColor, highlightColor);
-                index--;
-                commandIndex--;
-                fromLastEnter--;
+                if (c == '\n')
+                {
+                    fromLastEnter = 0;
+                    addStringToBuffer(passCommand(commandBuffer), 1); // Nota: las instrucciones del TPE especifican que la shell debe moverse hacia arriba si se excede su espacio para texto.
+                    freePrints();                                     // No se especifica el comportamiento esperado si el retorno de un 'comando' es mayor al espacio de la shell.
+                    commandIndex = 0;                                 // El comportamiento default es simplemente no imprimir el retorno completo. Esto es lo que ocurre si a passCommand se le da parámetro 'ask' 0.
+                }                                                     // De lo contrario, se imprimirá moviendo hacia arriba de a MOVE_BY líneas, requiriendo input del usuario.
+                else
+                {
+                    addCharToBuffer(c);
+                    fromLastEnter++;
+                    if (commandIndex < MAX_COMMAND_LENGTH)
+                        commandBuffer[commandIndex++] = c; // ignores commands after a certain length (since no commands should be that long)
+                }
             }
+            commandBuffer[commandIndex] = 0;
+            buffer[index] = 0;
         }
-        else
-        {
-            if (c == '\n')
-            {
-                fromLastEnter = 0;
-                addStringToBuffer(passCommand(commandBuffer), 1); // Nota: las instrucciones del TPE especifican que la shell debe moverse hacia arriba si se excede su espacio para texto.
-                freePrints();                                     // No se especifica el comportamiento esperado si el retorno de un 'comando' es mayor al espacio de la shell.
-                commandIndex = 0;                                 // El comportamiento default es simplemente no imprimir el retorno completo. Esto es lo que ocurre si a passCommand se le da parámetro 'ask' 0.
-            }                                                     // De lo contrario, se imprimirá moviendo hacia arriba de a MOVE_BY líneas, requiriendo input del usuario.
-            else
-            {
-                addCharToBuffer(c);
-                fromLastEnter++;
-                if (commandIndex < MAX_COMMAND_LENGTH)
-                    commandBuffer[commandIndex++] = c; // ignores commands after a certain length (since no commands should be that long)
-            }
-        }
-        commandBuffer[commandIndex] = 0;
-        buffer[index] = 0;
     }
-    blank();
-    free(commandBuffer);
-    free(buffer);
-    freePrints();
-    return 1;
 }
 
 void addCharToBuffer(char c)

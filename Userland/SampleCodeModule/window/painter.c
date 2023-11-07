@@ -2,7 +2,7 @@
 #define LINE_START_MAX 20
 #define X_LINE_END (((int)(w / (size * TRUE_LETTER_WIDTH))) * size * TRUE_LETTER_WIDTH)
 static double size = 1.0;
-static uint64_t w, h, xPointer = 0, yPointer = 0;
+static uint64_t w, h, xPointer = 0, yPointer = TRUE_LETTER_HEIGHT;
 static Window stamp;
 
 void startPainter(uint64_t width, uint64_t height)
@@ -28,7 +28,7 @@ uint64_t getSize()
 void newLine()
 {
     yPointer += TRUE_LETTER_HEIGHT * size;
-    xPointer = 0;
+    xPointer = 0; // xPointer leaves room for header
 }
 void moveCursor()
 {
@@ -132,7 +132,7 @@ uint64_t getCharPerLine()
 void blank()
 {
     xPointer = 0;
-    yPointer = 0;
+    yPointer = TRUE_LETTER_HEIGHT * size;
     clear();
 }
 void endPainter()

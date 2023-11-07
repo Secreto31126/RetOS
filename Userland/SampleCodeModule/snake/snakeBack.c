@@ -25,13 +25,16 @@ void setBoard(int snakeCount)
 {
     snakes = malloc(sizeof(snake) * snakeCount);
     objects = 0;
-    for (int i = 0; i < BOARD_SIZE; i++)
+    for (int i = 0; i < BOARD_HEIGHT; i++)
     {
-        board[0][i].health = 0;
-        board[0][i].player = 0;
-        board[0][i].toDraw = NO_DRAW;
-        board[0][i].drawDirection = UP;
-        board[0][i].trueDirection = UP;
+        for (int j = 0; j < BOARD_WIDTH; j++)
+        {
+            board[i][j].health = 0;
+            board[i][j].player = 0;
+            board[i][j].toDraw = NO_DRAW;
+            board[i][j].drawDirection = UP;
+            board[i][j].trueDirection = UP;
+        }
     }
 
     uint64_t boardSizeNoMargins = BOARD_SIZE_NO_MARGINS; // just to avoid calculating it in every loop
@@ -163,19 +166,31 @@ void setNewHeads(int snakeCount)
 
 void killSnake(unsigned int player)
 {
-    for (int i = 0; i < BOARD_SIZE; i++)
-        if (board[0][i].player == player && board[0][i].health)
+    for (int i = 0; i < BOARD_HEIGHT; i++)
+    {
+        for (int j = 0; j < BOARD_WIDTH; j++)
         {
-            board[0][i].health = 1; // Tiles with health 1 and toDraw BLANK will be drawn as background and become NO_DRAW on next update loop
-            board[0][i].toDraw = BLANK;
+            if (board[i][j].player == player && board[i][j].health)
+            {
+                board[i][j].health = 1; // Tiles with health 1 and toDraw BLANK will be drawn as background and become NO_DRAW on next update loop
+                board[i][j].toDraw = BLANK;
+            }
         }
+    }
+
     snakes[player].alive = 0;
 }
 void growSnake(unsigned int player)
 {
-    for (int i = 0; i < BOARD_SIZE; i++)
-        if (board[0][i].player == player && board[0][i].health != 0)
-            board[0][i].health++;
+    for (int i = 0; i < BOARD_HEIGHT; i++)
+    {
+        for (int j = 0; j < BOARD_WIDTH; j++)
+        {
+            if (board[i][j].player == player && board[i][j].health != 0)
+                board[i][j].health++;
+        }
+    }
+
     snakes[player].length++;
     objects++;
 }

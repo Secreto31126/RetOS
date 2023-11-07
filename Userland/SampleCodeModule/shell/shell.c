@@ -5,7 +5,7 @@
 void warpNLines(uint64_t n);
 void warpAndRedraw();
 void warpOneLine();
-char *passCommand(char *toPass);
+const char *passCommand(char *toPass);
 void paintLineStart();
 void paintCharOrWarp(char c);
 void paintStringOrWarp(char *s, char ask);
@@ -127,14 +127,14 @@ void paintCharOrWarp(char c)
         warpAndRedraw();
 }
 
-char *passCommand(char *toPass)
+const char *passCommand(char *toPass)
 {
     char mustRedraw = 0;
     char *toPaint = handleCommand(toPass, &mustRedraw);
 
     if (mustRedraw)
     {
-        char *toReturn;
+        const char *toReturn;
         if (strcmp(toPaint, ""))
         {
             if (strcmp(buffer, ""))
@@ -220,7 +220,7 @@ void warpNLines(uint64_t n) // char or char* you want to add must be in buffer a
 void paintLineStart()
 {
     paintString(lineStart, letterColor, highlightColor);
-    char *aux = lineStart;
+    const char *aux = lineStart;
     while (*aux)
     {
         buffer[index++] = *(aux++);

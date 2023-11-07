@@ -41,6 +41,7 @@ void setBoard(int snakeCount)
         if (j < boardSizeNoMargins)
         { // No objects will be added if board is full.
             board[0][j].toDraw = APPLE;
+            board[0][j].health = 1;
         }
     }
     for (int i = 0; i < snakeCount; i++)
@@ -78,7 +79,7 @@ unsigned int update(int snakeCount, int *deathCount, int *madeApple)
             lookingAt = board[i][j];
             if (lookingAt.health > 0) // All else should have health 0
             {
-                if (lookingAt.toDraw == BLANK) // allows blanks to remain for one reading to ensure they are not turned to NO_DRAW before they can be read by the front-end
+                if (lookingAt.toDraw == BLANK || lookingAt.toDraw == APPLE) // allows blanks to remain for one reading to ensure they are not turned to NO_DRAW before they can be read by the front-end
                 {
                     board[i][j].health = 0;
                 }
@@ -120,13 +121,14 @@ unsigned int update(int snakeCount, int *deathCount, int *madeApple)
                 {
                     board[i][j].toDraw = NO_DRAW; // No real need to update unmoving parts until they die. The condition lets us keep scoreboard on top of playBoard (snake can run-over scoreboard without being erased)
                 }
-                board[i][j].health--; // All snake parts lose one 'health' per movement. This way, parts remain for as many movements as the snake is long, giving the appearance of a continuous snake. Using players to uniformly color snakes reinforces this
+                if (board[i][j].health)   // because if it's a head that just died, health will be 0
+                    board[i][j].health--; // All snake parts lose one 'health' per movement. This way, parts remain for as many movements as the snake is long, giving the appearance of a continuous snake. Using players to uniformly color snakes reinforces this
                 if (board[i][j].health == 1)
                 {
                     board[i][j].toDraw = TAIL;
                     board[i][j].drawDirection = board[i][j].trueDirection;
                 }
-                if (board[i][j].health == 0)
+                if (board[i][j].health == 0 && board[i][j].toDraw != APPLE)
                     board[i][j].toDraw = BLANK;
             }
             else if (lookingAt.toDraw == BLANK) // only blanks should be turned to NO_DRAW when at health 0
@@ -160,7 +162,7 @@ void setNewHeads(int snakeCount)
 void killSnake(unsigned int player)
 {
     for (int i = 0; i < BOARD_SIZE; i++)
-        if (board[0][i].player == player && board[0][i].health != 0)
+        if (board[0][i].player == player && board[0][i].health)
         {
             board[0][i].health = 1; // Tiles with health 1 and toDraw BLANK will be drawn as background and become NO_DRAW on next update loop
             board[0][i].toDraw = BLANK;
@@ -182,7 +184,7 @@ void makeApple()
     if (j < boardSizeNoMargins)
     { // No objects will be added if board is full.
         board[0][j].toDraw = APPLE;
-        board[0][j].health = 0;
+        board[0][j].health = 1;
     }
 }
 
@@ -266,6 +268,7 @@ DIRECTION parseTurn(DIRECTION comingFrom, DIRECTION goingTo)
     }
     default:
         return UP; // should never be here, as turns from opposite directions do not exist
-        break;
     }
+
+    return UP;
 }

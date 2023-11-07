@@ -76,10 +76,10 @@ char *startSnake(char *commandParameters, char *mustRedraw)
         *mustRedraw = 1;
         return sPrintf(formatString, playSnake(1));
     }
-    if (i == 2)
+    if (i) // if 0, either input was 0 or invalid. Either way, input is not valid
     {
         *mustRedraw = 1;
-        return sPrintf(formatString, playSnake(2));
+        return sPrintf(formatString, playSnake(i > 3 ? 3 : i)); // we support a third player, it is controlled with the spacebar
     }
     return "Invalid snake parameter";
 }
@@ -89,17 +89,17 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     char matchFlag = 0;
     if (strcmp(commandParameters, "windows"))
     {
-        setBackgroundArray(windowsArray);
+        setBackgroundArray((char *)windowsArray);
         setBackgroundColorMap(windowsColorMap);
-        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap);
+        setSnakeDrawing(DRAW_SIZE, (char *)classicHeadUp, (char *)classicOther, (char *)classicTail, (char *)classicTurn, (char *)classicApple, (HexColor *)appleColorMap);
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
     else if (strcmp(commandParameters, "mario"))
     {
-        setBackgroundArray(marioArray);
+        setBackgroundArray((char *)marioArray);
         setBackgroundColorMap(marioColorMap);
-        setSnakeDrawing(BIG_DRAW_SIZE, goomba, goomba, goomba, pipe, marioItem, marioItemColorMap);
+        setSnakeDrawing(BIG_DRAW_SIZE, (char *)goomba, (char *)goomba, (char *)goomba, (char *)pipe, (char *)marioItem, (HexColor *)marioItemColorMap);
         setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }
@@ -142,7 +142,7 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
 
 char *changehighlightColor(char *commandParameters, char *mustRedraw)
 {
-    if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
+    if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
         return "Hex value given not valid.";
     setHighlightColor(atoiHex(commandParameters)); // will read until an invalid character is found or 8 characters have been read. If an invalid character was found, what was read so far will be set as the color.
     *mustRedraw = 1;
@@ -150,9 +150,9 @@ char *changehighlightColor(char *commandParameters, char *mustRedraw)
 }
 char *changeLetterColor(char *commandParameters, char *mustRedraw)
 {
-    if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
+    if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
         return "Hex value given not valid.";
-    uint64_t hex = 0;
+    // uint64_t hex = 0;
     setLetterColor(atoiHex(commandParameters));
     *mustRedraw = 1;
     return "Letter color set";

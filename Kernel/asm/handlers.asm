@@ -30,8 +30,12 @@ pain_manager:
 
 %macro full_dump_interruption 0
 	call	dump_regs
-	mov		rdi, [rsp]
+	push	rdi
+	mov		rdi, [rsp + 8]
+	pushall
 	call	dump_regs_include_rip
+	popall
+	pop		rdi
 %endmacro
 
 %macro exception_handler 1

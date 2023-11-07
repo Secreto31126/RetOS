@@ -182,7 +182,7 @@ void drawBoard(frontSnake *snakes)
     uint64_t tileWidth = w / BOARD_WIDTH, tileHeight = h / BOARD_HEIGHT;
     Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
     tile *board = getBoard();
-    snake *backSnakes = getSnakes();
+    // snake *backSnakes = getSnakes();
     char *source;
     uint64_t drawSize = currentDrawing.drawSize;
     for (int i = 0; i < h; i += tileHeight)

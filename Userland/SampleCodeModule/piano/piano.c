@@ -7,7 +7,7 @@ void startPiano()
 {
     if ((songs = malloc(sizeof(Songs) * 6)) != 0)
     {
-        addSongs();
+        addSongs(songs);
     }
     else
     {
@@ -95,7 +95,7 @@ void startPiano()
     blank();
 }
 
-void addSongs()
+void addSongs(Songs *songs)
 {
     songs[0].song = imperial_march;
     songs[0].name = "Imperial March\n";

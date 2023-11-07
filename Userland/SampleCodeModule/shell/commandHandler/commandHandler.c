@@ -76,10 +76,10 @@ char *startSnake(char *commandParameters, char *mustRedraw)
         *mustRedraw = 1;
         return sPrintf(formatString, playSnake(1));
     }
-    if (i == 2)
+    if (i) // if 0, either input was 0 or invalid. Either way, input is not valid
     {
         *mustRedraw = 1;
-        return sPrintf(formatString, playSnake(2));
+        return sPrintf(formatString, playSnake(i > 3 ? 3 : i)); // we support a third player, it is controlled with the spacebar
     }
     return "Invalid snake parameter";
 }

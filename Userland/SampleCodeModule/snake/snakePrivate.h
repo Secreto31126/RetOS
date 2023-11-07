@@ -14,9 +14,10 @@
 typedef enum DIRECTION
 {
     LEFT,
-    RIGHT,
     UP,
+    RIGHT,
     DOWN,
+    NUMBER_OF_DIRECTIONS,
     NONE,
 } DIRECTION;
 typedef enum TO_DRAW

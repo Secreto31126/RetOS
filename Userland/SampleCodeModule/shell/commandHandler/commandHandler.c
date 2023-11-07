@@ -89,17 +89,17 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     char matchFlag = 0;
     if (strcmp(commandParameters, "windows"))
     {
-        setBackgroundArray(windowsArray);
+        setBackgroundArray((char *)windowsArray);
         setBackgroundColorMap(windowsColorMap);
-        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap);
+        setSnakeDrawing(DRAW_SIZE, (char *)classicHeadUp, (char *)classicOther, (char *)classicTail, (char *)classicTurn, (char *)classicApple, (HexColor *)appleColorMap);
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
     else if (strcmp(commandParameters, "mario"))
     {
-        setBackgroundArray(marioArray);
+        setBackgroundArray((char *)marioArray);
         setBackgroundColorMap(marioColorMap);
-        setSnakeDrawing(BIG_DRAW_SIZE, goomba, goomba, goomba, pipe, marioItem, marioItemColorMap);
+        setSnakeDrawing(BIG_DRAW_SIZE, (char *)goomba, (char *)goomba, (char *)goomba, (char *)pipe, (char *)marioItem, (HexColor *)marioItemColorMap);
         setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }

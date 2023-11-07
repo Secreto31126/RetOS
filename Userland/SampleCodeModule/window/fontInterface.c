@@ -10,7 +10,7 @@ typedef struct
 } font;
 
 static font fonts[FONT_COUNT] = {{.name = "Default",
-                                  .letters = Classic}};
+                                  .letters = (char *)Classic}};
 static font *currentFont = fonts;
 void setFont(int fontNumber) // was intended to allow changing fonts. Memory limitations prevented this
 {

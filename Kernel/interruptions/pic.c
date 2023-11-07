@@ -123,5 +123,5 @@ static void keyboard_handler()
 
     uint16_t letter = get_scancode_utf16(scancode, modifier);
     if (letter)
-        write_stdin(&letter, 1);
+        write_stdin((uint8_t *)&letter, 1);
 }

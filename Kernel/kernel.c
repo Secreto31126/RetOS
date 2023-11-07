@@ -4,11 +4,7 @@
 #include <modules.h>
 #include <console.h>
 #include <localization.h>
-#include <audio.h>
-#include <video.h>
 #include <memory.h>
-#include <images.h>
-#include <ticks.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -17,29 +13,15 @@ extern uint8_t bss;
 extern uint8_t endOfKernelBinary;
 extern uint8_t endOfKernel;
 
-static const uint64_t PageSize = 0x1000;
-
 static void *const sampleCodeModuleAddress = (void *)0x400000;
 static void *const sampleDataModuleAddress = (void *)0x500000;
-
-/**
- * @brief Userland entry point
- */
-typedef int (*EntryPoint)();
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
 	memset(bssAddress, 0, bssSize);
 }
 
-void *getStackBase()
-{
-	return (void *)((uint64_t)&endOfKernel + PageSize * 8 // The size of the stack itself, 32KiB
-					- sizeof(uint64_t)					  // Begin at the top of the stack
-	);
-}
-
-void *initializeKernelBinary()
+void initializeKernelBinary()
 {
 	char buffer[10];
 
@@ -96,17 +78,4 @@ void *initializeKernelBinary()
 	ncPrint(" [Done]");
 
 	ncClear();
-
-	return getStackBase();
-}
-
-int main()
-{
-	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
-	ncNewline();
-
-	ncPrint((char *)sampleDataModuleAddress);
-	ncNewline();
-
-	return 0;
 }

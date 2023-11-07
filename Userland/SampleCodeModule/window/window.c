@@ -240,14 +240,14 @@ Window overlayOnWindow(Window w, ShapeFunction f, uint64_t xOffset, uint64_t yOf
 
 Window overlayFromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sourceHeight, HexColor *map, uint64_t xOffset, uint64_t yOffset, OVERLAY_MODE m)
 {
-    uint64_t width = w.width, height = w.height, screenW = getScreenWidth(), screenH = getScreenHeight();
+    uint64_t width = w.width, height = w.height, screenW = getScreenWidth(), screenH = getScreenHeight(), xIndex, yIndex = 0;
     HexColor *result = w.pixels;
     double xScaleFactor = (double)sourceWidth / screenW, yScaleFactor = (double)sourceHeight / screenH;
-    int xIndex, yIndex = 0;
-    for (double i = yOffset * sourceHeight / screenH; i < sourceHeight && yIndex < height; i += yScaleFactor)
+    double jStart = (double)xOffset * sourceWidth / screenW; // to avoid redoing the math every loop
+    for (double i = (double)yOffset * sourceHeight / screenH; i < sourceHeight && yIndex < height; i += yScaleFactor)
     {
         xIndex = 0;
-        for (double j = xOffset * sourceWidth / screenW; j < sourceWidth && xIndex < width; j += xScaleFactor)
+        for (double j = jStart; j < sourceWidth && xIndex < width; j += xScaleFactor)
         {
             if (m == OPAQUE)
                 result[xIndex + yIndex * width] = colorMapper(map, source[(int)(j) + (int)(i)*sourceWidth]);
@@ -280,4 +280,9 @@ Window fromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sour
         yIndex++;
     }
     return w;
+}
+
+HexColor colorMapper(HexColor *colorMap, int code)
+{
+    return colorMap[code];
 }

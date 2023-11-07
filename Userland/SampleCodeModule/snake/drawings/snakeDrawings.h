@@ -38,5 +38,11 @@ extern char stone[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 extern char catapult[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 extern char textBoard[TEXT_BOARD_HEIGHT][TEXT_BOARD_WIDTH];
 extern HexColor textBoardColorMap[];
+extern char wyvBody[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
+extern char wyvHead[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
+extern char wyvTail[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
+extern char wyvTurn[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
+extern char guide[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
+extern HexColor guideColorMap[];
 
 #endif

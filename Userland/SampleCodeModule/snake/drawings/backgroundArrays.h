@@ -14,6 +14,7 @@ extern HexColor creationColorMap[];
 extern char creationArray[BACKGROUND_HEIGHT][BACKGROUND_WIDTH];
 extern HexColor camelotColorMap[];
 extern char camelotArray[BACKGROUND_HEIGHT][BACKGROUND_WIDTH];
-HexColor colorMapper(HexColor *colorMap, int code);
+extern HexColor idyllicColorMap[];
+extern char idyllicArray[BACKGROUND_HEIGHT][BACKGROUND_WIDTH];
 
 #endif

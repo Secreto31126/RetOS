@@ -99,7 +99,7 @@ unsigned int update(int snakeCount, int *deathCount, int *madeApple)
                         if (board[nextY][nextX].toDraw == APPLE)
                         {
                             growSnake(lookingAt.player);
-                            *madeApple = 1;
+                            (*madeApple)++;
                         }
                         snakes[lookingAt.player].nextHeadCoordinates[0] = nextX;
                         snakes[lookingAt.player].nextHeadCoordinates[1] = nextY;
@@ -136,7 +136,7 @@ unsigned int update(int snakeCount, int *deathCount, int *madeApple)
                 board[i][j].toDraw = NO_DRAW;
             }
         }
-    if (*madeApple)
+    for (int i = 0; i < *madeApple; i++) // in case two or more apples were eaten
         makeApple();
     setNewHeads(snakeCount);
     return toReturn; // player of dead snake, or 0

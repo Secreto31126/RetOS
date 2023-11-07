@@ -110,7 +110,7 @@ int playSnake(uint16_t snakeCount)
             }
             if (madeApple)
             {
-                score += APPLE_POINTS;
+                score += APPLE_POINTS * madeApple;
                 drawTextBackground(getSize(), MAX_SCORE_LENGTH);
                 play(330);
             }

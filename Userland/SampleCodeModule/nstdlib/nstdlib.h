@@ -31,7 +31,7 @@ uint64_t scanf(char *format, ...);
 uint64_t puts(char *string);
 uint64_t printf(char *format, ...);
 char *sPrintf(char *format, ...);
-uint64_t sPuts(char *receiver, char *source);
+uint64_t sPuts(char *receiver, const char *source);
 char sPutChar(char *receiver, char c);
 uint64_t strlen(char *s);
 static const double pi = 3.14159265359;

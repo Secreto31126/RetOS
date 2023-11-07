@@ -471,7 +471,7 @@ char sPutChar(char *receiver, char c)
 }
 
 // returns length of added string
-uint64_t sPuts(char *receiver, char *source)
+uint64_t sPuts(char *receiver, const char *source)
 {
     char count = 0;
     while (*receiver)

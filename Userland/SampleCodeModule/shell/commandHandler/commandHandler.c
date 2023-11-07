@@ -90,7 +90,7 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     if (strcmp(commandParameters, "windows"))
     {
         setBackgroundArray((char *)windowsArray);
-        setBackgroundColorMap(windowsColorMap);
+        setBackgroundColorMap((HexColor *)windowsColorMap);
         setSnakeDrawing(DRAW_SIZE, (char *)classicHeadUp, (char *)classicOther, (char *)classicTail, (char *)classicTurn, (char *)classicApple, (HexColor *)appleColorMap);
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
@@ -98,40 +98,40 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     else if (strcmp(commandParameters, "mario"))
     {
         setBackgroundArray((char *)marioArray);
-        setBackgroundColorMap(marioColorMap);
+        setBackgroundColorMap((HexColor *)marioColorMap);
         setSnakeDrawing(BIG_DRAW_SIZE, (char *)goomba, (char *)goomba, (char *)goomba, (char *)pipe, (char *)marioItem, (HexColor *)marioItemColorMap);
         setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }
     else if (strcmp(commandParameters, "pong"))
     {
-        setBackgroundArray(pongArray);
-        setBackgroundColorMap(pongColorMap);
-        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap);
+        setBackgroundArray((char *)pongArray);
+        setBackgroundColorMap((HexColor *)pongColorMap);
+        setSnakeDrawing(DRAW_SIZE, (char *)classicHeadUp, (char *)classicOther, (char *)classicTail, (char *)classicTurn, (char *)classicApple, (HexColor *)appleColorMap);
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
     else if (strcmp(commandParameters, "creation"))
     {
-        setBackgroundArray(creationArray);
-        setBackgroundColorMap(creationColorMap);
-        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap);
+        setBackgroundArray((char *)creationArray);
+        setBackgroundColorMap((HexColor *)creationColorMap);
+        setSnakeDrawing(DRAW_SIZE, (char *)classicHeadUp, (char *)classicOther, (char *)classicTail, (char *)classicTurn, (char *)classicApple, (HexColor *)appleColorMap);
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
     else if (strcmp(commandParameters, "camelot"))
     {
-        setBackgroundArray(camelotArray);
-        setBackgroundColorMap(camelotColorMap);
-        setSnakeDrawing(BIG_DRAW_SIZE, stone, stone, stone, catapult, excalibur, excaliburColorMap);
+        setBackgroundArray((char *)camelotArray);
+        setBackgroundColorMap((HexColor *)camelotColorMap);
+        setSnakeDrawing(BIG_DRAW_SIZE, (char *)stone, (char *)stone, (char *)stone, (char *)catapult, (char *)excalibur, (HexColor *)excaliburColorMap);
         setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }
     else if (strcmp(commandParameters, "idyllic"))
     {
-        setBackgroundArray(idyllicArray);
-        setBackgroundColorMap(idyllicColorMap);
-        setSnakeDrawing(BIG_DRAW_SIZE, wyvHead, wyvBody, wyvTail, wyvTurn, guide, guideColorMap);
+        setBackgroundArray((char *)idyllicArray);
+        setBackgroundColorMap((HexColor *)idyllicColorMap);
+        setSnakeDrawing(BIG_DRAW_SIZE, (char *)wyvHead, (char *)wyvBody, (char *)wyvTail, (char *)wyvTurn, (char *)guide, (HexColor *)guideColorMap);
         setDrawOptions(1, 1, 1, 1);
         matchFlag = 1;
     }

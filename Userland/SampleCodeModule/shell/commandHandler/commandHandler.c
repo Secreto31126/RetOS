@@ -136,7 +136,7 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
 
 char *changehighlightColor(char *commandParameters, char *mustRedraw)
 {
-    if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
+    if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
         return "Hex value given not valid.";
     setHighlightColor(atoiHex(commandParameters)); // will read until an invalid character is found or 8 characters have been read. If an invalid character was found, what was read so far will be set as the color.
     *mustRedraw = 1;
@@ -144,7 +144,7 @@ char *changehighlightColor(char *commandParameters, char *mustRedraw)
 }
 char *changeLetterColor(char *commandParameters, char *mustRedraw)
 {
-    if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
+    if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
         return "Hex value given not valid.";
     uint64_t hex = 0;
     setLetterColor(atoiHex(commandParameters));

@@ -174,9 +174,9 @@ void drawBoard(frontSnake *snakes)
     char *source;
     HexColor *colorMap;
     uint64_t drawSize = currentDrawing.drawSize;
-    for (int i = 0; i < yLimit; i += tileHeight)
+    for (int i = 0; i <= yLimit; i += tileHeight)
     {
-        for (int j = 0; j < xLimit; j += tileWidth, address++)
+        for (int j = 0; j <= xLimit; j += tileWidth, address++)
         {
             colorMap = snakes[board[address].player].colorMap;
             switch (board[address].toDraw)

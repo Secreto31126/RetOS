@@ -4,6 +4,10 @@ x64BareBones is a basic setup to develop operating systems for the Intel 64 bits
 
 The final goal of the project is to provide an entry point for a kernel and the possibility to load extra binary modules separated from the main kernel.
 
+## Read the docs
+
+[retdocs.vercel.app](https://retdocs.vercel.app/)
+
 ## Environment setup:
 
 1. Install the following packages before building the Toolchain and Kernel:

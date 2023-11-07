@@ -5,8 +5,7 @@
 	extern dump_regs
 	extern dump_regs_include_rip
 
-	extern getStackBase
-	extern main
+	extern execv
 
 	global zero_division_exception_handler
 	global invalid_opcode_exception_handler
@@ -21,12 +20,12 @@
 
 	global syscall_handler
 
+	section .data
+userland	db "module", 0
+
+	section .text
 ; Learnt this trick from pure64.asm
 %include "macro.s"
-
-pain_manager:
-	hlt
-	jmp		pain_manager
 
 %macro full_dump_interruption 0
 	call	dump_regs
@@ -44,12 +43,13 @@ pain_manager:
 	mov		rdi, %1
 	call	exception_manager
 
-	mov		qword [rsp], 0x400000
-
-	call 	getStackBase
-	mov 	[rsp + 8 * 3], rax
-
-	iretq
+	mov		rdi, userland
+	mov		rsi, 0
+	call 	execv
+.hang:
+	cli
+	hlt
+	jmp	.hang
 %endmacro
 
 %macro master_pic_handler 1

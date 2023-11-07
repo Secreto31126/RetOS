@@ -5,6 +5,15 @@
 
 void *memset(void *destination, int32_t character, uint64_t length);
 void *memcpy(void *destination, const void *source, uint64_t length);
+/**
+ * @brief Compare strings
+ * @see https://codebrowser.dev/glibc/glibc/string/strcmp.c.html
+ *
+ * @param p1 First string
+ * @param p2 Second string
+ * @return int The distance between both strings
+ */
+int strcmp(const char *p1, const char *p2);
 
 extern char *cpuVendor(char *result);
 

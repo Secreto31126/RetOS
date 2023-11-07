@@ -11,14 +11,14 @@ void blank();
 // returns 0 if out of space, 1 otherwise
 char paintChar(char c, HexColor letterColor, HexColor highlightColor);
 // returns 0 if did not fit. 1 otherwise. String is still painted partially if can't fit. Reccomended action is call to blank(), then paint again.
-char paintString(char *c, HexColor letterColor, HexColor highlightColor);
+char paintString(const char *c, HexColor letterColor, HexColor highlightColor);
 // draw the given character, top left corner on (x;y)
 void drawCharAt(char c, HexColor letterColor, HexColor highlightColor, uint64_t x, uint64_t y);
 void drawStringAt(char *c, HexColor letterColor, HexColor highlightColor, uint64_t x, uint64_t y);
 void setSize(double s);
 void endPainter();
 uint64_t getCharPerLine();
-char willFit(char *s);
+char willFit(const char *s);
 uint64_t getSize();
 
 #endif

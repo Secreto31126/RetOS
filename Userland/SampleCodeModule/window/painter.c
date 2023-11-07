@@ -75,7 +75,7 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
     moveCursor();
     return 1;
 }
-char paintString(char *c, HexColor letterColor, HexColor highlightColor)
+char paintString(const char *c, HexColor letterColor, HexColor highlightColor)
 {
     while (*c && paintChar(*c, letterColor, highlightColor))
     {
@@ -103,7 +103,7 @@ uint64_t maxXPointer()
 {
     return w - TRUE_LETTER_WIDTH * size;
 }
-char willFit(char *s)
+char willFit(const char *s)
 {
     double xP = 0, yP = 0, maxX = w - TRUE_LETTER_WIDTH * size, maxY = h - 2 * TRUE_LETTER_HEIGHT * size;
     while (*s)

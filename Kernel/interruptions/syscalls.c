@@ -55,17 +55,17 @@ static uint64_t halt(uint64_t, uint64_t, uint64_t, uint64_t rax);
 #define SYSCALL_COUNT 11
 typedef uint64_t (*syscall)(uint64_t, uint64_t, uint64_t, uint64_t);
 static syscall syscall_handlers[SYSCALL_COUNT] = {
-    read,
-    write,
-    draw,
-    malloc,
-    free,
-    get_time,
-    get_screen_size,
-    beep_bop,
-    get_tick,
-    get_lucas,
-    halt,
+    (syscall)read,
+    (syscall)write,
+    (syscall)draw,
+    (syscall)malloc,
+    (syscall)free,
+    (syscall)get_time,
+    (syscall)get_screen_size,
+    (syscall)beep_bop,
+    (syscall)get_tick,
+    (syscall)get_lucas,
+    (syscall)halt,
 };
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
@@ -78,9 +78,10 @@ uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
     return -1;
 }
 
-static uint64_t (*files[4])(uint8_t *, uint16_t) = {
+typedef uint16_t (*FileReader)(uint8_t *, uint16_t);
+static FileReader files[] = {
     read_stdin,
-    noop,
+    (FileReader)noop,
     read_stderr,
     read_stdkey,
 };

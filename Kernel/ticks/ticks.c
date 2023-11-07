@@ -11,7 +11,7 @@ typedef struct
 
 #define MAX_TASKS 256
 static uint8_t active_tasks = 0;
-static Task shedule[MAX_TASKS] = {0};
+static Task shedule[MAX_TASKS];
 
 uint64_t get_tick()
 {

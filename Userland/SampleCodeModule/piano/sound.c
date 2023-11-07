@@ -29,6 +29,11 @@
 
 // #define MEEP(f, d); beep(f); sleep_ticks(d);
 
+void play(uint32_t freq);
+void shut();
+void playFor(uint32_t freq, uint32_t ticks);
+void playSwitch(uint32_t *freqs, uint32_t cant, uint32_t length);
+
 /**
  * @see https://github.com/gabszzz/The-Imperial-March
  */

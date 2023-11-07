@@ -27,9 +27,7 @@
 #define B4 988
 #define C5 1046
 
-// #define MEEP(f, d) \
-//     beep(f);          \
-//     sleep_ticks(d);
+// #define MEEP(f, d); beep(f); sleep_ticks(d);
 
 /**
  * @see https://github.com/gabszzz/The-Imperial-March

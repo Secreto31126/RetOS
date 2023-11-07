@@ -645,7 +645,7 @@ char isPrefix(char *prefix, char *word)
 char *concatUnlimited(char *s1, char *s2)
 {
     uint64_t index = 0;
-    char *toReturn;
+    char *toReturn = null;
     while (*s1)
     {
         if (!(index % BLOCK))

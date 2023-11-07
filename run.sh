@@ -2,6 +2,12 @@
 path="${PWD}"
 container="tpe-builder"
 
+if [ "$1" = "DOCS" ]
+then
+    doxygen Doxyfile
+    exit 1
+fi
+
 docker build -t "$container" .
 if [ $? -ne 0 ]
 then

@@ -1,3 +1,5 @@
+#pragma GCC diagnostic ignored "-Wmultichar"
+
 #include "localization.h"
 
 #define LAZY_KEYBOARD_LAYOUT_LIMIT 58

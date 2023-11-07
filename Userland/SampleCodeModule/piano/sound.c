@@ -374,7 +374,7 @@ void shut()
  */
 void playFor(uint32_t freq, uint32_t ticks)
 {
-    uint32_t start = get_tick();
+    // uint32_t start = get_tick();
     beep(freq);
     sleep(ticks);
     shut();

@@ -61,6 +61,7 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
         return 1;
     }
     if ((xPointer + TRUE_LETTER_WIDTH * size) > w || c == '\n')
+    {
         if ((yPointer + TRUE_LETTER_HEIGHT * size * 2) > h) // *2 because letters are drawn from cursor downwards and to the right, so otherwise last line would have its top on the bottom of the screen
             return 0;
         else
@@ -69,6 +70,7 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
             if (c == '\n')
                 return 1;
         }
+    }
     drawCharAt(c, letterColor, highlightColor, xPointer, yPointer);
     moveCursor();
     return 1;

@@ -50,5 +50,6 @@ Window overlayOnWindow(Window w, ShapeFunction f, uint64_t xOffset, uint64_t yOf
 Window overlayFromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sourceHeight, HexColor *map, uint64_t xOffset, uint64_t yOffset, OVERLAY_MODE m);
 Window fromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sourceHeight, HexColor *map, uint64_t xOffset, uint64_t yOffset, OVERLAY_MODE m);
 uint64_t quickDraw(Window w);
+HexColor colorMapper(HexColor *colorMap, int code);
 
 #endif

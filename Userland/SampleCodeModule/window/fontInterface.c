@@ -9,22 +9,20 @@ typedef struct
     char *letters;
 } font;
 
-static font fonts[FONT_COUNT];
-static font *currentFont;
-void loadFont(char *fontName, char *fontLetters, int fontNumber)
-{
-    fonts[fontNumber % FONT_COUNT].name = fontName;
-    fonts[fontNumber % FONT_COUNT].letters = fontLetters;
-}
-void setFont(int fontNumber)
+static font fonts[FONT_COUNT] = {{"Default", Classic}};
+static font *currentFont = fonts;
+void setFont(int fontNumber) // was intended to allow changing fonts. Memory limitations prevented this
 {
     currentFont = fonts + (fontNumber % FONT_COUNT);
 }
-void initializeFonts()
+
+// Whole window will not be colored. Shell must handle backspace and whatnot (Literally just draw an ascii value that is all zeroes (such as '\b'), then reduce index).
+// Char will be automatically scaled to fit the window
+void drawCharToWindow(Window w, char c, HexColor letterColor, HexColor highlightColor)
 {
-    loadFont("Default", Classic, 0);
-    setFont(0);
+    toHexArray((currentFont->letters) + ((int)c % ASCII_MAX) * TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH, w.pixels, TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, w.width, w.height, 2, highlightColor, letterColor); // This is equivalent and quicker
 }
+
 /**
  * @deprecated drawCharToWindow has more finesse (and can carry a paint bucket)
  */
@@ -54,11 +52,4 @@ char drawStringToWindow(Window w, char *string, HexColor letterColor, HexColor h
     if (string[index])
         return 0;
     return 1;
-}
-
-// Whole window will not be colored. Shell must handle backspace and whatnot (Literally just draw an ascii value that is all zeroes (such as '\b'), then reduce index).
-// Char will be automatically scaled to fit the window
-void drawCharToWindow(Window w, char c, HexColor letterColor, HexColor highlightColor)
-{
-    toHexArray((currentFont->letters) + ((int)c % ASCII_MAX) * TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH, w.pixels, TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, w.width, w.height, 2, highlightColor, letterColor); // This is equivalent and quicker
 }

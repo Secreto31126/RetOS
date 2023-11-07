@@ -281,3 +281,8 @@ Window fromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sour
     }
     return w;
 }
+
+HexColor colorMapper(HexColor *colorMap, int code)
+{
+    return colorMap[code];
+}

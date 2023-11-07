@@ -103,7 +103,14 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
         setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }
-    /* comentado temporalmente porque no alcanza el espacio
+    else if (strcmp(commandParameters, "pong"))
+    {
+        setBackgroundArray(pongArray);
+        setBackgroundColorMap(pongColorMap);
+        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap);
+        setDrawOptions(0, 0, 1, 0);
+        matchFlag = 1;
+    }
     else if (strcmp(commandParameters, "creation"))
     {
         setBackgroundArray(creationArray);
@@ -112,14 +119,7 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
-    else if (strcmp(commandParameters, "pong"))
-    {
-        setBackgroundArray(pongArray);
-        setBackgroundColorMap(pongColorMap);
-        setSnakeDrawing(DRAW_SIZE, classicHeadUp, classicOther, classicTail, 0, classicApple, appleColorMap);
-        setDrawOptions(0, 0, 1, 0);
-        matchFlag = 1;
-    }
+    /* comentado porque no alcanza el espacio
     else if (strcmp(commandParameters, "camelot"))
     {
         setBackgroundArray(camelotArray);

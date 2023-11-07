@@ -77,7 +77,7 @@ void startPiano()
         default:
             if (note > '0' && note <= '6')
             {
-                char index = note - '1';
+                unsigned char index = note - '1';
                 paintString(songs[index].name, -1, 0);
                 songs[index].song();
             }

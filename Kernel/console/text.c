@@ -56,12 +56,12 @@ void ncPrintHeader(const char *string)
 
 	const int col_size = width / cols;
 
-	uint8_t *current;
+	uint8_t *current = header;
 	for (int i = 0; i < cols; i++)
 	{
 		current = header + i * col_size * 2;
 
-		int from, to;
+		int from = 0, to = 0;
 		switch (columns[i].dir)
 		{
 		case '\b':

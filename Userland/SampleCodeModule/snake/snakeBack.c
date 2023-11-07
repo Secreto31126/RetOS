@@ -73,6 +73,7 @@ unsigned int update(int snakeCount, int *deathCount, int *madeApple)
 {
     char toReturn = 0;
     tile lookingAt;
+    *madeApple = 0;
     for (int i = 0; i < BOARD_HEIGHT; i++)
         for (int j = 0; j < BOARD_WIDTH; j++)
         {
@@ -98,8 +99,7 @@ unsigned int update(int snakeCount, int *deathCount, int *madeApple)
                         if (board[nextY][nextX].toDraw == APPLE)
                         {
                             growSnake(lookingAt.player);
-                            makeApple();
-                            *madeApple = 1;
+                            (*madeApple)++;
                         }
                         snakes[lookingAt.player].nextHeadCoordinates[0] = nextX;
                         snakes[lookingAt.player].nextHeadCoordinates[1] = nextY;
@@ -136,6 +136,8 @@ unsigned int update(int snakeCount, int *deathCount, int *madeApple)
                 board[i][j].toDraw = NO_DRAW;
             }
         }
+    for (int i = 0; i < *madeApple; i++) // in case two or more apples were eaten
+        makeApple();
     setNewHeads(snakeCount);
     return toReturn; // player of dead snake, or 0
 }
@@ -268,7 +270,6 @@ DIRECTION parseTurn(DIRECTION comingFrom, DIRECTION goingTo)
     }
     default:
         return UP; // should never be here, as turns from opposite directions do not exist
+        break;
     }
-
-    return UP;
 }

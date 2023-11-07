@@ -155,9 +155,6 @@ dump_regs:
 
 	mov byte [dump_reg_string + rcx], 0
 
-	; Set rax to strlen, it will pick up the value with popall
-	mov	[rsp], rcx
-
 	popall
 	ret
 

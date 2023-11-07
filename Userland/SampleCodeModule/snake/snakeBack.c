@@ -116,7 +116,7 @@ unsigned int update(int snakeCount, int *deathCount, int *madeApple)
                         }
                     }
                 }
-                else if (i > SCORE_BOARD_TILES_Y && j > SCORE_BOARD_TILES_X)
+                else if (i > SCORE_BOARD_TILES_Y || j > SCORE_BOARD_TILES_X)
                 {
                     board[i][j].toDraw = NO_DRAW; // No real need to update unmoving parts until they die. The condition lets us keep scoreboard on top of playBoard (snake can run-over scoreboard without being erased)
                 }

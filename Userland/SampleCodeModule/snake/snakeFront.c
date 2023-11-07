@@ -31,12 +31,6 @@ static snakeDrawing currentDrawing = {DRAW_SIZE, classicHeadUp, classicOther, cl
 // Old draw modes commented porque me dio pena borrarlos :D
 void drawBackgroundWithParameters(Window w, uint64_t xOffset, uint64_t yOffset)
 {
-    // source = background;
-    // toHexArray(source, w.pixels, DRAW_SIZE, DRAW_SIZE, w.width, w.height, 1, BACKGROUND_COLOR);
-
-    // overlayOnWindow(w, backgroundFunction, xOffset, yOffset, 1.0, 1.0, OPAQUE);
-
-    // overlayFromCharArray(w, windowsArray, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, windowsColorMap, xOffset, yOffset, OPAQUE);
 
     overlayFromCharArray(w, backgroundArray, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, backgroundColorMap, xOffset, yOffset, OPAQUE);
     drawWindow(w, xOffset, yOffset);
@@ -72,10 +66,9 @@ int playSnake(uint16_t snakeCount)
     uint64_t time = get_tick();
     while (!gameOver)
     {
-        shut(); // stops any noises that begun on previous update loop
         drawScore(score);
         char c;
-        while ((c = readChar()))
+        while ((c = readChar())) // readChar returns 0 when buffer is empty. All player inputs should be read before passing them to the game
         {
             uint64_t size;
             if (c == '+' && (size = (getSize() + 1)) < MAX_LETTER_SIZE)
@@ -89,9 +82,11 @@ int playSnake(uint16_t snakeCount)
                 setSize(size);
             }
             doMovement(c, snakes);
+            wait();
         }
         if (timeHasPassed(time, MOVE_INTERVAL))
         {
+            shut(); // stops any noises that begun on previous update loop
             time = get_tick();
             for (int i = 0; i < snakeCount; i++)
                 if (snakes[i].nextMove != NONE)
@@ -172,44 +167,44 @@ void drawBoard(frontSnake *snakes)
 {
     uint64_t h = getScreenHeight(), w = getScreenWidth(), address = 0;
     uint64_t tileWidth = w / BOARD_WIDTH, tileHeight = h / BOARD_HEIGHT;
+    uint64_t xLimit = w - tileWidth, yLimit = h - tileHeight; // since tiles are drawn from top left
     Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
     tile *board = getBoard();
     snake *backSnakes = getSnakes();
     char *source;
+    HexColor *colorMap;
     uint64_t drawSize = currentDrawing.drawSize;
-    for (int i = 0; i < h; i += tileHeight)
+    for (int i = 0; i < yLimit; i += tileHeight)
     {
-        for (int j = 0; j < w; j += tileWidth, address++)
+        for (int j = 0; j < xLimit; j += tileWidth, address++)
         {
+            colorMap = snakes[board[address].player].colorMap;
             switch (board[address].toDraw)
             {
             case HEAD:
                 if (redrawBeforeHead)
                     drawBackgroundWithParameters(stamp, j, i); // Since the head can have transparency, the background must be redrawn before drawing head if a grow item has color where the head has transparency.
                 source = currentDrawing.headDrawing;
-                fromCharArray(stamp, source, drawSize, drawSize, snakes[board[address].player].colorMap, 0, 0, OPAQUE);
                 break;
             case TAIL:
                 if (redrawBeforeTail)
                     drawBackgroundWithParameters(stamp, j, i); // Since the tail has transparency, the background must be redrawn before drawing tail if the head has color where the tail is transparent.
                 source = currentDrawing.tailDrawing;
-                fromCharArray(stamp, source, drawSize, drawSize, snakes[board[address].player].colorMap, 0, 0, OPAQUE);
                 break;
             case TURN:
                 if (redrawBeforeTurn)
                     drawBackgroundWithParameters(stamp, j, i); // Since the tail has transparency, the background must be redrawn before drawing tail if the head has color where the tail is transparent.
                 source = currentDrawing.turnDrawing;
-                fromCharArray(stamp, source, drawSize, drawSize, snakes[board[address].player].colorMap, 0, 0, OPAQUE);
                 break;
             case BODY:
                 if (redrawBeforeBody)
                     drawBackgroundWithParameters(stamp, j, i); // Since the body might have transparency, the background must be redrawn before drawing tail.
                 source = currentDrawing.bodyDrawing;
-                fromCharArray(stamp, source, drawSize, drawSize, snakes[board[address].player].colorMap, 0, 0, OPAQUE);
                 break;
             case APPLE:
                 source = currentDrawing.growItemDrawing;
-                fromCharArray(stamp, source, drawSize, drawSize, currentDrawing.growItemColorMap, 0, 0, OPAQUE);
+                colorMap = currentDrawing.growItemColorMap;
+                // fromCharArray(stamp, source, drawSize, drawSize, currentDrawing.growItemColorMap, 0, 0, OPAQUE);
                 break;
             case BLANK:
                 drawBackgroundWithParameters(stamp, j, i);
@@ -220,6 +215,7 @@ void drawBoard(frontSnake *snakes)
                 continue;
                 break;
             }
+            fromCharArray(stamp, source, drawSize, drawSize, colorMap, 0, 0, OPAQUE);
             if (board[address].toDraw != APPLE && board[i].toDraw != BLANK) // don't want spinning apples or backgrounds.
                 switch (board[address].drawDirection)
                 {
@@ -238,7 +234,6 @@ void drawBoard(frontSnake *snakes)
                 }
             drawWindow(stamp, j, i);
         }
-        address--;
     }
     freeWindow(stamp);
 }
@@ -246,17 +241,6 @@ void drawBoard(frontSnake *snakes)
 void drawBackground()
 {
     uint64_t h = getScreenHeight(), w = getScreenWidth();
-    /*uint64_t tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
-    Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
-    for (int i = 0; i < h; i += tileHeight)
-    {
-        for (int j = 0; j < w; j += tileWidth)
-        {
-            drawBackgroundWithParameters(stamp, j, i);
-            drawWindow(stamp, j, i); // Since the tail has transparency, the background must be redrawn before drawing tail.
-        }
-    }
-    */
     Window wholeScreen = getWindow(w, h, malloc(h * w * sizeof(HexColor)));
     overlayFromCharArray(wholeScreen, backgroundArray, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, backgroundColorMap, 0, 0, OPAQUE);
     quickDraw(wholeScreen);

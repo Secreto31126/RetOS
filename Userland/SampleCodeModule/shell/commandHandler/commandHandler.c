@@ -119,7 +119,6 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
-    /* comentado porque no alcanza el espacio
     else if (strcmp(commandParameters, "camelot"))
     {
         setBackgroundArray(camelotArray);
@@ -128,7 +127,8 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
         setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }
-    */
+    /* comentado porque no alcanza el espacio
+     */
     if (matchFlag)
         return "Theme set.";
     return sPrintf("No theme matching %s was found.", commandParameters);

@@ -5,10 +5,12 @@
 void warpNLines(uint64_t n);
 void warpAndRedraw();
 void warpOneLine();
-const char *passCommand(char *toPass);
+char *passCommand(char *toPass);
 void paintLineStart();
 void paintCharOrWarp(char c);
 void paintStringOrWarp(char *s, char ask);
+void addStringToBuffer(char *s, char ask);
+void addCharToBuffer(char c);
 static char *buffer, *commandBuffer;
 static uint64_t index, commandIndex;
 static HexColor letterColor = 0xFF000000 | HEX_WHITE, highlightColor = 0xFF000000 | HEX_BLACK;
@@ -127,18 +129,18 @@ void paintCharOrWarp(char c)
         warpAndRedraw();
 }
 
-const char *passCommand(char *toPass)
+char *passCommand(char *toPass)
 {
     char mustRedraw = 0;
     char *toPaint = handleCommand(toPass, &mustRedraw);
 
     if (mustRedraw)
     {
-        const char *toReturn;
+        char *toReturn;
         if (strcmp(toPaint, ""))
         {
             if (strcmp(buffer, ""))
-                toReturn = lineStart;
+                toReturn = (char *)lineStart;
             else
                 toReturn = sPrintf("%s\n%s", buffer, lineStart);
         }
@@ -153,7 +155,7 @@ const char *passCommand(char *toPass)
     if (strcmp(toPaint, ""))
     {
         if (strcmp(buffer, ""))
-            return lineStart;
+            return (char *)lineStart;
         else
             return sPrintf("\n%s", lineStart);
     }

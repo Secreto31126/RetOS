@@ -89,7 +89,7 @@ int playSnake(uint16_t snakeCount)
                 drawTextBackground(size + 1, MAX_SCORE_LENGTH);
                 setSize(size);
             }
-            doMovement(c, snakes);
+            doMovement(c, snakeCount, snakes);
             wait();
         }
         if (timeHasPassed(time, MOVE_INTERVAL))

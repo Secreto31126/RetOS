@@ -112,7 +112,7 @@ uint64_t drawShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x,
 uint64_t drawScaledShape(ShapeFunction f, uint32_t width, uint32_t height, uint32_t x, uint32_t y, double xScaleFactor, double yScaleFactor)
 {
     if (!xScaleFactor || !yScaleFactor)
-        return;
+        return 0;
 
     uint64_t drawn = 0;
     for (int i = 0; i < height && i < VBE_mode_info->height; i++)

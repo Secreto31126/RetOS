@@ -49,9 +49,9 @@ void *memcpy(void *destination, const void *source, uint64_t length)
 	return destination;
 }
 
-void dump_regs_hex_magician(char *s, uint8_t r)
+void dump_regs_hex_magician(unsigned char *s, uint8_t r)
 {
-	char hextable[] = "0123456789ABCDEF";
+	unsigned char hextable[] = "0123456789ABCDEF";
 	s[0] = hextable[r / 0x10];
 	s[1] = hextable[r % 0x10];
 }

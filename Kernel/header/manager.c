@@ -5,11 +5,11 @@
 #include <localization.h>
 
 static void update_header_clock(char *header);
-static void update_header_counter(char *header);
+// static void update_header_counter(char *header);
 
 void update_header()
 {
-    char header[] = "\bRetOS\b\eExceptions: \t\t\t\t\e00:00";
+    char header[] = "\bRetOS\b\eExceptions: DEAD\e00:00";
     update_header_clock(header);
     // update_header_counter(header);
     ncPrintHeader(header);
@@ -36,16 +36,13 @@ static void update_header_clock(char *header)
     header[29] = '0' + minute % 16;
 }
 
-static void update_header_counter(char *header)
-{
-    uint64_t exceptions = get_exceptions_count();
+// static void update_header_counter(char *header)
+// {
+//     uint16_t count = get_exceptions_count();
 
-    while (exceptions > 0xFFFF)
-        exceptions /= 16;
-
-    int i = 23;
-    do
-    {
-        header[i--] = '0' + exceptions % 16 + (exceptions % 16 > 9 ? 7 : 0);
-    } while (exceptions /= 16 && i > 19);
-}
+//     int i = 23;
+//     do
+//     {
+//         header[i--] = '0' + count % 16 + (count % 16 > 9 ? 7 : 0);
+//     } while (count /= 16 && i > 19);
+// }

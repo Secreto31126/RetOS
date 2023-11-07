@@ -28,10 +28,18 @@ pain_manager:
 	hlt
 	jmp		pain_manager
 
-%macro exception_handler 1
+%macro full_dump_interruption 0
 	call	dump_regs
-	mov		rdi, [rsp]
+	push	rdi
+	mov		rdi, [rsp + 8]
+	pushall
 	call	dump_regs_include_rip
+	popall
+	pop		rdi
+%endmacro
+
+%macro exception_handler 1
+	full_dump_interruption
 
 	mov		rdi, %1
 	call	exception_manager
@@ -83,6 +91,7 @@ tick_handler:
 
 ; void keyboard_handler(void);
 keyboard_handler:
+	full_dump_interruption
 	master_pic_handler 1
 
 ; void cascade_pic(void);

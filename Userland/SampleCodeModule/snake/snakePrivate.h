@@ -37,12 +37,12 @@ typedef struct
     DIRECTION direction;
     uint64_t color;
     char alive;
-    char nextHeadCoordinates[2];
+    unsigned char nextHeadCoordinates[2];
 } snake;
 
 typedef struct tile
 {
-    char player;
+    unsigned int player;
     unsigned int health;
     TO_DRAW toDraw;
     DIRECTION trueDirection;

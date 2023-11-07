@@ -20,13 +20,21 @@ void freeColorMaps(int snakeCount, frontSnake *snakes);
 void drawScore(uint64_t score);
 void drawTextBackground(uint64_t size, uint64_t textLength);
 // default theme is windows
-static char *backgroundArray = windowsArray;
+static char *backgroundArray = (char *)windowsArray;
 static HexColor *backgroundColorMap = windowsColorMap;
 static char redrawBeforeBody = 0;
 static char redrawBeforeTail = 1;
 static char redrawBeforeTurn = 1;
 static char redrawBeforeHead = 0;
-static snakeDrawing currentDrawing = {DRAW_SIZE, classicHeadUp, classicOther, classicTail, classicTurn, classicApple, appleColorMap}; // turn currently unused
+static snakeDrawing currentDrawing = {
+    .drawSize = DRAW_SIZE,
+    .headDrawing = (char *)classicHeadUp,
+    .bodyDrawing = (char *)classicOther,
+    .tailDrawing = (char *)classicTail,
+    .turnDrawing = (char *)classicTurn,
+    .growItemDrawing = (char *)classicApple,
+    .growItemColorMap = (HexColor *)appleColorMap,
+};
 
 // Old draw modes commented porque me dio pena borrarlos :D
 void drawBackgroundWithParameters(Window w, uint64_t xOffset, uint64_t yOffset)
@@ -189,7 +197,7 @@ void drawBoard(frontSnake *snakes)
     uint64_t tileWidth = w / BOARD_WIDTH, tileHeight = h / BOARD_HEIGHT;
     Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
     tile *board = getBoard();
-    snake *backSnakes = getSnakes();
+    // snake *backSnakes = getSnakes();
     char *source;
     uint64_t drawSize = currentDrawing.drawSize;
     for (int i = 0; i < h; i += tileHeight)

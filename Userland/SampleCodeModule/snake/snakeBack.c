@@ -268,6 +268,7 @@ DIRECTION parseTurn(DIRECTION comingFrom, DIRECTION goingTo)
     }
     default:
         return UP; // should never be here, as turns from opposite directions do not exist
-        break;
     }
+
+    return UP;
 }

@@ -59,9 +59,9 @@ void startModules()
             paintString("You are now in the exception tests module.\nPress 1 to test the div-zero exception.\nPress 2 to test the invalid opcode exception.\nPress 3 to return to the module selector.\n", -1, 0);
             while ((c = getChar()) != '3')
             {
-                int i;
+                int i = 1;
                 if (c == '1')
-                    i = 1 / 0;
+                    i = i / (i - 1);
                 if (c == '2')
                 {
                     char code[] = "ඞඞඞ";

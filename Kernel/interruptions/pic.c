@@ -95,7 +95,12 @@ static void keyboard_handler()
             if (!IS_RELEASE(scancode))
                 return;
 
-            write_stderr(dump_reg_string, dump_regs() + 1);
+            // strlen + 1
+            uint16_t i = 0;
+            while (dump_reg_string[i++])
+                ;
+
+            write_stderr(dump_reg_string, i);
             return;
         }
     }

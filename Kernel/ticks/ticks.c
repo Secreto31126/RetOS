@@ -21,10 +21,10 @@ uint64_t get_tick()
 void update_tick()
 {
     // Every second
-    if (current_tick % 18)
-    {
-        update_header();
-    }
+    // if (!(current_tick % 18))
+    // {
+    //     update_header();
+    // }
 
     current_tick++;
 
@@ -37,7 +37,7 @@ void update_tick()
         if (shedule[i].tick <= current_tick)
         {
             shedule[i].task();
-            shedule[i].task == 0;
+            shedule[i].task = 0;
             active_tasks--;
         }
         else

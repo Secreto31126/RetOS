@@ -146,7 +146,7 @@ char *changeLetterColor(char *commandParameters, char *mustRedraw)
 {
     if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
         return "Hex value given not valid.";
-    uint64_t hex = 0;
+    // uint64_t hex = 0;
     setLetterColor(atoiHex(commandParameters));
     *mustRedraw = 1;
     return "Letter color set";

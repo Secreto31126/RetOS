@@ -64,9 +64,9 @@ int strcmp(const char *p1, const char *p2)
 	return c1 - c2;
 }
 
-void dump_regs_hex_magician(char *s, uint8_t r)
+void dump_regs_hex_magician(unsigned char *s, uint8_t r)
 {
-	char hextable[] = "0123456789ABCDEF";
+	unsigned char hextable[] = "0123456789ABCDEF";
 	s[0] = hextable[r / 0x10];
 	s[1] = hextable[r % 0x10];
 }

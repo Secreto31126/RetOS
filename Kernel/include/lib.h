@@ -26,12 +26,10 @@ extern void set_interrupt_flag(void);
 extern void unset_interrupt_flag(void);
 extern void halt_once(void);
 
-extern char dump_reg_string[360];
+extern unsigned char dump_reg_string[360];
 /**
  * @brief Dump registers value into dump_reg_string
- *
- * @return uint64_t The string length
  */
-extern uint64_t dump_regs(void);
+extern void dump_regs(void);
 
 #endif

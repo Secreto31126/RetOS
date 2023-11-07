@@ -20,6 +20,12 @@ void exception_manager(uint8_t exception)
         exceptions++;
     error_code = exception;
 
+    // strlen + 1
+    uint16_t i = 0;
+    while (dump_reg_string[i++])
+        ;
+    write_stderr(dump_reg_string, i);
+
     BSOD(exception);
     set_interrupt_flag();
     sleep_ticks(18 * 3);

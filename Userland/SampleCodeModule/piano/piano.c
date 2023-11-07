@@ -3,6 +3,8 @@
 static uint8_t exit = 0;
 static Songs *songs;
 
+void addSongs(Songs *songs);
+
 void startPiano()
 {
     if ((songs = malloc(sizeof(Songs) * 6)) != 0)

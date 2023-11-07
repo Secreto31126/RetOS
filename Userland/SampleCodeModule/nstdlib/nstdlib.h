@@ -15,6 +15,7 @@ extern unsigned long long get_unix_time(void);
 extern void *malloc(uint64_t size);
 extern void free(void *ptr);
 extern void beep(uint32_t freq);
+extern void halt_user();
 
 // library
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize);

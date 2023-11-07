@@ -5,7 +5,6 @@
 #define BIG_BLOCK 400
 #define null 0
 
-extern void halt_user();
 extern uint64_t get_dump(char *buffer, uint64_t n);
 uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisManyChars);
 uint64_t concatFrom(char *s1, char *s2);

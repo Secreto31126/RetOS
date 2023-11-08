@@ -17,6 +17,10 @@ static HexColor letterColor = 0xFF000000 | HEX_WHITE, highlightColor = 0xFF00000
 static const char *lineStart = ":~ ";
 static const char *shellIntro = "You are now in shell:\n";
 static char fromLastEnter = 0;
+void drawTime()
+{
+    drawStringAt(getTimeString(), 0xFFFFFFFF, 0xFF000000, 0, 0);
+}
 char shellStart()
 {
     uint32_t width = getScreenWidth();
@@ -34,7 +38,7 @@ char shellStart()
     char c;
     while (1)
     {
-        drawStringAt(getTimeString(), 0xFFFFFFFF, 0xFF000000, 0, 0);
+        drawTime();
         wait();
         if ((c = readChar()))
         {
@@ -107,17 +111,17 @@ void paintStringOrWarp(char *s, char ask)
         if (ask) // informs user output does not fit, waits for input, warps output, if it still does not fit, continues informing and waiting for input and warping
         {
             char *prompt = "The output of this command will not fit. Press any key to continue output.";
-            uint64_t pos = getScreenHeight() - TRUE_LETTER_HEIGHT * getSize() * (strlen(prompt) / getCharPerLine() + 1);
             do
             {
                 blank();
                 paintString(buffer, letterColor, highlightColor);
-                drawStringAt(prompt, 0xFF000000, 0xFFFFFFFF, 0, pos);
+                drawStringAt(prompt, 0xFF000000, 0xFFFFFFFF, 0, 0);
                 getChar();
                 warpNLines(MOVE_BY);
             } while (!willFit(buffer));
             blank();
             paintString(buffer, letterColor, highlightColor);
+            drawTime();
         }
         else // simply warps the output
         {

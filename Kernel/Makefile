@@ -32,6 +32,6 @@ $(LOADEROBJECT):
 	$(ASM) $(ASMFLAGS) $(LOADERSRC) -o $(LOADEROBJECT)
 
 clean:
-	@find . -name **.o -delete -or -name **.bin -delete
+	@find . -name "**.o" -delete -or -name "**.bin" -delete
 
 .PHONY: all clean

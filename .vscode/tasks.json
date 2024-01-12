@@ -21,7 +21,7 @@
             "command": "qemu-system-x86_64",
             "args": [
                 "-hda",
-                "\"${workspaceFolder}/Image/x64BareBonesImage.qcow2\"",
+                "\"/tmp/retos/x64BareBonesImage.qcow2\"",
                 "-m",
                 "512",
                 "-d",

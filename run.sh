@@ -41,8 +41,9 @@ then
 
     if [ "$(whoami)" = "tomyr" ]
     then
-        echo "Copying files to /mnt/c/Users/tomyr/Documents/C/RetOS/Image"
-        cp "$path/Image/"* "/mnt/c/Users/tomyr/Documents/C/RetOS/Image/"
+        echo "Copying files to //wsl$/Ubuntu/tmp/retos"
+        mkdir -p "//wsl$/Ubuntu/tmp/retos"
+        cp "$path/Image/"* "//wsl$/Ubuntu/tmp/retos"
     else
         echo "Copying files to /mnt/c/Users/Usuario/Documents/GitHub/RetOS/Image"
         cp "$path/Image/"* "/mnt/c/Users/Usuario/Documents/GitHub/RetOS/Image/"

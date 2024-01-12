@@ -6,6 +6,11 @@ Executable executables[EXECUTABLES] = {
         .filename = "module",
         .main = (EntryPoint)0x400000,
     },
+    {
+        .mod = 7,
+        .filename = "tomyland",
+        .main = (EntryPoint)0x600000,
+    },
 };
 
 extern uint8_t text;

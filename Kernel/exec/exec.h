@@ -5,7 +5,7 @@
 #include <ticks.h>
 #include <stdint.h>
 
-#define EXECUTABLES 1
+#define EXECUTABLES 2
 
 /**
  * @brief Userland entry point

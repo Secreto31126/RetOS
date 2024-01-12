@@ -15,6 +15,7 @@ extern uint8_t endOfKernel;
 
 static void *const sampleCodeModuleAddress = (void *)0x400000;
 static void *const sampleDataModuleAddress = (void *)0x500000;
+static void *const tomyland = (void *)0x600000;
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
@@ -25,8 +26,7 @@ void initializeKernelBinary()
 {
 	char buffer[10];
 
-	ncPrint("[x64BareBones]");
-	ncNewline();
+	ncPrint("[x64BareBones]\n");
 
 	ncPrint("CPU Vendor:");
 	ncPrint(cpuVendor(buffer));
@@ -34,48 +34,40 @@ void initializeKernelBinary()
 
 	ncPrint("[Loading memory manager]");
 	init_memory_manager();
-	ncPrint("[Done]");
+	ncPrint(" [Done]\n");
 
-	ncPrint("[Loading modules]");
-	ncNewline();
+	ncPrint("[Loading modules]\n");
 	void *moduleAddresses[] = {
 		sampleCodeModuleAddress,
-		sampleDataModuleAddress};
+		sampleDataModuleAddress,
+		tomyland,
+	};
 
 	loadModules(&endOfKernelBinary, moduleAddresses);
-	ncPrint("[Done]");
-	ncNewline();
-	ncNewline();
+	ncPrint("[Done]\n\n");
 
 	ncPrint("[Initializing kernel's binary]");
-	ncNewline();
 
 	clearBSS(&bss, &endOfKernel - &bss);
 
-	ncPrint("  text: 0x");
+	ncPrint("\n\ttext: 0x");
 	ncPrintHex((uint64_t)&text);
-	ncNewline();
-	ncPrint("  rodata: 0x");
+	ncPrint("\n\trodata: 0x");
 	ncPrintHex((uint64_t)&rodata);
-	ncNewline();
-	ncPrint("  data: 0x");
+	ncPrint("\n\tdata: 0x");
 	ncPrintHex((uint64_t)&data);
-	ncNewline();
-	ncPrint("  bss: 0x");
+	ncPrint("\n\tbss: 0x");
 	ncPrintHex((uint64_t)&bss);
-	ncNewline();
 
-	ncPrint("[Done]");
-	ncNewline();
-	ncNewline();
+	ncPrint("\n[Done]\n\n");
 
 	ncPrint("Setting OS's language to ES_AR");
 	set_language(ES_AR);
-	ncPrint(" [Done]");
+	ncPrint(" [Done]\n");
 
 	ncPrint("Initializing kernel's IDT");
 	initialize_idt();
 	ncPrint(" [Done]");
 
-	ncClear();
+	// ncClear();
 }

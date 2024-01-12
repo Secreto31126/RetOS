@@ -4,6 +4,8 @@
 	global cpuVendor
 	global input_dword
 	global output_dword
+	global input_word
+	global output_word
 	global input_byte
 	global output_byte
 	global set_interrupt_flag
@@ -51,6 +53,19 @@ output_dword:
 	mov edx, edi
 	mov eax, esi
 	out dx, eax
+	ret
+
+; uint16_t input_word(uint16_t port);
+input_word:
+	mov edx, edi
+	in	ax, dx
+	ret
+
+; void output_word(uint16_t port, uint16_t value);
+output_word:
+	mov edx, edi
+	mov eax, esi
+	out dx, ax
 	ret
 
 ; uint8_t input_byte(uint16_t port);

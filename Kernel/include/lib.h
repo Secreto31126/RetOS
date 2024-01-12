@@ -19,6 +19,8 @@ extern char *cpuVendor(char *result);
 
 extern uint32_t input_dword(uint16_t port);
 extern void output_dword(uint16_t port, uint32_t value);
+extern uint16_t input_word(uint16_t port);
+extern void output_word(uint16_t port, uint16_t value);
 extern uint8_t input_byte(uint16_t port);
 extern void output_byte(uint16_t port, uint8_t value);
 

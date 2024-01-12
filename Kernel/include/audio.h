@@ -1,6 +1,8 @@
 #ifndef AIO_H
 #define AIO_H
 
+#include <stdint.h>
+
 /**
  * @brief Plays a beep sound asynchronously
  *

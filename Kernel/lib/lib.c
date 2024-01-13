@@ -1,6 +1,6 @@
 #include <lib.h>
 
-void *memset(void *destination, int32_t c, uint64_t length)
+void *memset(void *destination, int c, size_t length)
 {
 	uint8_t chr = (uint8_t)c;
 	char *dst = (char *)destination;
@@ -11,7 +11,7 @@ void *memset(void *destination, int32_t c, uint64_t length)
 	return destination;
 }
 
-void *memcpy(void *destination, const void *source, uint64_t length)
+void *memcpy(void *destination, const void *source, size_t length)
 {
 	/*
 	 * memcpy does not support overlapping buffers, so always do it
@@ -62,6 +62,44 @@ int strcmp(const char *p1, const char *p2)
 			return c1 - c2;
 	} while (c1 == c2);
 	return c1 - c2;
+}
+
+size_t strlen(const char *str)
+{
+	const char *s = str;
+	while (*s)
+		s++;
+	return s - str;
+}
+
+char *strncpy(char *dest, const char *src, size_t n)
+{
+	if (n)
+	{
+		char *d = dest;
+		const char *s = src;
+
+		do
+		{
+			if (!(*d++ = *s++))
+			{
+				/* NUL pad the remaining n-1 bytes */
+				while (--n)
+					*d++ = 0;
+				break;
+			}
+		} while (--n);
+	}
+
+	return dest;
+}
+
+char *strcpy(char *dest, const char *src)
+{
+	char *save = dest;
+	for (; (*dest = *src); ++src, ++dest)
+		;
+	return save;
 }
 
 void dump_regs_hex_magician(unsigned char *s, uint8_t r)

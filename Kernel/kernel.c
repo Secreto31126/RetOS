@@ -26,10 +26,9 @@ void initializeKernelBinary()
 {
 	char buffer[10];
 
-	ncPrint("[x64BareBones]\n");
-
-	ncPrint("CPU Vendor:");
+	ncPrint("CPU Vendor: ");
 	ncPrint(cpuVendor(buffer));
+	ncNewline();
 	ncNewline();
 
 	ncPrint("[Loading memory manager]");
@@ -44,7 +43,7 @@ void initializeKernelBinary()
 	};
 
 	loadModules(&endOfKernelBinary, moduleAddresses);
-	ncPrint("[Done]\n\n");
+	ncPrint("[Done]\n");
 
 	ncPrint("[Initializing kernel's binary]");
 
@@ -67,7 +66,7 @@ void initializeKernelBinary()
 
 	ncPrint("Initializing kernel's IDT");
 	initialize_idt();
-	ncPrint(" [Done]");
+	ncPrint(" [Done]\n");
 
-	// ncClear();
+	ncClear();
 }

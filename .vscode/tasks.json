@@ -24,10 +24,12 @@
                 "\"/tmp/retos/x64BareBonesImage.qcow2\"",
                 "-m",
                 "512",
-                "-d",
-                "int",
+                // "-d",
+                // "int",
                 "-soundhw",
-                "pcspk"
+                "pcspk",
+                "-serial",
+                "stdio"
             ],
             "group": {
                 "kind": "test",

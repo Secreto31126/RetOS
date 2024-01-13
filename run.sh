@@ -42,7 +42,7 @@ then
     if [ "$(whoami)" = "tomyr" ]
     then
         echo "Copying files to //wsl$/Ubuntu/tmp/retos"
-        mkdir -p "//wsl$/Ubuntu/tmp/retos"
+        mkdir "//wsl$/Ubuntu/tmp/retos"
         cp "$path/Image/"* "//wsl$/Ubuntu/tmp/retos"
     else
         echo "Copying files to /mnt/c/Users/Usuario/Documents/GitHub/RetOS/Image"
@@ -52,6 +52,8 @@ then
 
     make clean -CToolchain > /dev/null
     make clean > /dev/null
+
+    read -p "Press enter to finish"
 else
     sudo qemu-system-x86_64 -hda "$path/Image/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk
     make clean -CToolchain > /dev/null

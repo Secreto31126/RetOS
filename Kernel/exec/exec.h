@@ -4,8 +4,11 @@
 #include <lib.h>
 #include <ticks.h>
 #include <stdint.h>
+#include <memory.h>
 
 #define EXECUTABLES 2
+#define MAX_ARGS 256
+#define STACK_SIZE 0x8000
 
 /**
  * @brief Userland entry point
@@ -32,12 +35,43 @@ typedef struct
 } Executable;
 
 /**
+ * @brief Small type to hold the rsp pointer
+ */
+typedef uint64_t *RSP;
+/**
+ * @brief Small type to hold the top of the stack pointer
+ */
+typedef char **Stack;
+
+extern int pid;
+/**
  * @brief Array of all of RetOS executables
  */
 extern Executable executables[EXECUTABLES];
 
-void *getStackBase();
+/**
+ * @brief Allocate stack memory and return the top and base of the stack
+ *
+ * @param rsp The base of the stack (top + size - sizeof(uint64_t))
+ * @return void* The top of the stack, NULL if error
+ */
+Stack getStackTopAndBase(RSP *rsp);
+/**
+ * @brief Set the stack's argv
+ *
+ * @param rsp The stack's base
+ * @param argv The argument values
+ * @return int argc if success, negative if error
+ */
+int setStackArgs(RSP *rsp, char *const argv[], Executable executable);
+/**
+ * @brief Free the stack memory
+ *
+ * @param stack The stack memory
+ * @param argc The number of arguments
+ */
+void freeStack(Stack stack, int argc);
 
-extern int portal_to_userland(int argc, char *const argv[], EntryPoint code, void *rsp);
+extern void portal_to_userland(EntryPoint code, RSP rsp);
 
 #endif

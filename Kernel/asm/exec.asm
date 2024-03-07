@@ -1,29 +1,27 @@
-	extern getStackBase
+	extern ncPrintHex
 
 	global portal_to_userland
 
-; int portal_to_userland(int argc, char *argv[], int (*code)(void), uint64_t rsp);
+; void portal_to_userland(int (*code)(void), uint64_t rsp);
 portal_to_userland:
-	mov		rax, [rsp]
-	mov		rsp, rcx
-	push	0			; NULL terminated argv
-
-.loop:
-	cmp		rdi, 0
-	jbe		.continue
-
-	dec			rdi
-	push qword	[rsi + rdi]
-	jmp			.loop
+	mov		rax, safe_return
+	mov		rsp, rsi
 
 .continue:
 	push		rax		; RetOS :)
-	mov			rcx, rsp
+	mov			rax, rsp; Get the stack base
 
 	push qword  0		; SS
-	push		rcx		; RSP
+	push		rax		; RSP
     push qword	0x202	; RFLAGS
 	push qword	0x8		; CS
-	push		rdx		; Userland code
+	push		rdi		; Userland code
 
     iretq				; In Userland we trust
+
+safe_return:
+	mov rdi, rax
+	call ncPrintHex
+.halt:
+	hlt
+	jmp .halt

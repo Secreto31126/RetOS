@@ -1,13 +1,13 @@
 include ../Makefile.inc
 
 MODULE=0002-tomyland.bin
-SOURCES=$(wildcard [^_]*.c)
+SOURCES=$(wildcard *.c)
 SOURCES_ASM=$(wildcard asm/*.asm)
 OBJECTS=$(SOURCES:.c=.o)
 OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
-LOADERSRC=_loader.c
+LOADERSRC=loader.asm
 
-LOADEROBJECT=$(LOADERSRC:.c=.o)
+LOADEROBJECT=$(LOADERSRC:.asm=.o)
 STATICLIBS=
 
 all: log $(MODULE)
@@ -28,7 +28,7 @@ $(MODULE): $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM)
 	$(ASM) $(ASMFLAGS) $< -o $@
 
 $(LOADEROBJECT):
-	$(GCC) $(GCCFLAGS) -c $(LOADERSRC) -o $(LOADEROBJECT)
+	$(ASM) $(ASMFLAGS) $(LOADERSRC) -o $(LOADEROBJECT)
 
 clean:
 	rm -rf *.o

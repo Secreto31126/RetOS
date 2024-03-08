@@ -7,7 +7,7 @@
 #include <memory.h>
 
 #define EXECUTABLES 2
-#define MAX_ARGS 256
+#define MAX_ARGS 255
 #define STACK_SIZE 0x8000
 
 /**
@@ -37,7 +37,7 @@ typedef struct
 /**
  * @brief Small type to hold the rsp pointer
  */
-typedef uint64_t *RSP;
+typedef void **RSP;
 /**
  * @brief Small type to hold the top of the stack pointer
  */
@@ -68,9 +68,10 @@ int setStackArgs(RSP *rsp, char *const argv[], Executable executable);
  * @brief Free the stack memory
  *
  * @param stack The stack memory
+ * @param rsp The stack base
  * @param argc The number of arguments
  */
-void freeStack(Stack stack, int argc);
+void freeStack(Stack stack, RSP rsp, int argc);
 
 extern void portal_to_userland(EntryPoint code, RSP rsp);
 

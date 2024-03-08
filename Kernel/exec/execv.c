@@ -2,6 +2,7 @@
 #include <console.h>
 
 static Stack current_stack = NULL;
+static RSP current_rsp = NULL;
 static int current_argc = 0;
 
 int execv(const char *pathname, char *const argv[])
@@ -18,7 +19,7 @@ int execv(const char *pathname, char *const argv[])
 
             pid++;
 
-            RSP rsp;
+            RSP rsp = NULL;
             Stack stack_memory = getStackTopAndBase(&rsp);
 
             if (!stack_memory)
@@ -32,17 +33,18 @@ int execv(const char *pathname, char *const argv[])
 
             if (argc < 0)
             {
-                freeStack(stack_memory, 0);
+                freeStack(stack_memory, rsp, 0);
                 return -argc;
             }
 
             if (current_stack)
             {
-                freeStack(current_stack, current_argc);
+                freeStack(current_stack, current_rsp, current_argc);
             }
 
-            current_argc = argc;
             current_stack = stack_memory;
+            current_rsp = rsp;
+            current_argc = argc;
 
             portal_to_userland(executables[i].main, rsp);
         }

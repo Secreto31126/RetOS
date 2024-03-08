@@ -77,7 +77,15 @@ int setStackArgs(RSP *rsp, char *const argv[], Executable executable)
         // ncPrintDec(i);
         // ncPrint(": ");
 
-        *stack = strcpy((char *)malloc(strlen(args) + 1), args);
+        char *copy = malloc(strlen(args) + 1);
+
+        if (!copy)
+        {
+            freeStack(NULL, (RSP)stack, argc - i - 1);
+            return -12;
+        }
+
+        *stack = strcpy(copy, args);
 
         // ncPrintHex((uint64_t)stack);
         // ncPrint(": ");
@@ -109,9 +117,9 @@ int setStackArgs(RSP *rsp, char *const argv[], Executable executable)
     return argc;
 }
 
-void freeStack(Stack stack, int argc)
+void freeStack(Stack stack, RSP rsp, int argc)
 {
     for (int i = 0; i < argc; i++)
-        free(stack[i]);
+        free(*rsp++);
     free(stack);
 }

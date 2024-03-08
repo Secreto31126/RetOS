@@ -2,20 +2,22 @@
 
 #include <sys.h>
 #include <stdint.h>
+#include <stddef.h>
 
 extern char bss;
 extern char endOfBinary;
 
-int main(char *);
+int main(int argc, char *argv[]);
 void *memset(void *destiny, int32_t c, uint64_t length);
+size_t strlen(const char *str);
 
-int main(char *name)
+int main(int argc, char *argv[])
 {
-	write(1, "Welcome to ", 12);
-	write(1, name, 9);
-	write(1, "!\n", 3);
-
-	return 0xDEADBEEF;
+	for (int i = 0; i < argc; i++)
+	{
+		write(1, argv[i], strlen(argv[i]));
+		write(1, "\n", 1);
+	}
 
 	char c;
 	beep(1000);
@@ -26,11 +28,16 @@ int main(char *name)
 	return 0xDEADC0DE;
 }
 
-int c_start(char *name)
+int c_start(char **argv)
 {
 	// Clean BSS
 	memset(&bss, 0, &endOfBinary - &bss);
-	return main(name);
+
+	int argc = 0;
+	while (argv[argc])
+		argc++;
+
+	return main(argc, argv);
 }
 
 void *memset(void *destiation, int32_t c, uint64_t length)
@@ -42,4 +49,12 @@ void *memset(void *destiation, int32_t c, uint64_t length)
 		dst[length] = chr;
 
 	return destiation;
+}
+
+size_t strlen(const char *str)
+{
+	const char *s = str;
+	while (*s)
+		s++;
+	return s - str;
 }

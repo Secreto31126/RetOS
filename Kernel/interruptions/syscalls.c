@@ -3,7 +3,7 @@
 /**
  * @brief Read from a file descriptor
  *
- * @param fd 0 for stdin, 3 for stdkey
+ * @param fd 0 for stdin, 2 for stderr, 3 for stdkey
  * @param buffer The buffer to write to
  * @param count The number of bytes to read
  * @return uint64_t The number of bytes read

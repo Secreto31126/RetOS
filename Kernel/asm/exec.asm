@@ -1,4 +1,5 @@
 	extern ncPrintHex
+	extern ncNewline
 
 	global portal_to_userland
 
@@ -22,6 +23,11 @@ portal_to_userland:
 safe_return:
 	mov rdi, rax
 	call ncPrintHex
+	call ncNewline
+	mov edx, 0x604
+	mov eax, 0x2000
+	out dx, ax		; Power off QEMU
 .halt:
+	cli
 	hlt
 	jmp .halt

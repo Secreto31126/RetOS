@@ -52,7 +52,7 @@ static uint64_t get_lucas(uint8_t *buffer, uint64_t count);
  */
 static uint64_t halt(uint64_t, uint64_t, uint64_t, uint64_t rax);
 
-#define SYSCALL_COUNT 11
+#define SYSCALL_COUNT 12
 typedef uint64_t (*syscall)(uint64_t, uint64_t, uint64_t, uint64_t);
 static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)read,
@@ -66,6 +66,7 @@ static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)get_tick,
     (syscall)get_lucas,
     (syscall)halt,
+    (syscall)execv,
 };
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)

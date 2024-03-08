@@ -57,6 +57,9 @@ int setStackArgs(RSP *rsp, char *const argv[], Executable executable)
     *stack = NULL;
 
     // ncNewline();
+    // ncPrint("argc: ");
+    // ncPrintDec(argc);
+    // ncNewline();
     // ncPrintHex((uint64_t)stack);
     // ncPrint(": ");
     // ncPrint("NULL");
@@ -67,11 +70,15 @@ int setStackArgs(RSP *rsp, char *const argv[], Executable executable)
     for (int i = argc - 1; i >= 0; i--)
     {
         char *args = argv[i];
-        *stack = strcpy((char *)malloc(strlen(args) + 1), args);
 
         // ncNewline();
-        // ncPrintHex(i);
-        // ncPrint(" arg: ");
+        // ncPrintHex((uint64_t)args);
+        // ncPrint(" - arg ");
+        // ncPrintDec(i);
+        // ncPrint(": ");
+
+        *stack = strcpy((char *)malloc(strlen(args) + 1), args);
+
         // ncPrintHex((uint64_t)stack);
         // ncPrint(": ");
         // ncPrint(args);
@@ -91,12 +98,12 @@ int setStackArgs(RSP *rsp, char *const argv[], Executable executable)
 
     // ncNewline();
     // ncPrint("rsp: ");
-    // ncPrintHex(*rsp);
+    // ncPrintHex((uint64_t)*rsp);
     // ncPrint("->");
 
     *rsp = (RSP)(stack);
 
-    // ncPrintHex(*rsp);
+    // ncPrintHex((uint64_t)*rsp);
     // ncNewline();
 
     return argc;

@@ -18,7 +18,7 @@ extern size_t write(int fd, const void *str, size_t len);
 extern void *malloc(uint32_t size);
 extern void free(void *ptr);
 extern size_t get_unix_time(void);
-// uint64_t get_screen_size();
+extern size_t get_screen_size();
 extern void beep(uint32_t freq);
 extern size_t get_tick();
 extern void halt_user();

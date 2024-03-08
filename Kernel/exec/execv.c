@@ -1,5 +1,4 @@
 #include "exec.h"
-#include <console.h>
 
 static Stack current_stack = NULL;
 static RSP current_rsp = NULL;

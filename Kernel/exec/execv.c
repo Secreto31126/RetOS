@@ -36,18 +36,14 @@ int execv(const char *pathname, char *const argv[])
                 return -argc;
             }
 
-            // ncPrint("Hi :]\n");
             if (current_stack)
             {
-                // ncPrint("Uh :[\n");
                 freeStack(current_stack, current_argc);
             }
 
-            // ncPrint("Hehe :]\n");
             current_argc = argc;
             current_stack = stack_memory;
 
-            // ncPrint("Byeeee :]\n");
             portal_to_userland(executables[i].main, rsp);
         }
     }

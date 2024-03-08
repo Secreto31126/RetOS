@@ -1,6 +1,3 @@
-	extern ncPrintHex
-	extern ncNewline
-
 	global portal_to_userland
 
 ; void portal_to_userland(int (*code)(void), uint64_t rsp);
@@ -21,9 +18,6 @@ portal_to_userland:
     iretq				; In Userland we trust
 
 safe_return:
-	mov rdi, rax
-	call ncPrintHex
-	call ncNewline
 	mov edx, 0x604
 	mov eax, 0x2000
 	out dx, ax		; Power off QEMU

@@ -1,15 +1,10 @@
 /* main.c */
 
 #include <sys.h>
-#include <stdint.h>
-#include <stddef.h>
+#include <lib.h>
 
 extern char bss;
 extern char endOfBinary;
-
-int main(int argc, char *argv[]);
-void *memset(void *destiny, int32_t c, uint64_t length);
-size_t strlen(const char *str);
 
 int main(int argc, char *argv[])
 {
@@ -38,23 +33,4 @@ int c_start(char **argv)
 		argc++;
 
 	return main(argc, argv);
-}
-
-void *memset(void *destiation, int32_t c, uint64_t length)
-{
-	uint8_t chr = (uint8_t)c;
-	char *dst = (char *)destiation;
-
-	while (length--)
-		dst[length] = chr;
-
-	return destiation;
-}
-
-size_t strlen(const char *str)
-{
-	const char *s = str;
-	while (*s)
-		s++;
-	return s - str;
 }

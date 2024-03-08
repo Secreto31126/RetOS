@@ -1,5 +1,5 @@
-#ifndef LIB_H
-#define LIB_H
+#ifndef SYS_H
+#define SYS_H
 
 #include <stdint.h>
 #include <stddef.h>

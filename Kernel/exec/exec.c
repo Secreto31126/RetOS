@@ -39,7 +39,7 @@ Stack getStackTopAndBase(RSP *rsp)
 
 int setStackArgs(RSP *rsp, char *const argv[], Executable executable)
 {
-    Stack stack = (Stack)(*rsp);
+    *(Stack)(*rsp) = NULL;
 
     /**
      * @brief The number of arguments, does not include the NULL terminator
@@ -54,18 +54,16 @@ int setStackArgs(RSP *rsp, char *const argv[], Executable executable)
         return -7;
     }
 
-    *stack = NULL;
-
     // ncNewline();
     // ncPrint("argc: ");
     // ncPrintDec(argc);
     // ncNewline();
-    // ncPrintHex((uint64_t)stack);
+    // ncPrintHex((uint64_t)*rsp);
     // ncPrint(": ");
     // ncPrint("NULL");
     // ncNewline();
 
-    stack--;
+    (*rsp)--;
 
     for (int i = argc - 1; i >= 0; i--)
     {
@@ -81,45 +79,43 @@ int setStackArgs(RSP *rsp, char *const argv[], Executable executable)
 
         if (!copy)
         {
-            freeStack(NULL, (RSP)stack, argc - i - 1);
+            freeStack(NULL, ++(*rsp));
             return -12;
         }
 
-        *stack = strcpy(copy, args);
+        *(Stack)(*rsp) = strcpy(copy, args);
 
-        // ncPrintHex((uint64_t)stack);
+        // ncPrintHex((uint64_t)*rsp);
         // ncPrint(": ");
         // ncPrint(args);
 
-        stack--;
+        (*rsp)--;
     }
 
     // Executable name
-    *stack = strcpy((char *)malloc(strlen(executable.filename) + 1), executable.filename);
+    char *copy = malloc(strlen(executable.filename) + 1);
+
+    if (!copy)
+    {
+        freeStack(NULL, ++(*rsp));
+        return -12;
+    }
+
+    *(Stack)(*rsp) = strcpy(copy, executable.filename);
     argc++;
 
     // ncNewline();
-    // ncPrintHex((uint64_t)stack);
+    // ncPrintHex((uint64_t)*rsp);
     // ncPrint(": ");
-    // ncPrint(stack[0]);
-    // ncNewline();
-
-    // ncNewline();
-    // ncPrint("rsp: ");
-    // ncPrintHex((uint64_t)*rsp);
-    // ncPrint("->");
-
-    *rsp = (RSP)(stack);
-
-    // ncPrintHex((uint64_t)*rsp);
+    // ncPrint(*(Stack)(*rsp));
     // ncNewline();
 
     return argc;
 }
 
-void freeStack(Stack stack, RSP rsp, int argc)
+void freeStack(Stack stack, RSP rsp)
 {
-    for (int i = 0; i < argc; i++)
+    while (rsp && *rsp)
         free(*rsp++);
     free(stack);
 }

@@ -68,10 +68,9 @@ int setStackArgs(RSP *rsp, char *const argv[], Executable executable);
  * @brief Free the stack memory
  *
  * @param stack The stack memory
- * @param rsp The stack base
- * @param argc The number of arguments
+ * @param rsp The stack base, it may be NULL
  */
-void freeStack(Stack stack, RSP rsp, int argc);
+void freeStack(Stack stack, RSP rsp);
 
 extern void portal_to_userland(EntryPoint code, RSP rsp);
 

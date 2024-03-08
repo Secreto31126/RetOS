@@ -22,5 +22,6 @@ extern size_t get_screen_size();
 extern void beep(uint32_t freq);
 extern size_t get_tick();
 extern void halt_user();
+int execv(char *pathname, char *argv[]);
 
 #endif

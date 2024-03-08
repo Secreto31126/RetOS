@@ -20,7 +20,8 @@ int main(int argc, char *argv[])
 		halt_user();
 	beep(0);
 
-	return 0xDEADC0DE;
+	char *args[] = {"Bye", NULL};
+	return execv("module", args);
 }
 
 int c_start(char **argv)

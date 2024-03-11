@@ -1,8 +1,11 @@
 
-all:  bootloader kernel userland image
+all:  bootloader global kernel userland image
 
 bootloader:
 	cd Bootloader; make all
+
+global:
+	cd Global; make all
 
 kernel:
 	cd Kernel; make all
@@ -16,7 +19,8 @@ image: kernel bootloader userland
 clean:
 	cd Bootloader; make clean
 	cd Image; make clean
+	cd Global; make clean
 	cd Kernel; make clean
 	cd Userland; make clean
 
-.PHONY: bootloader image collections kernel userland all clean
+.PHONY: bootloader image collections global kernel userland all clean

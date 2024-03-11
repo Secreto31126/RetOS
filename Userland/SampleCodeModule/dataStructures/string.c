@@ -24,20 +24,20 @@ void add(string receiver, char *s)
     }
     concat(receiver->content, s);
 }
-stringIterator getIterator(string s)
+stringIterator getStringIterator(string s)
 {
     stringIterator iter = malloc(sizeof(stringIterator));
     iter->index = 0;
     iter->s = s;
     return iter;
 }
-char next(stringIterator iter)
+char nextS(stringIterator iter)
 {
     if (!hasNext(iter))
         return 0;
     return iter->s->content[iter->index++];
 }
-char hasNext(stringIterator iter)
+char hasNextS(stringIterator iter)
 {
     return iter->index > iter->s->size;
 }

@@ -18,10 +18,11 @@ typedef stringIteratorHeader *stringIterator;
 string createString();
 string createSizedString(int initialSize);
 void add(string receiver, char *s);
-stringIterator getIterator(string s);
-char next(stringIterator iter);
-char hasNext(stringIterator iter);
+stringIterator getStringIterator(string s);
+char nextS(stringIterator iter);
+char hasNextS(stringIterator iter);
 void freeString(string s);
+void freeStringIterator(stringIterator iter);
 int size(string s);
 
 #endif

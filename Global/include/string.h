@@ -42,4 +42,13 @@ char *strncpy(char *dest, const char *src, size_t n);
  */
 char *strcpy(char *dest, const char *src);
 
+/**
+ * @brief Concatenate two strings
+ *
+ * @param dest The destination buffer to concatenate to
+ * @param src The source buffer to concatenate from
+ * @return char* The destination buffer
+ */
+char *strcat(char *dest, const char *src);
+
 #endif

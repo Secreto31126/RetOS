@@ -1,4 +1,4 @@
-#include <strings.h>
+#include <string.h>
 
 int strcmp(const char *p1, const char *p2)
 {

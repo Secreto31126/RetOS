@@ -2,8 +2,8 @@
 
 unsigned long long pow(double x, int y)
 {
-    unsigned long long ans = 1.0;
-    for (unsigned int i = 0; i < y; i++)
+    double ans = 1.0;
+    while (y--)
         ans *= x;
-    return ans;
+    return (unsigned long long)ans;
 }

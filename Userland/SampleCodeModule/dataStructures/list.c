@@ -20,7 +20,7 @@ void add(list l, listElem e)
     l->last = new;
     l->size++;
 }
-listElem getNode(node *n, int index)
+listElem getNode(node *n, uint64_t index)
 {
     if (n == null)
         return null;
@@ -28,13 +28,13 @@ listElem getNode(node *n, int index)
         return n->head;
     return getNode(n->tail, index - 1);
 }
-listElem get(list l, int index)
+listElem get(list l, uint64_t index)
 {
     if (l == null)
         return null;
     return getNode(l->first, index);
 }
-listElem removeNode(node *n, int index)
+listElem removeNode(node *n, uint64_t index)
 {
     if (n == null)
         return null;
@@ -50,7 +50,7 @@ listElem removeNode(node *n, int index)
     }
     return removeNode(n->tail, index - 1);
 }
-listElem remove(list l, int index)
+listElem remove(list l, uint64_t index)
 {
     if (l == null || index >= size)
         return null;
@@ -91,6 +91,7 @@ void freeNode(node *n)
 {
     if (n != null)
     {
+        freeListElem(n->head);
         freeList(n->tail);
         free(n);
     }

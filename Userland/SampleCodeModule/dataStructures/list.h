@@ -3,6 +3,9 @@
 #include "string.h"
 
 typedef string listElem;
+typedef void (*freeListElemFunction)(listElem);
+
+static freeListElemFunction freeListElem = freeString; // if the listElem does not allocate memory, initialize as a null function
 
 typedef struct node
 {
@@ -25,7 +28,7 @@ typedef listIteratorHeader *listIterator;
 
 list createList();
 void add(list l, listElem e);
-listElem get(list l, int index);
+listElem get(list l, uint64_t index);
 void push(list l, listElem e);
 listElem pop(list l);
 listIterator getListIterator(list l);

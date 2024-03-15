@@ -9,15 +9,19 @@
 typedef struct textBlockHeader
 {
     list lines;
-    int scale;
+    uint64_t scale;
+    uint64_t width;
+    uint64_t height;
     HexColor highlightColor;
     HexColor textColor;
 } textBlockHeader;
 
 typedef textBlockHeader *textBlock;
 
-void initializeTextDisplay();
-int getTextBlock();
+textBlock getTextBlock(uint64_t width, uint64_t height);
+void display(textBlock t);
+void addChar(textBlock t, char c);
+void addString(textBlock t, char *s);
 void freeTextBlock(textBlock toFree);
 
 #endif

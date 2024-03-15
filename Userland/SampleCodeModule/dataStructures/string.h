@@ -4,25 +4,26 @@
 typedef struct stringHeader
 {
     char *content;
-    int dim;
-    int size;
+    uint64_t dim;
+    uint64_t size;
 } stringHeader;
 typedef stringHeader *string;
 typedef struct stringIteratorHeader
 {
     string s;
-    int index;
+    uint64_t index;
 } stringIteratorHeader;
 typedef stringIteratorHeader *stringIterator;
 
 string createString();
-string createSizedString(int initialSize);
-void add(string receiver, char *s);
+string createStringFromInput(char *input);
+string createSizedString(uint64_t initialSize);
+void addString(string receiver, char *s);
 stringIterator getStringIterator(string s);
 char nextS(stringIterator iter);
 char hasNextS(stringIterator iter);
 void freeString(string s);
 void freeStringIterator(stringIterator iter);
-int size(string s);
+uint64_t size(string s);
 
 #endif

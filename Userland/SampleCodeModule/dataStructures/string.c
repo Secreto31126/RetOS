@@ -7,7 +7,13 @@ string createString()
 {
     return createSizedString(0);
 }
-string createSizedString(int initialSize)
+string createStringFromInput(char *input)
+{
+    string toRet = createSizedString(strlen(input));
+    addString(toRet, input);
+    return toRet;
+}
+string createSizedString(uint64_t initialSize)
 {
     string s = malloc(sizeof(stringHeader));
     s->content = initialSize ? malloc(sizeof(char) * initialSize) : null;
@@ -15,9 +21,9 @@ string createSizedString(int initialSize)
     s->size = 0;
     return s;
 }
-void add(string receiver, char *s)
+void addString(string receiver, char *s)
 {
-    int len = strlen(s);
+    uint64_t len = strlen(s);
     if (receiver->size + len > receiver->dim)
     {
         receiver->content = realloc(receiver->content, receiver->dim, ((receiver->size + len) / BLOCK) * BLOCK + 1);
@@ -54,7 +60,7 @@ void freeString(string s)
         free(s);
     }
 }
-int size(string s)
+uint64_t size(string s)
 {
     return s->size;
 }

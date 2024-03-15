@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #define EOF -1
+#define null 0
 
 // syscalls
 extern int print_sys(unsigned int fd, char *str, unsigned long long len);

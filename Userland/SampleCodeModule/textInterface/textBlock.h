@@ -1,6 +1,9 @@
 #ifndef TXT_H
 #define TXT_H
 
+// Tambien conocido como el fragmentador-de-memoria-inador
+// Es una lista de strings que se auto-genera nuevas lineas al quedarse sin espacio
+
 #include "./../dataStructures/list.h"
 #include "./../dataStructures/string.h"
 #include "./../nstdlib/nstdlib.h"
@@ -20,8 +23,8 @@ typedef textBlockHeader *textBlock;
 
 textBlock getTextBlock(uint64_t width, uint64_t height);
 void display(textBlock t);
-void addChar(textBlock t, char c);
-void addString(textBlock t, char *s);
+void putChar(textBlock t, char c);
+void putString(textBlock t, char *s);
 void freeTextBlock(textBlock toFree);
 
 #endif

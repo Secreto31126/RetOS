@@ -19,6 +19,7 @@ string createString();
 string createStringFromInput(char *input);
 string createSizedString(uint64_t initialSize);
 void addString(string receiver, char *s);
+void addChar(string receiver, char c);
 stringIterator getStringIterator(string s);
 char nextS(stringIterator iter);
 char hasNextS(stringIterator iter);

@@ -30,6 +30,11 @@ void addString(string receiver, char *s)
     }
     concat(receiver->content, s);
 }
+void addChar(string receiver, char c)
+{
+    char impromptuString[2] = {c, 0};
+    addString(receiver, impromptuString);
+}
 stringIterator getStringIterator(string s)
 {
     stringIterator iter = malloc(sizeof(stringIterator));

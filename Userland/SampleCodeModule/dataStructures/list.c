@@ -34,6 +34,10 @@ listElem get(list l, uint64_t index)
         return null;
     return getNode(l->first, index);
 }
+listElem peek(list l)
+{
+    return l == null ? null : l->last->head;
+}
 listElem removeNode(node *n, uint64_t index)
 {
     if (n == null)
@@ -45,6 +49,7 @@ listElem removeNode(node *n, uint64_t index)
         listElem toRet = n->tail->head;
         node *toFree = n->tail;
         n->tail = n->tail->tail;
+        freeListElem(toFree->head);
         free(toFree);
         return toRet;
     }
@@ -81,6 +86,7 @@ listElem pop(list l)
         listElem toRet = l->first->head;
         node *toFree = l->first;
         l->first = l->first->tail;
+        freeListElem(toFree->head);
         free(toFree);
         if (l->first == null)
             l->last = l->first;

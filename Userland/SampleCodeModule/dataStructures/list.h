@@ -2,9 +2,9 @@
 #define LST_H
 #include "string.h"
 
-typedef string listElem;
 typedef void (*freeListElemFunction)(listElem);
 
+typedef string listElem;
 static freeListElemFunction freeListElem = freeString; // if the listElem does not allocate memory, initialize as a null function
 
 typedef struct node
@@ -38,5 +38,6 @@ listElem nextL(listIterator iter);
 char hasNextL(listIterator iter);
 void freeListIterator(listIterator iter);
 void freeList(list l);
+uint64_t listSize(list l);
 
 #endif

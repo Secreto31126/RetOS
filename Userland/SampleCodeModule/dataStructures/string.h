@@ -25,6 +25,7 @@ char nextS(stringIterator iter);
 char hasNextS(stringIterator iter);
 void freeString(string s);
 void freeStringIterator(stringIterator iter);
-uint64_t size(string s);
+uint64_t stringSize(string s);
+void backspace(string receiver);
 
 #endif

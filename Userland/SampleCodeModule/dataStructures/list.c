@@ -57,7 +57,7 @@ listElem removeNode(node *n, uint64_t index)
 }
 listElem remove(list l, uint64_t index)
 {
-    if (l == null || index >= size)
+    if (l == null || index >= l->size)
         return null;
     l->size--;
     if (l->first == l->last)
@@ -129,4 +129,8 @@ char hasNextL(listIterator iter)
 void freeListIterator(listIterator iter)
 {
     free(iter);
+}
+uint64_t listSize(list l)
+{
+    return l->size;
 }

@@ -21,19 +21,27 @@ string createSizedString(uint64_t initialSize)
     s->size = 0;
     return s;
 }
+void concatString(string receiver, char *s)
+{
+    for (int i = receiver->size - 1; *s; i++)
+        receiver->content[i] = *(s++);
+}
 void addString(string receiver, char *s)
 {
     uint64_t len = strlen(s);
     if (receiver->size + len > receiver->dim)
-    {
         receiver->content = realloc(receiver->content, receiver->dim, ((receiver->size + len) / BLOCK) * BLOCK + 1);
-    }
-    concat(receiver->content, s);
+    concatString(receiver, s);
+    receiver->size += len;
 }
 void addChar(string receiver, char c)
 {
     char impromptuString[2] = {c, 0};
     addString(receiver, impromptuString);
+}
+void backspace(string receiver)
+{
+    receiver->size--;
 }
 stringIterator getStringIterator(string s)
 {
@@ -65,7 +73,7 @@ void freeString(string s)
         free(s);
     }
 }
-uint64_t size(string s)
+uint64_t stringSize(string s)
 {
     return s->size;
 }

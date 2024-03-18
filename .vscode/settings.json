@@ -2,6 +2,10 @@
     "editor.formatOnSave": true,
     "files.associations": {
         "list.h": "c",
-        "window.h": "c"
+        "window.h": "c",
+        "array": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "utility": "c"
     }
 }

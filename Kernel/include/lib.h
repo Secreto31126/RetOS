@@ -43,6 +43,11 @@ char *strncpy(char *dest, const char *src, size_t n);
  */
 char *strcpy(char *dest, const char *src);
 
+/**
+ * @brief Send QEMU a shutdown signal, or halt the CPU if failed
+ */
+void power_off(void);
+
 extern char *cpuVendor(char *result);
 
 extern uint32_t input_dword(uint16_t port);

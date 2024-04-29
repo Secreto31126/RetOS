@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-typedef void (*Callback)(void);
+// typedef void (*Callback)(void);
 
 /**
  * @brief Get the tick value
@@ -18,6 +18,7 @@ uint64_t get_tick();
 void update_tick();
 /**
  * @brief Sleep for a certain amount of ticks
+ * @deprecated
  *
  * @param ticks Amount of ticks to sleep
  */
@@ -28,6 +29,6 @@ void sleep_ticks(uint64_t ticks);
  * @param ticks Amount of ticks to wait before executing the task
  * @param task The task to execute
  */
-void add_task(uint64_t ticks, Callback task);
+// void add_task(uint64_t ticks, Callback task);
 
 #endif

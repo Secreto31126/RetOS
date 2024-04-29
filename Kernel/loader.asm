@@ -1,5 +1,5 @@
-	extern execv
 	extern initializeKernelBinary
+	extern start_userland
 
 	global loader
 
@@ -15,11 +15,12 @@ argv		dq hello, world, 0
 
 loader:
 	call	initializeKernelBinary	; Set up the kernel binary
+	call 	start_userland
 	; mov		rdi, userland
-	mov		rdi, tomyland
-	mov		rsi, argv
-	call 	execv
+	; mov		rdi, tomyland
+	; mov		rsi, argv
+	; call 	execv
 .hang:
-	cli
+	; cli
 	hlt
 	jmp	.hang

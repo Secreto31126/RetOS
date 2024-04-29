@@ -102,6 +102,17 @@ char *strcpy(char *dest, const char *src)
 	return save;
 }
 
+void power_off()
+{
+	output_word(0x604, 0x2000);
+
+	while (1)
+	{
+		unset_interrupt_flag();
+		halt_once();
+	}
+}
+
 void dump_regs_hex_magician(unsigned char *s, uint8_t r)
 {
 	unsigned char hextable[] = "0123456789ABCDEF";

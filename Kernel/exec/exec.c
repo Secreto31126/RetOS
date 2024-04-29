@@ -1,13 +1,15 @@
 #include "exec.h"
-// #include <console.h>
-
-int pid = 0;
 
 Executable executables[EXECUTABLES] = {
     {
         .mod = 7,
         .filename = "module",
         .main = (EntryPoint)0x400000,
+    },
+    {
+        .mod = 6,
+        .filename = "data",
+        .main = (EntryPoint)0x500000,
     },
     {
         .mod = 7,
@@ -23,28 +25,36 @@ extern uint8_t bss;
 extern uint8_t endOfKernelBinary;
 extern uint8_t endOfKernel;
 
-Stack getStackTopAndBase(RSP *rsp)
+#define PUSH(rsp, val) (*((char **)(--(rsp))) = (val))
+
+void set_stack_args(int argc, char *const argv[], Stack heap, RSP *rsp)
 {
-    Stack stackTop = malloc(STACK_SIZE);
-    if (!stackTop)
+    PUSH(*rsp, NULL);
+
+    for (int i = argc - 1; i >= 0; i--)
     {
-        return NULL;
+        char *args = argv[i];
+
+        char *copy = heap;
+        heap += strlen(args) + 1;
+
+        strcpy(copy, args);
+        PUSH(*rsp, copy);
     }
-
-    *rsp = (RSP)(((uint8_t *)stackTop) + STACK_SIZE - sizeof(uint64_t));
-    return stackTop;
-
-    // return (void *)((uint64_t)&endOfKernel + PageSize * 8 - sizeof(uint64_t));
 }
 
-int setStackArgs(RSP *rsp, char *const argv[], Executable executable)
+int check_args(char *const argv[])
 {
-    *(Stack)(*rsp) = NULL;
-
     /**
      * @brief The number of arguments, does not include the NULL terminator
      */
     int argc = 0;
+
+    if (!argv)
+    {
+        return argc;
+    }
+
     while (argv[argc] && ++argc < MAX_ARGS)
         ;
 
@@ -54,68 +64,5 @@ int setStackArgs(RSP *rsp, char *const argv[], Executable executable)
         return -7;
     }
 
-    // ncNewline();
-    // ncPrint("argc: ");
-    // ncPrintDec(argc);
-    // ncNewline();
-    // ncPrintHex((uint64_t)*rsp);
-    // ncPrint(": ");
-    // ncPrint("NULL");
-    // ncNewline();
-
-    (*rsp)--;
-
-    for (int i = argc - 1; i >= 0; i--)
-    {
-        char *args = argv[i];
-
-        // ncNewline();
-        // ncPrintHex((uint64_t)args);
-        // ncPrint(" - arg ");
-        // ncPrintDec(i);
-        // ncPrint(": ");
-
-        char *copy = malloc(strlen(args) + 1);
-
-        if (!copy)
-        {
-            freeStack(NULL, ++(*rsp));
-            return -12;
-        }
-
-        *(Stack)(*rsp) = strcpy(copy, args);
-
-        // ncPrintHex((uint64_t)*rsp);
-        // ncPrint(": ");
-        // ncPrint(args);
-
-        (*rsp)--;
-    }
-
-    // Executable name
-    char *copy = malloc(strlen(executable.filename) + 1);
-
-    if (!copy)
-    {
-        freeStack(NULL, ++(*rsp));
-        return -12;
-    }
-
-    *(Stack)(*rsp) = strcpy(copy, executable.filename);
-    argc++;
-
-    // ncNewline();
-    // ncPrintHex((uint64_t)*rsp);
-    // ncPrint(": ");
-    // ncPrint(*(Stack)(*rsp));
-    // ncNewline();
-
     return argc;
-}
-
-void freeStack(Stack stack, RSP rsp)
-{
-    while (rsp && *rsp)
-        free(*rsp++);
-    free(stack);
 }

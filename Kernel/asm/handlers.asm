@@ -5,7 +5,12 @@
 	extern dump_regs
 	extern dump_regs_include_rip
 
-	extern execv
+    extern ncPrintHex
+    extern ncNewline
+    extern ncTab
+
+	; extern execv
+	extern scheduler
 
 	global zero_division_exception_handler
 	global invalid_opcode_exception_handler
@@ -45,7 +50,7 @@ userland	db "module", 0
 
 	mov		rdi, userland
 	mov		rsi, 0
-	call 	execv
+	; call 	execv
 .hang:
 	cli
 	hlt
@@ -87,7 +92,36 @@ sus_exception_handler:
 
 ; void tick_handler(void);
 tick_handler:
-	master_pic_handler 0
+	cli
+
+	pushall
+
+	call	scheduler
+
+	; Overwrite the RSP from the interruption stack
+	; 15 registers from pushall, rip, cs, rflags, 2 more for good luck
+	; and finally you get rsp's address
+	lea		rdi, [rsp + 8 * 15 + 8 * 5]
+	mov		[rsp + 8 * 15 + 8 * 3], rdi
+
+	mov		rdi, 0
+	call	pic_manager
+
+	mov		al, 0x20
+	out		0x20, al
+
+	popall
+
+	pushall
+	call	ncTab
+	mov		rdi, [rsp + 8 * 15 + 8 * 3]
+	call	ncPrintHex
+	call	ncNewline
+	popall
+
+	sti
+
+	iretq
 
 ; void keyboard_handler(void);
 keyboard_handler:
@@ -112,8 +146,19 @@ usb_handler:
 
 ; uint64_t syscall_handler(void);
 syscall_handler:
+	; Keep a full dump of the registers in the stack for context switching
 	pushall_not_rax
+	push	rax
+
 	mov		rcx, rax
+	mov		r8, rsp
+	; The cooler rsp
+	lea		r9, [rsp + 8 * 15 + 8 * 3]
+
 	call	syscall_manager
+
+	; Don't overwrite the return value
+	add		rsp, 8
 	popall_not_rax
+
 	iretq

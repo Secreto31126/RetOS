@@ -1,8 +1,5 @@
 #include "exec.h"
 
-static Stack current_stack = NULL;
-static RSP current_rsp = NULL;
-
 int execv(const char *pathname, char *const argv[])
 {
     for (uint64_t i = 0; i < EXECUTABLES; i++)
@@ -15,33 +12,19 @@ int execv(const char *pathname, char *const argv[])
                 return 1;
             }
 
-            pid++;
-
-            RSP rsp = NULL;
-            Stack stack = getStackTopAndBase(&rsp);
-
-            if (!stack)
-            {
-                // ENOMEM
-                return 12;
-            }
-
-            char *empty_argv[1] = {NULL};
-            int argc = setStackArgs(&rsp, argv ? argv : empty_argv, executables[i]);
+            int argc = check_args(argv);
 
             if (argc < 0)
             {
-                freeStack(stack, rsp);
                 return -argc;
             }
 
-            if (current_stack)
-            {
-                freeStack(current_stack, current_rsp);
-            }
+            Process *process = get_current_process();
+            RSP rsp = process->stack + process->stack_size;
 
-            current_stack = stack;
-            current_rsp = rsp;
+            set_stack_args(argc, argv, (Stack)process->stack, &rsp);
+
+            process->rsp = rsp;
 
             portal_to_userland(executables[i].main, rsp);
         }

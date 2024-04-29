@@ -5,6 +5,8 @@
 #include <console.h>
 #include <localization.h>
 #include <memory.h>
+#include <proc.h>
+#include <exec.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -25,6 +27,9 @@ void clearBSS(void *bssAddress, uint64_t bssSize)
 void initializeKernelBinary()
 {
 	char buffer[10];
+	ncPrint("Stack: ");
+	ncPrintHex((uint64_t)buffer);
+	ncPrint("\n");
 
 	ncPrint("CPU Vendor: ");
 	ncPrint(cpuVendor(buffer));
@@ -69,4 +74,34 @@ void initializeKernelBinary()
 	ncPrint(" [Done]\n");
 
 	ncClear();
+
+	// Print it here before the scheduler starts
+	ncPrint("\nRSP\t\tPID\tN_PID\tN_RSP\n");
+	set_interrupt_flag();
+}
+
+void start_userland()
+{
+	kernel_fork();
+	ncPrint("Running PID: ");
+	ncPrintDec(get_pid());
+	ncPrint("\n");
+	if (!get_pid())
+	{
+		ncPrint("I'm the parent (Kernel)\n");
+
+		while (1)
+			halt_once();
+	}
+	else
+	{
+		ncPrint("I'm the child (Future Userland)\n");
+
+		ncPrint("Executing userland code\n");
+		execv("tomyland", NULL);
+		ncPrint("Error executing userland code\n");
+
+		while (1)
+			halt_once();
+	}
 }

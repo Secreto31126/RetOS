@@ -6,6 +6,8 @@
 /**
  * @brief Prints a string in the screen as the header
  *
+ * @deprecated It was fun while it lasted
+ *
  * @param string The string to be printed with custom format,
  * \\b for begining, \\n for in the middle, \\e for end,
  * \\t for trash

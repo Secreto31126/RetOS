@@ -2,18 +2,18 @@
 #define PEXE_H
 
 #include <lib.h>
+#include <proc.h>
 #include <ticks.h>
 #include <stdint.h>
 #include <memory.h>
 
-#define EXECUTABLES 2
+#define EXECUTABLES 3
 #define MAX_ARGS 255
-#define STACK_SIZE 0x8000
 
 /**
  * @brief Userland entry point
  */
-typedef int (*EntryPoint)();
+typedef void (*EntryPoint)(void);
 
 /**
  * @brief Executable file
@@ -27,7 +27,7 @@ typedef struct
     /**
      * @brief Execute Permission (Bit wise RWX)
      */
-    uint64_t mod;
+    int mod;
     /**
      * @brief Executable code
      */
@@ -41,36 +41,30 @@ typedef void **RSP;
 /**
  * @brief Small type to hold the top of the stack pointer
  */
-typedef char **Stack;
+typedef char *Stack;
 
-extern int pid;
 /**
  * @brief Array of all of RetOS executables
  */
 extern Executable executables[EXECUTABLES];
 
 /**
- * @brief Allocate stack memory and return the top and base of the stack
+ * @brief Validate the arguments and count them
  *
- * @param rsp The base of the stack (top + size - sizeof(uint64_t))
- * @return void* The top of the stack, NULL if error
- */
-Stack getStackTopAndBase(RSP *rsp);
-/**
- * @brief Set the stack's argv
- *
- * @param rsp The stack's base
- * @param argv The argument values
+ * @param argv The argument values, NULL terminated, it may be NULL and return 0
  * @return int argc if success, negative if error
  */
-int setStackArgs(RSP *rsp, char *const argv[], Executable executable);
+int check_args(char *const argv[]);
 /**
- * @brief Free the stack memory
+ * @brief Set the process' stack arguments
  *
- * @param stack The stack memory
- * @param rsp The stack base, it may be NULL
+ * @param argc The number of arguments
+ * @param argv The argument values, NULL terminated
+ * @param heap The heap memory of the process, the argv strings will be copied here
+ * (Hippity hoppity, your heap is now my property :] )
+ * @param rsp The rsp pointer of the process
  */
-void freeStack(Stack stack, RSP rsp);
+void set_stack_args(int argc, char *const argv[], Stack heap, RSP *rsp);
 
 extern void portal_to_userland(EntryPoint code, RSP rsp);
 

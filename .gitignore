@@ -9,6 +9,7 @@
 
 #Object files
 *.o
+*.mem
 
 docs/
 

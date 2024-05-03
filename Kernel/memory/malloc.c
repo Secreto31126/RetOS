@@ -8,7 +8,7 @@ void *malloc(uint32_t size)
     }
 
     map_entry *map = map_start;
-    while (map < heap_start)
+    while (map < map_end)
     {
         if (*map)
         {
@@ -16,11 +16,11 @@ void *malloc(uint32_t size)
             continue;
         }
 
-        for (uint64_t i = 1; map + i < heap_start; i++)
+        for (uint64_t i = 1; map + i < map_end; i++)
         {
             if (i * sizeof(map_entry) >= size)
             {
-                *map = i * sizeof(map_entry);
+                *map = i;
                 return (void *)map + map_size;
             }
 

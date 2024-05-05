@@ -13,7 +13,7 @@ loader:
 	sti
 
 	; Fork the first process
-	mov		rax, 0xC
+	mov		rax, 0xF
 	int		80h
 
 	mov		rdi, rax

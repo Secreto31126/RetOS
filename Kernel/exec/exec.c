@@ -70,7 +70,9 @@ RSP set_process_args(int argc, char const argv[MAX_ARGS][MAX_ARG_LEN], Process *
         PUSH(*rsp, copy);
     }
 
-    PUSH(*rsp, (void *)argc);
+    // "initialization of 'void *' from 'int' makes pointer from integer without a cast"
+    // Take that, GCC. Hope you are happy with this monstrosity.
+    PUSH(*rsp, NULL + argc);
 
     return *rsp;
 }

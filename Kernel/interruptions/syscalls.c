@@ -57,10 +57,10 @@ static uint64_t halt(uint64_t, uint64_t, uint64_t, uint64_t rax);
  * @param rsp The interruption rsp
  * @return uint64_t The new process' pid
  */
-static uint64_t fork(uint64_t, uint64_t, uint64_t, uint64_t, void *rsp, void **i_rsp);
+static uint64_t fork(uint64_t, uint64_t, uint64_t, uint64_t, void *rsp);
 
-#define SYSCALL_COUNT 14
-typedef uint64_t (*syscall)(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t *);
+#define SYSCALL_COUNT 16
+typedef uint64_t (*syscall)(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t);
 static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)read,
     (syscall)write,
@@ -73,16 +73,18 @@ static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)get_tick,
     (syscall)get_lucas,
     (syscall)halt,
+    (syscall)noop, // Reserved for bye (exit)
+    (syscall)noop, // Idk, something Cool here
+    (syscall)get_pid,
     (syscall)execv,
     (syscall)fork,
-    (syscall)get_pid,
 };
 
-uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax, uint64_t rsp, uint64_t *i_rsp)
+uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax, uint64_t rsp)
 {
     if (rax < SYSCALL_COUNT)
     {
-        return syscall_handlers[rax](rdi, rsi, rdx, rax, rsp, i_rsp);
+        return syscall_handlers[rax](rdi, rsi, rdx, rax, rsp);
     }
 
     return -1;
@@ -168,7 +170,7 @@ static uint64_t halt(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
     return rax;
 }
 
-static uint64_t fork(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, void *rsp, void **i_rsp)
+static uint64_t fork(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, void *rsp)
 {
-    return create_process(rsp, i_rsp);
+    return create_process(rsp);
 }

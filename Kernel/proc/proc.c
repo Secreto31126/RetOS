@@ -1,51 +1,84 @@
 #include "proc.h"
 
-#define STACK_END(stack, size) (((void *)(stack)) + (size))
+/**
+ * @brief The current process ID
+ */
+pid_t pid;
 
-pid_t pid = 0;
+pid_t processes_count;
 
-pid_t processes_count = 1;
-Process processes[MAX_PROCESSES] = {
+/**
+ * @brief The array of all processes
+ */
+Process processes[MAX_PROCESSES] = {};
+
+void *create_process_init()
+{
+    void *new_stack = malloc(INIT_STACK_SIZE);
+
+    if (!new_stack)
     {
+        return NULL;
+    }
+
+    processes[0] = (Process){
         .pid = 0,
-        .stack = (void *)0x50000,
-        // Kernel has no concept of stack limit or top,
-        // it believes all the RAM belongs to it.
-        // This property is meaningless to kernel,
-        // we just pray it doesn't use more than this.
-        .stack_size = 0x400,
-        .rsp = (void *)0x50400, // The initial rsp setted by Pure64
+        .ppid = 0,
+        .stack = new_stack,
+        .running_stack = new_stack,
+        .stack_size = INIT_STACK_SIZE,
+        .running_stack_size = INIT_STACK_SIZE,
+        .rsp = STACK_END(new_stack, INIT_STACK_SIZE),
         .state = PROCESS_RUNNING,
-    },
-};
+    };
+
+    pid = 0;
+    processes_count = 1;
+
+    ncPrintHex((uint64_t)processes[0].stack);
+
+    return processes[0].rsp;
+}
 
 pid_t get_pid()
 {
     return pid;
 }
 
-Process *get_current_process()
+pid_t set_pid(pid_t p)
 {
-    return processes + pid;
+    pid_t o = pid;
+    pid = p;
+    return o;
 }
 
-pid_t create_process(void *rsp, void **i_rsp)
+Process *get_current_process()
+{
+    return get_process(pid);
+}
+
+Process *get_process(pid_t p)
+{
+    return processes + p;
+}
+
+pid_t create_process(void *rsp)
 {
     // Pseudo semaphore
     unset_interrupt_flag();
 
-    if (processes_count + 1 >= MAX_PROCESSES)
+    if (processes_count + 1 > MAX_PROCESSES)
     {
         return -1;
     }
 
-    pid_t new_pid = processes_count++;
+    pid_t new_pid = processes_count;
 
-    set_interrupt_flag();
-
+    // It's me, hi, I'm the process it's me
     Process *parent = get_current_process();
 
-    size_t new_stack_size = parent->stack_size < MIN_STACK_SIZE ? MIN_STACK_SIZE : parent->stack_size;
+    // If the parent has a bigger stack, use it
+    size_t new_stack_size = parent->stack_size > MIN_STACK_SIZE ? parent->stack_size : MIN_STACK_SIZE;
 
     void *new_stack = malloc(new_stack_size);
 
@@ -56,17 +89,53 @@ pid_t create_process(void *rsp, void **i_rsp)
 
     // Set the new process' basic properties
     processes[new_pid].pid = new_pid;
+    processes[new_pid].ppid = parent->pid;
     processes[new_pid].stack = new_stack;
-    processes[new_pid].stack_size = parent->stack_size;
+    processes[new_pid].running_stack = parent->running_stack;
+    processes[new_pid].stack_size = new_stack_size;
+    processes[new_pid].running_stack_size = parent->running_stack_size;
+    processes[new_pid].rsp = rsp;
     processes[new_pid].state = PROCESS_READY;
+    processes_count++;
 
     // We aren't Linux, we must copy the stack at creation time
-    memcpy(STACK_END(new_stack, new_stack_size) - parent->stack_size, parent->stack, parent->stack_size);
+    memcpy(
+        STACK_END(new_stack, new_stack_size) - parent->running_stack_size,
+        parent->running_stack,
+        parent->running_stack_size);
 
-    processes[new_pid].rsp = STACK_END(new_stack, new_stack_size) - (STACK_END(parent->stack, parent->stack_size) - rsp);
+    // ncPrint("\n\tNew process ");
+    // ncPrintDec(new_pid);
+    // ncPrint(" created with rsp 0x");
+    // ncPrintHex((uint64_t)rsp);
+    // ncPrint(" and stack 0x");
+    // ncPrintHex((uint64_t)new_stack);
+    // ncPrint(" and stack_end 0x");
+    // ncPrintHex((uint64_t)STACK_END(new_stack, new_stack_size));
+    // ncNewline();
 
-    void **new_i_rsp = STACK_END(parent->stack, parent->stack_size) - ((void *)i_rsp);
-    *new_i_rsp = STACK_END(new_stack, new_stack_size) - (STACK_END(parent->stack, parent->stack_size) - *i_rsp);
+    set_interrupt_flag();
 
     return new_pid;
+}
+
+/**
+ * @brief Reset a process to its own stack
+ * @note Blocks any process with equal running_stack from running (TODO: Use a semaphore for this)
+ * @note This function should be called only from the scheduler or execv
+ *
+ * @param process The process to expell from its parent's house
+ */
+void move_away_from_parents_house(Process *process)
+{
+    if (process->running_stack != process->stack)
+    {
+        swap_stacks(
+            process->running_stack,
+            STACK_END(process->stack, process->stack_size) - process->running_stack_size,
+            process->running_stack_size);
+
+        process->running_stack = process->stack;
+        process->running_stack_size = process->stack_size;
+    }
 }

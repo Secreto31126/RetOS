@@ -24,19 +24,15 @@ void clearBSS(void *bssAddress, uint64_t bssSize)
 	memset(bssAddress, 0, bssSize);
 }
 
-void initializeKernelBinary()
+void *initializeKernelBinary()
 {
 	char buffer[10];
-	ncPrint("Stack: ");
-	ncPrintHex((uint64_t)buffer);
-	ncPrint("\n");
-
 	ncPrint("CPU Vendor: ");
 	ncPrint(cpuVendor(buffer));
 	ncNewline();
 	ncNewline();
 
-	ncPrint("[Loading memory manager]");
+	ncPrint("Loading memory manager");
 	init_memory_manager();
 	ncPrint(" [Done]\n");
 
@@ -73,35 +69,40 @@ void initializeKernelBinary()
 	initialize_idt();
 	ncPrint(" [Done]\n");
 
+	ncPrint("Initializing init process with stack at 0x");
+	void *rsp = create_process_init();
+	ncPrint(" [Done]\n");
+
 	ncClear();
 
-	// Print it here before the scheduler starts
-	ncPrint("\nRSP\t\tPID\tN_PID\tN_RSP\n");
-	set_interrupt_flag();
+	return rsp;
 }
 
-void start_userland()
+void init(pid_t child_pid)
 {
-	kernel_fork();
-	ncPrint("Running PID: ");
-	ncPrintDec(get_pid());
-	ncPrint("\n");
-	if (!get_pid())
+	if (!child_pid)
 	{
-		ncPrint("I'm the parent (Kernel)\n");
+		ncPrintDec(get_pid());
+		ncPrint(": I will be Userland!\n");
 
-		while (1)
-			halt_once();
+		char *argv[] = {"I'm Userland!", "Hell yeah!", ":]", NULL};
+		ncPrintDec(execv("tomyland", argv));
+		ncPrint(" error: Failed to start userland\n");
 	}
 	else
 	{
-		ncPrint("I'm the child (Future Userland)\n");
+		if (child_pid < 0)
+		{
+			ncPrint("Error: Failed the master fork\n");
+			return;
+		}
 
-		ncPrint("Executing userland code\n");
-		execv("tomyland", NULL);
-		ncPrint("Error executing userland code\n");
+		ncPrintDec(get_pid());
+		ncPrint(": I'm init!\n");
 
 		while (1)
+		{
 			halt_once();
+		}
 	}
 }

@@ -31,8 +31,7 @@ static void loadModule(uint8_t **module, void *targetModuleAddress)
 	memcpy(targetModuleAddress, *module, moduleSize);
 	*module += moduleSize;
 
-	ncPrint(" [Done]");
-	ncNewline();
+	ncPrint(" [Done]\n");
 }
 
 static uint32_t readUint32(uint8_t **address)

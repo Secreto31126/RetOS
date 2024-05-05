@@ -41,13 +41,25 @@ typedef struct Process
      */
     pid_t pid;
     /**
+     * @brief The parent process id
+     */
+    pid_t ppid;
+    /**
      * @brief The process allocated stack
      */
     void *stack;
     /**
-     * @brief The process' stack size
+     * @brief Where the stack should be placed to run the process, inherited from the parent
+     */
+    void *running_stack;
+    /**
+     * @brief The process' stack size, in bytes
      */
     size_t stack_size;
+    /**
+     * @brief The process' running stack size, in bytes, inherited from the parent
+     */
+    size_t running_stack_size;
     /**
      * @brief The process rsp
      */
@@ -59,11 +71,28 @@ typedef struct Process
 } Process;
 
 /**
+ * @brief Create the init process
+ *
+ * @note Running stack will point to the same location as the stack,
+ * so any reference to memory locations will be meaningless after
+ * the first context switch. Kernel, don't keep pointers to the stack.
+ *
+ * @return void* The rsp of the new process
+ */
+void *create_process_init();
+/**
  * @brief Get the current process
  *
  * @return Process* The current process
  */
 Process *get_current_process();
+/**
+ * @brief Get a process by its pid
+ *
+ * @param pid The process' pid to get
+ * @return Process* The process
+ */
+Process *get_process(pid_t pid);
 /**
  * @brief Get the currently executing pid
  *
@@ -74,14 +103,11 @@ pid_t get_pid();
  * @brief Create a new process
  *
  * @note This function must ALWAYS be called from a interruption context.
- * Looking at you, kernel. Use kernel_fork() instead.
+ * Looking at you, kernel. Don't use it.
  *
  * @param rsp The rsp with the context switch header
- * @param i_rsp The interruption rsp direction
  * @return pid_t The new process' pid
  */
-pid_t create_process(void *rsp, void **i_rsp);
-
-extern void *kernel_fork();
+pid_t create_process(void *rsp);
 
 #endif

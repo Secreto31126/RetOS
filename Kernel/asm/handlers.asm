@@ -5,10 +5,6 @@
 	extern dump_regs
 	extern dump_regs_include_rip
 
-    extern ncPrintHex
-    extern ncNewline
-    extern ncTab
-
 	; extern execv
 	extern scheduler
 
@@ -96,27 +92,14 @@ tick_handler:
 
 	pushall
 
-	call	scheduler
-
-	; Overwrite the RSP from the interruption stack
-	; 15 registers from pushall, rip, cs, rflags, 2 more for good luck
-	; and finally you get rsp's address
-	lea		rdi, [rsp + 8 * 15 + 8 * 5]
-	mov		[rsp + 8 * 15 + 8 * 3], rdi
-
 	mov		rdi, 0
 	call	pic_manager
+
+	call	scheduler
 
 	mov		al, 0x20
 	out		0x20, al
 
-	popall
-
-	pushall
-	call	ncTab
-	mov		rdi, [rsp + 8 * 15 + 8 * 3]
-	call	ncPrintHex
-	call	ncNewline
 	popall
 
 	sti
@@ -146,18 +129,16 @@ usb_handler:
 
 ; uint64_t syscall_handler(void);
 syscall_handler:
-	; Keep a full dump of the registers in the stack for context switching
 	pushall_not_rax
-	push	rax
+	; Set rax to 0 if a fork is requested
+	push	qword 0
 
 	mov		rcx, rax
 	mov		r8, rsp
-	; The cooler rsp
-	lea		r9, [rsp + 8 * 15 + 8 * 3]
 
 	call	syscall_manager
 
-	; Don't overwrite the return value
+	; Ignore rax value
 	add		rsp, 8
 	popall_not_rax
 

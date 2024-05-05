@@ -8,7 +8,12 @@
 #include <memory.h>
 
 #define EXECUTABLES 3
-#define MAX_ARGS 255
+#define MAX_ARGS 256
+/**
+ * @brief Each argument max length
+ * @note Includes the NULL terminator
+ */
+#define MAX_ARG_LEN 1024
 
 /**
  * @brief Userland entry point
@@ -49,23 +54,31 @@ typedef char *Stack;
 extern Executable executables[EXECUTABLES];
 
 /**
- * @brief Validate the arguments and count them
+ * @brief Validate the arguments and count them (not including the NULL terminator)
  *
  * @param argv The argument values, NULL terminated, it may be NULL and return 0
  * @return int argc if success, negative if error
  */
 int check_args(char *const argv[]);
 /**
- * @brief Set the process' stack arguments
+ * @brief Set the process' new arguments
+ * @note Resets the process' RSP to the bottom of the stack and pushes the arguments there
  *
  * @param argc The number of arguments
  * @param argv The argument values, NULL terminated
- * @param heap The heap memory of the process, the argv strings will be copied here
- * (Hippity hoppity, your heap is now my property :] )
- * @param rsp The rsp pointer of the process
+ * @param process The process to set the arguments to
+ * @return RSP The new rsp pointer
  */
-void set_stack_args(int argc, char *const argv[], Stack heap, RSP *rsp);
+RSP set_process_args(int argc, char const argv[MAX_ARGS][MAX_ARG_LEN], Process *process);
+/**
+ * @brief Save the arguments somewhere, as long as it's not in the constantly moving stack
+ *
+ * @param argc The number of arguments (asumes it was validated with check_args())
+ * @param argv The argument values, NULL terminated
+ * @return char* const* const The backup pointer
+ */
+char *const *const backup_argv_somewhere(int argc, char *const argv[]);
 
-extern void portal_to_userland(EntryPoint code, RSP rsp);
+extern void portal_to_userland(int argc, char *const argv[], Process *process, EntryPoint code);
 
 #endif

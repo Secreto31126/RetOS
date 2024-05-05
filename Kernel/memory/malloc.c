@@ -1,5 +1,6 @@
 #include "memory.h"
 
+#define MEM_SCALE 1
 void *malloc(uint32_t size)
 {
     if (!size || size > heap_size)
@@ -18,7 +19,7 @@ void *malloc(uint32_t size)
 
         for (uint64_t i = 1; map + i < map_end; i++)
         {
-            if (i * sizeof(map_entry) >= size)
+            if (i * MEM_SCALE * sizeof(map_entry) >= size)
             {
                 *map = i;
                 return (void *)map + map_size;

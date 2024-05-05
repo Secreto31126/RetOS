@@ -1,26 +1,25 @@
 	extern initializeKernelBinary
-	extern start_userland
+	extern init
 
 	global loader
-
-	section .data
-userland	db "module", 0
-tomyland	db "tomyland", 0
-
-hello		db "Hello", 0
-world		db "World", 0
-argv		dq hello, world, 0
 
 	section .text
 
 loader:
-	call	initializeKernelBinary	; Set up the kernel binary
-	call 	start_userland
-	; mov		rdi, userland
-	; mov		rdi, tomyland
-	; mov		rsi, argv
-	; call 	execv
+	call	initializeKernelBinary
+
+	; Start using the init stack
+	mov		rsp, rax
+	sti
+
+	; Fork the first process
+	mov		rax, 0xC
+	int		80h
+
+	mov		rdi, rax
+	call 	init
+
 .hang:
-	; cli
+	cli
 	hlt
 	jmp	.hang

@@ -1,5 +1,7 @@
 #include "exec.h"
 
+#define PUSH(rsp, val) (*((void **)(--(rsp))) = (val))
+
 Executable executables[EXECUTABLES] = {
     {
         .mod = 7,
@@ -18,31 +20,6 @@ Executable executables[EXECUTABLES] = {
     },
 };
 
-extern uint8_t text;
-extern uint8_t rodata;
-extern uint8_t data;
-extern uint8_t bss;
-extern uint8_t endOfKernelBinary;
-extern uint8_t endOfKernel;
-
-#define PUSH(rsp, val) (*((char **)(--(rsp))) = (val))
-
-void set_stack_args(int argc, char *const argv[], Stack heap, RSP *rsp)
-{
-    PUSH(*rsp, NULL);
-
-    for (int i = argc - 1; i >= 0; i--)
-    {
-        char *args = argv[i];
-
-        char *copy = heap;
-        heap += strlen(args) + 1;
-
-        strcpy(copy, args);
-        PUSH(*rsp, copy);
-    }
-}
-
 int check_args(char *const argv[])
 {
     /**
@@ -55,8 +32,14 @@ int check_args(char *const argv[])
         return argc;
     }
 
-    while (argv[argc] && ++argc < MAX_ARGS)
-        ;
+    while (argv[argc] && argc + 1 < MAX_ARGS)
+    {
+        if (strlen(argv[argc++]) >= MAX_ARG_LEN - 1)
+        {
+            // E2BIG
+            return -7;
+        }
+    }
 
     if (argc >= MAX_ARGS)
     {
@@ -65,4 +48,41 @@ int check_args(char *const argv[])
     }
 
     return argc;
+}
+
+RSP set_process_args(int argc, char const argv[MAX_ARGS][MAX_ARG_LEN], Process *process)
+{
+    RSP *rsp = (RSP *)&process->rsp;
+    Stack heap = process->stack;
+
+    *rsp = process->stack + process->stack_size;
+
+    PUSH(*rsp, NULL);
+
+    for (int i = argc - 1; i >= 0; i--)
+    {
+        char const *args = argv[i];
+
+        char *copy = heap;
+        heap += strlen(args) + 1;
+
+        strcpy(copy, args);
+        PUSH(*rsp, copy);
+    }
+
+    PUSH(*rsp, (void *)argc);
+
+    return *rsp;
+}
+
+char argv_backup[MAX_ARGS][MAX_ARG_LEN];
+
+char *const *const backup_argv_somewhere(int argc, char *const argv[])
+{
+    for (int i = 0; i < argc; i++)
+    {
+        strcpy(argv_backup[i], argv[i]);
+    }
+
+    return (char *const *const)argv_backup;
 }

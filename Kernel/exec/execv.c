@@ -19,14 +19,11 @@ int execv(const char *pathname, char *const argv[])
                 return -argc;
             }
 
-            Process *process = get_current_process();
-            RSP rsp = process->stack + process->stack_size;
-
-            set_stack_args(argc, argv, (Stack)process->stack, &rsp);
-
-            process->rsp = rsp;
-
-            portal_to_userland(executables[i].main, rsp);
+            portal_to_userland(
+                argc,
+                backup_argv_somewhere(argc, argv),
+                get_current_process(),
+                executables[i].main);
         }
     }
 

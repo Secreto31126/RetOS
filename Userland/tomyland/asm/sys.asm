@@ -9,15 +9,17 @@
     global get_tick
     global get_dump
     global halt_user
+    global get_pid
     global execv
+    global fork
 
-; int read(int fd, char *str, size_t len);
+; size_t read(int fd, void *buf, size_t count);
 read:
     mov rax, 0
     int 80h
     ret
 
-; int write(int fd, const char *str, size_t len);
+; size_t write(int fd, void *buf, size_t count);
 write:
     mov rax, 1
     int 80h
@@ -71,8 +73,20 @@ halt_user:
     int 80h
     ret
 
+; int get_pid();
+get_pid:
+    mov rax, 0xD
+    int 80h
+    ret
+
 ; int execv(char *pathname, char *argv[]);
 execv:
-    mov rax, 0xB
+    mov rax, 0xE
+    int 80h
+    ret
+
+; int fork();
+fork:
+    mov rax, 0xF
     int 80h
     ret

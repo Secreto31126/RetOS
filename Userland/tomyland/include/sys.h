@@ -8,11 +8,11 @@
  * @brief Read from a file descriptor
  *
  * @param fd 0 for stdin, 2 for stderr, 3 for stdkey
- * @param buffer The buffer to write to
+ * @param buf The buffer to write to
  * @param count The number of bytes to read
  * @return size_t The number of bytes read
  */
-extern size_t read(int fd, void *str, size_t len);
+extern size_t read(int fd, void *buf, size_t count);
 extern size_t write(int fd, const void *str, size_t len);
 // uint64_t draw(HexColor *figure, uint64_t dimensions, uint64_t position);
 extern void *malloc(uint32_t size);
@@ -22,6 +22,8 @@ extern size_t get_screen_size();
 extern void beep(uint32_t freq);
 extern size_t get_tick();
 extern void halt_user();
-int execv(char *pathname, char *argv[]);
+extern int get_pid();
+extern int execv(char *pathname, char *argv[]);
+extern int fork();
 
 #endif

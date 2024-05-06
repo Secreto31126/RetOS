@@ -91,6 +91,10 @@ typedef struct Process
      * @brief The process' children count
      */
     size_t children_count;
+    /**
+     * @brief The process' priority
+     */
+    signed char priority;
 } Process;
 
 /**

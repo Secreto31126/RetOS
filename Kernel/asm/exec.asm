@@ -8,7 +8,7 @@
 
 	section .bss
 
-execv_running_stack	resq 0x100
+execv_running_stack	resb 0x400
 
 	section .text
 
@@ -16,7 +16,7 @@ execv_running_stack	resq 0x100
 portal_to_userland:
 	cli
 
-	lea		rsp, [execv_running_stack + 0x100]
+	lea		rsp, [execv_running_stack + 0x400]
 	lea		rsp, [rsp - 8 * 4]
 	mov		rbp, rsp
 

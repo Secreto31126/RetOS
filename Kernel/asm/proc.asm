@@ -8,8 +8,8 @@
 
 	section .bss
 
-scheduler_running_stack	resq 0x400
-exit_running_stack		resq 0x100
+scheduler_running_stack	resb 0x800
+exit_running_stack		resb 0x400
 
 	section .text
 
@@ -17,23 +17,23 @@ exit_running_stack		resq 0x100
 scheduler:
 	; Save the return address
 	xchg	rax, [rsp]
-	mov		[scheduler_running_stack + 0x400 - 8], rax
+	mov		[scheduler_running_stack + 0x800 - 8], rax
 	pop		rax
 
 	mov		rdi, rsp
-	lea		rsp, [scheduler_running_stack + 0x400 - 8]
+	lea		rsp, [scheduler_running_stack + 0x800 - 8]
 
 	call	context_switch
 	mov		rsp, rax
 
-	mov		rax, [scheduler_running_stack + 0x400 - 8]
+	mov		rax, [scheduler_running_stack + 0x800 - 8]
 	push	rax
 
 	ret
 
 ; void exit();
 exit:
-	lea		rsp, [exit_running_stack + 0x100]
+	lea		rsp, [exit_running_stack + 0x400]
 
 .kill:
 	cli

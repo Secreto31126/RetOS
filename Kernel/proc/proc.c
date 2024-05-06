@@ -175,12 +175,33 @@ int kill_process(pid_t pid)
 
     Process *man_im_dead = get_process(pid);
 
-    if (man_im_dead->state == NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR)
+    if (man_im_dead->state == NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR || man_im_dead->state == PROCESS_DEAD)
     {
         set_interrupt_flag();
 
         // ENOENT
         return 2;
+    }
+
+    // If the dead body is in its parents' house
+    if (man_im_dead->running_stack != man_im_dead->stack)
+    {
+        memcpy(
+            man_im_dead->running_stack,
+            STACK_END(man_im_dead->stack, man_im_dead->stack_size) - man_im_dead->running_stack_size,
+            man_im_dead->running_stack_size);
+    }
+
+    Process *parent = get_process(man_im_dead->ppid);
+
+    for (size_t i = 0; i < MAX_PROCESSES; i++)
+    {
+        if (parent->children[i] == pid)
+        {
+            parent->children[i] = -1;
+            parent->children_count--;
+            break;
+        }
     }
 
     /**
@@ -214,6 +235,15 @@ int kill_process(pid_t pid)
         if (p->ppid == pid)
         {
             p->ppid = man_im_dead->ppid;
+
+            for (size_t j = 0; j < MAX_PROCESSES; j++)
+            {
+                if (parent->children[j] == -1)
+                {
+                    parent->children[j] = i;
+                    break;
+                }
+            }
         }
 
         // Stacks preservation (pseudo pagination)

@@ -6,14 +6,13 @@
 #include <memory.h>
 #include <console.h>
 
-#define MAX_PROCESSES 10
-#define MIN_STACK_SIZE 0x8000
+#define MIN_STACK_SIZE 0x80000
 #define INIT_STACK_SIZE 0x400
 
 #define STACK_END(stack, size) (((void *)(stack)) + (size))
 
 /**
- * @brief The amount of active processes (processes' length)
+ * @brief The amount of active processes
  */
 extern pid_t processes_count;
 

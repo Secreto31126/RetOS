@@ -1,8 +1,14 @@
 #ifndef PRC_H
 #define PRC_H
 
+#include <stddef.h>
+
+#define MAX_PROCESS_CHILDREN 2
+#define MAX_PROCESSES 10
+
 /**
  * @brief An unique process identifier type
+ * @note -1 indicates an invalid pid
  */
 typedef int pid_t;
 
@@ -11,6 +17,15 @@ typedef int pid_t;
  */
 typedef enum ProcessStateEnum
 {
+    /**
+     * @brief Empty state
+     */
+    NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR = '\0',
+    /**
+     * @brief Caput
+     * @note Synonym for NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR
+     */
+    PROCESS_DEAD = '\0',
     /**
      * @brief Running
      */
@@ -68,6 +83,15 @@ typedef struct Process
      * @brief The process state, configured by the scheduler in context_switch()
      */
     ProcessState state;
+    /**
+     * @brief The process' children
+     * @note MAX_PROCESSES because it might inherit all the children from a child
+     */
+    pid_t children[MAX_PROCESSES];
+    /**
+     * @brief The process' children count
+     */
+    size_t children_count;
 } Process;
 
 /**

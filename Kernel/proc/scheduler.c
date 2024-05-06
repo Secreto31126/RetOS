@@ -3,7 +3,8 @@
 /**
  * @brief Handle a context switch request, preserving the current rsp and returning the next rsp
  *
- * @note This function should only be called from assembly with interruptions disabled, hence not declared in proc.h
+ * @note This function should only be called from assembly within a tick interruption
+ * and interruptions disabled, hence not declared in proc.h
  *
  * @param rsp The current rsp
  * @return void* The next rsp
@@ -30,7 +31,7 @@ void *context_switch(void *rsp)
     {
         // pid++;
         // pid %= processes_count;
-        set_pid((get_pid() + 1) % processes_count);
+        set_pid((get_pid() + 1) % MAX_PROCESSES);
 
         // ncPrint("\nStatus PID ");
         // ncPrintDec(pid);

@@ -69,13 +69,30 @@ pid_t create_process(void *rsp)
 
     if (processes_count + 1 > MAX_PROCESSES)
     {
+        set_interrupt_flag();
         return -1;
     }
 
-    pid_t new_pid = processes_count;
+    pid_t new_pid = 1;
+    while (new_pid < MAX_PROCESSES && processes[new_pid].state != NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR)
+    {
+        new_pid++;
+    }
+
+    if (new_pid == MAX_PROCESSES)
+    {
+        set_interrupt_flag();
+        return -1;
+    }
 
     // It's me, hi, I'm the process it's me
     Process *parent = get_current_process();
+
+    if (parent->children_count + 1 > MAX_PROCESS_CHILDREN)
+    {
+        set_interrupt_flag();
+        return -1;
+    }
 
     // If the parent has a bigger stack, use it
     size_t new_stack_size = parent->stack_size > MIN_STACK_SIZE ? parent->stack_size : MIN_STACK_SIZE;
@@ -84,6 +101,7 @@ pid_t create_process(void *rsp)
 
     if (!new_stack)
     {
+        set_interrupt_flag();
         return -1;
     }
 
@@ -96,6 +114,17 @@ pid_t create_process(void *rsp)
     processes[new_pid].running_stack_size = parent->running_stack_size;
     processes[new_pid].rsp = rsp;
     processes[new_pid].state = PROCESS_READY;
+    for (size_t i = 0; i < MAX_PROCESS_CHILDREN; i++)
+    {
+        processes[new_pid].children[i] = -1;
+    }
+    processes[new_pid].children_count = 0;
+
+    // Set the parent's children
+    parent->children[parent->children_count] = new_pid;
+
+    // Keep track of the process population
+    parent->children_count++;
     processes_count++;
 
     // We aren't Linux, we must copy the stack at creation time

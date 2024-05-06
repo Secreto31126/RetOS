@@ -12,8 +12,6 @@
  */
 void *context_switch(void *rsp)
 {
-    ncPrint("Switch: ");
-
     Process *old_process = get_current_process();
 
     if (old_process->state == PROCESS_RUNNING)
@@ -36,7 +34,7 @@ void *context_switch(void *rsp)
     do
     {
         // pid++;
-        // pid %= active_processes_count;
+        // pid %= processes_count;
         set_pid((get_pid() + 1) % MAX_PROCESSES);
 
         // ncPrint("\nStatus PID ");
@@ -76,11 +74,6 @@ void *context_switch(void *rsp)
                 new_process->running_stack_size);
         }
     }
-
-    ncPrintDec(old_process->pid);
-    ncPrint(" -> ");
-    ncPrintDec(new_process->pid);
-    ncNewline();
 
     new_process->state = PROCESS_RUNNING;
     return new_process->rsp;

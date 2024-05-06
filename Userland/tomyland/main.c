@@ -17,8 +17,6 @@ int main(int argc, char *argv[])
 		write(1, "\n", 1);
 	}
 
-	beep(1000);
-
 	int child_pid = fork();
 	int child = child_pid == 0;
 	int parent = child_pid != 0;

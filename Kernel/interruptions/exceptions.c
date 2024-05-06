@@ -26,10 +26,12 @@ void exception_manager(uint8_t exception)
         ;
     write_stderr(dump_reg_string, i);
 
+    beep(850);
     BSOD(exception);
     set_interrupt_flag();
     sleep_ticks(18 * 3);
     unset_interrupt_flag();
+    beep(0);
 
     // If weird exception, suicide
     if (exception != 0 && exception != 6)

@@ -133,5 +133,17 @@ pid_t get_pid();
  * @return pid_t The new process' pid
  */
 pid_t create_process(void *rsp);
+/**
+ * @brief Kill a process by its pid
+ *
+ * @param pid The process' pid to kill
+ * @return int 0 if the process was killed, error code otherwise
+ */
+int kill_process(pid_t pid);
+
+/**
+ * @brief Kill the current process and halt
+ */
+extern void exit();
 
 #endif

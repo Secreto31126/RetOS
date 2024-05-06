@@ -1,4 +1,5 @@
 #include "proc.h"
+#include <console.h>
 
 /**
  * @brief Handle a context switch request, preserving the current rsp and returning the next rsp
@@ -11,20 +12,25 @@
  */
 void *context_switch(void *rsp)
 {
+    ncPrint("Switch: ");
+
     Process *old_process = get_current_process();
 
-    old_process->rsp = rsp;
-
-    if (rsp < old_process->running_stack || STACK_END(old_process->running_stack, old_process->running_stack_size) < rsp)
+    if (old_process->state == PROCESS_RUNNING)
     {
-        ncPrint("Possible Stack Overflow for PID ");
-        ncPrintDec(old_process->pid);
-        ncPrint(" (RSP: ");
-        ncPrintHex((uint64_t)rsp);
-        ncPrint(")\n");
-    }
+        old_process->rsp = rsp;
 
-    old_process->state = PROCESS_READY;
+        if (rsp < old_process->running_stack || STACK_END(old_process->running_stack, old_process->running_stack_size) < rsp)
+        {
+            ncPrint("Possible Stack Overflow for PID ");
+            ncPrintDec(old_process->pid);
+            ncPrint(" (RSP: ");
+            ncPrintHex((uint64_t)rsp);
+            ncPrint(")\n");
+        }
+
+        old_process->state = PROCESS_READY;
+    }
 
     Process *new_process;
     do
@@ -48,13 +54,17 @@ void *context_switch(void *rsp)
     // If the process changed
     if (old_process->pid != new_process->pid)
     {
-        // If the kid is in its parents' house
-        if (old_process->running_stack != old_process->stack)
+        // If the old process isn't (living) dead
+        if (old_process->state != PROCESS_DEAD && old_process->state != PROCESS_ZOMBIE)
         {
-            swap_stacks(
-                old_process->running_stack,
-                STACK_END(old_process->stack, old_process->stack_size) - old_process->running_stack_size,
-                old_process->running_stack_size);
+            // If the kid is in its parents' house
+            if (old_process->running_stack != old_process->stack)
+            {
+                swap_stacks(
+                    old_process->running_stack,
+                    STACK_END(old_process->stack, old_process->stack_size) - old_process->running_stack_size,
+                    old_process->running_stack_size);
+            }
         }
 
         // If the new process still lives with its parents
@@ -66,6 +76,11 @@ void *context_switch(void *rsp)
                 new_process->running_stack_size);
         }
     }
+
+    ncPrintDec(old_process->pid);
+    ncPrint(" -> ");
+    ncPrintDec(new_process->pid);
+    ncNewline();
 
     new_process->state = PROCESS_RUNNING;
     return new_process->rsp;

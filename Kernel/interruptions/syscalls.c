@@ -73,8 +73,8 @@ static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)get_tick,
     (syscall)get_lucas,
     (syscall)halt,
-    (syscall)noop, // Reserved for bye (exit)
-    (syscall)noop, // Idk, something Cool here
+    (syscall)exit,
+    (syscall)noop, // semaphore (0xCross-roads)
     (syscall)get_pid,
     (syscall)execv,
     (syscall)fork,

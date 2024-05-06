@@ -148,23 +148,92 @@ pid_t create_process(void *rsp)
     return new_pid;
 }
 
-/**
- * @brief Reset a process to its own stack
- * @note Blocks any process with equal running_stack from running (TODO: Use a semaphore for this)
- * @note This function should be called only from the scheduler or execv
- *
- * @param process The process to expell from its parent's house
- */
-void move_away_from_parents_house(Process *process)
+int kill_process(pid_t pid)
 {
-    if (process->running_stack != process->stack)
-    {
-        swap_stacks(
-            process->running_stack,
-            STACK_END(process->stack, process->stack_size) - process->running_stack_size,
-            process->running_stack_size);
+    // Pseudo semaphore
+    unset_interrupt_flag();
 
-        process->running_stack = process->stack;
-        process->running_stack_size = process->stack_size;
+    Process *man_im_dead = get_process(pid);
+
+    if (man_im_dead->state == NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR)
+    {
+        set_interrupt_flag();
+
+        // ENOENT
+        return 2;
     }
+
+    /**
+     * @brief Wether the stack should be freed or not (another process is using it as running stack)
+     */
+    bool free_stack = true;
+    /**
+     * @brief Wether another process moved into the stack (free_stack is set to false)
+     */
+    bool stack_inherited = false;
+    /**
+     * @brief Wether the running stack should be freed or not (another process is using it as running stack)
+     */
+    bool free_running_stack = man_im_dead->stack != man_im_dead->running_stack;
+
+    for (pid_t i = 0; i < MAX_PROCESSES; i++)
+    {
+        if (i == pid)
+        {
+            continue;
+        }
+
+        Process *p = get_process(i);
+
+        if (p->state == NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR)
+        {
+            continue;
+        }
+
+        // Process inheritance
+        if (p->ppid == pid)
+        {
+            p->ppid = man_im_dead->ppid;
+        }
+
+        // Stacks preservation (pseudo pagination)
+        if (p->running_stack == man_im_dead->stack)
+        {
+            // If a process still needs the stack to run (pseudo pagination), don't free it
+            free_stack = false;
+
+            // Try to inherit the stack from the parent
+            if (!stack_inherited)
+            {
+                stack_inherited = inherit_parents_house(p);
+            }
+        }
+
+        if (p->running_stack == man_im_dead->running_stack)
+        {
+            // If another process is still using the running stack (pseudo pagination), don't free it
+            free_running_stack = false;
+        }
+    }
+
+    if (free_stack)
+    {
+        free(man_im_dead->stack);
+    }
+
+    if (free_running_stack)
+    {
+        free(man_im_dead->running_stack);
+    }
+
+    man_im_dead->state = PROCESS_DEAD;
+    processes_count--;
+
+    ncPrint("Process ");
+    ncPrintDec(pid);
+    ncPrint(" killed\n");
+
+    set_interrupt_flag();
+
+    return 0;
 }

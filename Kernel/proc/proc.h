@@ -30,6 +30,10 @@ pid_t set_pid(pid_t p);
  * @note No change if both stacks are equal
  * @note RSP should NEVER be pointing to either stack, for obvious reasons
  *
+ * @cite "I want pagination!"
+ * "We have pagination at home"
+ * Pagination at home:
+ *
  * @param current Stack 1
  * @param stash Stack 2
  * @param size The size of the stacks to swap

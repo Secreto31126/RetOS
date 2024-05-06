@@ -33,6 +33,9 @@ pid_t set_pid(pid_t p);
  * @return true if the process inherited its parent's house, false otherwise
  */
 bool inherit_parents_house(Process *process);
+void robin_add(pid_t);
+pid_t robin_next();
+pid_t robin_remove(pid_t pid);
 
 /**
  * @brief Swaps the contents of 2 stacks
@@ -48,9 +51,5 @@ bool inherit_parents_house(Process *process);
  * @param size The size of the stacks to swap
  */
 extern void swap_stacks(void *current, void *stash, size_t size);
-
-void add_proc(pid_t);
-pid_t next_p();
-pid_t remove_p(pid_t pid);
 
 #endif

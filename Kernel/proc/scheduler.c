@@ -93,75 +93,90 @@ p_node *first = NULL;
 p_node *last = NULL;
 signed char remaining = 0;
 
-void add_proc(pid_t pid)
+void robin_add(pid_t pid)
 {
     p_node *to_add = malloc(sizeof(p_node));
+
     to_add->pid = pid;
     to_add->next = NULL;
+
     if (first == NULL)
     {
         first = to_add;
         remaining = READ_PRIORITY(first);
     }
     else
+    {
         last->next = to_add;
+    }
+
     last = to_add;
 }
 
 pid_t remove_rec_p(pid_t pid, p_node *first)
 {
     if (first->next == NULL)
+    {
         return -1;
+    }
+
     if (first->next->pid = pid)
     {
         p_node *aux = first->next;
         first->next = aux->next;
         free(aux);
+
         return pid;
     }
+
     return remove_rec_p(pid, first->next);
 }
-pid_t remove_p(pid_t pid)
+
+pid_t robin_remove(pid_t pid)
 {
     if (first == NULL)
+    {
         return -1;
+    }
+
     if (first->pid == pid)
     {
         remaining = first->next == NULL ? 0 : READ_PRIORITY(first->next);
         return pid;
     }
+
     return remove_rec_p(pid, first);
 }
-pid_t next_p()
+
+pid_t robin_next()
 {
     if (first == NULL)
+    {
         return -1;
-    if (remaining-- < 0)
+    }
+
+    if (remaining-- > 0)
+    {
         return first;
+    }
 
     p_node *aux = first;
     pid_t to_ret = aux->pid;
     first = first->next;
+
     if (first == NULL)
+    {
         last = first;
+    }
+
+    // TODO: Don't free it, reuse it
     free(aux);
+
     remaining = READ_PRIORITY(first);
     if (get_process(to_ret)->state == PROCESS_DEAD)
-        return next_p();
-    return to_ret;
-}
-
-void print_p_rec(p_node *first)
-{
-    if (first != NULL)
     {
-        printf("%d-->", first->pid);
-        print_p_rec(first->next);
+        return robin_next();
     }
-}
 
-void print_p()
-{
-    print_p_rec(first);
-    printf("\n");
+    return to_ret;
 }

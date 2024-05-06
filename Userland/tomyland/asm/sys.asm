@@ -9,6 +9,7 @@
     global get_tick
     global get_dump
     global halt_user
+    global exit
     global get_pid
     global execv
     global fork
@@ -70,6 +71,12 @@ get_tick:
 ; void halt_user();
 halt_user:
     mov rax, 0xA
+    int 80h
+    ret
+
+; void exit();
+exit:
+    mov rax, 0xB
     int 80h
     ret
 

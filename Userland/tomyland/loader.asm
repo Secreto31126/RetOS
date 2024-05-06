@@ -5,8 +5,9 @@
 _start:
 	mov		rdi, [rsp]
 	lea		rsi, [rsp + 8]
+
 	call	main
 
-	; In the future, an exit syscall will go here
-
-	ret
+	mov		rdi, rax ; Lol, Kernel doesn't care about your "status code"
+	mov		rax, 0xB
+	int		80h

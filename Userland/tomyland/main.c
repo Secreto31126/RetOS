@@ -19,16 +19,23 @@ int main(int argc, char *argv[])
 
 	beep(1000);
 
-	if (fork())
+	int child_pid = fork();
+	int child = child_pid == 0;
+	int parent = child_pid != 0;
+
+	if (parent)
 	{
 		char *args[] = {"Bye", NULL};
 		return execv("module", args);
 	}
 	else
 	{
-		while (1)
+		if (child_pid < 0)
 		{
-			halt_user();
+			write(1, "Error forking\n", 14);
+			return 1;
 		}
+
+		return 0;
 	}
 }

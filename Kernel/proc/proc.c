@@ -66,18 +66,14 @@ Process *get_process(pid_t p)
 
 pid_t create_process(void *rsp)
 {
-    // Pseudo semaphore
-    unset_interrupt_flag();
-
     if (active_processes_count + 1 > MAX_PROCESSES)
     {
-        set_interrupt_flag();
         return -1;
     }
 
     bool tried_to_clean_dead_bodies = false;
 FIND_PID:
-    pid_t new_pid = 1;
+    pid_t new_pid = every_processes_count % (MAX_PROCESSES - 1) + 1;
     while (new_pid < MAX_PROCESSES && processes[new_pid].state != NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR)
     {
         new_pid++;
@@ -100,7 +96,6 @@ FIND_PID:
             goto FIND_PID;
         }
 
-        set_interrupt_flag();
         return -1;
     }
 
@@ -109,7 +104,6 @@ FIND_PID:
 
     if (parent->children_count + 1 > MAX_PROCESS_CHILDREN)
     {
-        set_interrupt_flag();
         return -1;
     }
 
@@ -120,7 +114,6 @@ FIND_PID:
 
     if (!new_stack)
     {
-        set_interrupt_flag();
         return -1;
     }
 
@@ -163,22 +156,15 @@ FIND_PID:
     // ncPrintHex((uint64_t)STACK_END(new_stack, new_stack_size));
     // ncNewline();
 
-    set_interrupt_flag();
-
     return new_pid;
 }
 
 int kill_process(pid_t pid)
 {
-    // Pseudo semaphore
-    unset_interrupt_flag();
-
     Process *man_im_dead = get_process(pid);
 
     if (man_im_dead->state == NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR || man_im_dead->state == PROCESS_DEAD)
     {
-        set_interrupt_flag();
-
         // ENOENT
         return 2;
     }
@@ -282,8 +268,6 @@ int kill_process(pid_t pid)
     ncPrint("Process ");
     ncPrintDec(pid);
     ncPrint(" killed\n");
-
-    set_interrupt_flag();
 
     return 0;
 }

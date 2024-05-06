@@ -33,8 +33,8 @@ bool inherit_parents_house(Process *process)
 
 /**
  * @brief Reset a process to its own stack
- * @note Blocks any process with equal running_stack from running (TODO: Use a semaphore for this)
  * @note This function should only be called from execv in assembler
+ * (which should be called from a syscall for "atomicity")
  *
  * @param process The process to expell from its parent's house
  */

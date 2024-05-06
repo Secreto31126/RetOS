@@ -14,8 +14,6 @@ execv_running_stack	resb 0x400
 
 ; extern void portal_to_userland(int argc, char *const argv[], Process *process, EntryPoint code);
 portal_to_userland:
-	cli
-
 	lea		rsp, [execv_running_stack + 0x400]
 	lea		rsp, [rsp - 8 * 4]
 	mov		rbp, rsp
@@ -37,8 +35,6 @@ portal_to_userland:
 	mov		rcx, [rbp + 8 * 3]
 
 	mov		rsp, rax
-
-	sti
 
 	push qword  0		; SS
 	push		rax		; RSP

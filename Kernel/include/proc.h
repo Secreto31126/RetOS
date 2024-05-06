@@ -138,6 +138,7 @@ pid_t get_pid();
 pid_t create_process(void *rsp);
 /**
  * @brief Kill a process by its pid
+ * @note This function should only be called from a syscall for "atomicity"
  *
  * @param pid The process' pid to kill
  * @return int 0 if the process was killed, error code otherwise
@@ -146,6 +147,7 @@ int kill_process(pid_t pid);
 
 /**
  * @brief Kill the current process and halt
+ * @note This function should only be called from a syscall for "atomicity"
  */
 extern void exit();
 

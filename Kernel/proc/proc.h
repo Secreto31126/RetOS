@@ -26,8 +26,8 @@ extern pid_t active_processes_count;
 pid_t set_pid(pid_t p);
 /**
  * @brief Let a process inherit its parent's stack
- * @note Blocks any process with equal running_stack from running (TODO: Use a semaphore for this)
  * @note This function should only be called from kill_pid
+ * (which should only be called from a syscall for "atomicity")
  *
  * @param process The process to inherit its parent's house
  * @return true if the process inherited its parent's house, false otherwise

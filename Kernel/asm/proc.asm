@@ -36,22 +36,22 @@ exit:
 	lea		rsp, [exit_running_stack + 0x400]
 
 .kill:
-	cli
 	call	get_pid
 	mov		rdi, rax
 	call	kill_process
-	sti
 
 	; Keep killing until it's dead dead or the scheduler stops you
 	cmp		rax, 0
 	jne		.kill
 
-.halt:
-	; Death loop until scheduler release your soul
-	sti
-	hlt
-	jmp		.halt
+	; Let the scheduler pick your soul and die happily
+	int		0x20
 
+	; Just in case
+.loop:
+	sti
+	halt
+	jmp		.loop
 
 ; void swap_stacks(void *current, void *stash, size_t size);
 swap_stacks:

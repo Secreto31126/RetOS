@@ -88,8 +88,6 @@ sus_exception_handler:
 
 ; void tick_handler(void);
 tick_handler:
-	cli
-
 	pushall
 
 	mov		rdi, 0
@@ -101,8 +99,6 @@ tick_handler:
 	out		0x20, al
 
 	popall
-
-	sti
 
 	iretq
 

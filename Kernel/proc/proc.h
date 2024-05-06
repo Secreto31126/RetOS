@@ -49,4 +49,8 @@ bool inherit_parents_house(Process *process);
  */
 extern void swap_stacks(void *current, void *stash, size_t size);
 
+void add_proc(pid_t);
+pid_t next_p();
+pid_t remove_p(pid_t pid);
+
 #endif

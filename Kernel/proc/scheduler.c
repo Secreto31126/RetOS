@@ -78,3 +78,72 @@ void *context_switch(void *rsp)
     new_process->state = PROCESS_RUNNING;
     return new_process->rsp;
 }
+
+// priority based round Robin
+
+typedef struct p_node
+{
+    pid_t pid;
+    struct p_node *next;
+} p_node;
+
+p_node *first = NULL;
+p_node *last = NULL;
+
+void add_proc(pid_t pid)
+{
+    p_node *to_add = malloc(sizeof(p_node));
+    to_add->pid = pid;
+    to_add->next = NULL;
+    if (first == NULL)
+        first = to_add;
+    else
+        last->next = to_add;
+    last = to_add;
+}
+
+pid_t remove_rec_p(pid_t pid, p_node *first)
+{
+    if (first->next == NULL)
+        return -1;
+    if (first->next->pid = pid)
+    {
+        p_node *aux = first->next;
+        first->next = aux->next;
+        free(aux);
+        return pid;
+    }
+    return remove_rec_p(pid, first->next);
+}
+pid_t remove_p(pid_t pid)
+{
+    return first == NULL ? -1 : first->pid == pid ? pid
+                                                  : remove_rec_p(pid, first);
+}
+pid_t next_p()
+{
+    if (first == NULL)
+        return -1;
+    p_node *aux = first;
+    pid_t to_ret = aux->pid;
+    first = first->next;
+    if (first == NULL)
+        last = first;
+    free(aux);
+    return to_ret;
+}
+
+void print_p_rec(p_node *first)
+{
+    if (first != NULL)
+    {
+        printf("%d-->", first->pid);
+        print_p_rec(first->next);
+    }
+}
+
+void print_p()
+{
+    print_p_rec(first);
+    printf("\n");
+}

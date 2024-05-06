@@ -36,7 +36,7 @@ void *context_switch(void *rsp)
     do
     {
         // pid++;
-        // pid %= processes_count;
+        // pid %= active_processes_count;
         set_pid((get_pid() + 1) % MAX_PROCESSES);
 
         // ncPrint("\nStatus PID ");

@@ -5,7 +5,8 @@
  */
 pid_t pid;
 
-pid_t processes_count;
+pid_t active_processes_count;
+pid_t every_processes_count;
 
 /**
  * @brief The array of all processes
@@ -33,7 +34,8 @@ void *create_process_init()
     };
 
     pid = 0;
-    processes_count = 1;
+    active_processes_count = 1;
+    every_processes_count = 1;
 
     ncPrintHex((uint64_t)processes[0].stack);
 
@@ -67,12 +69,14 @@ pid_t create_process(void *rsp)
     // Pseudo semaphore
     unset_interrupt_flag();
 
-    if (processes_count + 1 > MAX_PROCESSES)
+    if (active_processes_count + 1 > MAX_PROCESSES)
     {
         set_interrupt_flag();
         return -1;
     }
 
+    bool tried_to_clean_dead_bodies = false;
+FIND_PID:
     pid_t new_pid = 1;
     while (new_pid < MAX_PROCESSES && processes[new_pid].state != NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR)
     {
@@ -81,6 +85,21 @@ pid_t create_process(void *rsp)
 
     if (new_pid == MAX_PROCESSES)
     {
+        if (!tried_to_clean_dead_bodies)
+        {
+            for (size_t i = 0; i < MAX_PROCESSES; i++)
+            {
+                Process *p = get_process(i);
+                if (p->state == PROCESS_DEAD)
+                {
+                    p->state = NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR;
+                }
+            }
+
+            tried_to_clean_dead_bodies = true;
+            goto FIND_PID;
+        }
+
         set_interrupt_flag();
         return -1;
     }
@@ -114,7 +133,7 @@ pid_t create_process(void *rsp)
     processes[new_pid].running_stack_size = parent->running_stack_size;
     processes[new_pid].rsp = rsp;
     processes[new_pid].state = PROCESS_READY;
-    for (size_t i = 0; i < MAX_PROCESS_CHILDREN; i++)
+    for (size_t i = 0; i < MAX_PROCESSES; i++)
     {
         processes[new_pid].children[i] = -1;
     }
@@ -125,7 +144,8 @@ pid_t create_process(void *rsp)
 
     // Keep track of the process population
     parent->children_count++;
-    processes_count++;
+    active_processes_count++;
+    every_processes_count++;
 
     // We aren't Linux, we must copy the stack at creation time
     memcpy(
@@ -227,7 +247,7 @@ int kill_process(pid_t pid)
     }
 
     man_im_dead->state = PROCESS_DEAD;
-    processes_count--;
+    active_processes_count--;
 
     ncPrint("Process ");
     ncPrintDec(pid);

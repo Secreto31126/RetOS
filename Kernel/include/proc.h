@@ -22,11 +22,6 @@ typedef enum ProcessStateEnum
      */
     NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR = '\0',
     /**
-     * @brief Caput
-     * @note Synonym for NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR
-     */
-    PROCESS_DEAD = '\0',
-    /**
      * @brief Running
      */
     PROCESS_RUNNING = 'R',
@@ -44,6 +39,10 @@ typedef enum ProcessStateEnum
      * TODO: Implement this state
      */
     PROCESS_ZOMBIE = 'Z',
+    /**
+     * @brief Caput
+     */
+    PROCESS_DEAD = 'D',
 } ProcessState;
 
 /**

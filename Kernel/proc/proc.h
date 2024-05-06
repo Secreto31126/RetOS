@@ -15,7 +15,7 @@
 /**
  * @brief The amount of active processes
  */
-extern pid_t processes_count;
+extern pid_t active_processes_count;
 
 /**
  * @brief Set the pid value

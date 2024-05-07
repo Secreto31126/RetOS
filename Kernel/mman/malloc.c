@@ -1,4 +1,4 @@
-#include "memory.h"
+#include "mman.h"
 
 #define MEM_SCALE 1
 void *malloc(uint32_t size)

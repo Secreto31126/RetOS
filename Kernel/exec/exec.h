@@ -1,9 +1,10 @@
 #ifndef PEXE_H
 #define PEXE_H
 
-#include <lib.h>
+#include <mman.h>
 #include <proc.h>
 #include <ticks.h>
+#include <string.h>
 #include <stdint.h>
 #include <memory.h>
 

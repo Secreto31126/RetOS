@@ -3,6 +3,7 @@
 
 #include <lib.h>
 #include <proc.h>
+#include <mman.h>
 #include <memory.h>
 #include <console.h>
 #include <stdbool.h>

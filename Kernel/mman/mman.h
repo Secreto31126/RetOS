@@ -1,7 +1,7 @@
-#ifndef PMEM_H
-#define PMEM_H
+#ifndef PMMAN_H
+#define PMMAN_H
 
-#include <memory.h>
+#include <mman.h>
 
 typedef uint32_t map_entry;
 

@@ -6,6 +6,7 @@
 #include <lib.h>
 #include <proc.h>
 #include <exec.h>
+#include <mman.h>
 #include <audio.h>
 #include <video.h>
 #include <ticks.h>
@@ -14,7 +15,6 @@
 #include <stdkey.h>
 #include <stdint.h>
 #include <header.h>
-#include <memory.h>
 #include <images.h>
 #include <console.h>
 #include <localization.h>

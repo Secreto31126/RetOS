@@ -2,14 +2,14 @@ include Makefile.inc
 
 KERNEL=kernel.bin
 KERNELSRC=kernel.c
-SOURCES=$(KERNELSRC) $(wildcard proc/*.c) $(wildcard exec/*.c) $(wildcard lib/*.c) $(wildcard ticks/*.c) $(wildcard console/*.c) $(wildcard audio/*.c) $(wildcard video/*.c) $(wildcard images/*.c) $(wildcard modules/*.c) $(wildcard localization/*.c) $(wildcard stdin/*.c) $(wildcard stderr/*.c) $(wildcard stdkey/*.c) $(wildcard interruptions/*.c) $(wildcard memory/*.c) # $(wildcard folder_name/*.c)
+SOURCES=$(KERNELSRC) $(wildcard mman/*.c) $(wildcard proc/*.c) $(wildcard exec/*.c) $(wildcard lib/*.c) $(wildcard ticks/*.c) $(wildcard console/*.c) $(wildcard audio/*.c) $(wildcard video/*.c) $(wildcard images/*.c) $(wildcard modules/*.c) $(wildcard localization/*.c) $(wildcard stdin/*.c) $(wildcard stderr/*.c) $(wildcard stdkey/*.c) $(wildcard interruptions/*.c) # $(wildcard folder_name/*.c)
 SOURCES_ASM=$(wildcard asm/*.asm)
 OBJECTS=$(SOURCES:.c=.o)
 OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
 LOADERSRC=loader.asm
 
 LOADEROBJECT=$(LOADERSRC:.asm=.o)
-STATICLIBS=
+STATICLIBS=$(wildcard ../Global/memory/*.o) $(wildcard ../Global/string/*.o)
 
 all: log $(KERNEL)
 

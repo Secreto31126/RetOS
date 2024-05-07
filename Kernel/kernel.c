@@ -7,6 +7,7 @@
 #include <memory.h>
 #include <proc.h>
 #include <exec.h>
+#include <mman.h>
 
 extern uint8_t text;
 extern uint8_t rodata;

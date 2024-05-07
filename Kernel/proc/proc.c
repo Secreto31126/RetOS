@@ -35,7 +35,7 @@ void *create_process_init()
 
     pid = 0;
     active_processes_count = 1;
-    every_processes_count = 1;
+    every_processes_count = 0;
 
     ncPrintHex((uint64_t)processes[0].stack);
 

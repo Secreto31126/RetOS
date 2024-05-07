@@ -120,7 +120,7 @@ pid_t remove_rec_p(pid_t pid, p_node *first)
         return -1;
     }
 
-    if (first->next->pid = pid)
+    if (first->next->pid == pid)
     {
         p_node *aux = first->next;
         first->next = aux->next;
@@ -157,7 +157,7 @@ pid_t robin_next()
 
     if (remaining-- > 0)
     {
-        return first;
+        return first->pid;
     }
 
     p_node *aux = first;

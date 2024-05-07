@@ -50,7 +50,7 @@ exit:
 	; Just in case
 .loop:
 	sti
-	halt
+	hlt
 	jmp		.loop
 
 ; void swap_stacks(void *current, void *stash, size_t size);

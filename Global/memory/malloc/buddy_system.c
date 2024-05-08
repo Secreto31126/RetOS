@@ -118,12 +118,18 @@ void cascade_state(char *x, size_t_m i, states s)
 
 void set_heap(void *start, size_t_m size)
 {
-    size_t_m unit = size / (BLOCK + HEAD_SIZE * 2);
+    // A complete binary tree has (2*LEAVES)-1 nodes
+    // Unit represents the number of MEMORY_BLOCK-NODE pairs that can fit into the given heap
+    size_t_m unit = size / (BLOCK + HEAD_SIZE * 2 - 1);
+
     mem_start = start;
     mem_end = mem_start + round_to_power_of_two(BLOCK * unit);
-    ;
+
     map_start = mem_end;
-    map_end = map_start + round_to_power_of_two(HEAD_SIZE * 2 * unit);
+    // The binary tree must be complete to be properly mapped in an array
+    map_end = map_start + round_to_power_of_two((HEAD_SIZE * 2 - 1) * unit);
+
+    // Initialize binary tree
     for (void *i = map_start; i < map_end; i++)
         *((uint64_t *)i) = EMPTY;
 }
@@ -145,10 +151,12 @@ void *malloc_m(size_t_m size)
 {
     if (size > mem_end - mem_start)
         return NULL;
-    size_t_m index = map_index_to_mem_index(find_buddy(size, 0, mem_end - mem_start));
+    size_t_m index = find_buddy(size, 0, mem_end - mem_start);
     if (index == -1)
+    {
         return NULL;
-    return mem_start + index;
+    }
+    return mem_start + map_index_to_mem_index(index);
 }
 
 size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size)
@@ -160,7 +168,7 @@ size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size)
     }
     // if does not fit in half the space of the node, you are in a smallest node that can fit it
     // If current_size is smaller than BLOCK, you have reached minimum allowed node
-    if (size > current_size / 2 || current_size <= BLOCK)
+    if (size > current_size / 2 || current_size / 2 <= BLOCK)
     {
         if (read_state(map_start, index) == EMPTY)
         {

@@ -197,12 +197,16 @@ void print_m(char avoid_empty)
     printf("-----------------------------------------------------\n");
     print_m_rec(0, 0, avoid_empty);
     printf("-----------------------------------------------------\n");
-    for (int i = 0; i < 256; i++)
+    printf("Printing map as binary\n");
+    printf("-----------------------------------------------------\n");
+    for (int i = 0; i < map_end - map_start; i++)
     {
         printf("%d", IS_BIT_SET(((char *)map_start), i));
         if (i % 2)
             printf(" ");
     }
+    printf("\n");
+    printf("-----------------------------------------------------\n");
 }
 
 void print_m_data()
@@ -228,7 +232,7 @@ void print_m_rec(size_t_m i, size_t_m height, char avoid_empty)
 
     print_m_rec(GET_LEFT(i), height + 1, avoid_empty);
     for (int i = 0; i < height; i++)
-        printf("\t");
+        printf("  ");
 
     if (s == EMPTY)
         printf("E\n");
@@ -239,3 +243,7 @@ void print_m_rec(size_t_m i, size_t_m height, char avoid_empty)
 
     print_m_rec(GET_RIGHT(i), height + 1, avoid_empty);
 }
+
+// Damn, this project works
+// It is slightly beautiful
+// I am slightly proud

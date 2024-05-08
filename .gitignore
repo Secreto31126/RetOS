@@ -11,6 +11,9 @@
 *.o
 *.mem
 
+# Elfos files
+*.elf
+
 docs/
 
 .vercel

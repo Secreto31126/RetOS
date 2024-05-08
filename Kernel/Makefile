@@ -1,6 +1,6 @@
 include Makefile.inc
 
-KERNEL=kernel.bin
+KERNEL=kernel
 KERNELSRC=kernel.c
 SOURCES=$(KERNELSRC) $(wildcard mman/*.c) $(wildcard proc/*.c) $(wildcard exec/*.c) $(wildcard lib/*.c) $(wildcard ticks/*.c) $(wildcard console/*.c) $(wildcard audio/*.c) $(wildcard video/*.c) $(wildcard images/*.c) $(wildcard modules/*.c) $(wildcard localization/*.c) $(wildcard stdin/*.c) $(wildcard stderr/*.c) $(wildcard stdkey/*.c) $(wildcard interruptions/*.c) # $(wildcard folder_name/*.c)
 SOURCES_ASM=$(wildcard asm/*.asm)
@@ -20,7 +20,15 @@ log:
 	@echo
 
 $(KERNEL): $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM)
-	$(LD) $(LDFLAGS) -T kernel.ld -o $(KERNEL) $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(STATICLIBS)
+	$(LD) $(LDFLAGS) -T kernel.ld -o $(KERNEL).bin $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(STATICLIBS)
+ifneq ($(DEBUG), 0)
+	$(LD) $(LDFLAGS) -T kernel.ld --oformat=elf64-x86-64 -o ../Image/$(KERNEL).elf $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(STATICLIBS)
+endif
+
+ifneq ($(DEBUG), 0)
+GCCFLAGS += -g
+ASMFLAGS += -g -F dwarf
+endif
 
 %.o: %.c
 	$(GCC) $(GCCFLAGS) -I./include -I../Global/include -c $< -o $@

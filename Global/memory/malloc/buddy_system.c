@@ -21,7 +21,7 @@
 #define GET_LEFT(i) (((i) << 1) + 1)
 #define GET_RIGHT(i) (((i) << 1) + 2)
 #define GET_PARENT(i) ((i - 1) >> 1)
-#define GET_BROTHER(i) (IS_LEFT(i) ? GET_RIGHT(GET_PARENT(i)):GET_LEFT(GET_PARENT(i)))
+#define GET_BROTHER(i) (IS_LEFT(i) ? GET_RIGHT(GET_PARENT(i)) : GET_LEFT(GET_PARENT(i)))
 
 #include "stdint.h"
 #include <stdio.h>
@@ -48,26 +48,6 @@ size_t_m round_to_power_of_two(size_t_m s)
     while (i * 2 <= s)
         i *= 2;
     return i;
-}
-size_t_m get_left(size_t_m index)
-{
-    return index * 2 + 1;
-}
-size_t_m get_right(size_t_m index)
-{
-    return index * 2 + 2;
-}
-char is_left(size_t_m index)
-{
-    return index % 2;
-}
-size_t_m get_parent(size_t_m index)
-{
-    return (index - 1) / 2;
-}
-size_t_m get_brother(size_t_m index)
-{
-    return is_left(index) ? get_right(get_parent(index)) : get_left(get_parent(index));
 }
 
 void set_state(char *x, size_t_m i, states s)
@@ -114,22 +94,22 @@ void cascade_state(char *x, size_t_m i, states s)
     switch (s)
     {
     case EMPTY:
-        aux = read_state(x, get_parent(i));
+        aux = read_state(x, GET_PARENT(i));
         if (aux == FULL)
-            set_state(x, get_parent(i), SPLIT);
-        else if (aux == SPLIT && read_state(x, get_brother(i)) == EMPTY)
-            set_state(x, get_parent(i), EMPTY);
+            set_state(x, GET_PARENT(i), SPLIT);
+        else if (aux == SPLIT && read_state(x, GET_BROTHER(i)) == EMPTY)
+            set_state(x, GET_PARENT(i), EMPTY);
         break;
     case SPLIT:
-        if (read_state(x, get_parent(i)) != SPLIT)
-            set_state(x, get_parent(i), SPLIT);
+        if (read_state(x, GET_PARENT(i)) != SPLIT)
+            set_state(x, GET_PARENT(i), SPLIT);
         break;
     case FULL:
-        aux = read_state(x, get_parent(i));
+        aux = read_state(x, GET_PARENT(i));
         if (aux == EMPTY)
-            set_state(x, get_parent(i), SPLIT);
-        else if (aux == SPLIT && read_state(x, get_brother(i)) == FULL)
-            set_state(x, get_parent(i), FULL);
+            set_state(x, GET_PARENT(i), SPLIT);
+        else if (aux == SPLIT && read_state(x, GET_BROTHER(i)) == FULL)
+            set_state(x, GET_PARENT(i), FULL);
         break;
     default:
         break;
@@ -193,10 +173,10 @@ size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size)
     {
         return -1;
     }
-    size_t_m left = find_buddy(size, get_left(index), current_size / 2);
+    size_t_m left = find_buddy(size, GET_LEFT(index), current_size / 2);
     if (left == -1)
     {
-        return find_buddy(size, get_right(index), current_size / 2);
+        return find_buddy(size, GET_RIGHT(index), current_size / 2);
     }
 }
 void *realloc_m(void *ptr, size_t_m size)
@@ -246,7 +226,7 @@ void print_m_rec(size_t_m i, size_t_m height, char avoid_empty)
     if (s == EMPTY && avoid_empty)
         return;
 
-    print_m_rec(get_left(i), height + 1, avoid_empty);
+    print_m_rec(GET_LEFT(i), height + 1, avoid_empty);
     for (int i = 0; i < height; i++)
         printf("\t");
 
@@ -257,5 +237,5 @@ void print_m_rec(size_t_m i, size_t_m height, char avoid_empty)
     else
         printf("F\n");
 
-    print_m_rec(get_right(i), height + 1, avoid_empty);
+    print_m_rec(GET_RIGHT(i), height + 1, avoid_empty);
 }

@@ -13,9 +13,9 @@
 
 #define HEAD_SIZE 2
 
-#define IS_BIT_SET(x, i) ((x[i >> 3] & (1 << (i & 7))) != 0)
-#define SET_BIT(x, i) x[i >> 3] |= (1 << (i & 7))
-#define CLEAR_BIT(x, i) x[i >> 3] &= (1 << (i & 7)) ^ 0xFF
+#define IS_BIT_SET(x, i) (((x)[(i) >> 3] & (1 << ((i) & 7))) != 0)
+#define SET_BIT(x, i) (x)[(i) >> 3] |= (1 << ((i) & 7))
+#define CLEAR_BIT(x, i) (x)[(i) >> 3] &= (1 << ((i) & 7)) ^ 0xFF
 
 #define IS_LEFT(i) ((i) % 2)
 #define GET_LEFT(i) (((i) << 1) + 1)
@@ -33,10 +33,10 @@ typedef enum states
     FULL
 } states;
 
-void *mem_start;
-void *mem_end;
-void *map_start;
-void *map_end;
+char *mem_start;
+char *mem_end;
+char *map_start;
+char *map_end;
 
 void cascade_state(char *x, size_t_m i, states s);
 
@@ -122,7 +122,7 @@ void set_heap(void *start, size_t_m size)
     // Unit represents the number of MEMORY_BLOCK-NODE pairs that can fit into the given heap
     size_t_m unit = size / (BLOCK + HEAD_SIZE * 2 - 1);
 
-    mem_start = start;
+    mem_start = (char *)start;
     mem_end = mem_start + round_to_power_of_two(BLOCK * unit);
 
     map_start = mem_end;
@@ -130,7 +130,7 @@ void set_heap(void *start, size_t_m size)
     map_end = map_start + round_to_power_of_two((HEAD_SIZE * 2 - 1) * unit);
 
     // Initialize binary tree
-    for (void *i = map_start; i < map_end; i++)
+    for (char *i = map_start; i < map_end; i++)
         *((uint64_t *)i) = EMPTY;
 }
 
@@ -156,18 +156,21 @@ void *malloc_m(size_t_m size)
     {
         return NULL;
     }
-    return mem_start + map_index_to_mem_index(index);
+    return (void *)(mem_start + map_index_to_mem_index(index));
 }
 
+/**
+ * @brief dfs algorithm, searches for a node that represents the smallest unit of memory that can fit the request
+ */
 size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size)
 {
-    // if does not fit in the space denoted by the node, do not look further, this node cannot fit it
+    // if does not fit in the space denoted by the node, do not look further
     if (size > current_size)
     {
         return -1;
     }
     // if does not fit in half the space of the node, you are in a smallest node that can fit it
-    // If current_size is smaller than BLOCK, you have reached minimum allowed node
+    // If current_size is smaller than BLOCK, you have reached minimum allowed memory unit
     if (size > current_size / 2 || current_size / 2 <= BLOCK)
     {
         if (read_state(map_start, index) == EMPTY)
@@ -177,15 +180,18 @@ size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size)
         }
         return -1;
     }
+    // If a node is full, the children are considered full as well
     if (read_state(map_start, index) == FULL)
     {
         return -1;
     }
+    // dfs recursion: search left, if not found, return right search
     size_t_m left = find_buddy(size, GET_LEFT(index), current_size / 2);
     if (left == -1)
     {
         return find_buddy(size, GET_RIGHT(index), current_size / 2);
     }
+    return left;
 }
 void *realloc_m(void *ptr, size_t_m size)
 {
@@ -193,8 +199,8 @@ void *realloc_m(void *ptr, size_t_m size)
 }
 void free_m(void *ptr)
 {
-    if (ptr > mem_start && ptr < mem_end)
-        set_state(mem_start, mem_index_to_map_index(ptr - mem_start), EMPTY);
+    if (((char *)ptr) > mem_start && ((char *)ptr) < mem_end)
+        set_state(mem_start, mem_index_to_map_index(((char *)ptr) - mem_start), EMPTY);
 }
 
 void print_m_rec(size_t_m i, size_t_m height, char avoid_empty);

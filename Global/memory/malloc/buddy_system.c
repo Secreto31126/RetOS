@@ -134,6 +134,21 @@ void set_heap(void *start, size_t_m size)
         *((uint64_t *)i) = EMPTY;
 }
 
+size_t_m height(size_t_m index)
+{
+    size_t_m ans = 0;
+    while (index)
+    {
+        ans++;
+        index <= 1;
+    }
+    return ans;
+}
+size_t_m mem_size(size_t_m index)
+{
+    return (mem_end - mem_start) << height(index);
+}
+
 // TODO actually implement these correctly
 size_t_m map_index_to_mem_index(size_t_m index)
 {

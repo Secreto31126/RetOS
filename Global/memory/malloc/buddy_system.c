@@ -149,7 +149,7 @@ size_t_m mem_size(size_t_m index)
     return (mem_end - mem_start) >> height(index);
 }
 
-// TODO actually implement these correctly
+// TODO actually test these
 size_t_m map_index_to_mem_index(size_t_m index)
 {
     size_t_m result = 0;
@@ -168,6 +168,19 @@ size_t_m mem_index_to_map_index(size_t_m index)
 {
     size_t_m probe = 0;
     size_t_m jump = (mem_end - mem_start) >> 1;
+    size_t_m map_index = 0;
+    while (probe < index && jump > 0)
+    {
+        if (probe + jump < index)
+        {
+            probe += jump;
+            map_index = GET_RIGHT(map_index);
+        }
+        else
+            map_index = GET_LEFT(map_index);
+        jump >>= 1;
+    }
+    return map_index;
 }
 
 size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size);

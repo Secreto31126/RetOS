@@ -140,13 +140,13 @@ size_t_m height(size_t_m index)
     while (index)
     {
         ans++;
-        index <<= 1;
+        index >>= 1;
     }
     return ans;
 }
 size_t_m mem_size(size_t_m index)
 {
-    return (mem_end - mem_start) << height(index);
+    return (mem_end - mem_start) >> height(index);
 }
 
 // TODO actually implement these correctly
@@ -159,14 +159,15 @@ size_t_m map_index_to_mem_index(size_t_m index)
         if (!IS_LEFT(index))
             result += jump;
         index = GET_PARENT(index);
-        jump >>= 1;
+        jump <<= 1;
     }
     return result;
 }
 
 size_t_m mem_index_to_map_index(size_t_m index)
 {
-    return index * HEAD_SIZE / BLOCK;
+    size_t_m probe = 0;
+    size_t_m jump = (mem_end - mem_start) >> 1;
 }
 
 size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size);

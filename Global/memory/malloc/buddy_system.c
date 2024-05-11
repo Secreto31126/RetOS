@@ -45,8 +45,8 @@ size_t_m round_to_power_of_two(size_t_m s)
     if (!s)
         return 0;
     int i = 1;
-    while (i * 2 <= s)
-        i *= 2;
+    while ((i >> 1) <= s)
+        i >>= 1;
     return i;
 }
 
@@ -140,7 +140,7 @@ size_t_m height(size_t_m index)
     while (index)
     {
         ans++;
-        index <= 1;
+        index <<= 1;
     }
     return ans;
 }
@@ -152,7 +152,16 @@ size_t_m mem_size(size_t_m index)
 // TODO actually implement these correctly
 size_t_m map_index_to_mem_index(size_t_m index)
 {
-    return index * BLOCK / HEAD_SIZE;
+    size_t_m result = 0;
+    size_t_m jump = mem_size(index);
+    while (index)
+    {
+        if (!IS_LEFT(index))
+            result += jump;
+        index = GET_PARENT(index);
+        jump >>= 1;
+    }
+    return result;
 }
 
 size_t_m mem_index_to_map_index(size_t_m index)

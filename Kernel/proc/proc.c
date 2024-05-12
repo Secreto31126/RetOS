@@ -33,6 +33,10 @@ void *create_process_init()
         .state = PROCESS_RUNNING,
         .children = {},
         .children_count = 0,
+        .priority = 1,
+        .next_blocked = NULL,
+        .block_condition = no_condition,
+        .condition_data = NULL,
     };
 
     pid = 0;
@@ -133,6 +137,10 @@ FIND_PID:
         processes[new_pid].children[i] = -1;
     }
     processes[new_pid].children_count = 0;
+    processes[new_pid].priority = parent->priority;
+    processes[new_pid].next_blocked = NULL;
+    processes[new_pid].block_condition = no_condition;
+    processes[new_pid].condition_data = NULL;
 
     // Set the parent's children
     parent->children[parent->children_count] = new_pid;
@@ -141,6 +149,7 @@ FIND_PID:
     parent->children_count++;
     active_processes_count++;
     every_processes_count++;
+    robin_add(new_pid);
 
     // We aren't Linux, we must copy the stack at creation time
     memcpy(

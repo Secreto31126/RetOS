@@ -1,8 +1,10 @@
 	extern context_switch
+	extern yield_robin
 	extern get_pid
 	extern kill_process
 
 	global scheduler
+	global yield
 	global exit
 	global swap_stacks
 
@@ -29,6 +31,12 @@ scheduler:
 	mov		rax, [scheduler_running_stack + 0x800 - 8]
 	push	rax
 
+	ret
+
+; void yield();
+yield:
+	call	yield_robin
+	int		0x20
 	ret
 
 ; void exit();

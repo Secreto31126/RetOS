@@ -9,7 +9,7 @@ int execv(const char *pathname, char *const argv[])
             if (!(executables[i].mod & 1))
             {
                 // EPERM
-                return 1;
+                return 13;
             }
 
             int argc = check_args(argv);

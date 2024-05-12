@@ -26,5 +26,8 @@ extern void exit();
 extern int get_pid();
 extern int execv(char *pathname, char *argv[]);
 extern int fork();
+extern void yield();
+extern void waitpid();
+extern void sleep(unsigned int seconds);
 
 #endif

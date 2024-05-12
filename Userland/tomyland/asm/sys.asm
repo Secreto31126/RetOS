@@ -13,6 +13,9 @@
     global get_pid
     global execv
     global fork
+    global yield
+    global waitpid
+    global sleep
 
 ; size_t read(int fd, void *buf, size_t count);
 read:
@@ -95,5 +98,23 @@ execv:
 ; int fork();
 fork:
     mov rax, 0xF
+    int 80h
+    ret
+
+; void yield();
+yield:
+    mov rax, 0x10
+    int 80h
+    ret
+
+; void waitpid();
+waitpid:
+    mov rax, 0x11
+    int 80h
+    ret
+
+; void sleep(size_t ticks);
+sleep:
+    mov rax, 0x12
     int 80h
     ret

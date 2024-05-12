@@ -31,6 +31,8 @@ void *create_process_init()
         .running_stack_size = INIT_STACK_SIZE,
         .rsp = STACK_END(new_stack, INIT_STACK_SIZE),
         .state = PROCESS_RUNNING,
+        .children = {},
+        .children_count = 0,
     };
 
     pid = 0;
@@ -180,12 +182,42 @@ int kill_process(pid_t pid)
 
     Process *parent = get_process(man_im_dead->ppid);
 
+    // Mark the children as dead in the parent
     for (size_t i = 0; i < MAX_PROCESSES; i++)
     {
         if (parent->children[i] == pid)
         {
             parent->children[i] = -1;
             parent->children_count--;
+            break;
+        }
+    }
+
+    // Copy the children to the parent
+    for (
+        size_t i = 0, j = 0, copied = 0;
+        copied < man_im_dead->children_count && i < MAX_PROCESSES && j < MAX_PROCESSES;
+        i++)
+    {
+        if (man_im_dead->children[i] < 0)
+        {
+            continue;
+        }
+
+        while (j < MAX_PROCESSES && parent->children[j] >= 0)
+        {
+            j++;
+        }
+
+        if (j < MAX_PROCESSES)
+        {
+            parent->children[j] = man_im_dead->children[i];
+            parent->children_count++;
+            copied++;
+        }
+        else
+        {
+            // Sometimes, you can't save them all (doesn't happen here)
             break;
         }
     }

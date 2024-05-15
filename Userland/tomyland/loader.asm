@@ -8,6 +8,6 @@ _start:
 
 	call	main
 
-	mov		rdi, rax ; Lol, Kernel doesn't care about your "status code"
+	mov		rdi, rax
 	mov		rax, 0xB
 	int		80h

@@ -19,23 +19,17 @@ int main(int argc, char *argv[])
 	// 	puts("\n");
 	// }
 
+	// int pid = fork();
+	// if (pid)
+	// {
+	// 	while (1)
+	// 	{
+	// 		waitpid(-1, NULL, 0);
+	// 	}
+	// }
+
 	int child_pid = fork();
-	int child = child_pid == 0;
-
-	if (child)
-	{
-		if (fork())
-		{
-			puts("Hello, I'm the child, and I die inmediatelly\n");
-			return 0;
-		}
-
-		puts("Hello, I'm the child's child\n");
-		sleep(5);
-		puts("I slept 5 seconds today 💀\n");
-		return 0;
-	}
-	else
+	if (child_pid)
 	{
 		if (child_pid < 0)
 		{
@@ -44,9 +38,36 @@ int main(int argc, char *argv[])
 		}
 
 		puts("My kid is alive\n");
-		waitpid();
-		puts("My kid died happily...\n");
+		while (1)
+		{
+			int status = 0;
+			char p = waitpid(-1, NULL, 0) + '1';
+			char s = status + '0';
 
+			puts("(");
+			write(1, &p, 1);
+			puts(" - 1) died with status ");
+			write(1, &s, 1);
+		}
+
+		return 1;
+	}
+
+	int grandchild_pid = fork();
+	if (grandchild_pid)
+	{
+		if (grandchild_pid < 0)
+		{
+			puts("Error forking\n");
+			return 1;
+		}
+
+		puts("Hello, I'm the child, and I die inmediatelly\n");
 		return 0;
 	}
+
+	puts("Hello, I'm the child's child\n");
+	sleep(2);
+	puts("I slept 2 seconds today 💀\n");
+	return 0;
 }

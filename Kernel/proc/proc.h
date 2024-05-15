@@ -10,7 +10,7 @@
 #include <stdbool.h>
 
 #define MIN_STACK_SIZE 0x80000
-#define INIT_STACK_SIZE 0x400
+#define IDLE_STACK_SIZE 0x400
 
 #define STACK_END(stack, size) (((void *)(stack)) + (size))
 
@@ -27,6 +27,14 @@ extern pid_t active_processes_count;
  */
 pid_t set_pid(pid_t p);
 /**
+ * @brief Set the exit code to the current process
+ *
+ * @note Should only be used by exit()
+ *
+ * @param status The exit code
+ */
+void set_exit_code(int status);
+/**
  * @brief Let a process inherit its parent's stack
  * @note This function should only be called from kill_pid
  * (which should only be called from a syscall for "atomicity")
@@ -37,13 +45,13 @@ pid_t set_pid(pid_t p);
 bool inherit_parents_house(Process *process);
 
 /**
- * @brief Await the death of all childrens
+ * @brief Await the death of a children
  *
  * @param pid The process' pid
  * @return true Condition met
  * @return false Condition not met
  */
-bool children_death(pid_t pid);
+bool zombie_child(pid_t pid);
 /**
  * @brief Await a semaphore to be raised
  * @todo Implement semaphore logic
@@ -85,11 +93,18 @@ void check_blocked_processes();
 /**
  * @brief Add a process to the blocked queue
  *
+ * @note It could be a vaargs
+ * @note ¯\_(ツ)_/¯
+ *
  * @param p The process to block
  * @param condition The condition to unblock the process
- * @param data Any data required by the condition
+ * @param data0 Condition data
+ * @param data1 Condition data
+ * @param data2 Condition data
+ * @param data3 Condition data
+ * @param data4 Condition data
  */
-void add_blocked(Process *p, ProcessBlockConditional condition, void *data);
+void add_blocked(Process *p, ProcessBlockConditional condition, void *data0, void *data1, void *data2, void *data3, void *data4);
 
 /**
  * @brief Add a process to the round robin queue

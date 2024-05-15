@@ -92,14 +92,17 @@ typedef struct Process
      */
     ProcessState state;
     /**
-     * @brief The process' children
-     * @note MAX_PROCESSES because it might inherit all the children from a child
+     * @brief The process' children head of the list
      */
-    pid_t children[MAX_PROCESSES];
+    struct Process *next_child;
     /**
-     * @brief The process' children count
+     * @brief The process' next brother
      */
-    size_t children_count;
+    struct Process *next_brother;
+    /**
+     * @brief The process' exit code
+     */
+    int exit_code;
     /**
      * @brief The process' priority
      */
@@ -107,7 +110,7 @@ typedef struct Process
     /**
      * @brief Points to the next blocked process
      *
-     * @note The list head is always stored in the init process (pid 0)
+     * @note The list head is always stored in the idle process (pid 0)
      */
     struct Process *next_blocked;
     /**
@@ -117,11 +120,11 @@ typedef struct Process
     /**
      * @brief Any data required by the condition
      */
-    void *condition_data;
+    void *condition_data[5];
 } Process;
 
 /**
- * @brief Create the init process
+ * @brief Create the first process (idle)
  *
  * @note Running stack will point to the same location as the stack,
  * so any reference to memory locations will be meaningless after
@@ -129,7 +132,7 @@ typedef struct Process
  *
  * @return void* The rsp of the new process
  */
-void *create_process_init();
+void *create_process_idle();
 /**
  * @brief Get the current process
  *
@@ -168,15 +171,16 @@ pid_t create_process(void *rsp);
  */
 int kill_process(pid_t pid);
 /**
- * @brief Block the current process until all children are dead
+ * @brief Block the current process until the child pid dies
  */
-void waitpid();
+pid_t waitpid(pid_t pid, int *wstatus, int options);
 /**
  * @brief Block the current process for a number of ticks
  *
  * @param ticks The number of ticks to sleep
+ * @return unsigned int The number of ticks left to sleep (always 0 in RetOS)
  */
-void sleep(unsigned int ticks);
+unsigned int sleep(unsigned int ticks);
 
 /**
  * @brief Skip remaining CPU time and give it to the next process

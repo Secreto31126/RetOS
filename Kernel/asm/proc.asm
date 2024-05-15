@@ -1,5 +1,6 @@
 	extern context_switch
 	extern yield_robin
+	extern set_exit_code
 	extern get_pid
 	extern kill_process
 
@@ -11,7 +12,7 @@
 	section .bss
 
 scheduler_running_stack	resb 0x800
-exit_running_stack		resb 0x400
+exit_running_stack		resb 0x800
 
 	section .text
 
@@ -39,9 +40,11 @@ yield:
 	int		0x20
 	ret
 
-; void exit();
+; void exit(int status);
 exit:
-	lea		rsp, [exit_running_stack + 0x400]
+	lea		rsp, [exit_running_stack + 0x800]
+	; Any last words?
+	call	set_exit_code
 
 .kill:
 	call	get_pid
@@ -53,7 +56,7 @@ exit:
 	jne		.kill
 
 	; Let the scheduler pick your soul and die happily
-	int		0x20
+	call	yield
 
 	; Just in case
 .loop:

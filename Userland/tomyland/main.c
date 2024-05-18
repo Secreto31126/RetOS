@@ -10,21 +10,25 @@ extern char endOfBinary;
 
 int main(int argc, char *argv[])
 {
-	// char pid = get_pid() + '0';
-	// for (int i = 0; i < argc; i++)
-	// {
-	// 	write(1, &pid, 1);
-	// 	puts(": ");
-	// 	puts(argv[i]);
-	// 	puts("\n");
-	// }
+	char char_pid = get_pid() + '0';
+	for (int i = 0; i < argc; i++)
+	{
+		write(1, &char_pid, 1);
+		puts(": ");
+		puts(argv[i]);
+		puts("\n");
+	}
 
 	// int pid = fork();
 	// if (pid)
 	// {
 	// 	while (1)
 	// 	{
-	// 		waitpid(-1, NULL, 0);
+	// 		if (waitpid(-1, NULL, 0) < 0)
+	// 		{
+	// 			puts("Byeeeeee!\n");
+	// 			return 0;
+	// 		}
 	// 	}
 	// }
 
@@ -37,17 +41,26 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 
-		puts("My kid is alive\n");
+		// puts("My kid is alive\n");
 		while (1)
 		{
 			int status = 0;
-			char p = waitpid(-1, NULL, 0) + '1';
+			int pid = waitpid(-1, &status, 0);
+
+			if (pid < 0)
+			{
+				puts("I ran out of kids to await...\n");
+				break;
+			}
+
+			char p = pid + '0';
 			char s = status + '0';
 
-			puts("(");
+			puts("PID ");
 			write(1, &p, 1);
-			puts(" - 1) died with status ");
+			puts(" died with status ");
 			write(1, &s, 1);
+			puts("\n");
 		}
 
 		return 1;
@@ -67,7 +80,7 @@ int main(int argc, char *argv[])
 	}
 
 	puts("Hello, I'm the child's child\n");
-	sleep(2);
-	puts("I slept 2 seconds today 💀\n");
-	return 0;
+	sleep(1);
+	puts("I slept 1 second today 💀\n");
+	return 1;
 }

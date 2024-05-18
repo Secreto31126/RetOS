@@ -169,6 +169,16 @@ void set_exit_code(int status)
 
 int kill_process(pid_t pid)
 {
+    if (pid == 0)
+    {
+        return 1;
+    }
+
+    if (pid == 1)
+    {
+        power_off();
+    }
+
     Process *man_im_dead = get_process(pid);
 
     if (man_im_dead->state == NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR || man_im_dead->state == PROCESS_DEAD || man_im_dead->state == PROCESS_ZOMBIE)

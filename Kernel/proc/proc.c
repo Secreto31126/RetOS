@@ -138,11 +138,6 @@ FIND_PID:
     // Not worth looping, there's no biggie if it's trash
     // processes[new_pid].condition_data = {};
 
-    // Keep track of the process population
-    active_processes_count++;
-    every_processes_count++;
-    robin_add(new_pid);
-
     // We aren't Linux, we must copy the stack at creation time
     memcpy(
         STACK_END(new_stack, new_stack_size) - parent->running_stack_size,
@@ -158,6 +153,11 @@ FIND_PID:
     // ncPrint(" and stack_end 0x");
     // ncPrintHex((uint64_t)STACK_END(new_stack, new_stack_size));
     // ncNewline();
+
+    // Keep track of the process population
+    active_processes_count++;
+    every_processes_count++;
+    robin_add(new_pid);
 
     return new_pid;
 }

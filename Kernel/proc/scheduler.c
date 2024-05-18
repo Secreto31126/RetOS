@@ -74,87 +74,81 @@ void *context_switch(void *rsp)
 }
 
 // Priority based round Robin
-typedef struct p_node
-{
-    pid_t pid;
-    struct p_node *next;
-} p_node;
-
-p_node *first = NULL;
-p_node *last = NULL;
-signed char remaining = 0;
+static Process *last = NULL;
+static signed char remaining = 0;
 
 void robin_add(pid_t pid)
 {
-    p_node *to_add = malloc(sizeof(p_node));
+    Process *p = get_process(pid);
+    p->next_robin = NULL;
 
-    to_add->pid = pid;
-    to_add->next = NULL;
+    Process *idle = get_process(0);
 
-    if (first == NULL)
+    if (idle->next_robin == NULL)
     {
-        first = to_add;
-        remaining = get_process(first->pid)->priority;
+        idle->next_robin = p;
+        remaining = get_process(pid)->priority;
     }
     else
     {
-        last->next = to_add;
+        last->next_robin = p;
     }
 
-    last = to_add;
+    last = p;
 }
 
-static p_node *remove_rec_p(pid_t pid, p_node *node)
+static Process *remove_rec_p(pid_t pid, Process *p)
 {
-    if (node == NULL)
+    if (p == NULL)
     {
-        return node;
+        return p;
     }
 
-    if (node->pid == pid)
+    if (p->pid == pid)
     {
-        p_node *next = node->next;
-        free(node);
-
+        Process *next = p->next_robin;
+        p->next_robin = NULL;
         return next;
     }
 
-    node->next = remove_rec_p(pid, node->next);
-    if (node->next == NULL)
+    p->next_robin = remove_rec_p(pid, p->next_robin);
+    if (p->next_robin == NULL)
     {
-        last = node;
+        last = p;
     }
 
-    return node;
+    return p;
 }
 
 void robin_remove(pid_t pid)
 {
-    if (first == NULL)
+    Process *idle = get_process(0);
+
+    if (idle->next_robin == NULL)
     {
         return;
     }
 
-    if (first->pid == pid)
+    if (idle->next_robin->pid == pid)
     {
-        p_node *aux = first;
-        first = first->next;
-        free(aux);
+        Process *removed = idle->next_robin;
+        idle->next_robin = removed->next_robin;
+        removed->next_robin = NULL;
 
-        if (first == NULL)
+        if (idle->next_robin == NULL)
         {
             last = NULL;
             return;
         }
 
-        remaining = get_process(first->pid)->priority;
+        remaining = idle->next_robin->priority;
         return;
     }
 
-    first->next = remove_rec_p(pid, first->next);
-    if (first->next == NULL)
+    idle->next_robin = remove_rec_p(pid, idle->next_robin);
+    if (idle->next_robin->next_robin == NULL)
     {
-        last = first;
+        last = idle->next_robin;
     }
 
     return;
@@ -162,13 +156,15 @@ void robin_remove(pid_t pid)
 
 pid_t robin_next()
 {
+    Process *idle = get_process(0);
+    Process *first = idle->next_robin;
+
     if (first == NULL)
     {
-        return 0;
+        return idle->pid;
     }
 
-    Process *p = get_process(first->pid);
-    if (p->state == PROCESS_DEAD || p->state == PROCESS_ZOMBIE)
+    if (first->state == PROCESS_DEAD || first->state == PROCESS_ZOMBIE)
     {
         robin_remove(first->pid);
         return robin_next();
@@ -179,21 +175,9 @@ pid_t robin_next()
         return first->pid;
     }
 
-    if (first->next == NULL)
-    {
-        remaining = p->priority;
-        return first->pid;
-    }
+    robin_remove(first->pid);
+    robin_add(first->pid);
 
-    p_node *aux = first;
-    first = first->next;
-
-    last->next = aux;
-    aux->next = NULL;
-
-    last = aux;
-
-    remaining = get_process(first->pid)->priority;
     return first->pid;
 }
 

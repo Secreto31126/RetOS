@@ -260,9 +260,9 @@ int kill_process(pid_t pid)
     man_im_dead->state = PROCESS_ZOMBIE;
     active_processes_count--;
 
-    ncPrint("Process ");
-    ncPrintDec(pid);
-    ncPrint(" killed\n");
+    // ncPrint("Process ");
+    // ncPrintDec(pid);
+    // ncPrint(" killed\n");
 
     return 0;
 }

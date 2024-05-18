@@ -69,6 +69,11 @@ void *context_switch(void *rsp)
         }
     }
 
+    // ncPrintDec(old_process->pid);
+    // ncPrint(" -> ");
+    // ncPrintDec(new_process->pid);
+    // ncNewline();
+
     new_process->state = PROCESS_RUNNING;
     return new_process->rsp;
 }

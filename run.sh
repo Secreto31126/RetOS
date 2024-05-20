@@ -72,7 +72,7 @@ else
     mkdir "/tmp/retos"
     cp "$path/Image/"* "/tmp/retos"
 
-    qemu-system-x86_64 -hda "/tmp/retos/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk
+    qemu-system-x86_64 -hda "/tmp/retos/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk -serial stdio
     make clean -CToolchain > /dev/null
     make clean > /dev/null
 fi

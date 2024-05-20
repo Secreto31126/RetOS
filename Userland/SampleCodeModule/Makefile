@@ -30,7 +30,7 @@ ASMFLAGS += -g -F dwarf
 endif
 
 %.o: %.c
-	$(GCC) $(GCCFLAGS) -I./include -I../Global/include -c $< -o $@
+	$(GCC) $(GCCFLAGS) -I./include -I../../Global/include -c $< -o $@
 
 %.o : %.asm
 	$(ASM) $(ASMFLAGS) $< -o $@

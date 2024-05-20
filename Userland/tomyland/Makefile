@@ -8,7 +8,7 @@ OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
 LOADERSRC=loader.asm
 
 LOADEROBJECT=$(LOADERSRC:.asm=.o)
-STATICLIBS=$(wildcard ../../Global/string/*.o)
+STATICLIBS=$(wildcard ../../Global/string/*.o) $(wildcard ../../Global/math/*.o) $(wildcard ../../Global/stdlib/*.o)
 
 all: log $(MODULE)
 
@@ -30,7 +30,7 @@ ASMFLAGS += -g -F dwarf
 endif
 
 %.o: %.c
-	$(GCC) $(GCCFLAGS) -I./include -c $< -o $@
+	$(GCC) $(GCCFLAGS) -I./include -I../../Global/include -c $< -o $@
 
 %.o : %.asm
 	$(ASM) $(ASMFLAGS) $< -o $@

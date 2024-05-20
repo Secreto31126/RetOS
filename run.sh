@@ -37,11 +37,16 @@ then
         mkdir "//wsl$/Ubuntu/tmp/retos"
         echo $path
         cp "$path/Image/"* "//wsl$/Ubuntu/tmp/retos"
+    else
+        echo "Copying files to /tmp/retos"
+        rm -rf "/tmp/retos"
+        mkdir "/tmp/retos"
+        cp "$path/Image/"* "/tmp/retos"
     fi
 
     echo
     echo "Debug mode"
-    echo "Quick! Run the following command in another terminal:"
+    echo "Run the following command in another terminal:"
     echo 'qemu-system-x86_64 -s -S -hda "/tmp/retos/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk'
 
     read -p "Press enter to finish"
@@ -50,16 +55,11 @@ then
     echo
     echo "Fast WSL mode"
 
-    if [ "$(whoami)" = "tomyr" ]
-    then
-        echo "Copying files to //wsl$/Ubuntu/tmp/retos"
-        rm -rf "//wsl$/Ubuntu/tmp/retos"
-        mkdir "//wsl$/Ubuntu/tmp/retos"
-        cp "$path/Image/"* "//wsl$/Ubuntu/tmp/retos"
-    else
-        echo "Copying files to /mnt/c/Users/Usuario/Documents/GitHub/RetOS/Image"
-        cp "$path/Image/"* "/mnt/c/Users/Usuario/Documents/GitHub/RetOS/Image/"
-    fi
+    echo "Copying files to //wsl$/Ubuntu/tmp/retos"
+    rm -rf "//wsl$/Ubuntu/tmp/retos"
+    mkdir "//wsl$/Ubuntu/tmp/retos"
+    cp "$path/Image/"* "//wsl$/Ubuntu/tmp/retos"
+
     echo "Done"
 
     make clean -CToolchain > /dev/null
@@ -67,7 +67,12 @@ then
 
     read -p "Press enter to finish"
 else
-    sudo qemu-system-x86_64 -hda "$path/Image/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk
+    echo "Copying files to /tmp/retos"
+    rm -rf "/tmp/retos"
+    mkdir "/tmp/retos"
+    cp "$path/Image/"* "/tmp/retos"
+
+    qemu-system-x86_64 -hda "/tmp/retos/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk
     make clean -CToolchain > /dev/null
     make clean > /dev/null
 fi

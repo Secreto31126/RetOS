@@ -252,7 +252,8 @@ size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size)
 }
 void *realloc_m(void *ptr, size_t_m size)
 {
-    return NULL;
+    free_m(ptr);
+    return malloc_m(size);
 }
 void free_m(void *ptr)
 {

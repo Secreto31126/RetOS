@@ -30,18 +30,18 @@ docker rm "$id" > /dev/null
 
 if [ "$1" = "DEBUG" ]
 then
-    if [ "$(whoami)" = "tomyr" ]
+    if [ "$(whoami)" = "lucasl" ]
     then
+        echo "Copying files to /tmp/retos"
+        rm -rf "/tmp/retos"
+        mkdir "/tmp/retos"
+        cp "$path/Image/"* "/tmp/retos"
+    else
         echo "Copying files to //wsl$/Ubuntu/tmp/retos"
         rm -rf "//wsl$/Ubuntu/tmp/retos"
         mkdir "//wsl$/Ubuntu/tmp/retos"
         echo $path
         cp "$path/Image/"* "//wsl$/Ubuntu/tmp/retos"
-    else
-        echo "Copying files to /tmp/retos"
-        rm -rf "/tmp/retos"
-        mkdir "/tmp/retos"
-        cp "$path/Image/"* "/tmp/retos"
     fi
 
     echo

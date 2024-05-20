@@ -14,7 +14,7 @@ log:
 	@echo
 
 ifneq ($(DEBUG), 0)
-GCCFLAGS=$(GCCFLAGS) -g
+GCCFLAGS += -g
 ASMFLAGS += -g -F dwarf
 endif
 

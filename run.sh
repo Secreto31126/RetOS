@@ -30,6 +30,9 @@ docker rm "$id" > /dev/null
 
 if [ "$1" = "DEBUG" ]
 then
+    echo
+    echo "Debug mode"
+
     if [ "$(whoami)" = "lucasl" ]
     then
         echo "Copying files to /tmp/retos"
@@ -44,8 +47,6 @@ then
         cp "$path/Image/"* "//wsl$/Ubuntu/tmp/retos"
     fi
 
-    echo
-    echo "Debug mode"
     echo "Run the following command in another terminal:"
     echo 'qemu-system-x86_64 -s -S -hda "/tmp/retos/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk'
 

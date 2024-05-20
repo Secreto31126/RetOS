@@ -13,6 +13,11 @@ log:
 	@echo "\tSOURCES=$(SOURCES) $(SOURCES_ASM)"
 	@echo
 
+ifneq ($(DEBUG), 0)
+GCCFLAGS=$(GCCFLAGS) -g
+ASMFLAGS += -g -F dwarf
+endif
+
 %.o: %.c
 	$(GCC) $(GCCFLAGS) -I./include -c $< -o $@
 
@@ -20,6 +25,6 @@ log:
 	$(ASM) $(ASMFLAGS) -i ./asm/ $< -o $@
 
 clean:
-	@find . -name "**.o" -delete -or -name "**.bin" -delete
+	@rm -rf *.o
 
 .PHONY: all clean

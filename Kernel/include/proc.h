@@ -2,6 +2,7 @@
 #define PRC_H
 
 #include <stddef.h>
+#include <stdbool.h>
 
 #define MAX_PROCESS_CHILDREN 2
 #define MAX_PROCESSES 10
@@ -46,6 +47,14 @@ typedef enum ProcessStateEnum
 } ProcessState;
 
 /**
+ * @brief A conditional function to unblock a process
+ *
+ * @param pid The process' pid
+ * @return bool True if the process should be unblocked, false otherwise
+ */
+typedef bool (*ProcessBlockConditional)(pid_t);
+
+/**
  * @brief The Process structure
  */
 typedef struct Process
@@ -83,22 +92,45 @@ typedef struct Process
      */
     ProcessState state;
     /**
-     * @brief The process' children
-     * @note MAX_PROCESSES because it might inherit all the children from a child
+     * @brief The process' children head of the list
      */
-    pid_t children[MAX_PROCESSES];
+    struct Process *next_child;
     /**
-     * @brief The process' children count
+     * @brief The process' next brother
      */
-    size_t children_count;
+    struct Process *next_brother;
+    /**
+     * @brief The process' exit code
+     */
+    int exit_code;
+    /**
+     * @brief The next process in the round-robin list
+     *
+     * @note The list head is always stored in the idle process (pid 0)
+     */
+    struct Process *next_robin;
     /**
      * @brief The process' priority
      */
     signed char priority;
+    /**
+     * @brief Points to the next blocked process
+     *
+     * @note The list head is always stored in the idle process (pid 0)
+     */
+    struct Process *next_blocked;
+    /**
+     * @brief The condition needed to be satisfied to unblock the process
+     */
+    ProcessBlockConditional block_condition;
+    /**
+     * @brief Any data required by the condition
+     */
+    void *condition_data[5];
 } Process;
 
 /**
- * @brief Create the init process
+ * @brief Create the first process (idle)
  *
  * @note Running stack will point to the same location as the stack,
  * so any reference to memory locations will be meaningless after
@@ -106,7 +138,7 @@ typedef struct Process
  *
  * @return void* The rsp of the new process
  */
-void *create_process_init();
+void *create_process_idle();
 /**
  * @brief Get the current process
  *
@@ -144,7 +176,22 @@ pid_t create_process(void *rsp);
  * @return int 0 if the process was killed, error code otherwise
  */
 int kill_process(pid_t pid);
+/**
+ * @brief Block the current process until the child pid dies
+ */
+pid_t waitpid(pid_t pid, int *wstatus, int options);
+/**
+ * @brief Block the current process for a number of ticks
+ *
+ * @param ticks The number of ticks to sleep
+ * @return unsigned int The number of ticks left to sleep (always 0 in RetOS)
+ */
+unsigned int sleep(unsigned int ticks);
 
+/**
+ * @brief Skip remaining CPU time and give it to the next process
+ */
+extern void yield();
 /**
  * @brief Kill the current process and halt
  * @note This function should only be called from a syscall for "atomicity"

@@ -70,8 +70,8 @@ void *initializeKernelBinary()
 	initialize_idt();
 	ncPrint(" [Done]\n");
 
-	ncPrint("Initializing init process with stack at 0x");
-	void *rsp = create_process_init();
+	ncPrint("Initializing idle process with stack at 0x");
+	void *rsp = create_process_idle();
 	ncPrint(" [Done]\n");
 
 	ncClear();
@@ -79,14 +79,14 @@ void *initializeKernelBinary()
 	return rsp;
 }
 
-void init(pid_t child_pid)
+void idle(pid_t child_pid)
 {
 	if (!child_pid)
 	{
 		ncPrintDec(get_pid());
-		ncPrint(": I will be Userland!\n");
+		ncPrint(": I will be init!\n");
 
-		char *argv[] = {"I'm Userland!", "Hell yeah!", ":]", NULL};
+		char *argv[] = {"I'm in Userland!", "Hell yeah!", ":]", NULL};
 		ncPrintDec(execv("tomyland", argv));
 		ncPrint(" error: Failed to start userland\n");
 	}
@@ -99,7 +99,7 @@ void init(pid_t child_pid)
 		}
 
 		ncPrintDec(get_pid());
-		ncPrint(": I'm init!\n");
+		ncPrint(": I'm idle!\n");
 
 		while (1)
 		{

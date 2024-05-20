@@ -1,6 +1,6 @@
 include ../Makefile.inc
 
-MODULE=0000-sampleCodeModule.bin
+MODULE=0000-sampleCodeModule
 SOURCES=$(wildcard [^_]*.c) $(wildcard nstdlib/*.c) $(wildcard window/*.c) $(wildcard shell/*.c) $(wildcard shell/commandHandler/*.c) $(wildcard snake/*.c) $(wildcard snake/drawings/*.c) $(wildcard moduleSelector/*.c) $(wildcard piano/*.c)
 SOURCES_ASM=$(wildcard *.asm)
 OBJECTS=$(SOURCES:.c=.o)
@@ -19,7 +19,15 @@ log:
 	@echo
 
 $(MODULE): $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM)
-	$(LD) $(LDFLAGS) -T sampleCodeModule.ld -o ../$(MODULE) $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(STATICLIBS)
+	$(LD) $(LDFLAGS) -T sampleCodeModule.ld -o ../$(MODULE).bin $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(STATICLIBS)
+ifneq ($(DEBUG), 0)
+	$(LD) $(LDFLAGS) -T sampleCodeModule.ld --oformat=elf64-x86-64 -o ../../Image/$(MODULE).elf $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(STATICLIBS)
+endif
+
+ifneq ($(DEBUG), 0)
+GCCFLAGS += -g
+ASMFLAGS += -g -F dwarf
+endif
 
 %.o: %.c
 	$(GCC) $(GCCFLAGS) -I./include -I../Global/include -c $< -o $@
@@ -31,6 +39,6 @@ $(LOADEROBJECT):
 	$(GCC) $(GCCFLAGS) -c $(LOADERSRC) -o $(LOADEROBJECT)
 
 clean:
-	rm -rf *.o
+	@find . -name *.o -delete
 
 .PHONY: all clean print

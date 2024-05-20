@@ -13,9 +13,9 @@ pid_t every_processes_count;
  */
 Process processes[MAX_PROCESSES] = {};
 
-void *create_process_init()
+void *create_process_idle()
 {
-    void *new_stack = malloc(INIT_STACK_SIZE);
+    void *new_stack = malloc(IDLE_STACK_SIZE);
 
     if (!new_stack)
     {
@@ -27,10 +27,17 @@ void *create_process_init()
         .ppid = 0,
         .stack = new_stack,
         .running_stack = new_stack,
-        .stack_size = INIT_STACK_SIZE,
-        .running_stack_size = INIT_STACK_SIZE,
-        .rsp = STACK_END(new_stack, INIT_STACK_SIZE),
+        .stack_size = IDLE_STACK_SIZE,
+        .running_stack_size = IDLE_STACK_SIZE,
+        .rsp = STACK_END(new_stack, IDLE_STACK_SIZE),
         .state = PROCESS_RUNNING,
+        .next_child = NULL,
+        .next_brother = NULL,
+        .exit_code = 0,
+        .priority = 1,
+        .next_blocked = NULL,
+        .block_condition = no_condition,
+        .condition_data = {},
     };
 
     pid = 0;
@@ -102,11 +109,6 @@ FIND_PID:
     // It's me, hi, I'm the process it's me
     Process *parent = get_current_process();
 
-    if (parent->children_count + 1 > MAX_PROCESS_CHILDREN)
-    {
-        return -1;
-    }
-
     // If the parent has a bigger stack, use it
     size_t new_stack_size = parent->stack_size > MIN_STACK_SIZE ? parent->stack_size : MIN_STACK_SIZE;
 
@@ -126,19 +128,15 @@ FIND_PID:
     processes[new_pid].running_stack_size = parent->running_stack_size;
     processes[new_pid].rsp = rsp;
     processes[new_pid].state = PROCESS_READY;
-    for (size_t i = 0; i < MAX_PROCESSES; i++)
-    {
-        processes[new_pid].children[i] = -1;
-    }
-    processes[new_pid].children_count = 0;
-
-    // Set the parent's children
-    parent->children[parent->children_count] = new_pid;
-
-    // Keep track of the process population
-    parent->children_count++;
-    active_processes_count++;
-    every_processes_count++;
+    processes[new_pid].next_child = NULL;
+    processes[new_pid].next_brother = parent->next_child;
+    parent->next_child = get_process(new_pid);
+    processes[new_pid].exit_code = 0;
+    processes[new_pid].priority = parent->priority;
+    processes[new_pid].next_blocked = NULL;
+    processes[new_pid].block_condition = no_condition;
+    // Not worth looping, there's no biggie if it's trash
+    // processes[new_pid].condition_data = {};
 
     // We aren't Linux, we must copy the stack at creation time
     memcpy(
@@ -156,14 +154,34 @@ FIND_PID:
     // ncPrintHex((uint64_t)STACK_END(new_stack, new_stack_size));
     // ncNewline();
 
+    // Keep track of the process population
+    active_processes_count++;
+    every_processes_count++;
+    robin_add(new_pid);
+
     return new_pid;
+}
+
+void set_exit_code(int status)
+{
+    get_current_process()->exit_code = status;
 }
 
 int kill_process(pid_t pid)
 {
+    if (pid == 0)
+    {
+        return 1;
+    }
+
+    if (pid == 1)
+    {
+        power_off();
+    }
+
     Process *man_im_dead = get_process(pid);
 
-    if (man_im_dead->state == NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR || man_im_dead->state == PROCESS_DEAD)
+    if (man_im_dead->state == NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR || man_im_dead->state == PROCESS_DEAD || man_im_dead->state == PROCESS_ZOMBIE)
     {
         // ENOENT
         return 2;
@@ -176,18 +194,6 @@ int kill_process(pid_t pid)
             man_im_dead->running_stack,
             STACK_END(man_im_dead->stack, man_im_dead->stack_size) - man_im_dead->running_stack_size,
             man_im_dead->running_stack_size);
-    }
-
-    Process *parent = get_process(man_im_dead->ppid);
-
-    for (size_t i = 0; i < MAX_PROCESSES; i++)
-    {
-        if (parent->children[i] == pid)
-        {
-            parent->children[i] = -1;
-            parent->children_count--;
-            break;
-        }
     }
 
     /**
@@ -203,34 +209,10 @@ int kill_process(pid_t pid)
      */
     bool free_running_stack = man_im_dead->stack != man_im_dead->running_stack;
 
-    for (pid_t i = 0; i < MAX_PROCESSES; i++)
+    Process *p = man_im_dead->next_child;
+    while (p)
     {
-        if (i == pid)
-        {
-            continue;
-        }
-
-        Process *p = get_process(i);
-
-        if (p->state == NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR)
-        {
-            continue;
-        }
-
-        // Process inheritance
-        if (p->ppid == pid)
-        {
-            p->ppid = man_im_dead->ppid;
-
-            for (size_t j = 0; j < MAX_PROCESSES; j++)
-            {
-                if (parent->children[j] == -1)
-                {
-                    parent->children[j] = i;
-                    break;
-                }
-            }
-        }
+        p->ppid = 1;
 
         // Stacks preservation (pseudo pagination)
         if (p->running_stack == man_im_dead->stack)
@@ -245,11 +227,24 @@ int kill_process(pid_t pid)
             }
         }
 
-        if (p->running_stack == man_im_dead->running_stack)
+        if (!p->next_brother)
         {
-            // If another process is still using the running stack (pseudo pagination), don't free it
-            free_running_stack = false;
+            Process *init = get_process(1);
+            p->next_brother = init->next_child;
+            init->next_child = man_im_dead->next_child;
+            break;
         }
+
+        p = p->next_brother;
+    }
+
+    if (!free_stack && !stack_inherited)
+    {
+        ncPrint("Probably a memory leak just happened\n");
+        // Why, you may ask? If the stack is the running of any of its children,
+        // But none of them inherited it, then no one will ever try to delete it.
+        // I can think of a few ways to fix it, but none of them are likely to
+        // be programmed by me right now.
     }
 
     if (free_stack)
@@ -262,12 +257,12 @@ int kill_process(pid_t pid)
         free(man_im_dead->running_stack);
     }
 
-    man_im_dead->state = PROCESS_DEAD;
+    man_im_dead->state = PROCESS_ZOMBIE;
     active_processes_count--;
 
-    ncPrint("Process ");
-    ncPrintDec(pid);
-    ncPrint(" killed\n");
+    // ncPrint("Process ");
+    // ncPrintDec(pid);
+    // ncPrint(" killed\n");
 
     return 0;
 }

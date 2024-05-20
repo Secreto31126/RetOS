@@ -14,10 +14,9 @@ void *context_switch(void *rsp)
 {
     Process *old_process = get_current_process();
 
-    if (old_process->state == PROCESS_RUNNING)
+    // Only validate pseudo stackoverflow protection if the process is alive
+    if (old_process->state != PROCESS_DEAD && old_process->state != PROCESS_ZOMBIE && old_process->state != NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR)
     {
-        old_process->rsp = rsp;
-
         if (rsp < old_process->running_stack || STACK_END(old_process->running_stack, old_process->running_stack_size) < rsp)
         {
             ncPrint("Possible Stack Overflow for PID ");
@@ -26,28 +25,23 @@ void *context_switch(void *rsp)
             ncPrintHex((uint64_t)rsp);
             ncPrint(")\n");
         }
-
-        old_process->state = PROCESS_READY;
     }
 
-    Process *new_process;
-    do
+    if (old_process->state == PROCESS_RUNNING)
     {
-        // pid++;
-        // pid %= processes_count;
-        set_pid((get_pid() + 1) % MAX_PROCESSES);
+        old_process->rsp = rsp;
+        old_process->state = PROCESS_READY;
+    }
+    else if (old_process->state == PROCESS_BLOCKED)
+    {
+        old_process->rsp = rsp;
+        robin_remove(old_process->pid);
+    }
 
-        // ncPrint("\nStatus PID ");
-        // ncPrintDec(pid);
-        // ncPrint(" (");
-        // ncPrintHex((uint64_t)processes[pid].stack);
-        // ncPrint(")");
-        // ncPrint(": ");
-        // ncPrint(get_current_process()->state == PROCESS_READY ? "READY (" : "NOT READY (");
-        // ncPrintDec(get_current_process()->state);
-        // ncPrint(")\n");
+    check_blocked_processes();
+    set_pid(robin_next());
 
-    } while ((new_process = get_current_process())->state != PROCESS_READY); // Get the next ready process
+    Process *new_process = get_current_process();
 
     // If the process changed
     if (old_process->pid != new_process->pid)
@@ -75,84 +69,110 @@ void *context_switch(void *rsp)
         }
     }
 
+    // ncPrintDec(old_process->pid);
+    // ncPrint(" -> ");
+    // ncPrintDec(new_process->pid);
+    // ncNewline();
+
     new_process->state = PROCESS_RUNNING;
     return new_process->rsp;
 }
 
-// priority based round Robin
-#define READ_PRIORITY(p) (get_process((p)->next->pid)->priority)
-#define READ_STATE(p) (get_process((p)->next->pid)->state)
-
-typedef struct p_node
-{
-    pid_t pid;
-    struct p_node *next;
-} p_node;
-
-p_node *first = NULL;
-p_node *last = NULL;
-signed char remaining = 0;
+// Priority based round Robin
+static Process *last = NULL;
+static signed char remaining = 0;
 
 void robin_add(pid_t pid)
 {
-    p_node *to_add = malloc(sizeof(p_node));
+    Process *p = get_process(pid);
+    p->next_robin = NULL;
 
-    to_add->pid = pid;
-    to_add->next = NULL;
+    Process *idle = get_process(0);
 
-    if (first == NULL)
+    if (idle->next_robin == NULL)
     {
-        first = to_add;
-        remaining = READ_PRIORITY(first);
+        idle->next_robin = p;
+        remaining = get_process(pid)->priority;
     }
     else
     {
-        last->next = to_add;
+        last->next_robin = p;
     }
 
-    last = to_add;
+    last = p;
 }
 
-pid_t remove_rec_p(pid_t pid, p_node *first)
+static Process *remove_rec_p(pid_t pid, Process *p)
 {
-    if (first->next == NULL)
+    if (p == NULL)
     {
-        return -1;
+        return p;
     }
 
-    if (first->next->pid == pid)
+    if (p->pid == pid)
     {
-        p_node *aux = first->next;
-        first->next = aux->next;
-        free(aux);
-
-        return pid;
+        Process *next = p->next_robin;
+        p->next_robin = NULL;
+        return next;
     }
 
-    return remove_rec_p(pid, first->next);
+    p->next_robin = remove_rec_p(pid, p->next_robin);
+    if (p->next_robin == NULL)
+    {
+        last = p;
+    }
+
+    return p;
 }
 
-pid_t robin_remove(pid_t pid)
+void robin_remove(pid_t pid)
 {
-    if (first == NULL)
+    Process *idle = get_process(0);
+
+    if (idle->next_robin == NULL)
     {
-        return -1;
+        return;
     }
 
-    if (first->pid == pid)
+    if (idle->next_robin->pid == pid)
     {
-        remaining = first->next == NULL ? 0 : READ_PRIORITY(first->next);
-        return pid;
+        Process *removed = idle->next_robin;
+        idle->next_robin = removed->next_robin;
+        removed->next_robin = NULL;
+
+        if (idle->next_robin == NULL)
+        {
+            last = NULL;
+            return;
+        }
+
+        remaining = idle->next_robin->priority;
+        return;
     }
 
-    return remove_rec_p(pid, first);
+    idle->next_robin = remove_rec_p(pid, idle->next_robin);
+    if (idle->next_robin->next_robin == NULL)
+    {
+        last = idle->next_robin;
+    }
+
+    return;
 }
 
 pid_t robin_next()
 {
+    Process *idle = get_process(0);
+    Process *first = idle->next_robin;
+
     if (first == NULL)
     {
-        return -1;
+        return idle->pid;
+    }
+
+    if (first->state == PROCESS_DEAD || first->state == PROCESS_ZOMBIE)
+    {
+        robin_remove(first->pid);
+        return robin_next();
     }
 
     if (remaining-- > 0)
@@ -160,23 +180,13 @@ pid_t robin_next()
         return first->pid;
     }
 
-    p_node *aux = first;
-    pid_t to_ret = aux->pid;
-    first = first->next;
+    robin_remove(first->pid);
+    robin_add(first->pid);
 
-    if (first == NULL)
-    {
-        last = first;
-    }
+    return first->pid;
+}
 
-    // TODO: Don't free it, reuse it
-    free(aux);
-
-    remaining = READ_PRIORITY(first);
-    if (get_process(to_ret)->state == PROCESS_DEAD)
-    {
-        return robin_next();
-    }
-
-    return to_ret;
+void yield_robin()
+{
+    remaining = 0;
 }

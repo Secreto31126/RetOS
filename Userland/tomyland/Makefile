@@ -1,6 +1,6 @@
 include ../Makefile.inc
 
-MODULE=0002-tomyland.bin
+MODULE=0002-tomyland
 SOURCES=$(wildcard *.c) $(wildcard lib/*.c)
 SOURCES_ASM=$(wildcard asm/*.asm)
 OBJECTS=$(SOURCES:.c=.o)
@@ -8,7 +8,7 @@ OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
 LOADERSRC=loader.asm
 
 LOADEROBJECT=$(LOADERSRC:.asm=.o)
-STATICLIBS=
+STATICLIBS=$(wildcard ../../Global/string/*.o)
 
 all: log $(MODULE)
 
@@ -19,7 +19,15 @@ log:
 	@echo
 
 $(MODULE): $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM)
-	$(LD) $(LDFLAGS) -T tomyland.ld -o ../$(MODULE) $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(STATICLIBS)
+	$(LD) $(LDFLAGS) -T tomyland.ld -o ../$(MODULE).bin $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(STATICLIBS)
+ifneq ($(DEBUG), 0)
+	$(LD) $(LDFLAGS) -T tomyland.ld --oformat=elf64-x86-64 -o ../../Image/$(MODULE).elf $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(STATICLIBS)
+endif
+
+ifneq ($(DEBUG), 0)
+GCCFLAGS += -g
+ASMFLAGS += -g -F dwarf
+endif
 
 %.o: %.c
 	$(GCC) $(GCCFLAGS) -I./include -c $< -o $@
@@ -31,6 +39,6 @@ $(LOADEROBJECT):
 	$(ASM) $(ASMFLAGS) $(LOADERSRC) -o $(LOADEROBJECT)
 
 clean:
-	rm -rf *.o
+	@find . -name *.o -delete
 
 .PHONY: all clean print

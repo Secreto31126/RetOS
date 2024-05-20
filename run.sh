@@ -18,7 +18,7 @@ id=
 if [ "$1" = "DEBUG" ]
 then
     echo "Debug mode"
-    id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all EGCCFLAGS="-g -Wl,--oformat=elf64-x86-64" ELDFLAGS="--oformat=elf64-x86-64 -o /root/Image/kernel.elf")
+    id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all DEBUG=1)
 else
     id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all)
 fi

@@ -1,5 +1,5 @@
 	extern initializeKernelBinary
-	extern init
+	extern idle
 
 	global loader
 
@@ -8,7 +8,7 @@
 loader:
 	call	initializeKernelBinary
 
-	; Start using the init stack
+	; Start using the idle stack
 	mov		rsp, rax
 	sti
 
@@ -17,7 +17,7 @@ loader:
 	int		80h
 
 	mov		rdi, rax
-	call 	init
+	call 	idle
 
 .hang:
 	cli

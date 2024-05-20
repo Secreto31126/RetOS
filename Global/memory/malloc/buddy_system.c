@@ -30,7 +30,8 @@ typedef enum states
 {
     EMPTY = 0,
     SPLIT,
-    FULL
+    FULL,
+    ALLOCATED
 } states;
 
 char *mem_start;
@@ -67,6 +68,10 @@ void set_state(char *x, size_t_m i, states s)
         SET_BIT(x, bit_index);
         CLEAR_BIT(x, bit_index + 1);
         break;
+    case ALLOCATED:
+        SET_BIT(x, bit_index);
+        SET_BIT(x, bit_index + 1);
+        break;
     default:
         break;
     }
@@ -79,6 +84,8 @@ states read_state(char *x, size_t_m i)
 {
     if (IS_BIT_SET(x, i << 1))
     {
+        if (IS_BIT_SET(x, (i << 1) + 1))
+            return ALLOCATED;
         return FULL;
     }
     if (IS_BIT_SET(x, (i << 1) + 1))
@@ -105,10 +112,11 @@ void cascade_state(char *x, size_t_m i, states s)
             set_state(x, GET_PARENT(i), SPLIT);
         break;
     case FULL:
+    case ALLOCATED:
         aux = read_state(x, GET_PARENT(i));
         if (aux == EMPTY)
             set_state(x, GET_PARENT(i), SPLIT);
-        else if (aux == SPLIT && read_state(x, GET_BROTHER(i)) == FULL)
+        else if (aux == SPLIT && (read_state(x, GET_BROTHER(i)) == FULL || read_state(x, GET_BROTHER(i)) == ALLOCATED))
             set_state(x, GET_PARENT(i), FULL);
         break;
     default:
@@ -167,18 +175,29 @@ size_t_m map_index_to_mem_index(size_t_m index)
 size_t_m mem_index_to_map_index(size_t_m index)
 {
     size_t_m probe = 0;
-    size_t_m jump = (mem_end - mem_start) >> 1;
+    size_t_m jump = (mem_end - mem_start) >> 2;
     size_t_m map_index = 0;
     while (probe < index && jump > 0)
     {
-        if (probe + jump < index)
+        if (probe + jump <= index)
         {
             probe += jump;
             map_index = GET_RIGHT(map_index);
         }
         else
+        {
             map_index = GET_LEFT(map_index);
+        }
         jump >>= 1;
+    }
+
+    if (!jump)
+    {
+        return map_index;
+    }
+    while (read_state(map_start, map_index) != ALLOCATED)
+    {
+        map_index = GET_LEFT(map_index);
     }
     return map_index;
 }
@@ -213,13 +232,13 @@ size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size)
     {
         if (read_state(map_start, index) == EMPTY)
         {
-            set_state(map_start, index, FULL);
+            set_state(map_start, index, ALLOCATED);
             return index;
         }
         return -1;
     }
     // If a node is full, the children are considered full as well
-    if (read_state(map_start, index) == FULL)
+    if (read_state(map_start, index) == FULL || read_state(map_start, index) == ALLOCATED)
     {
         return -1;
     }
@@ -237,8 +256,8 @@ void *realloc_m(void *ptr, size_t_m size)
 }
 void free_m(void *ptr)
 {
-    if (((char *)ptr) > mem_start && ((char *)ptr) < mem_end)
-        set_state(mem_start, mem_index_to_map_index(((char *)ptr) - mem_start), EMPTY);
+    if (((char *)ptr) >= mem_start && ((char *)ptr) <= mem_end)
+        set_state(map_start, mem_index_to_map_index(((char *)ptr) - mem_start), EMPTY);
 }
 
 void print_m_rec(size_t_m i, size_t_m height, char avoid_empty);
@@ -290,8 +309,10 @@ void print_m_rec(size_t_m i, size_t_m height, char avoid_empty)
         printf("E\n");
     else if (s == SPLIT)
         printf("S\n");
-    else
+    else if (s == FULL)
         printf("F\n");
+    else
+        printf("A\n");
 
     print_m_rec(GET_RIGHT(i), height + 1, avoid_empty);
 }

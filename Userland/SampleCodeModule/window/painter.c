@@ -1,83 +1,85 @@
 #include "painter.h"
 #define LINE_START_MAX 20
-#define X_LINE_END (((int)(w / (size * TRUE_LETTER_WIDTH))) * size * TRUE_LETTER_WIDTH)
-static double size = 1.0;
-static uint64_t w, h, xPointer = 0, yPointer = TRUE_LETTER_HEIGHT;
-static Window stamp;
+#define X_LINE_END(p) (((int)((p)->w / ((p)->size * TRUE_LETTER_WIDTH))) * (p)->size * TRUE_LETTER_WIDTH)
 
-void startPainter(uint64_t width, uint64_t height)
+painter startPainter(uint64_t width, uint64_t height)
 {
-    w = width;
-    h = height;
-    stamp = getWindow(TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, malloc(TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH * sizeof(HexColor)));
+    painter p = malloc(sizeof(painterHeader));
+    p->xPointer = 0;
+    p->yPointer = TRUE_LETTER_HEIGHT;
+    p->size = 1.0;
+    p->w = width;
+    p->h = height;
+    p->stamp = getWindow(TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, malloc(TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH * sizeof(HexColor)));
+    return p;
 }
-void setSize(double s)
+void setSize(painter p, double s)
 {
     if (s < 0.49 || s > 9.0)
         return;
-    size = s;
-    stamp.width = TRUE_LETTER_WIDTH * size;
-    stamp.height = TRUE_LETTER_HEIGHT * size;
-    free(stamp.pixels);
-    stamp.pixels = malloc(((int)(TRUE_LETTER_HEIGHT * size)) * ((int)(TRUE_LETTER_WIDTH * size)) * sizeof(HexColor)); // realloc unnecessary, as all characters are only temporarily stamped
+    p->size = s;
+    p->stamp.width = TRUE_LETTER_WIDTH * p->size;
+    p->stamp.height = TRUE_LETTER_HEIGHT * p->size;
+    free(p->stamp.pixels);
+    p->stamp.pixels = malloc(((int)(TRUE_LETTER_HEIGHT * p->size)) * ((int)(TRUE_LETTER_WIDTH * p->size)) * sizeof(HexColor)); // realloc unnecessary, as all characters are only temporarily stamped
 }
-uint64_t getSize()
+uint64_t getSize(painter p)
 {
-    return (uint64_t)(size + 0.5);
+    return (uint64_t)(p->size + 0.5);
 }
-void newLine()
+void newLine(painter p)
 {
-    yPointer += TRUE_LETTER_HEIGHT * size;
-    xPointer = 0; // xPointer leaves room for header
+    p->yPointer += TRUE_LETTER_HEIGHT * p->size;
+    p->xPointer = 0; // xPointer leaves room for header
 }
-void moveCursor()
+void moveCursor(painter p)
 {
-    xPointer += TRUE_LETTER_WIDTH * size;
+    p->xPointer += TRUE_LETTER_WIDTH * p->size;
 }
-void paintBackSpace()
+void paintBackSpace(painter p)
 {
-    if (xPointer <= 0)
+    if (p->xPointer <= 0)
     {
-        yPointer -= size * TRUE_LETTER_HEIGHT;
-        xPointer = X_LINE_END;
+        p->yPointer -= p->size * TRUE_LETTER_HEIGHT;
+        p->xPointer = X_LINE_END(p);
     }
-    drawCharToWindow(stamp, 0, 0xFF000000, 0xFF000000);
-    xPointer -= TRUE_LETTER_WIDTH * size;
-    drawWindow(stamp, xPointer, yPointer);
+    drawCharToWindow(p->stamp, 0, 0xFF000000, 0xFF000000);
+    p->xPointer -= TRUE_LETTER_WIDTH * p->size;
+    drawWindow(p->stamp, p->xPointer, p->yPointer);
 }
-void drawCharAt(char c, HexColor letterColor, HexColor highlightColor, uint64_t x, uint64_t y)
+void drawCharAt(painter p, char c, HexColor letterColor, HexColor highlightColor, uint64_t x, uint64_t y)
 {
-    drawCharToWindow(stamp, c, letterColor, highlightColor);
-    drawWindow(stamp, x, y);
+    drawCharToWindow(p->stamp, c, letterColor, highlightColor);
+    drawWindow(p->stamp, x, y);
 }
-char paintChar(char c, HexColor letterColor, HexColor highlightColor)
+char paintChar(painter p, char c, HexColor letterColor, HexColor highlightColor)
 {
     if (c == '\b')
     {
-        if (!(xPointer <= 0 && yPointer <= 0)) // shouldn't be able to backspace through line starters, but shell should handle that.
+        if (!(p->xPointer <= 0 && p->yPointer <= 0)) // shouldn't be able to backspace through line starters, but shell should handle that.
         {
-            paintBackSpace();
+            paintBackSpace(p);
         }
         return 1;
     }
-    if ((xPointer + TRUE_LETTER_WIDTH * size) > w || c == '\n')
+    if ((p->xPointer + TRUE_LETTER_WIDTH * p->size) > p->w || c == '\n')
     {
-        if ((yPointer + TRUE_LETTER_HEIGHT * size * 2) > h) // *2 because letters are drawn from cursor downwards and to the right, so otherwise last line would have its top on the bottom of the screen
+        if ((p->yPointer + TRUE_LETTER_HEIGHT * p->size * 2) > p->h) // *2 because letters are drawn from cursor downwards and to the right, so otherwise last line would have its top on the bottom of the screen
             return 0;
         else
         {
-            newLine();
+            newLine(p);
             if (c == '\n')
                 return 1;
         }
     }
-    drawCharAt(c, letterColor, highlightColor, xPointer, yPointer);
-    moveCursor();
+    drawCharAt(p, c, letterColor, highlightColor, p->xPointer, p->yPointer);
+    moveCursor(p);
     return 1;
 }
-char paintString(const char *c, HexColor letterColor, HexColor highlightColor)
+char paintString(painter p, const char *c, HexColor letterColor, HexColor highlightColor)
 {
-    while (*c && paintChar(*c, letterColor, highlightColor))
+    while (*c && paintChar(p, *c, letterColor, highlightColor))
     {
         c++;
     }
@@ -86,56 +88,60 @@ char paintString(const char *c, HexColor letterColor, HexColor highlightColor)
     return 1;
 }
 // This implementation is not beautiful modularization, it is simple, easy and doesn't repeat code instead.
-void drawStringAt(char *c, HexColor letterColor, HexColor highlightColor, uint64_t x, uint64_t y)
+void drawStringAt(painter p, char *c, HexColor letterColor, HexColor highlightColor, uint64_t x, uint64_t y)
 {
-    uint64_t auxX = xPointer, auxY = yPointer;
-    xPointer = x;
-    yPointer = y;
-    paintString(c, letterColor, highlightColor);
-    xPointer = auxX;
-    yPointer = auxY;
+    uint64_t auxX = p->xPointer, auxY = p->yPointer;
+    p->xPointer = x;
+    p->yPointer = y;
+    paintString(p, c, letterColor, highlightColor);
+    p->xPointer = auxX;
+    p->yPointer = auxY;
 }
-uint64_t maxYPointer()
+uint64_t maxYPointer(painter p)
 {
-    return h - 2 * size * TRUE_LETTER_HEIGHT;
+    return p->h - 2 * p->size * TRUE_LETTER_HEIGHT;
 }
-uint64_t maxXPointer()
+uint64_t maxXPointer(painter p)
 {
-    return w - TRUE_LETTER_WIDTH * size;
+    return p->w - TRUE_LETTER_WIDTH * p->size;
 }
-char willFit(const char *s)
+char willFit(painter p, const char *s)
 {
-    double xP = 0, yP = 0, maxX = w - TRUE_LETTER_WIDTH * size, maxY = h - 2 * TRUE_LETTER_HEIGHT * size;
+    double xP = 0, yP = 0, maxX = p->w - TRUE_LETTER_WIDTH * p->size, maxY = p->h - 2 * TRUE_LETTER_HEIGHT * p->size;
     while (*s)
     {
         if (*s == '\n' || xP > maxX)
         {
             xP = 0;
-            yP += TRUE_LETTER_HEIGHT * size;
+            yP += TRUE_LETTER_HEIGHT * p->size;
             if (yP > maxY)
                 return 0;
         }
         else
         {
-            xP += TRUE_LETTER_WIDTH * size;
+            xP += TRUE_LETTER_WIDTH * p->size;
         }
         s++;
     }
     return 1;
 }
 
-uint64_t getCharPerLine()
+uint64_t getCharPerLine(painter p)
 {
-    return (uint64_t)(w / TRUE_LETTER_WIDTH / size);
+    return (uint64_t)(p->w / TRUE_LETTER_WIDTH / p->size);
 }
 
-void blank()
+void blankNoClear(painter p)
 {
-    xPointer = 0;
-    yPointer = TRUE_LETTER_HEIGHT * size;
+    p->xPointer = 0;
+    p->yPointer = TRUE_LETTER_HEIGHT * p->size;
+}
+void blank(painter p)
+{
+    blankNoClear(p);
     clear();
 }
-void endPainter()
+void endPainter(painter p)
 {
-    freeWindow(stamp);
+    freeWindow(p->stamp);
 }

@@ -39,6 +39,6 @@ $(LOADEROBJECT):
 	$(GCC) $(GCCFLAGS) -c $(LOADERSRC) -o $(LOADEROBJECT)
 
 clean:
-	@find . -name *.o -delete
+	@find . -name "*.o" -delete
 
 .PHONY: all clean print

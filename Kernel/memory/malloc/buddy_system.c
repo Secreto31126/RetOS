@@ -259,6 +259,7 @@ void free_m(void *ptr)
     if (((char *)ptr) >= mem_start && ((char *)ptr) <= mem_end)
         set_state(map_start, mem_index_to_map_index(((char *)ptr) - mem_start), EMPTY);
 }
+/*
 
 void print_m_rec(size_t_m i, size_t_m height, char avoid_empty);
 
@@ -316,6 +317,7 @@ void print_m_rec(size_t_m i, size_t_m height, char avoid_empty)
 
     print_m_rec(GET_RIGHT(i), height + 1, avoid_empty);
 }
+*/
 
 // Damn, this project works
 // It is slightly beautiful

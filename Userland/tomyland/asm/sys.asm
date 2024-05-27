@@ -16,6 +16,9 @@
     global yield
     global waitpid
     global sleep
+    global pipe
+    global close
+    global dup2
 
 ; size_t read(int fd, void *buf, size_t count);
 read:
@@ -116,5 +119,23 @@ waitpid:
 ; void sleep(size_t ticks);
 sleep:
     mov rax, 0x12
+    int 80h
+    ret
+
+; int pipe(int pipefd[2]);
+pipe:
+    mov rax, 0x13
+    int 80h
+    ret
+
+; int close(int fd);
+dup2:
+    mov rax, 0x14
+    int 80h
+    ret
+
+; int dup2(int oldfd, int newfd);
+dup2:
+    mov rax, 0x15
     int 80h
     ret

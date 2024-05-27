@@ -10,14 +10,35 @@ extern char endOfBinary;
 
 int main(int argc, char *argv[])
 {
-	// char char_pid = get_pid() + '0';
-	// for (int i = 0; i < argc; i++)
+	// int pipefd[2];
+	// int err = pipe(pipefd);
+
+	// if (err)
 	// {
-	// 	write(1, &char_pid, 1);
-	// 	puts(": ");
-	// 	puts(argv[i]);
-	// 	puts("\n");
+	// 	beep(440);
+	// 	sleep(2);
+	// 	return 1;
 	// }
+
+	// err = dup2(pipefd[1], 1);
+
+	// if (err < 0)
+	// {
+	// 	beep(440);
+	// 	sleep(2);
+	// 	return 1;
+	// }
+
+	// puts("Hello");
+
+	// char str[10];
+	// read(pipefd[0], str, 10);
+
+	// write(2, str, strlen(str));
+
+	// execv("module", NULL);
+	// sleep(100);
+	// return 1;
 
 	int pid = fork();
 	if (pid)
@@ -33,6 +54,15 @@ int main(int argc, char *argv[])
 
 	execv("module", NULL);
 	return 1;
+
+	// char char_pid = get_pid() + '0';
+	// for (int i = 0; i < argc; i++)
+	// {
+	// 	write(1, &char_pid, 1);
+	// 	puts(": ");
+	// 	puts(argv[i]);
+	// 	puts("\n");
+	// }
 
 	// int child_pid = fork();
 	// if (child_pid)

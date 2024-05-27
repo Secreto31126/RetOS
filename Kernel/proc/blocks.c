@@ -70,3 +70,10 @@ unsigned int sleep(unsigned int seconds)
     yield();
     return (uintptr_t)p->condition_data[0];
 }
+
+void read_block(int file)
+{
+    Process *p = get_current_process();
+    add_blocked(p, read_available, NULL + file, NULL, NULL, NULL, NULL);
+    yield();
+}

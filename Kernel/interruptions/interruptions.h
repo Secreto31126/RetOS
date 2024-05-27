@@ -11,8 +11,10 @@
 #include <video.h>
 #include <ticks.h>
 #include <stdin.h>
+#include <stdout.h>
 #include <stderr.h>
 #include <stdkey.h>
+#include <files.h>
 #include <stdint.h>
 #include <header.h>
 #include <images.h>

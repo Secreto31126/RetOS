@@ -38,7 +38,13 @@ void *create_process_idle()
         .next_blocked = NULL,
         .block_condition = no_condition,
         .condition_data = {},
+        .files = {0, 1, 2, 3},
     };
+
+    for (size_t i = 4; i < MAX_PROCESS_FILES; i++)
+    {
+        processes[0].files[i] = -1;
+    }
 
     pid = 0;
     active_processes_count = 1;
@@ -137,6 +143,15 @@ FIND_PID:
     processes[new_pid].block_condition = no_condition;
     // Not worth looping, there's no biggie if it's trash
     // processes[new_pid].condition_data = {};
+    for (size_t i = 0; i < MAX_PROCESS_FILES; i++)
+    {
+        if (IS_PIPE(parent->files[i]))
+        {
+            add_pipe_end(parent->files[i]);
+        }
+
+        processes[new_pid].files[i] = parent->files[i];
+    }
 
     // We aren't Linux, we must copy the stack at creation time
     memcpy(
@@ -265,4 +280,61 @@ int kill_process(pid_t pid)
     // ncPrint(" killed\n");
 
     return 0;
+}
+
+int open_file(int file, int flags)
+{
+    Process *p = get_current_process();
+
+    for (size_t i = 0; i < MAX_PROCESS_FILES; i++)
+    {
+        if (p->files[i] == -1)
+        {
+            p->files[i] = file | flags;
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+int close(int fd)
+{
+    Process *p = get_current_process();
+
+    if (0 <= fd && fd < MAX_PROCESS_FILES && p->files[fd] != -1)
+    {
+        if (IS_PIPE(p->files[fd]))
+        {
+            close_pipe(p->files[fd]);
+        }
+
+        p->files[fd] = -1;
+        return 0;
+    }
+
+    return -1;
+}
+
+int dup2(int oldfd, int newfd)
+{
+    Process *p = get_current_process();
+
+    if (oldfd == newfd)
+    {
+        return newfd;
+    }
+
+    if (0 <= oldfd && oldfd < MAX_PROCESS_FILES && 0 <= newfd && newfd < MAX_PROCESS_FILES)
+    {
+        if (p->files[oldfd] != -1)
+        {
+            close(p->files[newfd]);
+        }
+
+        p->files[newfd] = p->files[oldfd];
+        return newfd;
+    }
+
+    return -1;
 }

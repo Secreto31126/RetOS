@@ -4,6 +4,7 @@
 #include <lib.h>
 #include <proc.h>
 #include <mman.h>
+#include <files.h>
 #include <ticks.h>
 #include <memory.h>
 #include <console.h>

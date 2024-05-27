@@ -105,3 +105,8 @@ void stdkey_keyevent(uint8_t scancode)
         }
     }
 }
+
+bool stdkey_empty()
+{
+    return reader == writer && !on_your_left;
+}

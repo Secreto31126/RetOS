@@ -3,9 +3,13 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <pipes.h>
 
-#define MAX_PROCESS_CHILDREN 2
+#define MAX_PROCESS_FILES 10
 #define MAX_PROCESSES 10
+
+#define O_FILE 0x0
+#define O_PIPE 0x8000
 
 /**
  * @brief An unique process identifier type
@@ -127,6 +131,10 @@ typedef struct Process
      * @brief Any data required by the condition
      */
     void *condition_data[5];
+    /**
+     * @brief Process open file descriptors
+     */
+    int files[MAX_PROCESS_FILES];
 } Process;
 
 /**
@@ -177,6 +185,31 @@ pid_t create_process(void *rsp);
  */
 int kill_process(pid_t pid);
 /**
+ * @brief Open a file in the current process
+ * @note Kernel only, the syscall open() won't exist (yet)
+ *
+ * @param file The kernel file descriptor
+ * @param flags O_ flags
+ * @return int The process file descriptor, -1 if the file couldn't be opened
+ */
+int open_file(int file, int flags);
+/**
+ * @brief Close a file in the current process
+ *
+ * @param fd The process file descriptor
+ * @return int 0 if the file was closed, -1 otherwise
+ */
+int close(int fd);
+/**
+ * @brief Duplicate a file descriptor
+ *
+ * @param oldfd The old file descriptor to duplicate
+ * @param newfd The new file descriptor to use
+ * @return int
+ */
+int dup2(int oldfd, int newfd);
+
+/**
  * @brief Block the current process until the child pid dies
  */
 pid_t waitpid(pid_t pid, int *wstatus, int options);
@@ -187,6 +220,12 @@ pid_t waitpid(pid_t pid, int *wstatus, int options);
  * @return unsigned int The number of ticks left to sleep (always 0 in RetOS)
  */
 unsigned int sleep(unsigned int ticks);
+/**
+ * @brief Add a read block to the current process
+ *
+ * @param file The file descriptor to read wait for
+ */
+void read_block(int file);
 
 /**
  * @brief Skip remaining CPU time and give it to the next process
@@ -196,6 +235,6 @@ extern void yield();
  * @brief Kill the current process and halt
  * @note This function should only be called from a syscall for "atomicity"
  */
-extern void exit();
+extern void exit(int status);
 
 #endif

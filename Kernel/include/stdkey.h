@@ -2,6 +2,7 @@
 #define STDK_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 /**
  * @brief Read from stdkey
@@ -25,5 +26,12 @@ uint16_t write_stdkey(uint8_t *buf, uint16_t len);
  * @param scancode The scancode of the key
  */
 void stdkey_keyevent(uint8_t scancode);
+/**
+ * @brief Wether or not stdkey is empty
+ *
+ * @return true stdkey is empty
+ * @return false stdkey is not empty
+ */
+bool stdkey_empty();
 
 #endif

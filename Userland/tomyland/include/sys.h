@@ -29,5 +29,8 @@ extern int fork();
 extern void yield();
 extern int waitpid(int pid, int *wstatus, int options);
 extern void sleep(unsigned int seconds);
+extern int pipe(int pipefd[2]);
+extern int close(int fd);
+extern int dup2(int oldfd, int newfd);
 
 #endif

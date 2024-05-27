@@ -52,3 +52,8 @@ uint16_t write_stdin(uint8_t *buf, uint16_t len)
 
     return i;
 }
+
+bool stdin_empty()
+{
+    return reader == writer && !on_your_left;
+}

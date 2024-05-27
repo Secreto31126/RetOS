@@ -14,12 +14,23 @@
 
 #define MAX_COMMAND_LENGTH 90
 
-char shellStart();
-void setHighlightColor(HexColor color);
-void setLetterColor(HexColor color);
-void resize(double size);
-void warpNLines(uint64_t lines);
-void clearShell();
-void paintStringOrWarp(char *s, char ask);
+typedef shellData *shell;
+
+typedef struct shellData
+{
+    painter p;
+    char *buffer, *commandBuffer;
+    uint64_t index, commandIndex;
+    HexColor letterColor, highlightColor;
+    char fromLastEnter;
+} shellData;
+
+char shellStart(painter p);
+void setHighlightColor(shell s, HexColor color);
+void setLetterColor(shell s, HexColor color);
+void resize(shell s, double size);
+void warpNLines(shell s, uint64_t lines);
+void clearShell(shell s);
+void paintStringOrWarp(shell s, char *str, char ask);
 
 #endif

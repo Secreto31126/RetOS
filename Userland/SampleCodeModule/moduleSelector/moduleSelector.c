@@ -24,7 +24,7 @@ void startModules()
         case '1':
         {
             blank(p);
-            shellStart();
+            shellStart(p);
             setEnvironment(p);
             break;
         }

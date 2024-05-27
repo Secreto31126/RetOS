@@ -2,146 +2,150 @@
 #include "commandHandler/commandHandler.h"
 #define BLOCK 50
 #define MOVE_BY 8
-void warpNLines(uint64_t n);
+#define SHELL_INTRO "You are now in shell:\n"
+#define LINE_START ":~ "
+void warpNLines(shell s, uint64_t n);
 void warpAndRedraw();
 void warpOneLine();
-char *passCommand(char *toPass);
+char *passCommand(shell s, char *toPass);
 void paintLineStart();
-void paintCharOrWarp(char c);
-void paintStringOrWarp(char *s, char ask);
-void addStringToBuffer(char *s, char ask);
-void addCharToBuffer(char c);
-static char *buffer, *commandBuffer;
-static uint64_t index, commandIndex;
-static HexColor letterColor = 0xFF000000 | HEX_WHITE, highlightColor = 0xFF000000 | HEX_BLACK;
-static const char *lineStart = ":~ ";
-static const char *shellIntro = "You are now in shell:\n";
-static char fromLastEnter = 0;
-void drawTime()
+void paintCharOrWarp(shell s, char c);
+void paintStringOrWarp(shell s, char *str, char ask);
+void addStringToBuffer(shell s, char *str, char ask);
+void addCharToBuffer(shell s, char c);
+
+void drawTime(painter p)
 {
-    drawStringAt(getTimeString(), 0xFFFFFFFF, 0xFF000000, 0, 0);
+    drawStringAt(p, getTimeString(), 0xFFFFFFFF, 0xFF000000, 0, 0);
 }
-char shellStart()
+char shellStart(painter p)
 {
     uint32_t width = getScreenWidth();
     uint32_t height = getScreenHeight();
+    shell s = malloc(sizeof(shellData));
 
-    index = 0;
-    commandIndex = 0;
-    commandBuffer = malloc(sizeof(char) * (MAX_COMMAND_LENGTH + 1));
-    buffer = malloc((width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH);
-    *buffer = 0;
-    *commandBuffer = 0;
-    index += sPuts(buffer, shellIntro);
-    paintString(buffer, letterColor, highlightColor);
-    paintLineStart();
+    s->p = p;
+    s->letterColor = 0xFF000000 | HEX_WHITE;
+    s->highlightColor = 0xFF000000 | HEX_BLACK;
+    s->fromLastEnter = 0;
+    s->index = 0;
+    s->commandIndex = 0;
+    s->commandBuffer = malloc(sizeof(char) * (MAX_COMMAND_LENGTH + 1));
+    s->buffer = malloc((width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH);
+    *(s->buffer) = 0;
+    *(s->commandBuffer) = 0;
+    s->index += sPuts(s->buffer, SHELL_INTRO);
+
+    paintString(p, s->buffer, s->letterColor, s->highlightColor);
+    paintLineStart(p);
     char c;
     while (1)
     {
-        drawTime();
+        drawTime(p);
         wait();
         if ((c = readChar()))
         {
-            if (c == '\n' && strcmp(commandBuffer, "exit"))
+            if (c == '\n' && strcmp(s->commandBuffer, "exit"))
             {
-                blank();
-                free(commandBuffer);
-                free(buffer);
+                blank(p);
+                free(s->commandBuffer);
+                free(s->buffer);
                 freePrints();
+                free(s);
                 return 1;
             }
             if (c == '\b')
             {
-                if (!fromLastEnter || !index)
+                if (!s->fromLastEnter || !s->index)
                 {
                     continue;
                 }
                 else
                 {
-                    paintChar(c, letterColor, highlightColor);
-                    index--;
-                    commandIndex--;
-                    fromLastEnter--;
+                    paintChar(s->p, c, s->letterColor, s->highlightColor);
+                    s->index--;
+                    s->commandIndex--;
+                    s->fromLastEnter--;
                 }
             }
             else
             {
                 if (c == '\n')
                 {
-                    fromLastEnter = 0;
-                    addStringToBuffer(passCommand(commandBuffer), 1); // Nota: las instrucciones del TPE especifican que la shell debe moverse hacia arriba si se excede su espacio para texto.
-                    freePrints();                                     // No se especifica el comportamiento esperado si el retorno de un 'comando' es mayor al espacio de la shell.
-                    commandIndex = 0;                                 // El comportamiento default es simplemente no imprimir el retorno completo. Esto es lo que ocurre si a passCommand se le da parámetro 'ask' 0.
-                }                                                     // De lo contrario, se imprimirá moviendo hacia arriba de a MOVE_BY líneas, requiriendo input del usuario.
+                    s->fromLastEnter = 0;
+                    addStringToBuffer(s, passCommand(s, s->commandBuffer), 1); // Nota: las instrucciones del TPE especifican que la shell debe moverse hacia arriba si se excede su espacio para texto.
+                    freePrints();                                              // No se especifica el comportamiento esperado si el retorno de un 'comando' es mayor al espacio de la shell.
+                    s->commandIndex = 0;                                       // El comportamiento default es simplemente no imprimir el retorno completo. Esto es lo que ocurre si a passCommand se le da parámetro 'ask' 0.
+                } // De lo contrario, se imprimirá moviendo hacia arriba de a MOVE_BY líneas, requiriendo input del usuario.
                 else
                 {
-                    addCharToBuffer(c);
-                    fromLastEnter++;
-                    if (commandIndex < MAX_COMMAND_LENGTH)
-                        commandBuffer[commandIndex++] = c; // ignores commands after a certain length (since no commands should be that long)
+                    addCharToBuffer(s, c);
+                    s->fromLastEnter++;
+                    if (s->commandIndex < MAX_COMMAND_LENGTH)
+                        s->commandBuffer[s->commandIndex++] = c; // ignores commands after a certain length (since no commands should be that long)
                 }
             }
-            commandBuffer[commandIndex] = 0;
-            buffer[index] = 0;
+            s->commandBuffer[s->commandIndex] = 0;
+            s->buffer[s->index] = 0;
         }
     }
 }
 
-void addCharToBuffer(char c)
+void addCharToBuffer(shell s, char c)
 {
-    buffer[index++] = c;
-    buffer[index] = 0;
-    paintCharOrWarp(c);
+    s->buffer[s->index++] = c;
+    s->buffer[s->index] = 0;
+    paintCharOrWarp(s, c);
 }
-void addStringToBuffer(char *s, char ask)
+void addStringToBuffer(shell s, char *str, char ask)
 {
     //  paintString(s, 0xffff0000, 0xff00ff00);
-    char *aux = s;
+    char *aux = str;
     while (*aux)
-        buffer[index++] = *(aux++);
-    buffer[index] = 0;
-    paintStringOrWarp(s, ask);
+        s->buffer[s->index++] = *(aux++);
+    s->buffer[s->index] = 0;
+    paintStringOrWarp(s, str, ask);
 }
-void paintStringOrWarp(char *s, char ask)
+void paintStringOrWarp(shell s, char *str, char ask)
 {
-    if (strcmp(s, ""))
+    if (strcmp(str, ""))
         return;
-    if (!willFit(buffer))
+    if (!willFit(s->p, s->buffer))
     {
         if (ask) // informs user output does not fit, waits for input, warps output, if it still does not fit, continues informing and waiting for input and warping
         {
             char *prompt = "The output of this command will not fit. Press any key to continue output.";
             do
             {
-                blank();
-                paintString(buffer, letterColor, highlightColor);
-                drawStringAt(prompt, 0xFF000000, 0xFFFFFFFF, 0, 0);
+                blank(s->p);
+                paintString(s->p, s->buffer, s->letterColor, s->highlightColor);
+                drawStringAt(s->p, prompt, 0xFF000000, 0xFFFFFFFF, 0, 0);
                 getChar();
-                warpNLines(MOVE_BY);
-            } while (!willFit(buffer));
-            blank();
-            paintString(buffer, letterColor, highlightColor);
-            drawTime();
+                warpNLines(s->p, MOVE_BY);
+            } while (!willFit(s->p, s->buffer));
+            blank(s->p);
+            paintString(s->p, s->buffer, s->letterColor, s->highlightColor);
+            drawTime(s->p);
         }
         else // simply warps the output
         {
-            warpOneLine();
-            while (!willFit(buffer))
-                warpOneLine();
-            blank();
-            paintString(buffer, letterColor, highlightColor);
+            warpOneLine(s->p);
+            while (!willFit(s->p, s->buffer))
+                warpOneLine(s->p);
+            blank(s->p);
+            paintString(s->p, s->buffer, s->letterColor, s->highlightColor);
         }
     }
     else
-        paintString(s, letterColor, highlightColor);
+        paintString(s->p, str, s->letterColor, s->highlightColor);
 }
-void paintCharOrWarp(char c)
+void paintCharOrWarp(shell s, char c)
 {
-    if (!paintChar(c, letterColor, highlightColor))
-        warpAndRedraw();
+    if (!paintChar(s->p, c, s->letterColor, s->highlightColor))
+        warpAndRedraw(s->p);
 }
 
-char *passCommand(char *toPass)
+char *passCommand(shell s, char *toPass)
 {
     char mustRedraw = 0;
     char *toPaint = handleCommand(toPass, &mustRedraw);
@@ -151,93 +155,93 @@ char *passCommand(char *toPass)
         char *toReturn;
         if (strcmp(toPaint, ""))
         {
-            if (strcmp(buffer, ""))
-                toReturn = (char *)lineStart;
+            if (strcmp(s->buffer, ""))
+                toReturn = (char *)(s->lineStart);
             else
-                toReturn = sPrintf("%s\n%s", buffer, lineStart);
+                toReturn = sPrintf("%s\n%s", s->buffer, s->lineStart);
         }
         else
-            toReturn = sPrintf("%s\n%s\n%s", buffer, toPaint, lineStart);
-        index = 0;
-        buffer[index] = 0;
-        if (willFit(toReturn)) // so as not to blank when it won't fit, as the painting functions will blank anyways
-            blank();
+            toReturn = sPrintf("%s\n%s\n%s", s->buffer, toPaint, s->lineStart);
+        s->index = 0;
+        s->buffer[s->index] = 0;
+        if (willFit(s->p, toReturn)) // so as not to blank when it won't fit, as the painting functions will blank anyways
+            blank(s->p);
         return toReturn;
     }
     if (strcmp(toPaint, ""))
     {
-        if (strcmp(buffer, ""))
-            return (char *)lineStart;
+        if (strcmp(s->buffer, ""))
+            return (char *)(s->lineStart);
         else
-            return sPrintf("\n%s", lineStart);
+            return sPrintf("\n%s", s->lineStart);
     }
-    return sPrintf("\n%s\n%s", toPaint, lineStart);
+    return sPrintf("\n%s\n%s", toPaint, s->lineStart);
 }
-void warpOneLine()
+void warpOneLine(shell s)
 {
-    warpNLines(1);
+    warpNLines(s, 1);
 }
-void warpAndRedraw()
+void warpAndRedraw(shell s)
 {
-    warpOneLine();
-    blank();
-    paintString(buffer, letterColor, highlightColor);
+    warpOneLine(s);
+    blank(s->p);
+    paintString(s->p, s->buffer, s->letterColor, s->highlightColor);
 }
-void setLetterColor(HexColor color) // command handler is responsible for setting mustRedraw to 1
+void setLetterColor(shell s, HexColor color) // command handler is responsible for setting mustRedraw to 1
 {
-    letterColor = 0xFF000000 | color; // Letters cannot be transparent
+    s->letterColor = 0xFF000000 | color; // Letters cannot be transparent
 }
-void setHighlightColor(HexColor color) // command handler is responsible for setting mustRedraw to 1
+void setHighlightColor(shell s, HexColor color) // command handler is responsible for setting mustRedraw to 1
 {
-    highlightColor = color; // highlights can be transparent
+    s->highlightColor = color; // highlights can be transparent
 }
-void resize(double size) // command handler is responsible for setting mustRedraw to 1
+void resize(shell s, double size) // command handler is responsible for setting mustRedraw to 1
 {
-    setSize(size);
+    setSize(s->p, size);
 }
 
-void clearShell()
+void clearShell(shell s)
 {
-    blank();
-    index = 0;
-    buffer[index] = 0;
-    commandIndex = 0;
-    commandBuffer[commandIndex] = 0;
-    fromLastEnter = 0;
+    blank(s->p);
+    s->index = 0;
+    s->buffer[s->index] = 0;
+    s->commandIndex = 0;
+    s->commandBuffer[s->commandIndex] = 0;
+    s->fromLastEnter = 0;
 }
 
-void warpNLines(uint64_t n) // char or char* you want to add must be in buffer already. This shortens the buffer from the start so that it fits, then repaints it.
+void warpNLines(shell s, uint64_t n) // char or char* you want to add must be in buffer already. This shortens the buffer from the start so that it fits, then repaints it.
 {
     if (!n)
         return;
-    uint64_t max = getCharPerLine();
+    uint64_t max = getCharPerLine(s->p);
     int i = 0, j, k = 0;
     while (n)
     {
-        for (i = 0; i < max && buffer[k + i] && buffer[k + i] != '\n'; i++)
+        for (i = 0; i < max && s->buffer[k + i] && s->buffer[k + i] != '\n'; i++)
             ;
         n--;
         i++;
         k += i;
-        if (!buffer[k - 1])
+        if (!((s->buffer)[k - 1]))
         {
-            index = 0;
-            buffer[index] = 0;
+            s->index = 0;
+            s->buffer[s->index] = 0;
             return;
         }
     }
-    for (j = k; buffer[j]; j++)
-        buffer[j - k] = buffer[j];
-    index = j - k;
-    buffer[index] = 0;
+    for (j = k; s->buffer[j]; j++)
+        s->buffer[j - k] = s->buffer[j];
+    s->index = j - k;
+    s->buffer[s->index] = 0;
 }
-void paintLineStart()
+void paintLineStart(shell s)
 {
-    paintString(lineStart, letterColor, highlightColor);
-    const char *aux = lineStart;
+    paintString(s->p, LINE_START, s->letterColor, s->highlightColor);
+    const char *aux = LINE_START;
     while (*aux)
     {
-        buffer[index++] = *(aux++);
+        s->buffer[s->index++] = *(aux++);
     }
-    buffer[index] = 0;
+    s->buffer[s->index] = 0;
 }

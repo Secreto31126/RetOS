@@ -144,4 +144,5 @@ void blank(painter p)
 void endPainter(painter p)
 {
     freeWindow(p->stamp);
+    free(p);
 }

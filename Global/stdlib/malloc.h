@@ -22,7 +22,7 @@ void *malloc_m(size_t_m size);
 void *realloc_m(void *ptr, size_t_m size);
 void free_m(void *ptr);
 
-void print_m(char avoid_empty);
-void print_m_data();
+// void print_m(char avoid_empty);
+// void print_m_data();
 
 #endif

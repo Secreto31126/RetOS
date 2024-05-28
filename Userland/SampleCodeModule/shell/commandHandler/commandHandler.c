@@ -297,7 +297,7 @@ stringOrFd testExec(char *commandParameters, char *mustRedraw)
         execv("moduleName", aux);
 
         // TODO remove this loop once pipe works
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < 5; i++)
         {
             sleep(1);
             print_sys(pipeFd[1], "ello", sizeof("ello") - 1);

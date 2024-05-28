@@ -161,6 +161,7 @@ void readUntilClose(int fd)
         buffer[n] = 0;
         paintStringOrWarp(buffer, 0);
     }
+    close(fd);
     paintStringOrWarp("\n", 0);
     paintStringOrWarp((char *)lineStart, 0);
 }
@@ -171,9 +172,16 @@ char *passCommand(char *toPass)
     stringOrFd pair = handleCommand(toPass, &mustRedraw);
     if (pair.s == NULL)
     {
-        if (pair.fd > 0)
+        if (pair.fd >= 0)
+        {
+            paintStringOrWarp(pair.fd + '0', 1);
             readUntilClose(pair.fd);
-        paintStringOrWarp(pair.fd + '0', 0);
+        }
+        else
+        {
+            paintStringOrWarp("An invalid return was obtained from this command.\n", 1);
+            paintStringOrWarp(lineStart, 1);
+        }
         return "";
     }
     char *toPaint = pair.s;

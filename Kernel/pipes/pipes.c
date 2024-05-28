@@ -41,7 +41,8 @@ int pipe(int pipefd[2])
     }
 
     Pipe pipe = {
-        .ends = 2,
+        .read_ends = 1,
+        .write_ends = 1,
         .data = data,
         .read = data,
         .write = data,
@@ -57,7 +58,14 @@ int pipe(int pipefd[2])
 
 void add_pipe_end(int file)
 {
-    pipes[(file ^ O_PIPE) / 2].ends++;
+    if (file & 1)
+    {
+        pipes[((file ^ O_PIPE) - 1) / 2].write_ends++;
+    }
+    else
+    {
+        pipes[(file ^ O_PIPE) / 2].read_ends++;
+    }
 }
 
 int close_pipe(int file)
@@ -65,7 +73,16 @@ int close_pipe(int file)
     int fd = (file ^ O_PIPE) / 2;
     Pipe *pipe = pipes + fd;
 
-    if (!--pipe->ends)
+    if (file & 1)
+    {
+        pipe->write_ends--;
+    }
+    else
+    {
+        pipe->read_ends--;
+    }
+
+    if (!pipe->read_ends && !pipe->write_ends)
     {
         free(pipe->data);
         pipe->data = NULL;
@@ -130,6 +147,13 @@ bool pipe_empty(int file)
     }
 
     Pipe pipe = pipes[(file ^ O_PIPE) / 2];
+
+    // If the pipe doesn't have any write end,
+    // it must return 0 without blocking when read
+    if (!pipe.write_ends)
+    {
+        return false;
+    }
 
     return pipe.read == pipe.write;
 }

@@ -211,6 +211,14 @@ int kill_process(pid_t pid)
             man_im_dead->running_stack_size);
     }
 
+    for (size_t i = 0; i < MAX_PROCESS_FILES; i++)
+    {
+        if (man_im_dead->files[i] != -1)
+        {
+            close(man_im_dead->files[i]);
+        }
+    }
+
     /**
      * @brief Wether the stack should be freed or not (another process is using it as running stack)
      */

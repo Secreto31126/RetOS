@@ -149,15 +149,6 @@ void readUntilClose(int fd)
     int n;
     while (n = read_sys(fd, buffer, BLOCK - 1))
     {
-        for (int i = 0; i < n; i++)
-        {
-            if (!buffer[i])
-            {
-                paintStringOrWarp("\n", 0);
-                paintStringOrWarp((char *)lineStart, 0);
-                return; // TODO Remove this loop when read actually works
-            }
-        }
         buffer[n] = 0;
         paintStringOrWarp(buffer, 0);
     }
@@ -170,20 +161,25 @@ char *passCommand(char *toPass)
 {
     char mustRedraw = 0;
     stringOrFd pair = handleCommand(toPass, &mustRedraw);
+
     if (pair.s == NULL)
     {
         if (pair.fd >= 0)
         {
-            paintStringOrWarp(pair.fd + '0', 1);
+            char buffer[10];
+            itoa(pair.fd, buffer, 10);
+            paintStringOrWarp("\n", 0);
+            paintStringOrWarp(buffer, 0);
             readUntilClose(pair.fd);
         }
         else
         {
-            paintStringOrWarp("An invalid return was obtained from this command.\n", 1);
-            paintStringOrWarp(lineStart, 1);
+            paintStringOrWarp("An invalid return was obtained from this command.\n", 0);
+            paintStringOrWarp(lineStart, 0);
         }
         return "";
     }
+
     char *toPaint = pair.s;
 
     if (mustRedraw)

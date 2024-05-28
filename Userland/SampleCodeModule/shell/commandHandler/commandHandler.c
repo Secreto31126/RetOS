@@ -279,35 +279,39 @@ stringOrFd testExec(char *commandParameters, char *mustRedraw)
 {
     int pipeFd[2] = {0};
     int err = pipe(pipeFd);
+    if (pipeFd[0] < 0 || pipeFd[1] < 0)
+    {
+        stringOrFd aux = {"Pipe fds were invalid", -1};
+        return aux;
+    }
     if (err)
     {
         stringOrFd aux = {"Could not create pipe", -1};
         return aux;
     }
-    err = fork();
-    if (err == -1)
+    int c_pid = fork();
+    if (c_pid == -1)
     {
         stringOrFd aux = {"Could not execute command", -1};
         return aux;
     }
-    if (!err)
+    if (!c_pid)
     {
         close(pipeFd[0]);
         char *aux[2] = {commandParameters, NULL};
-        execv("moduleName", aux);
+        // execv("moduleName", aux);
 
-        // TODO remove this loop once pipe works
-        for (int i = 0; i < 5; i++)
+        char c = pipeFd[1] + '0' * 2;
+        for (int i = 0; i < 6; i++)
         {
             sleep(1);
             print_sys(pipeFd[1], "ello", sizeof("ello") - 1);
         }
-        print_sys(pipeFd[1], "esto", sizeof("esto"));
 
         close(pipeFd[1]);
         exit(1);
     }
-    if (err)
+    if (c_pid)
     {
         close(pipeFd[1]);
         stringOrFd aux = {NULL, pipeFd[0]};

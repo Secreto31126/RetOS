@@ -5,13 +5,13 @@
 #include "./../nstdlib/nstdlib.h"
 // Blank function automatically clears screen. For this reason, each process still should handle only one instance of painter
 // Use blankNoClear(p) and clear() from here if you want multiple painters per process (still not recommended)
-typedef painterHeader *painter;
 typedef struct painterHeader
 {
     double size;
     uint64_t w, h, xPointer, yPointer;
     Window stamp;
 } painterHeader;
+typedef painterHeader *painter;
 
 painter startPainter(uint64_t width, uint64_t height);
 

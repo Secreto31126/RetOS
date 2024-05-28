@@ -15,7 +15,7 @@ void startModules()
     painter p = startPainter(getScreenWidth(), getScreenHeight());
     // sports_center(); // por ahora no :D
     setEnvironment(p);
-    initializeCommands();
+    commandSet comSet = initializeCommands();
     char c;
     while ((c = getChar()) != '5')
     {
@@ -24,7 +24,7 @@ void startModules()
         case '1':
         {
             blank(p);
-            shellStart(p);
+            shellStart(p, comSet);
             setEnvironment(p);
             break;
         }

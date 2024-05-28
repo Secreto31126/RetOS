@@ -7,7 +7,7 @@
 void warpNLines(shell s, uint64_t n);
 void warpAndRedraw();
 void warpOneLine();
-char *passCommand(shell s, char *toPass);
+char *passCommand(shell s, commandSet comSet, char *toPass);
 void paintLineStart();
 void paintCharOrWarp(shell s, char c);
 void paintStringOrWarp(shell s, char *str, char ask);
@@ -18,7 +18,7 @@ void drawTime(painter p)
 {
     drawStringAt(p, getTimeString(), 0xFFFFFFFF, 0xFF000000, 0, 0);
 }
-char shellStart(painter p)
+char shellStart(painter p, commandSet comSet)
 {
     uint32_t width = getScreenWidth();
     uint32_t height = getScreenHeight();
@@ -73,9 +73,9 @@ char shellStart(painter p)
                 if (c == '\n')
                 {
                     s->fromLastEnter = 0;
-                    addStringToBuffer(s, passCommand(s, s->commandBuffer), 1); // Nota: las instrucciones del TPE especifican que la shell debe moverse hacia arriba si se excede su espacio para texto.
-                    freePrints();                                              // No se especifica el comportamiento esperado si el retorno de un 'comando' es mayor al espacio de la shell.
-                    s->commandIndex = 0;                                       // El comportamiento default es simplemente no imprimir el retorno completo. Esto es lo que ocurre si a passCommand se le da parámetro 'ask' 0.
+                    addStringToBuffer(s, passCommand(s, comSet, s->commandBuffer), 1); // Nota: las instrucciones del TPE especifican que la shell debe moverse hacia arriba si se excede su espacio para texto.
+                    freePrints();                                                      // No se especifica el comportamiento esperado si el retorno de un 'comando' es mayor al espacio de la shell.
+                    s->commandIndex = 0;                                               // El comportamiento default es simplemente no imprimir el retorno completo. Esto es lo que ocurre si a passCommand se le da parámetro 'ask' 0.
                 } // De lo contrario, se imprimirá moviendo hacia arriba de a MOVE_BY líneas, requiriendo input del usuario.
                 else
                 {
@@ -145,10 +145,10 @@ void paintCharOrWarp(shell s, char c)
         warpAndRedraw(s->p);
 }
 
-char *passCommand(shell s, char *toPass)
+char *passCommand(shell s, commandSet comSet, char *toPass)
 {
     char mustRedraw = 0;
-    char *toPaint = handleCommand(toPass, &mustRedraw);
+    char *toPaint = handleCommand(s, comSet, toPass, &mustRedraw);
 
     if (mustRedraw)
     {
@@ -156,12 +156,12 @@ char *passCommand(shell s, char *toPass)
         if (strcmp(toPaint, ""))
         {
             if (strcmp(s->buffer, ""))
-                toReturn = (char *)(s->lineStart);
+                toReturn = (char *)(LINE_START);
             else
-                toReturn = sPrintf("%s\n%s", s->buffer, s->lineStart);
+                toReturn = sPrintf("%s\n%s", s->buffer, LINE_START);
         }
         else
-            toReturn = sPrintf("%s\n%s\n%s", s->buffer, toPaint, s->lineStart);
+            toReturn = sPrintf("%s\n%s\n%s", s->buffer, toPaint, LINE_START);
         s->index = 0;
         s->buffer[s->index] = 0;
         if (willFit(s->p, toReturn)) // so as not to blank when it won't fit, as the painting functions will blank anyways
@@ -171,11 +171,11 @@ char *passCommand(shell s, char *toPass)
     if (strcmp(toPaint, ""))
     {
         if (strcmp(s->buffer, ""))
-            return (char *)(s->lineStart);
+            return (char *)(LINE_START);
         else
-            return sPrintf("\n%s", s->lineStart);
+            return sPrintf("\n%s", LINE_START);
     }
-    return sPrintf("\n%s\n%s", toPaint, s->lineStart);
+    return sPrintf("\n%s\n%s", toPaint, LINE_START);
 }
 void warpOneLine(shell s)
 {

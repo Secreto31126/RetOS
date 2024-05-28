@@ -1,24 +1,24 @@
 #include "./piano.h"
 
 // static uint8_t exit = 0;
-static Songs *songs;
 
 void addSongs(Songs *songs);
 
-void startPiano()
+void startPiano(painter p)
 {
+    Songs *songs;
     if ((songs = malloc(sizeof(Songs) * 6)) != 0)
     {
         addSongs(songs);
     }
     else
     {
-        paintString("Error allocating memory for songs.\n", -1, 0);
+        paintString(p, "Error allocating memory for songs.\n", -1, 0);
         return;
     }
     // PianoNote * notes = malloc(sizeof(PianoNote) * 12);
-    blank();
-    paintString("Welcome to the piano!\n\nPress 'q' to exit.\n", -1, 0);
+    blank(p);
+    paintString(p, "Welcome to the piano!\n\nPress 'q' to exit.\n", -1, 0);
     char note;
     while ((note = readChar()) != 'q')
     {
@@ -80,7 +80,7 @@ void startPiano()
             if (note > '0' && note <= '6')
             {
                 unsigned char index = note - '1';
-                paintString(songs[index].name, -1, 0);
+                paintString(p, songs[index].name, -1, 0);
                 songs[index].song();
             }
             shut();
@@ -94,7 +94,7 @@ void startPiano()
         halt_user();
     }
     free(songs);
-    blank();
+    blank(p);
 }
 
 void addSongs(Songs *songs)

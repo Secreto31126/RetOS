@@ -2,6 +2,7 @@
 #define CMNDP_H
 #define COMMAND_COUNT 7
 #include <stdint.h>
+#include "../shell.h"
 /**
  * Currently:
  * set highlight and letter colors .
@@ -14,14 +15,8 @@
  * exit
  * help .
  */
-typedef struct command
-{
-    char *code;
-    char *help;
-    char *(*action)(char *, char *);
-} command;
 
-void addCommand(char *commandCode, char *help, char *(*action)(char *, char *));
-char *handleCommand(char *command, char *mustRedraw);
+void addCommand(commandSet c, char *commandCode, char *help, action_t action);
+char *handleCommand(shell s, commandSet c, char *command, char *mustRedraw);
 
 #endif

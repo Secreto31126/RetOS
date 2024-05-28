@@ -5,69 +5,65 @@
 #include "./../../snake/snake.h"
 #include "./../../snake/drawings/backgroundArrays.h"
 #include "./../../snake/drawings/snakeDrawings.h"
-#include "./../shell.h"
 #include "./../../piano/piano.h"
 #include "./../../piano/sound.h"
 #define BLOCK 5
 #define MAX_LETTER_SIZE 4
 
-static command *commands;
-static uint64_t commandCount = 0;
-
-void freeCommands()
+void freeCommands(commandSet c)
 {
-    free(commands);
+    free(c.commands);
 }
-void addCommand(char *commandCode, char *help, char *(*commandAction)(char *, char *))
+void addCommand(commandSet c, char *commandCode, char *help, action_t commandAction)
 {
-    if (!(commandCount % BLOCK))
-        commands = realloc(commands, commandCount * sizeof(command), (commandCount + BLOCK) * sizeof(command));
-    commands[commandCount].code = commandCode;
-    commands[commandCount].action = commandAction;
-    commands[commandCount].help = help;
-    commandCount++;
+    if (!(c.commandCount % BLOCK))
+        c.commands = realloc(c.commands, c.commandCount * sizeof(command), (c.commandCount + BLOCK) * sizeof(command));
+    c.commands[c.commandCount].code = commandCode;
+    c.commands[c.commandCount].action = commandAction;
+    c.commands[c.commandCount].help = help;
+    c.commandCount++;
 }
-char *handleCommand(char *command, char *mustRedraw)
+char *handleCommand(shell s, commandSet c, char *command, char *mustRedraw)
 {
     command = shiftToWord(command);
     if (strcmpHandleWhitespace(command, "") || strcmpHandleWhitespace(command, " ")) // if command is empty or whitespace, it is ignored
         return "";
-    for (int i = 0; i < commandCount; i++)
+    for (int i = 0; i < c.commandCount; i++)
     {
-        if (isFirstWord(commands[i].code, command))
+        if (isFirstWord(c.commands[i].code, command))
         {
-            return commands[i].action(shiftToWord(command + strlen(commands[i].code)), mustRedraw); // Passes rest of command (the parameters) to the defined action. Skips to next word in case there is whitespace between the command and its parameters. Action is responsible for confirming valid parameters.
+            return c.commands[i].action(s, shiftToWord(command + strlen(c.commands[i].code)), mustRedraw); // Passes rest of command (the parameters) to the defined action. Skips to next word in case there is whitespace between the command and its parameters. Action is responsible for confirming valid parameters.
         }
     }
     return "Command was not recognized";
 }
 // prints will be freed after calling this function. returned string is not freed.
-char *getHelp(char *commandParameters, char *mustRedraw)
+char *getHelp(shell s, commandSet c, char *commandParameters, char *mustRedraw)
 {
     if (strcmpHandleWhitespace("", commandParameters)) // if the command is just 'help', all help menus are printed
     {
         uint64_t len = 0, i;
-        for (i = 0; i < commandCount; i++)
-            len += strlen(commands[i].help);
+        for (i = 0; i < c.commandCount; i++)
+            len += strlen(c.commands[i].help);
         char *display = malloc((len + i * 2 + 1) * sizeof(char));
         char *aux = display;
-        for (i = 0; i < commandCount; i++)
+        for (i = 0; i < c.commandCount; i++)
         {
-            aux += concatFrom(aux, commands[i].help);
+            aux += concatFrom(aux, c.commands[i].help);
             aux += concatFrom(aux, "\n\n");
         }
         addToAllocated(display);
         return display;
     }
-    for (int i = 0; i < commandCount; i++) // otherwise, a single matching help menu is printed if it exists.
+    for (int i = 0; i < c.commandCount; i++) // otherwise, a single matching help menu is printed if it exists.
     {
-        if (isFirstWord(commandParameters, commands[i].code))
-            return commands[i].help;
+        if (isFirstWord(commandParameters, c.commands[i].code))
+            return c.commands[i].help;
     }
     return sPrintf("No help menu that matches '%s' was found.", commandParameters); // sPrintf automatically adds created string to list of strings to be freed by freePrints()
 }
 
-char *startSnake(char *commandParameters, char *mustRedraw)
+char *startSnake(shell s, char *commandParameters, char *mustRedraw)
 {
     char *formatString = "Player %d won. Returning to shell";
     int i;
@@ -84,7 +80,7 @@ char *startSnake(char *commandParameters, char *mustRedraw)
     return "Invalid snake parameter";
 }
 
-char *setSnakeTheme(char *commandParameters, char *mustRedraw)
+char *setSnakeTheme(shell s, char *commandParameters, char *mustRedraw)
 {
     char matchFlag = 0;
     if (strcmp(commandParameters, "windows"))
@@ -140,61 +136,61 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     return sPrintf("No theme matching %s was found.", commandParameters);
 }
 
-char *changehighlightColor(char *commandParameters, char *mustRedraw)
+char *changehighlightColor(shell s, char *commandParameters, char *mustRedraw)
 {
     if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
         return "Hex value given not valid.";
-    setHighlightColor(atoiHex(commandParameters)); // will read until an invalid character is found or 8 characters have been read. If an invalid character was found, what was read so far will be set as the color.
+    setHighlightColor(s, atoiHex(commandParameters)); // will read until an invalid character is found or 8 characters have been read. If an invalid character was found, what was read so far will be set as the color.
     *mustRedraw = 1;
     return "Highlight color set.";
 }
-char *changeLetterColor(char *commandParameters, char *mustRedraw)
+char *changeLetterColor(shell s, char *commandParameters, char *mustRedraw)
 {
     if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
         return "Hex value given not valid.";
     // uint64_t hex = 0;
-    setLetterColor(atoiHex(commandParameters));
+    setLetterColor(s, atoiHex(commandParameters));
     *mustRedraw = 1;
     return "Letter color set";
 }
-char *changeLetterSize(char *commandParameters, char *mustRedraw)
+char *changeLetterSize(shell s, char *commandParameters, char *mustRedraw)
 {
     uint64_t newSize = atoi(commandParameters);
     if (newSize < 0 || newSize > MAX_LETTER_SIZE)
         return "Invalid letter size.";
     if (!newSize) // would be nice to actually handle doubles, however, no parseDouble function can be made (reasonably easily) if SSE registers cannot be used to return the value.
-        resize(0.5);
+        resize(s, 0.5);
     else
-        resize((double)newSize);
+        resize(s, (double)newSize);
     *mustRedraw = 1;
     return "Size set";
 }
-char *clearTheShell(char *commandParameters, char *mustRedraw)
+char *clearTheShell(shell s, char *commandParameters, char *mustRedraw)
 {
     uint64_t toClear;
     if ((toClear = atoi(commandParameters)))
     {
         *mustRedraw = 1;
-        warpNLines(toClear);
+        warpNLines(s, toClear);
     }
     else
-        clearShell();
+        clearShell(s);
     return "";
 }
-char *readMeTheDump(char *commandParameters, char *mustRedraw)
+char *readMeTheDump(shell s, char *commandParameters, char *mustRedraw)
 {
     char *c = getDumpString();
     if (strcmp(c, ""))
         return "No dump generated. Press 'alt' to generate a dump of the instant of pressing.";
     return sPrintf("The dump generated:\n%s", c);
 }
-char *playThePiano(char *commandParameters, char *mustRedraw)
+char *playThePiano(shell s, char *commandParameters, char *mustRedraw)
 {
     *mustRedraw = 1;
-    startPiano();
+    startPiano(s->p);
     return "Now exiting the yellow submarine.";
 }
-char *singToMe(char *commandParameters, char *mustRedraw)
+char *singToMe(shell s, char *commandParameters, char *mustRedraw)
 {
     char match = 0;
     if (strcmp(commandParameters, "imperial-march"))
@@ -231,21 +227,25 @@ char *singToMe(char *commandParameters, char *mustRedraw)
         return "Song is over. Now it's your turn.";
     return "Found no matching song.";
 }
-char *repeat(char *commandParameters, char *mustRedraw)
+char *repeat(shell s, char *commandParameters, char *mustRedraw)
 {
     return strcmp(commandParameters, "") ? " " : commandParameters;
 }
-void initializeCommands()
+commandSet initializeCommands()
 {
-    addCommand("help", "Help display for help module.\nFormat(s): 'help' | 'help' [MODULE_NAME]\nDisplays the help displays for all modules or the module specified.", getHelp);
-    addCommand("snake", "Help display for snake module.\nFormat(s): 'snake' | 'snake [PLAYERS]'\nStarts the snake module. If PLAYERS is greater than three, game will be initialized with three players. If no PLAYERS parameter is given, game will be initialized with one player. Players are controlled by 'wasd', 'ijkl', and 'v/spacebar b' key combinations.", startSnake);
-    addCommand("set-theme", "Help display for set theme module.\nFormat: 'set-theme [THEME]'\nSets the theme of the snake game to the specified theme.\nCurrently supported themes are:\nmario windows camelot creation pong idyllic", setSnakeTheme);
-    addCommand("set-size", "Help display for set size module.\nFormat: 'set-size [NUMBER]'\nSets the size of the shell to the specified integer. Maximum accepted size is 4, anything larger is illegible. Only positive integer sizes are accepted. Size 0 will set the size to 0.5", changeLetterSize);
-    addCommand("set-letter-color", "Help display for set letter color module.\nFormat: 'set-letter-color [HEX_COLOR]'\nSets the letter color of the shell to the specified integer.", changeLetterColor);
-    addCommand("set-highlight-color", "Help display for set highlight color.\nFormat: 'set-highlight-color [HEX_COLOR]'\nSets the highlight color of the shell to the specified integer.", changehighlightColor);
-    addCommand("clear", "Help display for clear module. \n Format(s): 'clear' | 'clear [LINES]'\nClears the shell or the number or shifts up the number of lines indicated.", clearTheShell);
-    addCommand("dump", "Help display for dump module.\n Format: 'dump'\nDisplays a dump if one has been generated by pressing the 'alt' key. Indicates no dump has been generated otherwise.", readMeTheDump);
-    addCommand("piano", "Help display for piano module.\nFormat: 'piano'\nStarts the piano module.\nPiano keys: z = Do, s = Do#, x = Re, d = Re#, c = mi, v = Fa, g = Fa#, b = Sol, h = Sol#, n = La, j = La#, m = Si", playThePiano);
-    addCommand("sing", "Help display for sing module.\nFormat: 'sing [SONG_NAME]'\nSings a song. Currently recognized songs are:\n'imperial-march' 'hes-a-pirate' 'outer-wilds' 'do-i-wanna-know' 'sports-center' 'here-comes-the-sun'.", singToMe);
-    addCommand("echo", "Help display for the echo module.\nFormat: 'echo [TO_ECHO]'\nIt repeats what you input.", repeat);
+    commandSet c;
+    c.commands = (command *)0;
+    c.commandCount = 0;
+    addCommand(c, "help", "Help display for help module.\nFormat(s): 'help' | 'help' [MODULE_NAME]\nDisplays the help displays for all modules or the module specified.", getHelp);
+    addCommand(c, "snake", "Help display for snake module.\nFormat(s): 'snake' | 'snake [PLAYERS]'\nStarts the snake module. If PLAYERS is greater than three, game will be initialized with three players. If no PLAYERS parameter is given, game will be initialized with one player. Players are controlled by 'wasd', 'ijkl', and 'v/spacebar b' key combinations.", startSnake);
+    addCommand(c, "set-theme", "Help display for set theme module.\nFormat: 'set-theme [THEME]'\nSets the theme of the snake game to the specified theme.\nCurrently supported themes are:\nmario windows camelot creation pong idyllic", setSnakeTheme);
+    addCommand(c, "set-size", "Help display for set size module.\nFormat: 'set-size [NUMBER]'\nSets the size of the shell to the specified integer. Maximum accepted size is 4, anything larger is illegible. Only positive integer sizes are accepted. Size 0 will set the size to 0.5", changeLetterSize);
+    addCommand(c, "set-letter-color", "Help display for set letter color module.\nFormat: 'set-letter-color [HEX_COLOR]'\nSets the letter color of the shell to the specified integer.", changeLetterColor);
+    addCommand(c, "set-highlight-color", "Help display for set highlight color.\nFormat: 'set-highlight-color [HEX_COLOR]'\nSets the highlight color of the shell to the specified integer.", changehighlightColor);
+    addCommand(c, "clear", "Help display for clear module. \n Format(s): 'clear' | 'clear [LINES]'\nClears the shell or the number or shifts up the number of lines indicated.", clearTheShell);
+    addCommand(c, "dump", "Help display for dump module.\n Format: 'dump'\nDisplays a dump if one has been generated by pressing the 'alt' key. Indicates no dump has been generated otherwise.", readMeTheDump);
+    addCommand(c, "piano", "Help display for piano module.\nFormat: 'piano'\nStarts the piano module.\nPiano keys: z = Do, s = Do#, x = Re, d = Re#, c = mi, v = Fa, g = Fa#, b = Sol, h = Sol#, n = La, j = La#, m = Si", playThePiano);
+    addCommand(c, "sing", "Help display for sing module.\nFormat: 'sing [SONG_NAME]'\nSings a song. Currently recognized songs are:\n'imperial-march' 'hes-a-pirate' 'outer-wilds' 'do-i-wanna-know' 'sports-center' 'here-comes-the-sun'.", singToMe);
+    addCommand(c, "echo", "Help display for the echo module.\nFormat: 'echo [TO_ECHO]'\nIt repeats what you input.", repeat);
+    return c;
 }

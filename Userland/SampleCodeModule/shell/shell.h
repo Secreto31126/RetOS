@@ -1,7 +1,6 @@
 #ifndef SHL_H
 #define SHL_H
 #include <stdint.h>
-#include "shell.h"
 #include "./../nstdlib/nstdlib.h"
 #include "./../window/window.h"
 #include "./../window/fontInterface.h"
@@ -13,9 +12,6 @@
 #include "./../piano/piano.h"
 
 #define MAX_COMMAND_LENGTH 90
-
-typedef shellData *shell;
-
 typedef struct shellData
 {
     painter p;
@@ -24,8 +20,22 @@ typedef struct shellData
     HexColor letterColor, highlightColor;
     char fromLastEnter;
 } shellData;
+typedef shellData *shell;
+typedef char *(*action_t)(shell, char *, char *);
 
-char shellStart(painter p);
+typedef struct command
+{
+    char *code;
+    char *help;
+    action_t action;
+} command;
+typedef struct commandSet
+{
+    command *commands;
+    int commandCount;
+} commandSet;
+
+char shellStart(painter p, commandSet comSet);
 void setHighlightColor(shell s, HexColor color);
 void setLetterColor(shell s, HexColor color);
 void resize(shell s, double size);

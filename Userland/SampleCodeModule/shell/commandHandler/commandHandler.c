@@ -32,7 +32,7 @@ char *handleCommand(shell s, commandSet c, char *command, char *mustRedraw)
     {
         if (isFirstWord(c.commands[i].code, command))
         {
-            return c.commands[i].action(s, shiftToWord(command + strlen(c.commands[i].code)), mustRedraw); // Passes rest of command (the parameters) to the defined action. Skips to next word in case there is whitespace between the command and its parameters. Action is responsible for confirming valid parameters.
+            return c.commands[i].action(s, c, shiftToWord(command + strlen(c.commands[i].code)), mustRedraw); // Passes rest of command (the parameters) to the defined action. Skips to next word in case there is whitespace between the command and its parameters. Action is responsible for confirming valid parameters.
         }
     }
     return "Command was not recognized";
@@ -63,7 +63,7 @@ char *getHelp(shell s, commandSet c, char *commandParameters, char *mustRedraw)
     return sPrintf("No help menu that matches '%s' was found.", commandParameters); // sPrintf automatically adds created string to list of strings to be freed by freePrints()
 }
 
-char *startSnake(shell s, char *commandParameters, char *mustRedraw)
+char *startSnake(shell s, commandSet c, char *commandParameters, char *mustRedraw)
 {
     char *formatString = "Player %d won. Returning to shell";
     int i;
@@ -80,7 +80,7 @@ char *startSnake(shell s, char *commandParameters, char *mustRedraw)
     return "Invalid snake parameter";
 }
 
-char *setSnakeTheme(shell s, char *commandParameters, char *mustRedraw)
+char *setSnakeTheme(shell s, commandSet c, char *commandParameters, char *mustRedraw)
 {
     char matchFlag = 0;
     if (strcmp(commandParameters, "windows"))
@@ -136,7 +136,7 @@ char *setSnakeTheme(shell s, char *commandParameters, char *mustRedraw)
     return sPrintf("No theme matching %s was found.", commandParameters);
 }
 
-char *changehighlightColor(shell s, char *commandParameters, char *mustRedraw)
+char *changehighlightColor(shell s, commandSet c, char *commandParameters, char *mustRedraw)
 {
     if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
         return "Hex value given not valid.";
@@ -165,7 +165,7 @@ char *changeLetterSize(shell s, char *commandParameters, char *mustRedraw)
     *mustRedraw = 1;
     return "Size set";
 }
-char *clearTheShell(shell s, char *commandParameters, char *mustRedraw)
+char *clearTheShell(shell s, commandSet c, char *commandParameters, char *mustRedraw)
 {
     uint64_t toClear;
     if ((toClear = atoi(commandParameters)))
@@ -177,20 +177,20 @@ char *clearTheShell(shell s, char *commandParameters, char *mustRedraw)
         clearShell(s);
     return "";
 }
-char *readMeTheDump(shell s, char *commandParameters, char *mustRedraw)
+char *readMeTheDump(shell s, commandSet c, char *commandParameters, char *mustRedraw)
 {
     char *c = getDumpString();
     if (strcmp(c, ""))
         return "No dump generated. Press 'alt' to generate a dump of the instant of pressing.";
     return sPrintf("The dump generated:\n%s", c);
 }
-char *playThePiano(shell s, char *commandParameters, char *mustRedraw)
+char *playThePiano(shell s, commandSet c, char *commandParameters, char *mustRedraw)
 {
     *mustRedraw = 1;
     startPiano(s->p);
     return "Now exiting the yellow submarine.";
 }
-char *singToMe(shell s, char *commandParameters, char *mustRedraw)
+char *singToMe(shell s, commandSet c, char *commandParameters, char *mustRedraw)
 {
     char match = 0;
     if (strcmp(commandParameters, "imperial-march"))
@@ -227,7 +227,7 @@ char *singToMe(shell s, char *commandParameters, char *mustRedraw)
         return "Song is over. Now it's your turn.";
     return "Found no matching song.";
 }
-char *repeat(shell s, char *commandParameters, char *mustRedraw)
+char *repeat(shell s, commandSet c, char *commandParameters, char *mustRedraw)
 {
     return strcmp(commandParameters, "") ? " " : commandParameters;
 }

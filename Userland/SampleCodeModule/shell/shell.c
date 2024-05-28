@@ -1,5 +1,4 @@
 #include "shell.h"
-#include "commandHandler/commandHandler.h"
 #define BLOCK 50
 #define MOVE_BY 8
 #define SHELL_INTRO "You are now in shell:\n"
@@ -121,7 +120,7 @@ void paintStringOrWarp(shell s, char *str, char ask)
                 paintString(s->p, s->buffer, s->letterColor, s->highlightColor);
                 drawStringAt(s->p, prompt, 0xFF000000, 0xFFFFFFFF, 0, 0);
                 getChar();
-                warpNLines(s->p, MOVE_BY);
+                warpNLines(s, MOVE_BY);
             } while (!willFit(s->p, s->buffer));
             blank(s->p);
             paintString(s->p, s->buffer, s->letterColor, s->highlightColor);

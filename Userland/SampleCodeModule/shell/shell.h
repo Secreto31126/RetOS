@@ -21,19 +21,19 @@ typedef struct shellData
     char fromLastEnter;
 } shellData;
 typedef shellData *shell;
-typedef char *(*action_t)(shell, char *, char *);
 
+typedef struct commandSet
+{
+    struct command *commands;
+    int commandCount;
+} commandSet;
+typedef char *(*action_t)(shell, commandSet, char *, char *);
 typedef struct command
 {
     char *code;
     char *help;
     action_t action;
 } command;
-typedef struct commandSet
-{
-    command *commands;
-    int commandCount;
-} commandSet;
 
 char shellStart(painter p, commandSet comSet);
 void setHighlightColor(shell s, HexColor color);

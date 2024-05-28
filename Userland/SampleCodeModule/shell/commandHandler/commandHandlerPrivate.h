@@ -22,6 +22,5 @@ typedef struct command
 } command;
 
 void addCommand(char *commandCode, char *help, char *(*action)(char *, char *));
-char *handleCommand(char *command, char *mustRedraw);
 
 #endif

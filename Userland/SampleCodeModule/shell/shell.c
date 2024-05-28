@@ -72,7 +72,7 @@ char shellStart()
                     addStringToBuffer(passCommand(commandBuffer), 1); // Nota: las instrucciones del TPE especifican que la shell debe moverse hacia arriba si se excede su espacio para texto.
                     freePrints();                                     // No se especifica el comportamiento esperado si el retorno de un 'comando' es mayor al espacio de la shell.
                     commandIndex = 0;                                 // El comportamiento default es simplemente no imprimir el retorno completo. Esto es lo que ocurre si a passCommand se le da parámetro 'ask' 0.
-                }                                                     // De lo contrario, se imprimirá moviendo hacia arriba de a MOVE_BY líneas, requiriendo input del usuario.
+                } // De lo contrario, se imprimirá moviendo hacia arriba de a MOVE_BY líneas, requiriendo input del usuario.
                 else
                 {
                     addCharToBuffer(c);
@@ -141,10 +141,23 @@ void paintCharOrWarp(char c)
         warpAndRedraw();
 }
 
+void readUntilClose(int fd)
+{
+
+    paintStringOrWarp((char *)lineStart, 0);
+}
+
 char *passCommand(char *toPass)
 {
     char mustRedraw = 0;
-    char *toPaint = handleCommand(toPass, &mustRedraw);
+    stringOrFd pair = handleCommand(toPass, &mustRedraw);
+    if (pair.s == NULL)
+    {
+        if (pair.fd > 0)
+            readUntilClose(pair.fd);
+        return "";
+    }
+    char *toPaint = pair.s;
 
     if (mustRedraw)
     {
@@ -205,7 +218,6 @@ void clearShell()
     commandBuffer[commandIndex] = 0;
     fromLastEnter = 0;
 }
-
 void warpNLines(uint64_t n) // char or char* you want to add must be in buffer already. This shortens the buffer from the start so that it fits, then repaints it.
 {
     if (!n)

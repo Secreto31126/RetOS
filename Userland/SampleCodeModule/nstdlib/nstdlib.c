@@ -49,60 +49,6 @@ void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize)
     return aux;
 }
 
-char *ultoa(unsigned long l, char *buffer, int radix)
-{
-    char *toRet = buffer;
-    while (l >= radix)
-    {
-        *buffer = (l % radix) + '0';
-        if (*buffer > '9')
-            *buffer += 'A' - '9' - 1;
-        buffer++;
-        l /= radix;
-    }
-
-    *buffer = l + '0';
-    if (*buffer > '9')
-        *buffer += 'A' - '9' - 1;
-    *(buffer + 1) = 0;
-    int halfLen = (buffer - toRet) / 2;
-    for (int i = 0; i <= halfLen; i++)
-    {
-        char aux = *(toRet + i);
-        *(toRet + i) = *(buffer - i);
-        *(buffer - i) = aux;
-    }
-    return toRet;
-}
-
-char *utoa(unsigned int n, char *buffer, int radix)
-{
-    return ultoa((unsigned long)n, buffer, radix);
-}
-
-char *itoa(int n, char *buffer, int radix)
-{
-    if (n < 0)
-    {
-        *buffer = '-';
-        buffer++;
-        n = -n;
-    }
-
-    return utoa((unsigned int)n, buffer, radix) - (n < 0);
-}
-
-uint64_t atoi(char *s)
-{
-    uint64_t ret = 0;
-    while (*s >= '0' && *s <= '9')
-    {
-        ret *= 10;
-        ret += *s - '0';
-        s++;
-    }
-    return ret;
-}
 uint64_t atoiHex(char *s)
 {
     char maxLength = 8; // max number of hex digits in a uint64_t
@@ -696,12 +642,4 @@ char *shiftToWord(char *s)
 char timeHasPassed(uint64_t start, uint64_t unit)
 {
     return (get_tick() - start) > unit;
-}
-void sleep(uint64_t ticks)
-{
-    uint64_t time = get_tick();
-    while (!timeHasPassed(time, ticks))
-    {
-        wait();
-    }
 }

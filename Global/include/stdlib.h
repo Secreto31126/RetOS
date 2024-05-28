@@ -23,6 +23,8 @@
 #define ISUPPER(c) ((c) >= 'A' && (c) <= 'Z')
 #define ISLOWER(c) ((c) >= 'a' && (c) <= 'z')
 
+#define NULL ((void *)0)
+
 char *itoa(int n, char *buffer, int radix);
 char *utoa(unsigned int n, char *buffer, int radix);
 char *ultoa(unsigned long l, char *buffer, int radix);

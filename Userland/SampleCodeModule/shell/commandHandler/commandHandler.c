@@ -27,19 +27,24 @@ void addCommand(char *commandCode, char *help, char *(*commandAction)(char *, ch
     commands[commandCount].help = help;
     commandCount++;
 }
-char *handleCommand(char *command, char *mustRedraw)
+stringOrFd handleCommand(char *command, char *mustRedraw)
 {
     command = shiftToWord(command);
-    if (strcmpHandleWhitespace(command, "") || strcmpHandleWhitespace(command, " ")) // if command is empty or whitespace, it is ignored
-        return "";
+    if (strcmpHandleWhitespace(command, "") || strcmpHandleWhitespace(command, " "))
+    { // if command is empty or whitespace, it is ignored
+        stringOrFd aux = {"", 0};
+        return aux;
+    }
     for (int i = 0; i < commandCount; i++)
     {
         if (isFirstWord(commands[i].code, command))
         {
-            return commands[i].action(shiftToWord(command + strlen(commands[i].code)), mustRedraw); // Passes rest of command (the parameters) to the defined action. Skips to next word in case there is whitespace between the command and its parameters. Action is responsible for confirming valid parameters.
+            stringOrFd aux = {commands[i].action(shiftToWord(command + strlen(commands[i].code)), mustRedraw), 0};
+            return aux; // Passes rest of command (the parameters) to the defined action. Skips to next word in case there is whitespace between the command and its parameters. Action is responsible for confirming valid parameters.
         }
     }
-    return "Command was not recognized";
+    stringOrFd aux = {"Command was not recognized", 0};
+    return aux;
 }
 // prints will be freed after calling this function. returned string is not freed.
 char *getHelp(char *commandParameters, char *mustRedraw)
@@ -99,7 +104,7 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
     {
         setBackgroundArray((char *)marioArray);
         setBackgroundColorMap((HexColor *)marioColorMap);
-        setSnakeDrawing(BIG_DRAW_SIZE, (char *)goomba, (char *)goomba, (char *)goomba, (char *)pipe, (char *)marioItem, (HexColor *)marioItemColorMap);
+        setSnakeDrawing(BIG_DRAW_SIZE, (char *)goomba, (char *)goomba, (char *)goomba, (char *)tube, (char *)marioItem, (HexColor *)marioItemColorMap);
         setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }

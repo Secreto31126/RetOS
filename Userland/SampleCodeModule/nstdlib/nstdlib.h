@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #define EOF -1
 
 // syscalls
@@ -16,13 +17,19 @@ extern void *malloc(uint64_t size);
 extern void free(void *ptr);
 extern void beep(uint32_t freq);
 extern void halt_user();
+extern void exit(int status);
+extern int get_pid();
+extern int execv(char *pathname, char *argv[]);
+extern int fork();
+extern void yield();
+extern int waitpid(int pid, int *wstatus, int options);
+extern void sleep(unsigned int seconds);
+extern int pipe(int pipefd[2]);
+extern int close(int fd);
+extern int dup2(int oldfd, int newfd);
 
 // library
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize);
-char *utoa(unsigned int n, char *buffer, int radix);
-char *itoa(int n, char *buffer, int radix);
-char *ultoa(uint64_t ll, char *buffer, int radix);
-uint64_t atoi(char *s);
 uint64_t atoiHex(char *s);
 char putChar(char c);
 char readChar();
@@ -53,6 +60,5 @@ char strcmpHandleWhitespace(char *s1, char *s2);
 char *shiftToWord(char *s);
 char *getDumpString();
 char timeHasPassed(uint64_t start, uint64_t unit);
-void sleep(uint64_t ticks);
 
 #endif

@@ -144,17 +144,22 @@ void paintCharOrWarp(char c)
 
 void readUntilClose(int fd)
 {
-    paintStringOrWarp("\n", 0);
-    char buffer[BLOCK];
+    addStringToBuffer("\n", 0);
+    char r_buffer[BLOCK];
     int n;
-    while (n = read_sys(fd, buffer, BLOCK - 1))
+    while (n = read_sys(fd, r_buffer, BLOCK - 1))
     {
-        buffer[n] = 0;
-        paintStringOrWarp(buffer, 0);
+        r_buffer[n] = 0;
+        for (int i = 0; i < n; i++)
+            if (r_buffer[i] < '0')
+                r_buffer[i] += '0';
+        addStringToBuffer(r_buffer, 0);
+        char c[2] = {n + '0', 0};
+        addStringToBuffer(&c, 0);
     }
     close(fd);
-    paintStringOrWarp("\n", 0);
-    paintStringOrWarp((char *)lineStart, 0);
+    addStringToBuffer("\n", 0);
+    addStringToBuffer((char *)lineStart, 0);
 }
 
 char *passCommand(char *toPass)
@@ -166,16 +171,16 @@ char *passCommand(char *toPass)
     {
         if (pair.fd >= 0)
         {
-            char buffer[10];
-            itoa(pair.fd, buffer, 10);
-            paintStringOrWarp("\n", 0);
-            paintStringOrWarp(buffer, 0);
+            char c_buffer[10];
+            itoa(pair.fd, c_buffer, 10);
+            addStringToBuffer("\n", 0);
+            addStringToBuffer(c_buffer, 0);
             readUntilClose(pair.fd);
         }
         else
         {
-            paintStringOrWarp("An invalid return was obtained from this command.\n", 0);
-            paintStringOrWarp(lineStart, 0);
+            addStringToBuffer("An invalid return was obtained from this command.\n", 0);
+            addStringToBuffer(lineStart, 0);
         }
         return "";
     }

@@ -1,5 +1,6 @@
 #include "shell.h"
 #include "commandHandler/commandHandler.h"
+#include <stdint.h>
 #define BLOCK 50
 #define MOVE_BY 8
 void warpNLines(uint64_t n);
@@ -143,7 +144,24 @@ void paintCharOrWarp(char c)
 
 void readUntilClose(int fd)
 {
-
+    paintStringOrWarp("\n", 0);
+    char buffer[BLOCK];
+    int n;
+    while (n = read_sys(fd, buffer, BLOCK - 1))
+    {
+        for (int i = 0; i < n; i++)
+        {
+            if (!buffer[i])
+            {
+                paintStringOrWarp("\n", 0);
+                paintStringOrWarp((char *)lineStart, 0);
+                return; // TODO Remove this loop when read actually works
+            }
+        }
+        buffer[n] = 0;
+        paintStringOrWarp(buffer, 0);
+    }
+    paintStringOrWarp("\n", 0);
     paintStringOrWarp((char *)lineStart, 0);
 }
 
@@ -155,6 +173,7 @@ char *passCommand(char *toPass)
     {
         if (pair.fd > 0)
             readUntilClose(pair.fd);
+        paintStringOrWarp(pair.fd + '0', 0);
         return "";
     }
     char *toPaint = pair.s;

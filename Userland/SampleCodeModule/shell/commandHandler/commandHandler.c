@@ -18,7 +18,7 @@ void freeCommands()
 {
     free(commands);
 }
-void addCommand(char *commandCode, char *help, char *(*commandAction)(char *, char *))
+void addCommand(char *commandCode, char *help, stringOrFd (*commandAction)(char *, char *))
 {
     if (!(commandCount % BLOCK))
         commands = realloc(commands, commandCount * sizeof(command), (commandCount + BLOCK) * sizeof(command));
@@ -39,15 +39,14 @@ stringOrFd handleCommand(char *command, char *mustRedraw)
     {
         if (isFirstWord(commands[i].code, command))
         {
-            stringOrFd aux = {commands[i].action(shiftToWord(command + strlen(commands[i].code)), mustRedraw), 0};
-            return aux; // Passes rest of command (the parameters) to the defined action. Skips to next word in case there is whitespace between the command and its parameters. Action is responsible for confirming valid parameters.
+            return commands[i].action(shiftToWord(command + strlen(commands[i].code)), mustRedraw); // Passes rest of command (the parameters) to the defined action. Skips to next word in case there is whitespace between the command and its parameters. Action is responsible for confirming valid parameters.
         }
     }
     stringOrFd aux = {"Command was not recognized", 0};
     return aux;
 }
 // prints will be freed after calling this function. returned string is not freed.
-char *getHelp(char *commandParameters, char *mustRedraw)
+stringOrFd getHelp(char *commandParameters, char *mustRedraw)
 {
     if (strcmpHandleWhitespace("", commandParameters)) // if the command is just 'help', all help menus are printed
     {
@@ -62,34 +61,42 @@ char *getHelp(char *commandParameters, char *mustRedraw)
             aux += concatFrom(aux, "\n\n");
         }
         addToAllocated(display);
-        return display;
+        stringOrFd toRet = {display, -1};
+        return toRet;
     }
     for (int i = 0; i < commandCount; i++) // otherwise, a single matching help menu is printed if it exists.
     {
         if (isFirstWord(commandParameters, commands[i].code))
-            return commands[i].help;
+        {
+            stringOrFd aux = {commands[i].help, 0};
+            return aux;
+        }
     }
-    return sPrintf("No help menu that matches '%s' was found.", commandParameters); // sPrintf automatically adds created string to list of strings to be freed by freePrints()
+    stringOrFd aux = {sPrintf("No help menu that matches '%s' was found.", commandParameters), -1}; // sPrintf automatically adds created string to list of strings to be freed by freePrints()
+    return aux;
 }
 
-char *startSnake(char *commandParameters, char *mustRedraw)
+stringOrFd startSnake(char *commandParameters, char *mustRedraw)
 {
     char *formatString = "Player %d won. Returning to shell";
     int i;
     if (strcmp("", commandParameters) || (i = atoi(commandParameters)) == 1)
     {
         *mustRedraw = 1;
-        return sPrintf(formatString, playSnake(1));
+        stringOrFd aux = {sPrintf(formatString, playSnake(1)), -1};
+        return aux;
     }
     if (i) // if 0, either input was 0 or invalid. Either way, input is not valid
     {
         *mustRedraw = 1;
-        return sPrintf(formatString, playSnake(i > 3 ? 3 : i)); // we support a third player, it is controlled with the spacebar
+        stringOrFd aux = {sPrintf(formatString, playSnake(i > 3 ? 3 : i)), -1}; // we support a third player, it is controlled with the spacebar
+        return aux;
     }
-    return "Invalid snake parameter";
+    stringOrFd aux = {"Invalid snake parameter", -1};
+    return aux;
 }
 
-char *setSnakeTheme(char *commandParameters, char *mustRedraw)
+stringOrFd setSnakeTheme(char *commandParameters, char *mustRedraw)
 {
     char matchFlag = 0;
     if (strcmp(commandParameters, "windows"))
@@ -141,40 +148,56 @@ char *setSnakeTheme(char *commandParameters, char *mustRedraw)
         matchFlag = 1;
     }
     if (matchFlag)
-        return "Theme set.";
-    return sPrintf("No theme matching %s was found.", commandParameters);
+    {
+        stringOrFd aux = {"Theme set." - 1};
+        return aux;
+    }
+    stringOrFd aux = {sPrintf("No theme matching %s was found.", commandParameters), -1};
+    return aux;
 }
 
-char *changehighlightColor(char *commandParameters, char *mustRedraw)
+stringOrFd changehighlightColor(char *commandParameters, char *mustRedraw)
 {
     if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
-        return "Hex value given not valid.";
+    {
+        stringOrFd aux = {"Hex value given not valid.", -1};
+        return aux;
+    }
     setHighlightColor(atoiHex(commandParameters)); // will read until an invalid character is found or 8 characters have been read. If an invalid character was found, what was read so far will be set as the color.
     *mustRedraw = 1;
-    return "Highlight color set.";
+    stringOrFd aux = {"Highlight color set", -1};
+    return aux;
 }
-char *changeLetterColor(char *commandParameters, char *mustRedraw)
+stringOrFd changeLetterColor(char *commandParameters, char *mustRedraw)
 {
     if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
-        return "Hex value given not valid.";
+    {
+        stringOrFd aux = {"Hex value given not valid.", -1};
+        return aux;
+    }
     // uint64_t hex = 0;
     setLetterColor(atoiHex(commandParameters));
     *mustRedraw = 1;
-    return "Letter color set";
+    stringOrFd aux = {"Letter color set", -1};
+    return aux;
 }
-char *changeLetterSize(char *commandParameters, char *mustRedraw)
+stringOrFd changeLetterSize(char *commandParameters, char *mustRedraw)
 {
     uint64_t newSize = atoi(commandParameters);
     if (newSize < 0 || newSize > MAX_LETTER_SIZE)
-        return "Invalid letter size.";
+    {
+        stringOrFd aux = {"Invalid letter size.", -1};
+        return aux;
+    }
     if (!newSize) // would be nice to actually handle doubles, however, no parseDouble function can be made (reasonably easily) if SSE registers cannot be used to return the value.
         resize(0.5);
     else
         resize((double)newSize);
     *mustRedraw = 1;
-    return "Size set";
+    stringOrFd aux = {"Size set", -1};
+    return aux;
 }
-char *clearTheShell(char *commandParameters, char *mustRedraw)
+stringOrFd clearTheShell(char *commandParameters, char *mustRedraw)
 {
     uint64_t toClear;
     if ((toClear = atoi(commandParameters)))
@@ -184,22 +207,28 @@ char *clearTheShell(char *commandParameters, char *mustRedraw)
     }
     else
         clearShell();
-    return "";
+    stringOrFd aux = {"", -1};
+    return aux;
 }
-char *readMeTheDump(char *commandParameters, char *mustRedraw)
+stringOrFd readMeTheDump(char *commandParameters, char *mustRedraw)
 {
     char *c = getDumpString();
     if (strcmp(c, ""))
-        return "No dump generated. Press 'alt' to generate a dump of the instant of pressing.";
-    return sPrintf("The dump generated:\n%s", c);
+    {
+        stringOrFd aux = {"No dump generated. Press 'alt' to generate a dump of the instant of pressing.", -1};
+        return aux;
+    }
+    stringOrFd aux = {sPrintf("The dump generated:\n%s", c), -1};
+    return aux;
 }
-char *playThePiano(char *commandParameters, char *mustRedraw)
+stringOrFd playThePiano(char *commandParameters, char *mustRedraw)
 {
     *mustRedraw = 1;
     startPiano();
-    return "Now exiting the yellow submarine.";
+    stringOrFd aux = {"Now exiting the yellow submarine.", -1};
+    return aux;
 }
-char *singToMe(char *commandParameters, char *mustRedraw)
+stringOrFd singToMe(char *commandParameters, char *mustRedraw)
 {
     char match = 0;
     if (strcmp(commandParameters, "imperial-march"))
@@ -233,13 +262,61 @@ char *singToMe(char *commandParameters, char *mustRedraw)
         match = 1;
     }
     if (match)
-        return "Song is over. Now it's your turn.";
-    return "Found no matching song.";
+    {
+        stringOrFd aux = {"Song is over. Now it's your turn.", -1};
+        return aux;
+    }
+    stringOrFd aux = {"Found no matching song.", -1};
+    return aux;
 }
-char *repeat(char *commandParameters, char *mustRedraw)
+stringOrFd repeat(char *commandParameters, char *mustRedraw)
 {
-    return strcmp(commandParameters, "") ? " " : commandParameters;
+    stringOrFd aux = {strcmp(commandParameters, "") ? " " : commandParameters, -1};
+    return aux;
 }
+
+stringOrFd testExec(char *commandParameters, char *mustRedraw)
+{
+    int pipeFd[2] = {0};
+    int err = pipe(pipeFd);
+    if (err)
+    {
+        stringOrFd aux = {"Could not create pipe", -1};
+        return aux;
+    }
+    err = fork();
+    if (err == -1)
+    {
+        stringOrFd aux = {"Could not execute command", -1};
+        return aux;
+    }
+    if (!err)
+    {
+        close(pipeFd[0]);
+        char *aux[2] = {commandParameters, NULL};
+        execv("moduleName", aux);
+
+        // TODO remove this loop once pipe works
+        for (int i = 0; i < 30; i++)
+        {
+            sleep(1);
+            print_sys(pipeFd[1], "ello", sizeof("ello") - 1);
+        }
+        print_sys(pipeFd[1], "esto", sizeof("esto"));
+
+        close(pipeFd[1]);
+        exit(1);
+    }
+    if (err)
+    {
+        close(pipeFd[1]);
+        stringOrFd aux = {NULL, pipeFd[0]};
+        return aux;
+    }
+    stringOrFd aux = {"How did we get here?", -1};
+    return aux;
+}
+
 void initializeCommands()
 {
     addCommand("help", "Help display for help module.\nFormat(s): 'help' | 'help' [MODULE_NAME]\nDisplays the help displays for all modules or the module specified.", getHelp);
@@ -253,4 +330,5 @@ void initializeCommands()
     addCommand("piano", "Help display for piano module.\nFormat: 'piano'\nStarts the piano module.\nPiano keys: z = Do, s = Do#, x = Re, d = Re#, c = mi, v = Fa, g = Fa#, b = Sol, h = Sol#, n = La, j = La#, m = Si", playThePiano);
     addCommand("sing", "Help display for sing module.\nFormat: 'sing [SONG_NAME]'\nSings a song. Currently recognized songs are:\n'imperial-march' 'hes-a-pirate' 'outer-wilds' 'do-i-wanna-know' 'sports-center' 'here-comes-the-sun'.", singToMe);
     addCommand("echo", "Help display for the echo module.\nFormat: 'echo [TO_ECHO]'\nIt repeats what you input.", repeat);
+    addCommand("test-e", "Help display for the test exec module.\n Format: 'test-e'\nTests exec.", testExec);
 }

@@ -18,9 +18,9 @@ typedef struct command
 {
     char *code;
     char *help;
-    char *(*action)(char *, char *);
+    stringOrFd (*action)(char *, char *);
 } command;
 
-void addCommand(char *commandCode, char *help, char *(*action)(char *, char *));
+void addCommand(char *commandCode, char *help, stringOrFd (*action)(char *, char *));
 
 #endif

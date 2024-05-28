@@ -12,7 +12,8 @@
 
 typedef struct Pipe
 {
-    int ends;
+    int read_ends;
+    int write_ends;
     void *data;
     void *read;
     void *write;

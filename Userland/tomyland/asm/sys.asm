@@ -129,7 +129,7 @@ pipe:
     ret
 
 ; int close(int fd);
-dup2:
+close:
     mov rax, 0x14
     int 80h
     ret

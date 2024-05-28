@@ -9,6 +9,7 @@
     global get_tick
     global get_dump
     global halt_user
+    global exit
 
 ; int read_sys(unsigned int fd, char *str, size_t len);
 read_sys:
@@ -72,5 +73,10 @@ get_dump:
 ; void halt_user();
 halt_user:
     mov rax, 0xA
+    int 80h
+    ret
+
+exit:
+    mov rax, 0xB
     int 80h
     ret

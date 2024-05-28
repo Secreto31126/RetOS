@@ -10,77 +10,79 @@ extern char endOfBinary;
 
 int main(int argc, char *argv[])
 {
-	char char_pid = get_pid() + '0';
-	for (int i = 0; i < argc; i++)
-	{
-		write(1, &char_pid, 1);
-		puts(": ");
-		puts(argv[i]);
-		puts("\n");
-	}
-
-	// int pid = fork();
-	// if (pid)
+	// char char_pid = get_pid() + '0';
+	// for (int i = 0; i < argc; i++)
 	// {
-	// 	while (1)
-	// 	{
-	// 		if (waitpid(-1, NULL, 0) < 0)
-	// 		{
-	// 			puts("Byeeeeee!\n");
-	// 			return 0;
-	// 		}
-	// 	}
+	// 	write(1, &char_pid, 1);
+	// 	puts(": ");
+	// 	puts(argv[i]);
+	// 	puts("\n");
 	// }
 
-	int child_pid = fork();
-	if (child_pid)
+	int pid = fork();
+	if (pid)
 	{
-		if (child_pid < 0)
-		{
-			puts("Error forking\n");
-			return 1;
-		}
-
-		// puts("My kid is alive\n");
 		while (1)
 		{
-			int status = 0;
-			int pid = waitpid(-1, &status, 0);
-
-			if (pid < 0)
+			if (waitpid(-1, NULL, 0) < 0)
 			{
-				puts("I ran out of kids to await...\n");
-				break;
+				return 0;
 			}
-
-			char p = pid + '0';
-			char s = status + '0';
-
-			puts("PID ");
-			write(1, &p, 1);
-			puts(" died with status ");
-			write(1, &s, 1);
-			puts("\n");
 		}
-
-		return 1;
 	}
 
-	int grandchild_pid = fork();
-	if (grandchild_pid)
-	{
-		if (grandchild_pid < 0)
-		{
-			puts("Error forking\n");
-			return 1;
-		}
-
-		puts("Hello, I'm the child, and I die inmediatelly\n");
-		return 0;
-	}
-
-	puts("Hello, I'm the child's child\n");
-	sleep(1);
-	puts("I slept 1 second today 💀\n");
+	execv("module", NULL);
 	return 1;
+
+	// int child_pid = fork();
+	// if (child_pid)
+	// {
+	// 	if (child_pid < 0)
+	// 	{
+	// 		puts("Error forking\n");
+	// 		return 1;
+	// 	}
+
+	// 	// puts("My kid is alive\n");
+	// 	while (1)
+	// 	{
+	// 		int status = 0;
+	// 		int pid = waitpid(-1, &status, 0);
+
+	// 		if (pid < 0)
+	// 		{
+	// 			puts("I ran out of kids to await...\n");
+	// 			break;
+	// 		}
+
+	// 		char p = pid + '0';
+	// 		char s = status + '0';
+
+	// 		puts("PID ");
+	// 		write(1, &p, 1);
+	// 		puts(" died with status ");
+	// 		write(1, &s, 1);
+	// 		puts("\n");
+	// 	}
+
+	// 	return 1;
+	// }
+
+	// int grandchild_pid = fork();
+	// if (grandchild_pid)
+	// {
+	// 	if (grandchild_pid < 0)
+	// 	{
+	// 		puts("Error forking\n");
+	// 		return 1;
+	// 	}
+
+	// 	puts("Hello, I'm the child, and I die inmediatelly\n");
+	// 	return 0;
+	// }
+
+	// puts("Hello, I'm the child's child\n");
+	// sleep(1);
+	// puts("I slept 1 second today 💀\n");
+	// return 1;
 }

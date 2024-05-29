@@ -1,6 +1,3 @@
 {
-    "editor.formatOnSave": true,
-    "files.associations": {
-        "commandhandler.h": "c"
-    }
+    "editor.formatOnSave": true
 }

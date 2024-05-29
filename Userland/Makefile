@@ -2,7 +2,7 @@ include Makefile.inc
 
 SAMPLE_DATA=0001-sampleDataModule.bin
 
-all: sampleCodeModule tomyland cat sampleDataModule
+all: sampleCodeModule tomyland cat wc sampleDataModule
 
 sampleCodeModule:
 	cd SampleCodeModule; make
@@ -13,6 +13,9 @@ tomyland:
 cat:
 	cd cat; make
 
+wc:
+	cd wc; make
+
 sampleDataModule:
 	whoami >> $(SAMPLE_DATA) && dd if=/dev/zero bs=1 count=1 >> $(SAMPLE_DATA)
 
@@ -20,7 +23,8 @@ clean:
 	cd SampleCodeModule; make clean
 	cd tomyland; make clean
 	cd cat; make clean
+	cd wc; make clean
 	rm -rf *.bin
 
 
-.PHONY: sampleCodeModule tomyland cat all clean
+.PHONY: sampleCodeModule tomyland cat wc all clean

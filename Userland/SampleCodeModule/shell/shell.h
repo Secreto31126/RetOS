@@ -21,5 +21,6 @@ void resize(double size);
 void warpNLines(uint64_t lines);
 void clearShell();
 void paintStringOrWarp(char *s, char ask);
+void addStringToBuffer(char *s, char ask);
 
 #endif

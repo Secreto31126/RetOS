@@ -301,11 +301,13 @@ stringOrFd testExec(char *commandParameters, char *mustRedraw)
         char *aux[2] = {commandParameters, NULL};
         // execv("moduleName", aux);
 
-        char c = pipeFd[1] + '0';
-        print_sys(pipeFd[1], &c, 1);
+        char c[] = {' ', 'w', 'r', 'i', 't', 'e', ':', pipeFd[1] + '0', ' ', 0};
+        addStringToBuffer(c, 0);
+        print_sys(pipeFd[1], c, 1);
         for (int i = 0; i < 6; i++)
         {
             yield();
+            addStringToBuffer("ello", 0);
             print_sys(pipeFd[1], "ello", sizeof("ello") - 1);
         }
 

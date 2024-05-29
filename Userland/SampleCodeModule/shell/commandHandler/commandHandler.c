@@ -62,8 +62,8 @@ stringOrFd getHelp(char *commandParameters, char *mustRedraw)
         char lineBreak[] = "\n\n";
         for (int i = 0; i < commandCount; i++)
         {
-            print_sys(pipeFd[1], commands[i].help, strlen(commands[i].help) + 1);
-            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
+            print_sys(pipeFd[1], commands[i].help, strlen(commands[i].help));
+            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak) - 1);
         }
         close(pipeFd[1]);
         return toRet;
@@ -168,7 +168,7 @@ stringOrFd setSnakeTheme(char *commandParameters, char *mustRedraw)
     }
     if (matchFlag)
     {
-        stringOrFd aux = {"Theme set." - 1};
+        stringOrFd aux = {"Theme set.", -1};
         return aux;
     }
     stringOrFd aux = {sPrintf("No theme matching %s was found.", commandParameters), -1};

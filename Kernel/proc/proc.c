@@ -213,10 +213,7 @@ int kill_process(pid_t pid)
 
     for (size_t i = 0; i < MAX_PROCESS_FILES; i++)
     {
-        if (man_im_dead->files[i] != -1)
-        {
-            close(man_im_dead->files[i]);
-        }
+        close(i);
     }
 
     /**
@@ -250,6 +247,12 @@ int kill_process(pid_t pid)
             }
         }
 
+        if (p->running_stack == man_im_dead->running_stack)
+        {
+            // If a process still needs the running stack to run (pseudo pagination), don't free it
+            free_running_stack = false;
+        }
+
         if (!p->next_brother)
         {
             Process *init = get_process(1);
@@ -277,10 +280,30 @@ int kill_process(pid_t pid)
 
     if (free_running_stack)
     {
-        free(man_im_dead->running_stack);
+        size_t count = active_processes_count;
+        for (size_t i = 0; i < MAX_PROCESS_FILES && count; i++)
+        {
+            Process *p = get_process(i);
+
+            if (p->pid != man_im_dead->pid && p->running_stack == man_im_dead->running_stack)
+            {
+                break;
+            }
+
+            if (p->running_stack)
+            {
+                count--;
+            }
+        }
+
+        if (!count)
+        {
+            free(man_im_dead->running_stack);
+        }
     }
 
     man_im_dead->state = PROCESS_ZOMBIE;
+    man_im_dead->running_stack = NULL;
     active_processes_count--;
 
     // ncPrint("Process ");
@@ -335,12 +358,14 @@ int dup2(int oldfd, int newfd)
 
     if (0 <= oldfd && oldfd < MAX_PROCESS_FILES && 0 <= newfd && newfd < MAX_PROCESS_FILES)
     {
-        if (p->files[oldfd] != -1)
-        {
-            close(p->files[newfd]);
-        }
+        close(newfd);
 
         p->files[newfd] = p->files[oldfd];
+        if (IS_PIPE(p->files[newfd]))
+        {
+            add_pipe_end(p->files[newfd]);
+        }
+
         return newfd;
     }
 

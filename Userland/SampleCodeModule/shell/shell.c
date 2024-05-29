@@ -147,7 +147,7 @@ void readUntilClose(int fd)
     addStringToBuffer("\n", 0);
     unsigned char r_buffer[BLOCK];
     int n;
-    while (n = read_sys(fd, r_buffer, BLOCK - 1))
+    while ((n = read_sys(fd, r_buffer, BLOCK - 1)) > 0)
     {
         r_buffer[n] = 0;
         addStringToBuffer(r_buffer, 0);

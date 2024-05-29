@@ -95,12 +95,12 @@ bool sleep_finished(pid_t pid)
     return false;
 }
 
-bool no_condition(pid_t pid)
-{
-    return true;
-}
-
 bool custom_condition(pid_t pid)
 {
     return get_process(pid)->condition_data[0];
+}
+
+bool no_condition(pid_t pid)
+{
+    return true;
 }

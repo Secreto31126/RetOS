@@ -23,12 +23,20 @@ size_t read(int fd, void *buffer, size_t count);
  */
 size_t write(int fd, const void *buffer, size_t count);
 /**
- * @brief Check if a file would block at reading
+ * @brief Check if a file is empty
  *
  * @param file The file to check
- * @return true it blocks
- * @return false it doesn't
+ * @return true it is
+ * @return false it isn't
  */
 bool file_empty(int file);
+/**
+ * @brief Check if a file is full
+ * 
+ * @param file The file to check
+ * @return true it is
+ * @return false it isn't
+ */
+bool file_full(int file);
 
 #endif

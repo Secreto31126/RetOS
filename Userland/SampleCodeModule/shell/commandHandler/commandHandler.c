@@ -49,13 +49,13 @@ stringOrFd handleCommand(char *command, char *mustRedraw)
 stringOrFd getHelp(char *commandParameters, char *mustRedraw)
 {
     int pipeFd[2];
-    stringOrFd willReturn = {NULL, -1};
+    stringOrFd toRet = {NULL, -1};
     if (pipe(pipeFd))
     {
-        willReturn.s = "Could not create pipe";
-        return willReturn;
+        toRet.s = "Could not create pipe";
+        return toRet;
     }
-    willReturn.fd = pipeFd[0];
+    toRet.fd = pipeFd[0];
     if (strcmpHandleWhitespace("", commandParameters)) // if the command is just 'help', all help menus are printed
     {
         for (int i = 0; i < commandCount; i++)
@@ -71,16 +71,18 @@ stringOrFd getHelp(char *commandParameters, char *mustRedraw)
             print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
         }
         close(pipeFd[1]);
-        return willReturn;
+        return toRet;
     }
     for (int i = 0; i < commandCount; i++) // otherwise, a single matching help menu is printed if it exists.
     {
         if (isFirstWord(commandParameters, commands[i].code))
         {
-            stringOrFd aux = {commands[i].help, 0};
-            return aux;
+            print_sys(pipeFd[1], commands[i].help, strlen(commands[i].help) + 1);
+            close(pipeFd[1]);
+            return toRet;
         }
     }
+    close(pipeFd[1]);
     stringOrFd aux = {sPrintf("No help menu that matches '%s' was found.", commandParameters), -1}; // sPrintf automatically adds created string to list of strings to be freed by freePrints()
     return aux;
 }

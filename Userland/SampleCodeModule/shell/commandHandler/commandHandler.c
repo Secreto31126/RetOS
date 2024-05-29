@@ -292,7 +292,7 @@ stringOrFd testExec(char *commandParameters, char *mustRedraw)
     int c_pid = fork();
     if (c_pid == -1)
     {
-        stringOrFd aux = {"Could not execute command", -1};
+        stringOrFd aux = {"Could not create new process", -1};
         return aux;
     }
     if (!c_pid)
@@ -305,7 +305,7 @@ stringOrFd testExec(char *commandParameters, char *mustRedraw)
         print_sys(pipeFd[1], &c, 1);
         for (int i = 0; i < 6; i++)
         {
-            sleep(1);
+            yield();
             print_sys(pipeFd[1], "ello", sizeof("ello") - 1);
         }
 

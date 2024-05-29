@@ -145,19 +145,20 @@ void paintCharOrWarp(char c)
 void readUntilClose(int fd)
 {
     addStringToBuffer("\n", 0);
-    char r_buffer[BLOCK];
+    unsigned char r_buffer[BLOCK];
     int n;
     while (n = read_sys(fd, r_buffer, BLOCK - 1))
     {
         r_buffer[n] = 0;
-        for (int i = 0; i < n; i++)
-            if (r_buffer[i] < '0')
-                r_buffer[i] += '0';
+        // for (int i = 0; i < n; i++)
+        //     if (r_buffer[i] < '0')
+        //         r_buffer[i] += '0';
         addStringToBuffer(r_buffer, 0);
         char c[2] = {n + '0', 0};
         addStringToBuffer(&c, 0);
     }
     close(fd);
+    waitpid(-1, NULL, 0);
     addStringToBuffer("\n", 0);
     addStringToBuffer((char *)lineStart, 0);
 }

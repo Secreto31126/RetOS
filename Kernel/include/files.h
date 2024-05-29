@@ -29,6 +29,6 @@ size_t write(int fd, const void *buffer, size_t count);
  * @return true it blocks
  * @return false it doesn't
  */
-bool would_block(int file);
+bool file_empty(int file);
 
 #endif

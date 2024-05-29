@@ -72,6 +72,14 @@ bool semaphore_raised(pid_t pid);
  */
 bool read_available(pid_t pid);
 /**
+ * @brief Await for a write to be available
+ *
+ * @param pid The process' pid
+ * @return true Condition met
+ * @return false Condition not met
+ */
+bool write_available(pid_t pid);
+/**
  * @brief Await for a sleep to finish
  *
  * @param pid The process' pid

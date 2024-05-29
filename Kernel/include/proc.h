@@ -226,6 +226,12 @@ unsigned int sleep(unsigned int ticks);
  * @param file The file descriptor to read wait for
  */
 void read_block(int file);
+/**
+ * @brief Add a write block to the current process
+ *
+ * @param file The file descriptor to write wait for
+ */
+void write_block(int file);
 
 /**
  * @brief Skip remaining CPU time and give it to the next process

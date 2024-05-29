@@ -157,3 +157,15 @@ bool pipe_empty(int file)
 
     return pipe.read == pipe.write;
 }
+
+bool pipe_full(int file)
+{
+    if (!(file & 1))
+    {
+        return false;
+    }
+
+    Pipe pipe = pipes[(file ^ O_PIPE) / 2];
+
+    return pipe.write == pipe.data + PIPE_SIZE;
+}

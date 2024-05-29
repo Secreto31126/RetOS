@@ -7,7 +7,7 @@ static FileEmpty empties[] = {
     stdkey_empty,
 };
 
-bool would_block(int file)
+bool file_empty(int file)
 {
     if (file < 4)
     {
@@ -16,6 +16,22 @@ bool would_block(int file)
     else if (IS_PIPE(file))
     {
         return pipe_empty(file);
+    }
+
+    return false;
+}
+
+bool file_full(int file)
+{
+    if (file < 4)
+    {
+        // Internal files are never filled,
+        // they overwrite old data if needed
+        return false;
+    }
+    else if (IS_PIPE(file))
+    {
+        return pipe_full(file);
     }
 
     return false;

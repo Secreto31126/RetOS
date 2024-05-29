@@ -49,9 +49,17 @@ int write_pipe(int file, const void *buf, size_t count);
  * @brief Wether or not a pipe has data to read
  *
  * @param file The pipe to check for
- * @return true The pipe would block
- * @return false The pipe would not block
+ * @return true The pipe is empty
+ * @return false The pipe is not empty
  */
 bool pipe_empty(int file);
+/**
+ * @brief Wether or not a pipe is full
+ *
+ * @param file The pipe to check for
+ * @return true The pipe is full
+ * @return false The pipe is not full
+ */
+bool pipe_full(int file);
 
 #endif

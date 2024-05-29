@@ -48,21 +48,23 @@ stringOrFd handleCommand(char *command, char *mustRedraw)
 // prints will be freed after calling this function. returned string is not freed.
 stringOrFd getHelp(char *commandParameters, char *mustRedraw)
 {
+    int pipeFd[2];
+    stringOrFd willReturn = {NULL, -1};
+    if (pipe(pipeFd))
+    {
+        willReturn.s = "Could not create pipe";
+        return willReturn;
+    }
+    willReturn.fd = pipeFd[0];
     if (strcmpHandleWhitespace("", commandParameters)) // if the command is just 'help', all help menus are printed
     {
-        uint64_t len = 0, i;
-        for (i = 0; i < commandCount; i++)
-            len += strlen(commands[i].help);
-        char *display = malloc((len + i * 2 + 1) * sizeof(char));
-        char *aux = display;
-        for (i = 0; i < commandCount; i++)
+        for (int i = 0; i < commandCount; i++)
         {
-            aux += concatFrom(aux, commands[i].help);
-            aux += concatFrom(aux, "\n\n");
+            print_sys(pipeFd[1], commands[i].help, strlen(commands[i].help) + 1);
+            print_sys(pipeFd[1], '\n', 1);
         }
-        addToAllocated(display);
-        stringOrFd toRet = {display, -1};
-        return toRet;
+        close(pipeFd[1]);
+        return willReturn;
     }
     for (int i = 0; i < commandCount; i++) // otherwise, a single matching help menu is printed if it exists.
     {

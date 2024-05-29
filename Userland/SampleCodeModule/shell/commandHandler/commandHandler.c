@@ -290,8 +290,18 @@ stringOrFd singToMe(char *commandParameters, char *mustRedraw)
 }
 stringOrFd repeat(char *commandParameters, char *mustRedraw)
 {
-    stringOrFd aux = {strcmp(commandParameters, "") ? " " : commandParameters, -1};
-    return aux;
+    int pipeFd[2];
+    stringOrFd toRet = {NULL, -1};
+    if (pipe(pipeFd))
+    {
+        toRet.s = "Could not create pipe";
+        return toRet;
+    }
+    toRet.fd = pipeFd[0];
+    char *aux = strcmp(commandParameters, "") ? " " : commandParameters;
+    print_sys(pipeFd[1], aux, strlen(aux) + 1);
+    close(pipeFd[1]);
+    return toRet;
 }
 
 stringOrFd testExec(char *commandParameters, char *mustRedraw)

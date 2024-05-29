@@ -56,17 +56,12 @@ stringOrFd getHelp(char *commandParameters, char *mustRedraw)
         return toRet;
     }
     toRet.fd = pipeFd[0];
+
     if (strcmpHandleWhitespace("", commandParameters)) // if the command is just 'help', all help menus are printed
     {
+        char lineBreak[] = "\n\n";
         for (int i = 0; i < commandCount; i++)
         {
-            char lineBreak[] = "\n\n";
-            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
-            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
-            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
-            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
-            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
-            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
             print_sys(pipeFd[1], commands[i].help, strlen(commands[i].help) + 1);
             print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
         }
@@ -89,22 +84,35 @@ stringOrFd getHelp(char *commandParameters, char *mustRedraw)
 
 stringOrFd startSnake(char *commandParameters, char *mustRedraw)
 {
+    int pipeFd[2];
+    stringOrFd toRet = {NULL, -1};
+    if (pipe(pipeFd))
+    {
+        toRet.s = "Could not create pipe";
+        return toRet;
+    }
+    toRet.fd = pipeFd[0];
+
     char *formatString = "Player %d won. Returning to shell";
     int i;
+    char *aux = NULL;
     if (strcmp("", commandParameters) || (i = atoi(commandParameters)) == 1)
     {
-        *mustRedraw = 1;
-        stringOrFd aux = {sPrintf(formatString, playSnake(1)), -1};
-        return aux;
+        char *aux = sPrintf(formatString, playSnake(1));
     }
     if (i) // if 0, either input was 0 or invalid. Either way, input is not valid
     {
-        *mustRedraw = 1;
-        stringOrFd aux = {sPrintf(formatString, playSnake(i > 3 ? 3 : i)), -1}; // we support a third player, it is controlled with the spacebar
-        return aux;
+        char *aux = sPrintf(formatString, playSnake(i > 3 ? 3 : i)); // we support a third player, it is controlled with the spacebar
     }
-    stringOrFd aux = {"Invalid snake parameter", -1};
-    return aux;
+    if (aux != NULL)
+    {
+        *mustRedraw = 1;
+        print_sys(pipeFd[1], aux, strlen(aux) + 1);
+        close(pipeFd[1]);
+        return toRet;
+    }
+    toRet.s = "Invalid snake parameter";
+    return toRet;
 }
 
 stringOrFd setSnakeTheme(char *commandParameters, char *mustRedraw)

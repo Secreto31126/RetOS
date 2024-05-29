@@ -90,7 +90,7 @@ int playSnake(uint16_t snakeCount)
                 setSize(size);
             }
             doMovement(c, snakeCount, snakes);
-            wait();
+            yield();
         }
         if (timeHasPassed(time, MOVE_INTERVAL))
         {

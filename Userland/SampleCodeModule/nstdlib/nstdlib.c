@@ -358,8 +358,7 @@ char readChar()
 char getChar()
 {
     char c;
-    while (!read_sys(0, &c, 1))
-        wait();
+    read_sys(0, &c, 1);
     return c;
 }
 

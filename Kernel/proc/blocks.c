@@ -77,3 +77,10 @@ void read_block(int file)
     add_blocked(p, read_available, NULL + file, NULL, NULL, NULL, NULL);
     yield();
 }
+
+void write_block(int file)
+{
+    Process *p = get_current_process();
+    add_blocked(p, write_available, NULL + file, NULL, NULL, NULL, NULL);
+    yield();
+}

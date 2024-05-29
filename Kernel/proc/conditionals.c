@@ -73,7 +73,14 @@ bool read_available(pid_t pid)
 {
     Process *p = get_process(pid);
     int file = (uintptr_t)p->condition_data[0];
-    return !would_block(file);
+    return !file_empty(file);
+}
+
+bool write_available(pid_t pid)
+{
+    Process *p = get_process(pid);
+    int file = (uintptr_t)p->condition_data[0];
+    return file_empty(file);
 }
 
 bool sleep_finished(pid_t pid)
@@ -86,6 +93,11 @@ bool sleep_finished(pid_t pid)
     }
 
     return false;
+}
+
+bool custom_condition(pid_t pid)
+{
+    return get_process(pid)->condition_data[0];
 }
 
 bool no_condition(pid_t pid)

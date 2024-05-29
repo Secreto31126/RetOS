@@ -60,8 +60,15 @@ stringOrFd getHelp(char *commandParameters, char *mustRedraw)
     {
         for (int i = 0; i < commandCount; i++)
         {
+            char lineBreak[] = "\n\n";
+            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
+            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
+            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
+            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
+            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
+            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
             print_sys(pipeFd[1], commands[i].help, strlen(commands[i].help) + 1);
-            print_sys(pipeFd[1], '\n', 1);
+            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak));
         }
         close(pipeFd[1]);
         return willReturn;

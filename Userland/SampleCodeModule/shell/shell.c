@@ -169,10 +169,6 @@ char *passCommand(char *toPass)
     {
         if (pair.fd >= 0)
         {
-            char c_buffer[10];
-            itoa(pair.fd, c_buffer, 10);
-            addStringToBuffer("\n", 0);
-            addStringToBuffer(c_buffer, 0);
             readUntilClose(pair.fd);
         }
         else

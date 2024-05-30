@@ -44,12 +44,13 @@ int main(int argc, char *argv[])
 	{
 		char str[50] = {0};
 		int n;
+		sleep(2);
 		while ((n = read(0, str, 50)) > 0)
 		{
 			write(1, str, n);
 		}
 		write(1, 0, 1);
-		sleep(3);
+		sleep(1);
 		exit(0);
 	}
 	else

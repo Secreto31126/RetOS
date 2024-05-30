@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
 			write(1, str, n);
 		}
 		write(1, 0, 1);
+		sleep(3);
 		exit(0);
 	}
 	else

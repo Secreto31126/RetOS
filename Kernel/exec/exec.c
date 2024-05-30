@@ -18,6 +18,21 @@ Executable executables[EXECUTABLES] = {
         .filename = "tomyland",
         .main = (EntryPoint)0x600000,
     },
+    {
+        .mod = 7,
+        .filename = "cat",
+        .main = (EntryPoint)0x700000,
+    },
+    {
+        .mod = 7,
+        .filename = "wc",
+        .main = (EntryPoint)0x800000,
+    },
+    {
+        .mod = 7,
+        .filename = "filter",
+        .main = (EntryPoint)0x900000,
+    },
 };
 
 int check_args(char *const argv[])

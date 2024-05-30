@@ -96,17 +96,17 @@ stringOrFd handleCommand(char *command, char *mustRedraw)
     }
 
     stringOrFd toPipe = {shiftToNextWord(command), -1}; // The first set of params I can hand over comes from the second word in my command string
-    int currentCommandStartIndex = 0;
+    char *currentCommandStart = command;
     for (int j = 0; command[j]; j++)
     {
         if (command[j] == '|')
         {
             command[j] = 0; // Cut off the string, so I do not hand other commands over to the executor
-            toPipe = wrapExecute(toPipe, command + currentCommandStartIndex, mustRedraw);
-            currentCommandStartIndex = shiftToWord(command + j + 1); // this is also safe, as '|' is not considered whitespace and would stop the shift, so j catches up
+            toPipe = wrapExecute(toPipe, currentCommandStart, mustRedraw);
+            currentCommandStart = shiftToWord(command + j + 1); // this is also safe, as '|' is not considered whitespace and would stop the shift, so j catches up
         }
     }
-    return wrapExecute(toPipe, command + currentCommandStartIndex, mustRedraw);
+    return wrapExecute(toPipe, currentCommandStart, mustRedraw);
 }
 
 stringOrFd getHelp(int commandFd, char *mustRedraw)

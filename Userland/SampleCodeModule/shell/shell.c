@@ -43,8 +43,6 @@ char shellStart()
         wait();
         if ((c = readChar()))
         {
-            if (c == ',')
-                c = '|';
             if (c == '\n' && strcmp(commandBuffer, "exit"))
             {
                 blank();

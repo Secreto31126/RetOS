@@ -7,6 +7,7 @@ extern char bss;
 extern char endOfBinary;
 
 #define puts(str) write(1, (str), strlen(str))
+static char flag = 0;
 
 int main(int argc, char *argv[])
 {
@@ -39,20 +40,35 @@ int main(int argc, char *argv[])
 	// execv("module", NULL);
 	// sleep(100);
 	// return 1;
-
-	int pid = fork();
-	if (pid)
+	if (flag)
 	{
-		while (1)
+		char str[50] = {0};
+		int n;
+		while ((n = read(0, str, 50)) > 0)
 		{
-			if (waitpid(-1, NULL, 0) < 0)
+			write(1, str, n);
+		}
+		write(1, 0, 1);
+		exit(0);
+	}
+	else
+	{
+		int pid = fork();
+		if (pid)
+		{
+			while (1)
 			{
-				return 0;
+				if (waitpid(-1, NULL, 0) < 0)
+				{
+					return 0;
+				}
 			}
 		}
-	}
 
-	execv("module", NULL);
+		flag = 1;
+		execv("module", NULL);
+		return 1;
+	}
 	return 1;
 
 	// char char_pid = get_pid() + '0';

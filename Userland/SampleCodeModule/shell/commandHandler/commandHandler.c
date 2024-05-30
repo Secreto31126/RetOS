@@ -10,15 +10,18 @@
 #include "./../../piano/sound.h"
 #define BLOCK 5
 #define MAX_LETTER_SIZE 4
+#define BLOCK 500 // Any command parameters that exceed this will be ignored. Just don't write commands exceeding 50 letters in terminal/don't feed longer than BLOCK letter input to shell built-ins
 
 static command *commands;
 static uint64_t commandCount = 0;
+
+char pipeAsChild(char *commandParameters);
 
 void freeCommands()
 {
     free(commands);
 }
-void addCommand(char *commandCode, char *help, stringOrFd (*commandAction)(char *, char *))
+void addCommand(char *commandCode, char *help, action_t commandAction)
 {
     if (!(commandCount % BLOCK))
         commands = realloc(commands, commandCount * sizeof(command), (commandCount + BLOCK) * sizeof(command));
@@ -27,27 +30,89 @@ void addCommand(char *commandCode, char *help, stringOrFd (*commandAction)(char 
     commands[commandCount].help = help;
     commandCount++;
 }
+
+stringOrFd handlePipe(stringOrFd params, char *mustRedraw, action_t action)
+{
+    stringOrFd toRet = {NULL, -1};
+    if (params.fd < 0)
+    { // If I don't receive an open read fd, then I use the parameters from the command I was given
+        int pipeFd[2];
+        if (pipe(pipeFd))
+        {
+            toRet.s = "Could not create pipe";
+            return toRet;
+        }
+        print_sys(pipeFd[WRITE_END], params.s, strlen(params.s));
+        close(pipeFd[WRITE_END]);
+        toRet = action(pipeFd[READ_END], mustRedraw);
+        close(pipeFd[READ_END]);
+        return toRet;
+    }
+    // I have been given an open read fd to hand it to a program. Either it does execv, in which case I close the fd, or it doesn't, in which case it has executed fully in this process and no longer needs the fd, so I close the fd
+    toRet = action(params.fd, mustRedraw);
+    return toRet;
+}
+
+stringOrFd execute(stringOrFd command, char *params, char *mustRedraw)
+{
+    for (int i = 0; i < commandCount; i++)
+    {
+        if (isFirstWord(commands[i].code, command.s))
+        {
+            command.s = params;
+            // line below makes it so that written params overrule piped params. Consider commenting it
+            command.fd = *command.s ? command.fd : -1;
+            return handlePipe(command, mustRedraw, commands[i].action);
+        }
+    }
+    stringOrFd aux = {"Command was not recognized", -1};
+    return aux;
+}
+
+stringOrFd wrapExecute(stringOrFd toPipe, char *command, char *mustRedraw)
+{
+    if (toPipe.s != NULL)
+    {
+        stringOrFd aux = {command, -1};
+        return execute(aux, shiftToNextWord(aux.s), mustRedraw);
+    }
+    else
+    { // I have an open read fd, I hand it over to the executor, and close it once it is no longer in use
+        stringOrFd aux = {command, toPipe.fd};
+        toPipe = execute(aux, shiftToNextWord(aux.s), mustRedraw);
+        close(aux.fd);
+        return toPipe;
+    }
+}
+
 stringOrFd handleCommand(char *command, char *mustRedraw)
 {
+
     command = shiftToWord(command);
     if (strcmpHandleWhitespace(command, "") || strcmpHandleWhitespace(command, " "))
     { // if command is empty or whitespace, it is ignored
-        stringOrFd aux = {"", 0};
+        stringOrFd aux = {"", -1};
         return aux;
     }
-    for (int i = 0; i < commandCount; i++)
+
+    stringOrFd toPipe = {shiftToNextWord(command), -1}; // The first set of params I can hand over comes from the second word in my command string
+    int currentCommandStartIndex = 0;
+    for (int j = 0; command[j]; j++)
     {
-        if (isFirstWord(commands[i].code, command))
+        if (command[j] == '|')
         {
-            return commands[i].action(shiftToWord(command + strlen(commands[i].code)), mustRedraw); // Passes rest of command (the parameters) to the defined action. Skips to next word in case there is whitespace between the command and its parameters. Action is responsible for confirming valid parameters.
+            command[j] = 0; // Cut off the string, so I do not hand other commands over to the executor
+            toPipe = wrapExecute(toPipe, command + currentCommandStartIndex, mustRedraw);
+            currentCommandStartIndex = shiftToWord(command + j + 1); // this is also safe, as '|' is not considered whitespace and would stop the shift, so j catches up
         }
     }
-    stringOrFd aux = {"Command was not recognized", 0};
-    return aux;
+    return wrapExecute(toPipe, command + currentCommandStartIndex, mustRedraw);
 }
-// prints will be freed after calling this function. returned string is not freed.
-stringOrFd getHelp(char *commandParameters, char *mustRedraw)
+
+stringOrFd getHelp(int commandFd, char *mustRedraw)
 {
+    char commandParameters[BLOCK];
+    commandParameters[readNFromFd(commandFd, commandParameters, BLOCK)] = 0;
     int pipeFd[2];
     stringOrFd toRet = {NULL, -1};
     if (pipe(pipeFd))
@@ -55,35 +120,37 @@ stringOrFd getHelp(char *commandParameters, char *mustRedraw)
         toRet.s = "Could not create pipe";
         return toRet;
     }
-    toRet.fd = pipeFd[0];
+    toRet.fd = pipeFd[READ_END];
 
     if (strcmpHandleWhitespace("", commandParameters)) // if the command is just 'help', all help menus are printed
     {
         char lineBreak[] = "\n\n";
         for (int i = 0; i < commandCount; i++)
         {
-            print_sys(pipeFd[1], commands[i].help, strlen(commands[i].help));
-            print_sys(pipeFd[1], lineBreak, sizeof(lineBreak) - 1);
+            print_sys(pipeFd[WRITE_END], commands[i].help, strlen(commands[i].help));
+            print_sys(pipeFd[WRITE_END], lineBreak, sizeof(lineBreak) - 1);
         }
-        close(pipeFd[1]);
+        close(pipeFd[WRITE_END]);
         return toRet;
     }
     for (int i = 0; i < commandCount; i++) // otherwise, a single matching help menu is printed if it exists.
     {
         if (isFirstWord(commandParameters, commands[i].code))
         {
-            print_sys(pipeFd[1], commands[i].help, strlen(commands[i].help) + 1);
-            close(pipeFd[1]);
+            print_sys(pipeFd[WRITE_END], commands[i].help, strlen(commands[i].help) + 1);
+            close(pipeFd[WRITE_END]);
             return toRet;
         }
     }
-    close(pipeFd[1]);
+    close(pipeFd[WRITE_END]);
     stringOrFd aux = {sPrintf("No help menu that matches '%s' was found.", commandParameters), -1}; // sPrintf automatically adds created string to list of strings to be freed by freePrints()
     return aux;
 }
 
-stringOrFd startSnake(char *commandParameters, char *mustRedraw)
+stringOrFd startSnake(int commandFd, char *mustRedraw)
 {
+    char commandParameters[BLOCK];
+    commandParameters[readNFromFd(commandFd, commandParameters, BLOCK)] = 0;
     int pipeFd[2];
     stringOrFd toRet = {NULL, -1};
     if (pipe(pipeFd))
@@ -91,7 +158,7 @@ stringOrFd startSnake(char *commandParameters, char *mustRedraw)
         toRet.s = "Could not create pipe";
         return toRet;
     }
-    toRet.fd = pipeFd[0];
+    toRet.fd = pipeFd[READ_END];
 
     char *formatString = "Player %d won. Returning to shell";
     int i;
@@ -107,16 +174,18 @@ stringOrFd startSnake(char *commandParameters, char *mustRedraw)
     if (aux != NULL)
     {
         *mustRedraw = 1;
-        print_sys(pipeFd[1], aux, strlen(aux) + 1);
-        close(pipeFd[1]);
+        print_sys(pipeFd[WRITE_END], aux, strlen(aux) + 1);
+        close(pipeFd[WRITE_END]);
         return toRet;
     }
     toRet.s = "Invalid snake parameter";
     return toRet;
 }
 
-stringOrFd setSnakeTheme(char *commandParameters, char *mustRedraw)
+stringOrFd setSnakeTheme(int commandFd, char *mustRedraw)
 {
+    char commandParameters[BLOCK];
+    commandParameters[readNFromFd(commandFd, commandParameters, BLOCK)] = 0;
     char matchFlag = 0;
     if (strcmp(commandParameters, "windows"))
     {
@@ -175,8 +244,10 @@ stringOrFd setSnakeTheme(char *commandParameters, char *mustRedraw)
     return aux;
 }
 
-stringOrFd changehighlightColor(char *commandParameters, char *mustRedraw)
+stringOrFd changehighlightColor(int commandFd, char *mustRedraw)
 {
+    char commandParameters[BLOCK];
+    commandParameters[readNFromFd(commandFd, commandParameters, BLOCK)] = 0;
     if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
     {
         stringOrFd aux = {"Hex value given not valid.", -1};
@@ -187,8 +258,10 @@ stringOrFd changehighlightColor(char *commandParameters, char *mustRedraw)
     stringOrFd aux = {"Highlight color set", -1};
     return aux;
 }
-stringOrFd changeLetterColor(char *commandParameters, char *mustRedraw)
+stringOrFd changeLetterColor(int commandFd, char *mustRedraw)
 {
+    char commandParameters[BLOCK];
+    commandParameters[readNFromFd(commandFd, commandParameters, BLOCK)] = 0;
     if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
     {
         stringOrFd aux = {"Hex value given not valid.", -1};
@@ -200,8 +273,10 @@ stringOrFd changeLetterColor(char *commandParameters, char *mustRedraw)
     stringOrFd aux = {"Letter color set", -1};
     return aux;
 }
-stringOrFd changeLetterSize(char *commandParameters, char *mustRedraw)
+stringOrFd changeLetterSize(int commandFd, char *mustRedraw)
 {
+    char commandParameters[BLOCK];
+    commandParameters[readNFromFd(commandFd, commandParameters, BLOCK)] = 0;
     uint64_t newSize = atoi(commandParameters);
     if (newSize < 0 || newSize > MAX_LETTER_SIZE)
     {
@@ -216,8 +291,10 @@ stringOrFd changeLetterSize(char *commandParameters, char *mustRedraw)
     stringOrFd aux = {"Size set", -1};
     return aux;
 }
-stringOrFd clearTheShell(char *commandParameters, char *mustRedraw)
+stringOrFd clearTheShell(int commandFd, char *mustRedraw)
 {
+    char commandParameters[BLOCK];
+    commandParameters[readNFromFd(commandFd, commandParameters, BLOCK)] = 0;
     uint64_t toClear;
     if ((toClear = atoi(commandParameters)))
     {
@@ -229,7 +306,7 @@ stringOrFd clearTheShell(char *commandParameters, char *mustRedraw)
     stringOrFd aux = {"", -1};
     return aux;
 }
-stringOrFd readMeTheDump(char *commandParameters, char *mustRedraw)
+stringOrFd readMeTheDump(int commandFd, char *mustRedraw)
 {
     char *c = getDumpString();
     if (strcmp(c, ""))
@@ -240,15 +317,19 @@ stringOrFd readMeTheDump(char *commandParameters, char *mustRedraw)
     stringOrFd aux = {sPrintf("The dump generated:\n%s", c), -1};
     return aux;
 }
-stringOrFd playThePiano(char *commandParameters, char *mustRedraw)
+stringOrFd playThePiano(int commandFd, char *mustRedraw)
 {
+    char commandParameters[BLOCK];
+    commandParameters[readNFromFd(commandFd, commandParameters, BLOCK)] = 0;
     *mustRedraw = 1;
     startPiano();
     stringOrFd aux = {"Now exiting the yellow submarine.", -1};
     return aux;
 }
-stringOrFd singToMe(char *commandParameters, char *mustRedraw)
+stringOrFd singToMe(int commandFd, char *mustRedraw)
 {
+    char commandParameters[BLOCK];
+    commandParameters[readNFromFd(commandFd, commandParameters, BLOCK)] = 0;
     char match = 0;
     if (strcmp(commandParameters, "imperial-march"))
     {
@@ -288,8 +369,10 @@ stringOrFd singToMe(char *commandParameters, char *mustRedraw)
     stringOrFd aux = {"Found no matching song.", -1};
     return aux;
 }
-stringOrFd repeat(char *commandParameters, char *mustRedraw)
+stringOrFd repeat(int commandFd, char *mustRedraw)
 {
+    char commandParameters[BLOCK];
+    commandParameters[readNFromFd(commandFd, commandParameters, BLOCK)] = 0;
     int pipeFd[2];
     stringOrFd toRet = {NULL, -1};
     if (pipe(pipeFd))
@@ -297,18 +380,18 @@ stringOrFd repeat(char *commandParameters, char *mustRedraw)
         toRet.s = "Could not create pipe";
         return toRet;
     }
-    toRet.fd = pipeFd[0];
+    toRet.fd = pipeFd[READ_END];
     char *aux = strcmp(commandParameters, "") ? " " : commandParameters;
-    print_sys(pipeFd[1], aux, strlen(aux) + 1);
-    close(pipeFd[1]);
+    print_sys(pipeFd[WRITE_END], aux, strlen(aux) + 1);
+    close(pipeFd[WRITE_END]);
     return toRet;
 }
 
-stringOrFd testExec(char *commandParameters, char *mustRedraw)
+stringOrFd testExec(int commandFd, char *mustRedraw)
 {
     int pipeFd[2] = {0};
     int err = pipe(pipeFd);
-    if (pipeFd[0] < 0 || pipeFd[1] < 0)
+    if (pipeFd[READ_END] < 0 || pipeFd[WRITE_END] < 0)
     {
         stringOrFd aux = {"Pipe fds were invalid", -1};
         return aux;
@@ -326,23 +409,29 @@ stringOrFd testExec(char *commandParameters, char *mustRedraw)
     }
     if (!c_pid)
     {
-        close(pipeFd[0]);
-        char *aux[2] = {commandParameters, NULL};
-        // execv("moduleName", aux);
+        // I am the child process
+
+        // close the read end of the pipe
+        close(pipeFd[READ_END]);
+        // redirect stdout to the write end of the pipe
+        dup2(pipeFd[WRITE_END], 1);
+        dup2(commandFd, 0);
+        execv("tomyland", NULL);
 
         for (int i = 0; i < 6; i++)
         {
             yield();
-            print_sys(pipeFd[1], "ello", sizeof("ello") - 1);
+            print_sys(pipeFd[WRITE_END], "ello", sizeof("ello") - 1);
         }
 
-        close(pipeFd[1]);
+        close(pipeFd[WRITE_END]);
         exit(1);
     }
     if (c_pid)
     {
-        close(pipeFd[1]);
-        stringOrFd aux = {NULL, pipeFd[0]};
+        // I am the parent process
+        close(pipeFd[WRITE_END]);
+        stringOrFd aux = {NULL, pipeFd[READ_END]};
         return aux;
     }
     stringOrFd aux = {"How did we get here?", -1};

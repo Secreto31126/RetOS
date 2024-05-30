@@ -14,13 +14,14 @@
  * exit
  * help .
  */
+typedef stringOrFd (*action_t)(int, char *);
 typedef struct command
 {
     char *code;
     char *help;
-    stringOrFd (*action)(char *, char *);
+    action_t action;
 } command;
 
-void addCommand(char *commandCode, char *help, stringOrFd (*action)(char *, char *));
+void addCommand(char *commandCode, char *help, action_t action);
 
 #endif

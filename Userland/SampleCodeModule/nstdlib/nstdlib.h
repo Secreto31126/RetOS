@@ -58,6 +58,8 @@ uint64_t concatFrom(char *sEnd, char *sAdd);
 void addToAllocated(char *address);
 char strcmpHandleWhitespace(char *s1, char *s2);
 char *shiftToWord(char *s);
+char *shiftToNextWord(char *s);
+int readNFromFd(int fd, char *buffer, int n);
 char *getDumpString();
 char timeHasPassed(uint64_t start, uint64_t unit);
 

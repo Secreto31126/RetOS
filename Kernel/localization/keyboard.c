@@ -59,7 +59,7 @@ static uint16_t const spanish_keyboard_layout[][3] = {
     {'l', 'L'},
     {'ñ', 'Ñ'},
     {'{', '[', '^'},
-    {0}, // IDK
+    {'|', '°', '¬'},
     {0}, // LShift
     {'}', ']', '`'},
     {'z', 'Z'},
@@ -140,7 +140,7 @@ static uint16_t const english_keyboard_layout[][3] = {
     {'l', 'L'},
     {'ñ', 'Ñ'},
     {'{', '['},
-    {0}, // IDK
+    {'|', '°', '¬'},
     {0}, // LShift
     {'}', ']', '`'},
     {'z', 'Z'},

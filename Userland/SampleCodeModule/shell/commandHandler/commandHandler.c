@@ -458,6 +458,6 @@ void initializeCommands()
     addCommand("sing", "Help display for sing module.\nFormat: 'sing [SONG_NAME]'\nSings a song. Currently recognized songs are:\n'imperial-march' 'hes-a-pirate' 'outer-wilds' 'do-i-wanna-know' 'sports-center' 'here-comes-the-sun'.", singToMe);
     addCommand("echo", "Help display for the echo module.\nFormat: 'echo [TO_ECHO]'\nIt repeats what you input.", repeat);
     addCommand("cat", "Help display for the cat module.\n Format(s): 'cat [text] | cat [fd]'\nEchoes given text or outputs content of fd received via pipe.", cat);
-    addCommand("wc", "Help display for the cat module.\n Format: 'wc [text or fd] | cat [fd]'\nOutputs the number of lines in the given input.", wc);
-    addCommand("filter", "Help display for the cat module.\n Format: 'filter [text or fd] | cat [fd]'\nEchoes given input, vowels removed.", filter);
+    addCommand("wc", "Help display for the wc module.\n Format: 'wc [text or fd] | cat [fd]'\nOutputs the number of lines in the given input.", wc);
+    addCommand("filter", "Help display for the filter module.\n Format: 'filter [text or fd] | cat [fd]'\nEchoes given input, vowels removed.", filter);
 }

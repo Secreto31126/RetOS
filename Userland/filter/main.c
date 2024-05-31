@@ -34,17 +34,18 @@ int main(int argc, char *argv[])
 {
 	char str[BLOCK] = {0};
 	int n;
-	while ((n = read(STD_OUT, str, BLOCK)) > 0)
+	while ((n = read(STD_IN, str, BLOCK)) > 0)
 	{
 		int removed = 0;
-		for (int i = 0, removed = 0; i < n; i++)
+		for (int i = 0; i < n; i++)
 		{
 			str[i - removed] = str[i];
 			if (isVowel(str[i]))
 				removed++;
 		}
-		write(STD_OUT, str, n - removed);
+		write(STD_OUT, str, n - removed - 1);
 	}
-	write(STD_OUT, 0, 1);
+	char c = 0;
+	write(STD_OUT, &c, 1);
 	return 0; // Exit handled outside
 }

@@ -303,9 +303,6 @@ stringOrFd readMeTheDump(stringOrFd commandFd, char *mustRedraw)
 }
 stringOrFd playThePiano(stringOrFd commandFd, char *mustRedraw)
 {
-    char savedSpace[READ_BLOCK];
-    char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
-
     *mustRedraw = 1;
     startPiano();
     stringOrFd aux = {"Now exiting the yellow submarine.", -1};

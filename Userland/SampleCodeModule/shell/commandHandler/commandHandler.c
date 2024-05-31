@@ -32,29 +32,6 @@ void addCommand(char *commandCode, char *help, action_t commandAction)
     commandCount++;
 }
 
-stringOrFd handlePipe(stringOrFd params, char *mustRedraw, action_t action)
-{
-    stringOrFd toRet = {NULL, -1};
-    if (params.fd < 0)
-    { // If I don't receive an open read fd, then I use the parameters from the command I was given
-        int pipeFd[2];
-        if (pipe(pipeFd))
-        {
-            toRet.s = "Could not create pipe";
-            return toRet;
-        }
-        print_sys(pipeFd[WRITE_END], params.s, strlen(params.s));
-        close(pipeFd[WRITE_END]);
-        params.fd = pipeFd[READ_END];
-        toRet = action(params, mustRedraw);
-        close(pipeFd[READ_END]);
-        return toRet;
-    }
-    // I have been given an open read fd to hand it to a program. Either it does execv, in which case I close the fd, or it doesn't, in which case it has executed fully in this process and no longer needs the fd, so I close the fd
-    toRet = action(params, mustRedraw);
-    return toRet;
-}
-
 stringOrFd execute(stringOrFd command, char *params, char *mustRedraw)
 {
     for (int i = 0; i < commandCount; i++)
@@ -62,7 +39,7 @@ stringOrFd execute(stringOrFd command, char *params, char *mustRedraw)
         if (isFirstWord(commands[i].code, command.s))
         {
             command.s = params;
-            return handlePipe(command, mustRedraw, commands[i].action);
+            return commands[i].action(command, mustRedraw);
         }
     }
     stringOrFd aux = {"Command was not recognized", -1};
@@ -426,21 +403,35 @@ stringOrFd pipeAndExec(char *moduleName, char *params, int readFd)
         // close the read end of the pipe
         close(pipeFd[READ_END]);
         // redirect stdout to the write end of the pipe
-        if (dup2(pipeFd[WRITE_END], 1) < 0 || dup2(readFd, 0) < 0)
+        if (dup2(pipeFd[WRITE_END], 1) < 0)
         {
             stringOrFd aux = {"Could not dup2", -1};
             return aux;
+        }
+        if (readFd > 0)
+        {
+            if (dup2(readFd, 0) < 0)
+            {
+                stringOrFd aux = {"Could not dup2", -1};
+                return aux;
+            }
+        }
+        else
+        {
+            close(STD_IN);
         }
 
         // whoosh
         if (params == NULL || !*params)
         {
+            paintStringOrWarp("Here", 0);
             execv(moduleName, NULL);
         }
         else
         {
             char *args[MAX_ARGS];
             separateString(params, args, MAX_ARGS);
+            paintStringOrWarp("Here D:", 0);
             execv(moduleName, args);
         }
 

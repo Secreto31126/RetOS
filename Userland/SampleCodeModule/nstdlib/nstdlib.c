@@ -659,3 +659,17 @@ char timeHasPassed(uint64_t start, uint64_t unit)
 {
     return (get_tick() - start) > unit;
 }
+int separateString(char *s, char **buffer, int bufferSize)
+{
+    if (bufferSize == 0)
+        return 0;
+    int i = 0;
+    while (*s && i < bufferSize - 1)
+    {
+        buffer[i++] = s;
+        s = shiftToNextWord(s);
+        if (*s)
+            *(s - 1) = 0;
+    }
+    buffer[i] = (char *)NULL;
+}

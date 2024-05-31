@@ -11,6 +11,7 @@
 #define BLOCK 5
 #define MAX_LETTER_SIZE 4
 #define READ_BLOCK 500 // Any command parameters that exceed this will be ignored. Just don't write commands exceeding 50 letters in terminal/don't feed longer than BLOCK letter input to shell built-ins
+#define MAX_ARGS 255   // for execv
 
 static command *commands;
 static uint64_t commandCount = 0;
@@ -44,12 +45,13 @@ stringOrFd handlePipe(stringOrFd params, char *mustRedraw, action_t action)
         }
         print_sys(pipeFd[WRITE_END], params.s, strlen(params.s));
         close(pipeFd[WRITE_END]);
-        toRet = action(pipeFd[READ_END], mustRedraw);
+        params.fd = pipeFd[READ_END];
+        toRet = action(params, mustRedraw);
         close(pipeFd[READ_END]);
         return toRet;
     }
     // I have been given an open read fd to hand it to a program. Either it does execv, in which case I close the fd, or it doesn't, in which case it has executed fully in this process and no longer needs the fd, so I close the fd
-    toRet = action(params.fd, mustRedraw);
+    toRet = action(params, mustRedraw);
     return toRet;
 }
 
@@ -61,7 +63,7 @@ stringOrFd execute(stringOrFd command, char *params, char *mustRedraw)
         {
             command.s = params;
             // line below makes it so that written params overrule piped params. Consider commenting it
-            command.fd = *command.s ? -1 : command.fd;
+            // command.fd = *command.s ? -1 : command.fd;
             return handlePipe(command, mustRedraw, commands[i].action);
         }
     }
@@ -387,7 +389,7 @@ stringOrFd repeat(int commandFd, char *mustRedraw)
     return toRet;
 }
 
-stringOrFd pipeAndExec(char *moduleName, int readFd)
+stringOrFd pipeAndExec(char *moduleName, char *params, int readFd)
 {
     int pipeFd[2] = {0};
     if (pipe(pipeFd))
@@ -415,7 +417,16 @@ stringOrFd pipeAndExec(char *moduleName, int readFd)
         }
 
         // whoosh
-        execv(moduleName, NULL);
+        if (params == NULL || !*params)
+        {
+            execv(moduleName, NULL);
+        }
+        else
+        {
+            char *args[MAX_ARGS];
+            separateString(params, args, MAX_ARGS);
+            execv(moduleName, args);
+        }
 
         stringOrFd aux = {"Could not execv", -1};
         return aux;
@@ -431,17 +442,17 @@ stringOrFd pipeAndExec(char *moduleName, int readFd)
     return aux;
 }
 
-stringOrFd cat(int commandFd, char *mustRedraw)
+stringOrFd cat(stringOrFd commandFd, char *mustRedraw)
 {
-    return pipeAndExec("cat", commandFd);
+    return pipeAndExec("cat", commandFd.s, commandFd.fd);
 }
-stringOrFd wc(int commandFd, char *mustRedraw)
+stringOrFd wc(stringOrFd commandFd, char *mustRedraw)
 {
-    return pipeAndExec("wc", commandFd);
+    return pipeAndExec("wc", commandFd.s, commandFd.fd);
 }
-stringOrFd filter(int commandFd, char *mustRedraw)
+stringOrFd filter(stringOrFd commandFd, char *mustRedraw)
 {
-    return pipeAndExec("filter", commandFd);
+    return pipeAndExec("filter", commandFd.s, commandFd.fd);
 }
 
 void initializeCommands()

@@ -14,7 +14,7 @@
  * exit
  * help .
  */
-typedef stringOrFd (*action_t)(int, char *);
+typedef stringOrFd (*action_t)(stringOrFd, char *);
 typedef struct command
 {
     char *code;

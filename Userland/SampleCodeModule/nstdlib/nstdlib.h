@@ -62,5 +62,6 @@ char *shiftToNextWord(char *s);
 int readNFromFd(int fd, char *buffer, int n);
 char *getDumpString();
 char timeHasPassed(uint64_t start, uint64_t unit);
+int separateString(char *s, char **buffer, int bufferSize);
 
 #endif

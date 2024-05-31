@@ -56,7 +56,6 @@ int main(int argc, char *argv[])
 
 	execv("module", NULL);
 	return 1;
-	return 1;
 
 	// char char_pid = get_pid() + '0';
 	// for (int i = 0; i < argc; i++)

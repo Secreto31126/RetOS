@@ -12,7 +12,7 @@
 #include "./../snake/drawings/snakeDrawings.h"
 #include "./../piano/piano.h"
 
-#define MAX_COMMAND_LENGTH 90
+#define MAX_COMMAND_LENGTH 900
 
 char shellStart();
 void setHighlightColor(HexColor color);

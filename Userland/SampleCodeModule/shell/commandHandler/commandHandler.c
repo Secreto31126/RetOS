@@ -165,11 +165,11 @@ stringOrFd startSnake(int commandFd, char *mustRedraw)
     char *aux = NULL;
     if (strcmp("", commandParameters) || (i = atoi(commandParameters)) == 1)
     {
-        *aux = sPrintf(formatString, playSnake(1));
+        aux = sPrintf(formatString, playSnake(1));
     }
     if (i) // if 0, either input was 0 or invalid. Either way, input is not valid
     {
-        *aux = sPrintf(formatString, playSnake(i > 3 ? 3 : i)); // we support a third player, it is controlled with the spacebar
+        aux = sPrintf(formatString, playSnake(i > 3 ? 3 : i)); // we support a third player, it is controlled with the spacebar
     }
     if (aux != NULL)
     {

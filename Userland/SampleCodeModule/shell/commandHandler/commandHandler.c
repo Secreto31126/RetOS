@@ -433,7 +433,7 @@ stringOrFd pipeAndExec(char *moduleName, int readFd)
 
 stringOrFd testExec(int commandFd, char *mustRedraw)
 {
-    return pipeAndExec("tomyland", commandFd);
+    return pipeAndExec("cat", commandFd);
 }
 
 void initializeCommands()

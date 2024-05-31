@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
 	}
 	itoa(count, str, 10);
 	write(STD_OUT, str, strlen(str));
-	write(STD_OUT, 0, 1);
+	char c = 0;
+	write(STD_OUT, &c, 1);
 	return 0; // Exit handled outside
 }

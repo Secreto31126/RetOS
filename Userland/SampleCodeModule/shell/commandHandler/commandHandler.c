@@ -32,7 +32,7 @@ void addCommand(char *commandCode, char *help, action_t commandAction)
     commandCount++;
 }
 
-stringOrFd execute(stringOrFd command, char *params, char *displayStyle)
+stringOrFd execute(stringOrFd command, char *params, displayStyles *displayStyle)
 {
     for (int i = 0; i < commandCount; i++)
     {
@@ -46,7 +46,7 @@ stringOrFd execute(stringOrFd command, char *params, char *displayStyle)
     return aux;
 }
 
-stringOrFd wrapExecute(stringOrFd toPipe, char *command, char *displayStyle)
+stringOrFd wrapExecute(stringOrFd toPipe, char *command, displayStyles *displayStyle)
 {
     if (toPipe.s != NULL)
     {
@@ -62,7 +62,7 @@ stringOrFd wrapExecute(stringOrFd toPipe, char *command, char *displayStyle)
     }
 }
 
-stringOrFd handleCommand(char *command, char *displayStyle)
+stringOrFd handleCommand(char *command, displayStyles *displayStyle)
 {
 
     command = shiftToWord(command);
@@ -86,7 +86,7 @@ stringOrFd handleCommand(char *command, char *displayStyle)
     return wrapExecute(toPipe, currentCommandStart, displayStyle);
 }
 
-stringOrFd getHelp(stringOrFd commandFd, char *displayStyle)
+stringOrFd getHelp(stringOrFd commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -125,7 +125,7 @@ stringOrFd getHelp(stringOrFd commandFd, char *displayStyle)
     return aux;
 }
 
-stringOrFd startSnake(stringOrFd commandFd, char *displayStyle)
+stringOrFd startSnake(stringOrFd commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -161,7 +161,7 @@ stringOrFd startSnake(stringOrFd commandFd, char *displayStyle)
     return toRet;
 }
 
-stringOrFd setSnakeTheme(stringOrFd commandFd, char *displayStyle)
+stringOrFd setSnakeTheme(stringOrFd commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -224,7 +224,7 @@ stringOrFd setSnakeTheme(stringOrFd commandFd, char *displayStyle)
     return aux;
 }
 
-stringOrFd changehighlightColor(stringOrFd commandFd, char *displayStyle)
+stringOrFd changehighlightColor(stringOrFd commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -239,7 +239,7 @@ stringOrFd changehighlightColor(stringOrFd commandFd, char *displayStyle)
     stringOrFd aux = {"Highlight color set", -1};
     return aux;
 }
-stringOrFd changeLetterColor(stringOrFd commandFd, char *displayStyle)
+stringOrFd changeLetterColor(stringOrFd commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -255,7 +255,7 @@ stringOrFd changeLetterColor(stringOrFd commandFd, char *displayStyle)
     stringOrFd aux = {"Letter color set", -1};
     return aux;
 }
-stringOrFd changeLetterSize(stringOrFd commandFd, char *displayStyle)
+stringOrFd changeLetterSize(stringOrFd commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -274,7 +274,7 @@ stringOrFd changeLetterSize(stringOrFd commandFd, char *displayStyle)
     stringOrFd aux = {"Size set", -1};
     return aux;
 }
-stringOrFd clearTheShell(stringOrFd commandFd, char *displayStyle)
+stringOrFd clearTheShell(stringOrFd commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -290,7 +290,7 @@ stringOrFd clearTheShell(stringOrFd commandFd, char *displayStyle)
     stringOrFd aux = {"", -1};
     return aux;
 }
-stringOrFd readMeTheDump(stringOrFd commandFd, char *displayStyle)
+stringOrFd readMeTheDump(stringOrFd commandFd, displayStyles *displayStyle)
 {
     char *c = getDumpString();
     if (strcmp(c, ""))
@@ -301,17 +301,14 @@ stringOrFd readMeTheDump(stringOrFd commandFd, char *displayStyle)
     stringOrFd aux = {sPrintf("The dump generated:\n%s", c), -1};
     return aux;
 }
-stringOrFd playThePiano(stringOrFd commandFd, char *displayStyle)
+stringOrFd playThePiano(stringOrFd commandFd, displayStyles *displayStyle)
 {
-    char savedSpace[READ_BLOCK];
-    char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
-
     *displayStyle = 1;
     startPiano();
     stringOrFd aux = {"Now exiting the yellow submarine.", -1};
     return aux;
 }
-stringOrFd singToMe(stringOrFd commandFd, char *displayStyle)
+stringOrFd singToMe(stringOrFd commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -355,7 +352,7 @@ stringOrFd singToMe(stringOrFd commandFd, char *displayStyle)
     stringOrFd aux = {"Found no matching song.", -1};
     return aux;
 }
-stringOrFd repeat(stringOrFd commandFd, char *displayStyle)
+stringOrFd repeat(stringOrFd commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -449,15 +446,15 @@ stringOrFd pipeAndExec(char *moduleName, char *params, int readFd)
     return aux;
 }
 
-stringOrFd cat(stringOrFd commandFd, char *displayStyle)
+stringOrFd cat(stringOrFd commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("cat", commandFd.s, commandFd.fd);
 }
-stringOrFd wc(stringOrFd commandFd, char *displayStyle)
+stringOrFd wc(stringOrFd commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("wc", commandFd.s, commandFd.fd);
 }
-stringOrFd filter(stringOrFd commandFd, char *displayStyle)
+stringOrFd filter(stringOrFd commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("filter", commandFd.s, commandFd.fd);
 }

@@ -96,7 +96,6 @@ void addCharToBuffer(char c)
 }
 void addStringToBuffer(const char *s, char ask)
 {
-    //  paintString(s, 0xffff0000, 0xff00ff00);
     const char *aux = s;
     while (*aux)
         buffer[index++] = *(aux++);
@@ -142,7 +141,7 @@ void paintCharOrWarp(char c)
         warpAndRedraw();
 }
 
-void readUntilClose(int fd)
+void readUntilClose(int fd, displayStyles displayStyle)
 {
     addStringToBuffer("\n", 0);
     char r_buffer[BLOCK];
@@ -169,7 +168,7 @@ char *passCommand(char *toPass)
     {
         if (pair.fd >= 0)
         {
-            readUntilClose(pair.fd);
+            readUntilClose(pair.fd, displayStyle);
         }
         else
         {

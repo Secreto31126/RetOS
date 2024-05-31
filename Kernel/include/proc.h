@@ -221,6 +221,13 @@ pid_t waitpid(pid_t pid, int *wstatus, int options);
  */
 unsigned int sleep(unsigned int ticks);
 /**
+ * @brief Block the current process for a number of microseconds (aka ticks)
+ *
+ * @param usec The number of microseconds to sleep
+ * @return unsigned int 0 on success, -1 on error (never happens in RetOS)
+ */
+unsigned int usleep(unsigned int usec);
+/**
  * @brief Add a read block to the current process
  *
  * @param file The file descriptor to read wait for

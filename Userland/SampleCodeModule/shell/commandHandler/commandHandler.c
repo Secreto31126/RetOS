@@ -418,20 +418,21 @@ stringOrFd pipeAndExec(char *moduleName, char *params, int readFd)
         }
         else
         {
+            addStringToBuffer("closing stdin in child", 0);
             close(STD_IN);
         }
 
         // whoosh
         if (params == NULL || !*params)
         {
-            paintStringOrWarp("Here", 0);
+            addStringToBuffer("Here", 0);
             execv(moduleName, NULL);
         }
         else
         {
             char *args[MAX_ARGS];
             separateString(params, args, MAX_ARGS);
-            paintStringOrWarp("Here D:", 0);
+            addStringToBuffer("Here D:", 0);
             execv(moduleName, args);
         }
 

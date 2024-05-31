@@ -386,7 +386,7 @@ char strCompare(char *a, char *b)
     return dist ? dist > 0 ? 1 : -1 : 0;
 }
 
-char strcmp(char *s1, char *s2)
+char strcmp(const char *s1, const char *s2)
 {
     while (*s1 || *s2)
     {

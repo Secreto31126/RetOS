@@ -9,8 +9,8 @@ void warpOneLine();
 char *passCommand(char *toPass);
 void paintLineStart();
 void paintCharOrWarp(char c);
-void paintStringOrWarp(char *s, char ask);
-void addStringToBuffer(char *s, char ask);
+void paintStringOrWarp(const char *s, char ask);
+void addStringToBuffer(const char *s, char ask);
 void addCharToBuffer(char c);
 static char *buffer, *commandBuffer;
 static uint64_t index, commandIndex;
@@ -94,16 +94,16 @@ void addCharToBuffer(char c)
     buffer[index] = 0;
     paintCharOrWarp(c);
 }
-void addStringToBuffer(char *s, char ask)
+void addStringToBuffer(const char *s, char ask)
 {
     //  paintString(s, 0xffff0000, 0xff00ff00);
-    char *aux = s;
+    const char *aux = s;
     while (*aux)
         buffer[index++] = *(aux++);
     buffer[index] = 0;
     paintStringOrWarp(s, ask);
 }
-void paintStringOrWarp(char *s, char ask)
+void paintStringOrWarp(const char *s, char ask)
 {
     if (strcmp(s, ""))
         return;
@@ -148,7 +148,7 @@ void readUntilClose(int fd)
     char c[2] = {fd + '0', 0};
     addStringToBuffer(c, 0);
     addStringToBuffer("\n", 0);
-    unsigned char r_buffer[BLOCK];
+    char r_buffer[BLOCK];
     int n;
     while ((n = read_sys(fd, r_buffer, BLOCK - 1)) > 0)
     {

@@ -9,8 +9,8 @@
 #define EOF -1
 
 // syscalls
-extern int print_sys(unsigned int fd, char *str, unsigned long long len);
-extern int read_sys(unsigned int fd, char *str, unsigned long long len);
+extern int print_sys(unsigned int fd, void *str, unsigned long long len);
+extern int read_sys(unsigned int fd, void *str, unsigned long long len);
 extern uint64_t get_tick();
 extern unsigned long long get_unix_time(void);
 extern void *malloc(uint64_t size);
@@ -44,7 +44,7 @@ char sPutChar(char *receiver, char c);
 uint64_t strlen(char *s);
 static const double pi = 3.14159265359;
 uint64_t pow(double base, uint64_t exponent); // can't return doubles in userland because SSE registers aren't usable
-char strcmp(char *s1, char *s2);
+char strcmp(const char *s1, const char *s2);
 char isPrefix(char *prefix, char *word);
 char isFirstWord(char *s1, char *firstWord);
 void wait();

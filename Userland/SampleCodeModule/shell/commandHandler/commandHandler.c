@@ -431,9 +431,17 @@ stringOrFd pipeAndExec(char *moduleName, int readFd)
     return aux;
 }
 
-stringOrFd testExec(int commandFd, char *mustRedraw)
+stringOrFd cat(int commandFd, char *mustRedraw)
 {
     return pipeAndExec("cat", commandFd);
+}
+stringOrFd wc(int commandFd, char *mustRedraw)
+{
+    return pipeAndExec("wc", commandFd);
+}
+stringOrFd filter(int commandFd, char *mustRedraw)
+{
+    return pipeAndExec("filter", commandFd);
 }
 
 void initializeCommands()
@@ -449,5 +457,7 @@ void initializeCommands()
     addCommand("piano", "Help display for piano module.\nFormat: 'piano'\nStarts the piano module.\nPiano keys: z = Do, s = Do#, x = Re, d = Re#, c = mi, v = Fa, g = Fa#, b = Sol, h = Sol#, n = La, j = La#, m = Si", playThePiano);
     addCommand("sing", "Help display for sing module.\nFormat: 'sing [SONG_NAME]'\nSings a song. Currently recognized songs are:\n'imperial-march' 'hes-a-pirate' 'outer-wilds' 'do-i-wanna-know' 'sports-center' 'here-comes-the-sun'.", singToMe);
     addCommand("echo", "Help display for the echo module.\nFormat: 'echo [TO_ECHO]'\nIt repeats what you input.", repeat);
-    addCommand("test-e", "Help display for the test exec module.\n Format: 'test-e'\nTests exec.", testExec);
+    addCommand("cat", "Help display for the cat module.\n Format(s): 'cat [text] | cat [fd]'\nEchoes given text or outputs content of fd received via pipe.", cat);
+    addCommand("wc", "Help display for the cat module.\n Format: 'wc [text or fd] | cat [fd]'\nOutputs the number of lines in the given input.", wc);
+    addCommand("filter", "Help display for the cat module.\n Format: 'filter [text or fd] | cat [fd]'\nEchoes given input, vowels removed.", filter);
 }

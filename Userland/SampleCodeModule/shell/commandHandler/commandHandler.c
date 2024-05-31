@@ -408,7 +408,7 @@ stringOrFd pipeAndExec(char *moduleName, char *params, int readFd)
             stringOrFd aux = {"Could not dup2", -1};
             return aux;
         }
-        if (readFd > 0)
+        if (readFd >= 0)
         {
             if (dup2(readFd, 0) < 0)
             {

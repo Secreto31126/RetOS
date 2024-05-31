@@ -48,9 +48,7 @@ int main(int argc, char *argv[])
 		{
 			write(1, str, n);
 		}
-		write(1, "here", sizeof("here"));
 		write(1, 0, 1);
-		sleep(1);
 		exit(0);
 	}
 	else

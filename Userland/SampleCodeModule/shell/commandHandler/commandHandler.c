@@ -61,7 +61,7 @@ stringOrFd execute(stringOrFd command, char *params, char *mustRedraw)
         {
             command.s = params;
             // line below makes it so that written params overrule piped params. Consider commenting it
-            command.fd = *command.s ? command.fd : -1;
+            command.fd = *command.s ? -1 : command.fd;
             return handlePipe(command, mustRedraw, commands[i].action);
         }
     }
@@ -422,9 +422,6 @@ stringOrFd pipeAndExec(char *moduleName, int readFd)
     }
     else if (c_pid)
     {
-        char c[2] = {pipeFd[WRITE_END] + '0', 0};
-        paintStringOrWarp("\nWriting to: ", 0);
-        paintStringOrWarp(c, 0);
         // I am the parent process
         close(pipeFd[WRITE_END]);
         stringOrFd aux = {NULL, pipeFd[READ_END]};
@@ -436,14 +433,7 @@ stringOrFd pipeAndExec(char *moduleName, int readFd)
 
 stringOrFd testExec(int commandFd, char *mustRedraw)
 {
-    char c[2] = {commandFd + '0', 0};
-    paintStringOrWarp("\nReading from: ", 0);
-    paintStringOrWarp(c, 0);
-    stringOrFd toRet = pipeAndExec("tomyland", commandFd);
-    paintStringOrWarp("\nWhat I write is read from: ", 0);
-    c[0] = toRet.fd + '0';
-    paintStringOrWarp(c, 0);
-    return toRet;
+    return pipeAndExec("tomyland", commandFd);
 }
 
 void initializeCommands()

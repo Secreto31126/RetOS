@@ -144,9 +144,6 @@ void paintCharOrWarp(char c)
 
 void readUntilClose(int fd)
 {
-    addStringToBuffer("\nShell is reading from: ", 0);
-    char c[2] = {fd + '0', 0};
-    addStringToBuffer(c, 0);
     addStringToBuffer("\n", 0);
     char r_buffer[BLOCK];
     int n;

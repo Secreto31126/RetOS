@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
 	{
 		write(STD_OUT, str, n);
 	}
-	write(STD_OUT, 0, 1);
+	char c = 0;
+	write(STD_OUT, &c, 1);
 	return 0; // Exit handled outside
 }

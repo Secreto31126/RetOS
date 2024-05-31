@@ -8,7 +8,7 @@ extern char endOfBinary;
 
 #define BLOCK 4096
 
-char isVowel(c)
+char isVowel(char c)
 {
 	switch (c)
 	{
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 	int n;
 	while ((n = read(0, str, BLOCK)) > 0)
 	{
-		int removed;
+		int removed = 0;
 		for (int i = 0, removed = 0; i < n; i++)
 		{
 			str[i - removed] = str[i];

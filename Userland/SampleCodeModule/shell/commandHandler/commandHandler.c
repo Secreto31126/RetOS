@@ -418,21 +418,20 @@ stringOrFd pipeAndExec(char *moduleName, char *params, int readFd)
         }
         else
         {
-            addStringToBuffer("closing stdin in child", 0);
+            // in UNIX, closing stdin causes undefined behaviour upon attempting to read stdin. A way of preventing stdin access in UNIX is to dup stdin to a temporary fd, then closing that fd
+            // in RetOS, closing stdin simply causes reads on stdin to return 0 without blocking, as a closed pipe would.
             close(STD_IN);
         }
 
         // whoosh
         if (params == NULL || !*params)
         {
-            addStringToBuffer("Here", 0);
             execv(moduleName, NULL);
         }
         else
         {
             char *args[MAX_ARGS];
             separateString(params, args, MAX_ARGS);
-            addStringToBuffer("Here D:", 0);
             execv(moduleName, args);
         }
 

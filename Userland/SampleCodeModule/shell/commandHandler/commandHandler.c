@@ -62,8 +62,6 @@ stringOrFd execute(stringOrFd command, char *params, char *mustRedraw)
         if (isFirstWord(commands[i].code, command.s))
         {
             command.s = params;
-            // line below makes it so that written params overrule piped params. Consider commenting it
-            // command.fd = *command.s ? -1 : command.fd;
             return handlePipe(command, mustRedraw, commands[i].action);
         }
     }

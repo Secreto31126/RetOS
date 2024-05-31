@@ -19,6 +19,7 @@
     global pipe
     global close
     global dup2
+    global usleep
 
 ; size_t read(int fd, void *buf, size_t count);
 read:
@@ -137,5 +138,11 @@ close:
 ; int dup2(int oldfd, int newfd);
 dup2:
     mov rax, 0x15
+    int 80h
+    ret
+
+; void usleep(unsigned int usec);
+usleep:
+    mov rax, 0x16
     int 80h
     ret

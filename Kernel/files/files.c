@@ -9,11 +9,12 @@ static FileEmpty empties[] = {
 
 bool file_empty(int file)
 {
-    if (file < 4)
+    if (0 <= file && file < 4)
     {
         return empties[file]();
     }
-    else if (IS_PIPE(file))
+
+    if (IS_PIPE(file))
     {
         return pipe_empty(file);
     }
@@ -23,13 +24,14 @@ bool file_empty(int file)
 
 bool file_full(int file)
 {
-    if (file < 4)
+    if (0 <= file && file < 4)
     {
         // Internal files are never filled,
         // they overwrite old data if needed
         return false;
     }
-    else if (IS_PIPE(file))
+
+    if (IS_PIPE(file))
     {
         return pipe_full(file);
     }

@@ -71,6 +71,14 @@ unsigned int sleep(unsigned int seconds)
     return (uintptr_t)p->condition_data[0];
 }
 
+unsigned int usleep(unsigned int usec)
+{
+    Process *p = get_current_process();
+    add_blocked(p, sleep_finished, NULL + (get_tick() + usec), NULL, NULL, NULL, NULL);
+    yield();
+    return (uintptr_t)p->condition_data[0] ? -1 : 0;
+}
+
 void read_block(int file)
 {
     Process *p = get_current_process();

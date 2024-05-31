@@ -11,6 +11,7 @@
 	global set_interrupt_flag
 	global unset_interrupt_flag
 	global halt_once
+	global exchange
 	global dump_regs
 	global dump_reg_string
 
@@ -94,6 +95,12 @@ unset_interrupt_flag:
 ; void halt_once(void);
 halt_once:
 	hlt
+	ret
+
+; uint64_t exchange(uint64_t *src, uint64_t value);
+exchange:
+	mov		rax, rsi
+	xchg	rax, [rdi]
 	ret
 
 %macro save_hex_in_string 0

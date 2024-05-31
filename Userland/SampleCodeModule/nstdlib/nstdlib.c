@@ -649,7 +649,7 @@ int readNFromFd(int fd, char *buffer, int n)
     if (fd < 0)
         return 0;
     int count = 1, aux; // count starts as 1, save space for the '\0'
-    while ((aux = read_sys(fd, buffer + count, n - count)) > 0 && count < n)
+    while ((aux = read_sys(fd, buffer + count - 1, n - count)) > 0 && count < n)
         count += aux;
     buffer[count - 1] = 0;
     return count;

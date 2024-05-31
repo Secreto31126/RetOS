@@ -32,37 +32,37 @@ void addCommand(char *commandCode, char *help, action_t commandAction)
     commandCount++;
 }
 
-stringOrFd execute(stringOrFd command, char *params, char *mustRedraw)
+stringOrFd execute(stringOrFd command, char *params, char *displayStyle)
 {
     for (int i = 0; i < commandCount; i++)
     {
         if (isFirstWord(commands[i].code, command.s))
         {
             command.s = params;
-            return commands[i].action(command, mustRedraw);
+            return commands[i].action(command, displayStyle);
         }
     }
     stringOrFd aux = {"Command was not recognized", -1};
     return aux;
 }
 
-stringOrFd wrapExecute(stringOrFd toPipe, char *command, char *mustRedraw)
+stringOrFd wrapExecute(stringOrFd toPipe, char *command, char *displayStyle)
 {
     if (toPipe.s != NULL)
     {
         stringOrFd aux = {command, -1};
-        return execute(aux, shiftToNextWord(aux.s), mustRedraw);
+        return execute(aux, shiftToNextWord(aux.s), displayStyle);
     }
     else
     { // I have an open read fd, I hand it over to the executor, and close it once it is no longer in use
         stringOrFd aux = {command, toPipe.fd};
-        toPipe = execute(aux, shiftToNextWord(aux.s), mustRedraw);
+        toPipe = execute(aux, shiftToNextWord(aux.s), displayStyle);
         close(aux.fd);
         return toPipe;
     }
 }
 
-stringOrFd handleCommand(char *command, char *mustRedraw)
+stringOrFd handleCommand(char *command, char *displayStyle)
 {
 
     command = shiftToWord(command);
@@ -79,14 +79,14 @@ stringOrFd handleCommand(char *command, char *mustRedraw)
         if (command[j] == '|')
         {
             command[j] = 0; // Cut off the string, so I do not hand other commands over to the executor
-            toPipe = wrapExecute(toPipe, currentCommandStart, mustRedraw);
+            toPipe = wrapExecute(toPipe, currentCommandStart, displayStyle);
             currentCommandStart = shiftToWord(command + j + 1); // this is also safe, as '|' is not considered whitespace and would stop the shift, so j catches up
         }
     }
-    return wrapExecute(toPipe, currentCommandStart, mustRedraw);
+    return wrapExecute(toPipe, currentCommandStart, displayStyle);
 }
 
-stringOrFd getHelp(stringOrFd commandFd, char *mustRedraw)
+stringOrFd getHelp(stringOrFd commandFd, char *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -125,7 +125,7 @@ stringOrFd getHelp(stringOrFd commandFd, char *mustRedraw)
     return aux;
 }
 
-stringOrFd startSnake(stringOrFd commandFd, char *mustRedraw)
+stringOrFd startSnake(stringOrFd commandFd, char *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -152,7 +152,7 @@ stringOrFd startSnake(stringOrFd commandFd, char *mustRedraw)
     }
     if (aux != NULL)
     {
-        *mustRedraw = 1;
+        *displayStyle = 1;
         print_sys(pipeFd[WRITE_END], aux, strlen(aux) + 1);
         close(pipeFd[WRITE_END]);
         return toRet;
@@ -161,7 +161,7 @@ stringOrFd startSnake(stringOrFd commandFd, char *mustRedraw)
     return toRet;
 }
 
-stringOrFd setSnakeTheme(stringOrFd commandFd, char *mustRedraw)
+stringOrFd setSnakeTheme(stringOrFd commandFd, char *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -224,7 +224,7 @@ stringOrFd setSnakeTheme(stringOrFd commandFd, char *mustRedraw)
     return aux;
 }
 
-stringOrFd changehighlightColor(stringOrFd commandFd, char *mustRedraw)
+stringOrFd changehighlightColor(stringOrFd commandFd, char *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -235,11 +235,11 @@ stringOrFd changehighlightColor(stringOrFd commandFd, char *mustRedraw)
         return aux;
     }
     setHighlightColor(atoiHex(commandParameters)); // will read until an invalid character is found or 8 characters have been read. If an invalid character was found, what was read so far will be set as the color.
-    *mustRedraw = 1;
+    *displayStyle = 1;
     stringOrFd aux = {"Highlight color set", -1};
     return aux;
 }
-stringOrFd changeLetterColor(stringOrFd commandFd, char *mustRedraw)
+stringOrFd changeLetterColor(stringOrFd commandFd, char *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -251,11 +251,11 @@ stringOrFd changeLetterColor(stringOrFd commandFd, char *mustRedraw)
     }
     // uint64_t hex = 0;
     setLetterColor(atoiHex(commandParameters));
-    *mustRedraw = 1;
+    *displayStyle = 1;
     stringOrFd aux = {"Letter color set", -1};
     return aux;
 }
-stringOrFd changeLetterSize(stringOrFd commandFd, char *mustRedraw)
+stringOrFd changeLetterSize(stringOrFd commandFd, char *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -270,11 +270,11 @@ stringOrFd changeLetterSize(stringOrFd commandFd, char *mustRedraw)
         resize(0.5);
     else
         resize((double)newSize);
-    *mustRedraw = 1;
+    *displayStyle = 1;
     stringOrFd aux = {"Size set", -1};
     return aux;
 }
-stringOrFd clearTheShell(stringOrFd commandFd, char *mustRedraw)
+stringOrFd clearTheShell(stringOrFd commandFd, char *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -282,7 +282,7 @@ stringOrFd clearTheShell(stringOrFd commandFd, char *mustRedraw)
     uint64_t toClear;
     if ((toClear = atoi(commandParameters)))
     {
-        *mustRedraw = 1;
+        *displayStyle = 1;
         warpNLines(toClear);
     }
     else
@@ -290,7 +290,7 @@ stringOrFd clearTheShell(stringOrFd commandFd, char *mustRedraw)
     stringOrFd aux = {"", -1};
     return aux;
 }
-stringOrFd readMeTheDump(stringOrFd commandFd, char *mustRedraw)
+stringOrFd readMeTheDump(stringOrFd commandFd, char *displayStyle)
 {
     char *c = getDumpString();
     if (strcmp(c, ""))
@@ -301,17 +301,17 @@ stringOrFd readMeTheDump(stringOrFd commandFd, char *mustRedraw)
     stringOrFd aux = {sPrintf("The dump generated:\n%s", c), -1};
     return aux;
 }
-stringOrFd playThePiano(stringOrFd commandFd, char *mustRedraw)
+stringOrFd playThePiano(stringOrFd commandFd, char *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
 
-    *mustRedraw = 1;
+    *displayStyle = 1;
     startPiano();
     stringOrFd aux = {"Now exiting the yellow submarine.", -1};
     return aux;
 }
-stringOrFd singToMe(stringOrFd commandFd, char *mustRedraw)
+stringOrFd singToMe(stringOrFd commandFd, char *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -355,7 +355,7 @@ stringOrFd singToMe(stringOrFd commandFd, char *mustRedraw)
     stringOrFd aux = {"Found no matching song.", -1};
     return aux;
 }
-stringOrFd repeat(stringOrFd commandFd, char *mustRedraw)
+stringOrFd repeat(stringOrFd commandFd, char *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -449,15 +449,15 @@ stringOrFd pipeAndExec(char *moduleName, char *params, int readFd)
     return aux;
 }
 
-stringOrFd cat(stringOrFd commandFd, char *mustRedraw)
+stringOrFd cat(stringOrFd commandFd, char *displayStyle)
 {
     return pipeAndExec("cat", commandFd.s, commandFd.fd);
 }
-stringOrFd wc(stringOrFd commandFd, char *mustRedraw)
+stringOrFd wc(stringOrFd commandFd, char *displayStyle)
 {
     return pipeAndExec("wc", commandFd.s, commandFd.fd);
 }
-stringOrFd filter(stringOrFd commandFd, char *mustRedraw)
+stringOrFd filter(stringOrFd commandFd, char *displayStyle)
 {
     return pipeAndExec("filter", commandFd.s, commandFd.fd);
 }

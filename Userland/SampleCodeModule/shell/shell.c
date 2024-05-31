@@ -162,8 +162,8 @@ void readUntilClose(int fd)
 
 char *passCommand(char *toPass)
 {
-    char mustRedraw = 0;
-    stringOrFd pair = handleCommand(toPass, &mustRedraw);
+    displayStyles displayStyle = 0;
+    stringOrFd pair = handleCommand(toPass, &displayStyle);
 
     if (pair.s == NULL)
     {
@@ -181,7 +181,7 @@ char *passCommand(char *toPass)
 
     char *toPaint = pair.s;
 
-    if (mustRedraw)
+    if (displayStyle >= REDRAW_ONCE)
     {
         char *toReturn;
         if (strcmp(toPaint, ""))
@@ -199,7 +199,7 @@ char *passCommand(char *toPass)
             blank();
         return toReturn;
     }
-    if (strcmp(toPaint, ""))
+    else if (strcmp(toPaint, ""))
     {
         if (strcmp(buffer, ""))
             return (char *)lineStart;
@@ -218,15 +218,15 @@ void warpAndRedraw()
     blank();
     paintString(buffer, letterColor, highlightColor);
 }
-void setLetterColor(HexColor color) // command handler is responsible for setting mustRedraw to 1
+void setLetterColor(HexColor color) // command handler is responsible for setting displayStyle to REDRAW_ONCE
 {
     letterColor = 0xFF000000 | color; // Letters cannot be transparent
 }
-void setHighlightColor(HexColor color) // command handler is responsible for setting mustRedraw to 1
+void setHighlightColor(HexColor color) // command handler is responsible for setting displayStyle to REDRAW_ONCE
 {
     highlightColor = color; // highlights can be transparent
 }
-void resize(double size) // command handler is responsible for setting mustRedraw to 1
+void resize(double size) // command handler is responsible for setting displayStyle to REDRAW_ONCE
 {
     setSize(size);
 }

@@ -2,6 +2,7 @@
 
 #include <sys.h>
 #include <string.h>
+#include <stdlib.h>
 
 extern char bss;
 extern char endOfBinary;
@@ -12,10 +13,10 @@ int main(int argc, char *argv[])
 {
 	char str[BLOCK] = {0};
 	int n;
-	while ((n = read(0, str, BLOCK)) > 0)
+	while ((n = read(STD_IN, str, BLOCK)) > 0)
 	{
-		write(1, str, n);
+		write(STD_OUT, str, n);
 	}
-	write(1, 0, 1);
+	write(STD_OUT, 0, 1);
 	return 0; // Exit handled outside
 }

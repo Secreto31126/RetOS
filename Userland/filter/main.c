@@ -2,6 +2,7 @@
 
 #include <sys.h>
 #include <string.h>
+#include <stdlib.h>
 
 extern char bss;
 extern char endOfBinary;
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
 {
 	char str[BLOCK] = {0};
 	int n;
-	while ((n = read(0, str, BLOCK)) > 0)
+	while ((n = read(STD_OUT, str, BLOCK)) > 0)
 	{
 		int removed = 0;
 		for (int i = 0, removed = 0; i < n; i++)
@@ -42,8 +43,8 @@ int main(int argc, char *argv[])
 			if (isVowel(str[i]))
 				removed++;
 		}
-		write(1, str, n - removed);
+		write(STD_OUT, str, n - removed);
 	}
-	write(1, 0, 1);
+	write(STD_OUT, 0, 1);
 	return 0; // Exit handled outside
 }

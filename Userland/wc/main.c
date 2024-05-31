@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 	char str[BLOCK] = {0};
 	int n;
 	char count = 1;
-	while ((n = read(0, str, BLOCK)) > 0)
+	while ((n = read(STD_IN, str, BLOCK)) > 0)
 	{
 		for (int i = 0; i < n; i++)
 		{
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	itoa(count, str, 10);
-	write(1, str, strlen(str));
-	write(1, 0, 1);
+	write(STD_OUT, str, strlen(str));
+	write(STD_OUT, 0, 1);
 	return 0; // Exit handled outside
 }

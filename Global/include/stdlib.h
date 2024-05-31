@@ -26,6 +26,8 @@
 #define NULL ((void *)0)
 #define READ_END 0
 #define WRITE_END 1
+#define STD_IN 0
+#define STD_OUT 1
 
 char *itoa(int n, char *buffer, int radix);
 char *utoa(unsigned int n, char *buffer, int radix);

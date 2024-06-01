@@ -14,6 +14,17 @@
 int strcmp(const char *p1, const char *p2);
 
 /**
+ * @brief Compare two strings up to n characters
+ * @see https://github.com/gcc-mirror/gcc/blob/master/libiberty/strncmp.c
+ *
+ * @param s1 The first string
+ * @param s2 The second string
+ * @param n The number of characters to compare
+ * @return int The distance between both strings
+ */
+int strncmp(const char *s1, const char *s2, register size_t n);
+
+/**
  * @brief Get the length of a string
  *
  * @param str The string

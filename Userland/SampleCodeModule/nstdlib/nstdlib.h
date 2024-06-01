@@ -30,7 +30,7 @@ extern void sleep(unsigned int seconds);
 extern int pipe(int pipefd[2]);
 extern int close(int fd);
 extern int dup2(int oldfd, int newfd);
-extern int pselect(int nfds, int *fds, int *ready);
+extern int pselect(int nfds, const int *fds, int *ready);
 extern int kill(int pid, int sig);
 
 // library

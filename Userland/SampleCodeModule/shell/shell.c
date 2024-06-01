@@ -168,6 +168,8 @@ int handleReadFd(moduleData data, displayStyles displayStyle)
     int n = read_sys(data.fd, r_buffer, READ_BLOCK - 1);
     if (n < 0)
         return 1;
+    if (n == 0)
+        return 2;
     r_buffer[n] = 0;
     addStringToBuffer(r_buffer, 0);
     return 0;
@@ -212,12 +214,33 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
     addStringToBuffer("\n", 0);
 
     // this loop could be simplified with a very ugly and hard to read function
-    while ((availableReadFdCount = pselect(readFdCount, readFds, availableReadFds)) > 0)
+    char leaveFlag = 0;
+    while (!leaveFlag)
     {
+        availableReadFdCount = pselect(readFdCount, readFds, availableReadFds);
+        char c[] = {availableReadFdCount + '0', '\t', 0};
+        char c_again[] = {availableReadFds[0] + '0', availableReadFds[1] + '0', availableReadFds[2] + '0', '\t', 0};
+        paintStringOrWarp(c_again, 0);
         for (int i = 0; i < availableReadFdCount; i++)
         {
-            if (STD_KEYS == availableReadFds[i])
+            if (data.fd == availableReadFds[i])
             {
+                paintStringOrWarp("Read from proc\n", 0);
+                char aux = handleReadFd(data, displayStyle);
+                if (aux == 1)
+                {
+                    killFgAndLeave(data, "Communication failed, killed foreground process.\n");
+                    return;
+                }
+                if (aux == 2)
+                { // process stopped writing, wait for it to terminate normally
+                    leaveFlag = 1;
+                    break;
+                }
+            }
+            else if (STD_KEYS == availableReadFds[i])
+            {
+                paintStringOrWarp("Read from stdk\n", 0);
                 char aux = handleStdKeys(data, displayStyle);
                 if (aux == 1)
                 {
@@ -225,21 +248,14 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
                     return;
                 }
                 if (aux == 2)
-                {
+                { // sent SIGKILL to process, wait for it to terminate
                     killFgAndLeave(data, "");
-                    return;
-                }
-            }
-            else if (data.fd == availableReadFds[i])
-            {
-                if (handleReadFd(data, displayStyle))
-                {
-                    killFgAndLeave(data, "Communication failed, killed foreground process.\n");
                     return;
                 }
             }
             else if (STD_IN == availableReadFds[i])
             {
+                paintStringOrWarp("Read from stdi\n", 0);
                 if (handleWriteFd(data, displayStyle))
                 {
                     killFgAndLeave(data, "Communication failed, killed foreground process.\n");
@@ -248,6 +264,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
             }
         }
     }
+    paintStringOrWarp("Left", 0);
 
     close(data.fd);
     if (data.writeFd >= 0)

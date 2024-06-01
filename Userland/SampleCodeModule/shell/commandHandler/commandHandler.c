@@ -499,6 +499,10 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, char makeTerm
 
 moduleData cat(moduleData commandFd, displayStyles *displayStyle)
 {
+    // no params received, no fd to read from, use terminal as fd
+    if ((!*commandFd.s || *commandFd.s == ' ') && commandFd.fd < 0)
+        return pipeAndExec("cat", "TERM_MODE", commandFd.fd, 1);
+    // params/fd received, normal cat
     return pipeAndExec("cat", commandFd.s, commandFd.fd, 0);
 }
 moduleData wc(moduleData commandFd, displayStyles *displayStyle)

@@ -96,6 +96,12 @@ bool multi_read_available(pid_t pid)
     for (size_t i = 0; i < nfds; i++)
     {
         int fd = fds[i];
+
+        if (fd < 0 || fd >= MAX_PROCESS_FILES)
+        {
+            continue;
+        }
+
         int file = p->files[fd];
 
         if (file == -1)

@@ -247,7 +247,7 @@ void write_block(int file);
  * @param ready An array to store the ready file descriptors
  * @return int The number of ready file descriptors, 0 if all waited files are closed
  */
-int pselect(int nfds, int *fds, int *ready);
+int pselect(int nfds, const int *fds, int *ready);
 
 /**
  * @brief Send a signal to a process

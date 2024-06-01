@@ -20,6 +20,7 @@
     global close
     global dup2
     global pselect
+    global kill
 
 ; int read_sys(unsigned int fd, char *str, size_t len);
 read_sys:

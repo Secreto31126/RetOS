@@ -145,8 +145,8 @@ void paintCharOrWarp(char c)
 
 int handleStdKeys(moduleData data, displayStyles displayStyle)
 {
-    char r_buffer[READ_BLOCK];
-    int n = read_sys(STD_KEYS, r_buffer, READ_BLOCK - 1);
+    char r_buffer[BLOCK];
+    int n = read_sys(STD_KEYS, r_buffer, BLOCK - 1);
     if (n < 0)
         return 1;
     buffer[n] = 0;
@@ -169,8 +169,8 @@ int handleStdKeys(moduleData data, displayStyles displayStyle)
 
 int handleReadFd(moduleData data, displayStyles displayStyle)
 {
-    char r_buffer[READ_BLOCK];
-    int n = read_sys(data.fd, r_buffer, READ_BLOCK - 1);
+    char r_buffer[BLOCK];
+    int n = read_sys(data.fd, r_buffer, BLOCK - 1);
     if (n < 0)
         return 1;
     if (n == 0)
@@ -182,9 +182,9 @@ int handleReadFd(moduleData data, displayStyles displayStyle)
 
 int handleWriteFd(moduleData data, displayStyles displayStyle)
 {
-    char r_buffer[READ_BLOCK];
+    char r_buffer[BLOCK];
 
-    int n = read_sys(STD_IN, r_buffer, READ_BLOCK - 1);
+    int n = read_sys(STD_IN, r_buffer, BLOCK - 1);
     if (n < 0)
         return 1;
 

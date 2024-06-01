@@ -408,7 +408,7 @@ char *getReadableString(moduleData source, char *buffer, int bufferSize)
     return buffer;
 }
 
-moduleData pipeAndExec(char *moduleName, char *params, int readFd, char keepWriteOpen)
+moduleData pipeAndExec(char *moduleName, char *params, int readFd, char makeTermPipe)
 {
     int pipeFd[2] = {0};
     if (pipe(pipeFd))
@@ -416,6 +416,16 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, char keepWrit
         moduleData aux = {"Could not create pipe", -1, -1, -1};
         return aux;
     }
+
+    int termPipe[2];
+    if (makeTermPipe && pipe(termPipe))
+    {
+        close(pipeFd[READ_END]);
+        close(pipeFd[WRITE_END]);
+        moduleData aux = {"Could not create pipe", -1, -1, -1};
+        return aux;
+    }
+
     int cPid = fork();
     if (cPid == -1)
     {
@@ -447,6 +457,11 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, char keepWrit
             close(STD_IN);
         }
 
+        if (makeTermPipe && dup2(termPipe[READ_END], STD_TERM) < 0)
+        {
+            exit(1);
+        }
+
         // whoosh
         if (params == NULL || !*params)
         {
@@ -465,15 +480,16 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, char keepWrit
     else if (cPid)
     {
         // I am the parent process
-        if (!keepWriteOpen)
+        close(pipeFd[WRITE_END]);
+        if (!makeTermPipe)
         {
-            close(pipeFd[WRITE_END]);
             moduleData aux = {NULL, pipeFd[READ_END], -1, cPid};
             return aux;
         }
         else
         {
-            moduleData aux = {NULL, pipeFd[READ_END], pipeFd[WRITE_END], cPid};
+            close(termPipe[READ_END]);
+            moduleData aux = {NULL, pipeFd[READ_END], termPipe[WRITE_END], cPid};
             return aux;
         }
     }

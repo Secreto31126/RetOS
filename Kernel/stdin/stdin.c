@@ -57,3 +57,9 @@ bool stdin_empty()
 {
     return reader == writer && !on_your_left;
 }
+
+void flush_stdin()
+{
+    reader = writer;
+    on_your_left = 0;
+}

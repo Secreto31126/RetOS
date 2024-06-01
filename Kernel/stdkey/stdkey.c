@@ -110,3 +110,9 @@ bool stdkey_empty()
 {
     return reader == writer && !on_your_left;
 }
+
+void flush_stdkey()
+{
+    reader = writer;
+    on_your_left = 0;
+}

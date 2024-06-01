@@ -57,3 +57,9 @@ bool stderr_empty()
 {
     return reader == writer && !on_your_left;
 }
+
+void flush_stderr()
+{
+    reader = writer;
+    on_your_left = 0;
+}

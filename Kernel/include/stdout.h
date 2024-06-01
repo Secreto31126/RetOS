@@ -27,5 +27,9 @@ uint16_t write_stdout(uint8_t *buf, uint16_t len);
  * @return false stdout is not empty
  */
 bool stdout_empty();
+/**
+ * @brief Flush stdout
+ */
+void flush_stdout();
 
 #endif

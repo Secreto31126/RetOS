@@ -33,5 +33,9 @@ void stdkey_keyevent(uint8_t scancode);
  * @return false stdkey is not empty
  */
 bool stdkey_empty();
+/**
+ * @brief Flush stdkey
+ */
+void flush_stdkey();
 
 #endif

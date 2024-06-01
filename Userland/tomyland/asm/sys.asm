@@ -21,6 +21,7 @@
     global close
     global dup2
     global usleep
+    global flush
 
 ; size_t read(int fd, void *buf, size_t count);
 read:
@@ -148,8 +149,14 @@ dup2:
     int 80h
     ret
 
-; void usleep(unsigned int usec);
+; int usleep(unsigned int usec);
 usleep:
     mov rax, 0x16
+    int 80h
+    ret
+
+; int flush(int fd);
+flush:
+    mov rax, 0x17
     int 80h
     ret

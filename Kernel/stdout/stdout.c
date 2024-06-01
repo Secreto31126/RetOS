@@ -54,3 +54,9 @@ bool stdout_empty()
 {
     return reader == writer && !on_your_left;
 }
+
+void flush_stdout()
+{
+    reader = writer;
+    on_your_left = 0;
+}

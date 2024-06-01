@@ -27,5 +27,9 @@ uint16_t write_stdin(uint8_t *buf, uint16_t len);
  * @return false stdin is not empty
  */
 bool stdin_empty();
+/**
+ * @brief Flush stdin
+ */
+void flush_stdin();
 
 #endif

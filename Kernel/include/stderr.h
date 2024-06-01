@@ -27,5 +27,9 @@ uint16_t write_stderr(uint8_t *buf, uint16_t len);
  * @return false stderr is not empty
  */
 bool stderr_empty();
+/**
+ * @brief Flush stderr
+ */
+void flush_stderr();
 
 #endif

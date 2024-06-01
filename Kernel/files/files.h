@@ -13,6 +13,7 @@
 #include <proc.h>
 
 typedef bool (*FileEmpty)();
+typedef void (*FileFlusher)();
 typedef uint16_t (*FileReader)(uint8_t *, uint16_t);
 typedef uint16_t (*FileWritter)(uint8_t *, uint16_t);
 

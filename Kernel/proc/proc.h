@@ -81,6 +81,8 @@ bool read_available(pid_t pid);
 bool write_available(pid_t pid);
 /**
  * @brief Wait for multiple fds to be read available
+ * @note The process' pointers will be invalid while checking because the running stack is not loaded
+ * Aka, you must allocate global memory to preserve the data
  *
  * @param pid The process' pid
  * @return true At least one file is available for reading or all files are closed

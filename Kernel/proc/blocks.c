@@ -93,10 +93,23 @@ void write_block(int file)
     yield();
 }
 
-int pselect(int nfds, int *fds, int *ready)
+int pselect(int nfds, const int *fds, int *ready)
 {
     Process *p = get_current_process();
-    add_blocked(p, multi_read_available, NULL + nfds, fds, ready, NULL, NULL);
+
+    int *copy_fds = malloc(nfds * sizeof(int));
+    memcpy(copy_fds, fds, nfds * sizeof(int));
+
+    int *copy_ready = malloc(nfds * sizeof(int));
+
+    add_blocked(p, multi_read_available, NULL + nfds, copy_fds, copy_ready, NULL, NULL);
     yield();
-    return (uintptr_t)p->condition_data[0];
+
+    int ready_count = (uintptr_t)p->condition_data[0];
+    memcpy(ready, copy_ready, ready_count * sizeof(int));
+
+    free(copy_fds);
+    free(copy_ready);
+
+    return ready_count;
 }

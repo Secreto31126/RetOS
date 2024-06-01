@@ -23,6 +23,8 @@
     global usleep
     global pselect
     global flush
+    global getpriority
+    global setpriority
 
 ; size_t read(int fd, void *buf, size_t count);
 read:
@@ -165,5 +167,17 @@ pselect:
 ; int flush(int fd);
 flush:
     mov rax, 0x18
+    int 80h
+    ret
+
+; int getpriority(int which, unsigned int who);
+getpriority:
+    mov rax, 0x19
+    int 80h
+    ret
+
+; int setpriority(int which, unsigned int who, int prio);
+setpriority:
+    mov rax, 0x1A
     int 80h
     ret

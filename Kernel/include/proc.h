@@ -5,17 +5,37 @@
 #include <stdbool.h>
 #include <pipes.h>
 
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 #define MAX_PROCESS_FILES 10
 #define MAX_PROCESSES 10
 
 #define O_FILE 0x0
 #define O_PIPE 0x8000
 
+/* Priority limits.  */
+#define PRIO_MIN -20 /* Minimum priority a process can have.  */
+#define PRIO_MAX 19  /* Maximum priority a process can have.  */
+
+/* The type of the WHICH argument to `getpriority' and `setpriority',
+   indicating what flavor of entity the WHO argument specifies.  */
+enum __priority_which
+{
+    PRIO_PROCESS = 0, /* WHO is a process ID.  */
+#define PRIO_PROCESS PRIO_PROCESS
+    PRIO_PGRP = 1, /* WHO is a process group ID.  */
+#define PRIO_PGRP PRIO_PGRP
+    PRIO_USER = 2 /* WHO is a user ID.  */
+#define PRIO_USER PRIO_USER
+};
+
 /**
  * @brief An unique process identifier type
  * @note -1 indicates an invalid pid
  */
 typedef int pid_t;
+typedef unsigned int id_t;
 
 /**
  * @brief Enum of all the possible process' states
@@ -114,7 +134,7 @@ typedef struct Process
      */
     struct Process *next_robin;
     /**
-     * @brief The process' priority
+     * @brief The process' priority (ranged between -20 and 19, lower is higher priority)
      */
     signed char priority;
     /**
@@ -208,6 +228,23 @@ int close(int fd);
  * @return int
  */
 int dup2(int oldfd, int newfd);
+/**
+ * @brief Get the priority of a resource
+ *
+ * @param which The resource type of the `who` argument (PRIO_PROCESS (0) is the only valid value)
+ * @param who The resource id
+ * @return int The priority of the resource
+ */
+int getpriority(int which, id_t who);
+/**
+ * @brief Set the priority of a resource
+ *
+ * @param which The resource type of the `who` argument (PRIO_PROCESS (0) is the only valid value)
+ * @param who The resource id
+ * @param prio The new priority (ranged between -20 and 19, lower is higher priority)
+ * @return int 0 on success, -1 on error
+ */
+int setpriority(int which, id_t who, int prio);
 
 /**
  * @brief Block the current process until the child pid dies

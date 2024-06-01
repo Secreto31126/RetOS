@@ -34,7 +34,7 @@ void *create_process_idle()
         .next_child = NULL,
         .next_brother = NULL,
         .exit_code = 0,
-        .priority = 1,
+        .priority = 19,
         .next_blocked = NULL,
         .block_condition = no_condition,
         .condition_data = {},
@@ -367,6 +367,29 @@ int dup2(int oldfd, int newfd)
         }
 
         return newfd;
+    }
+
+    return -1;
+}
+
+int getpriority(int which, id_t who)
+{
+    if (which == PRIO_PROCESS)
+    {
+        Process *p = get_process(who);
+        return p->priority;
+    }
+
+    return -1;
+}
+
+int setpriority(int which, id_t who, int prio)
+{
+    if (which == PRIO_PROCESS)
+    {
+        Process *p = get_process(who);
+        p->priority = MAX(PRIO_MIN, MIN(PRIO_MAX, prio));
+        return 0;
     }
 
     return -1;

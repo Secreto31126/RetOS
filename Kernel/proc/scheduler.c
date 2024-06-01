@@ -80,7 +80,7 @@ void *context_switch(void *rsp)
 
 // Priority based round Robin
 static Process *last = NULL;
-static signed char remaining = 0;
+static signed char remaining = 20;
 
 void robin_add(pid_t pid)
 {
@@ -175,7 +175,7 @@ pid_t robin_next()
         return robin_next();
     }
 
-    if (remaining-- > 0)
+    if (remaining++ < 20)
     {
         return first->pid;
     }
@@ -188,5 +188,5 @@ pid_t robin_next()
 
 void yield_robin()
 {
-    remaining = 0;
+    remaining = 20;
 }

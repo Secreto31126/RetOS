@@ -16,7 +16,7 @@
 static command *commands;
 static uint64_t commandCount = 0;
 
-char *getReadableString(stringOrFd source, char *buffer, int bufferSize);
+char *getReadableString(moduleData source, char *buffer, int bufferSize);
 
 void freeCommands()
 {
@@ -32,7 +32,7 @@ void addCommand(char *commandCode, char *help, action_t commandAction)
     commandCount++;
 }
 
-stringOrFd execute(stringOrFd command, char *params, displayStyles *displayStyle)
+moduleData execute(moduleData command, char *params, displayStyles *displayStyle)
 {
     for (int i = 0; i < commandCount; i++)
     {
@@ -42,37 +42,37 @@ stringOrFd execute(stringOrFd command, char *params, displayStyles *displayStyle
             return commands[i].action(command, displayStyle);
         }
     }
-    stringOrFd aux = {"Command was not recognized", -1};
+    moduleData aux = {"Command was not recognized", -1};
     return aux;
 }
 
-stringOrFd wrapExecute(stringOrFd toPipe, char *command, displayStyles *displayStyle)
+moduleData wrapExecute(moduleData toPipe, char *command, displayStyles *displayStyle)
 {
     if (toPipe.s != NULL)
     {
-        stringOrFd aux = {command, -1};
+        moduleData aux = {command, -1};
         return execute(aux, shiftToNextWord(aux.s), displayStyle);
     }
     else
     { // I have an open read fd, I hand it over to the executor, and close it once it is no longer in use
-        stringOrFd aux = {command, toPipe.fd};
+        moduleData aux = {command, toPipe.fd};
         toPipe = execute(aux, shiftToNextWord(aux.s), displayStyle);
         close(aux.fd);
         return toPipe;
     }
 }
 
-stringOrFd handleCommand(char *command, displayStyles *displayStyle)
+moduleData handleCommand(char *command, displayStyles *displayStyle)
 {
 
     command = shiftToWord(command);
     if (strcmpHandleWhitespace(command, "") || strcmpHandleWhitespace(command, " "))
     { // if command is empty or whitespace, it is ignored
-        stringOrFd aux = {"", -1};
+        moduleData aux = {"", -1};
         return aux;
     }
 
-    stringOrFd toPipe = {shiftToNextWord(command), -1}; // The first set of params I can hand over comes from the second word in my command string
+    moduleData toPipe = {shiftToNextWord(command), -1}; // The first set of params I can hand over comes from the second word in my command string
     char *currentCommandStart = command;
     for (int j = 0; command[j]; j++)
     {
@@ -86,13 +86,13 @@ stringOrFd handleCommand(char *command, displayStyles *displayStyle)
     return wrapExecute(toPipe, currentCommandStart, displayStyle);
 }
 
-stringOrFd getHelp(stringOrFd commandFd, displayStyles *displayStyle)
+moduleData getHelp(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
 
     int pipeFd[2];
-    stringOrFd toRet = {NULL, -1};
+    moduleData toRet = {NULL, -1};
     if (pipe(pipeFd))
     {
         toRet.s = "Could not create pipe";
@@ -121,17 +121,17 @@ stringOrFd getHelp(stringOrFd commandFd, displayStyles *displayStyle)
         }
     }
     close(pipeFd[WRITE_END]);
-    stringOrFd aux = {sPrintf("No help menu that matches '%s' was found.", commandParameters), -1}; // sPrintf automatically adds created string to list of strings to be freed by freePrints()
+    moduleData aux = {sPrintf("No help menu that matches '%s' was found.", commandParameters), -1}; // sPrintf automatically adds created string to list of strings to be freed by freePrints()
     return aux;
 }
 
-stringOrFd startSnake(stringOrFd commandFd, displayStyles *displayStyle)
+moduleData startSnake(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
 
     int pipeFd[2];
-    stringOrFd toRet = {NULL, -1};
+    moduleData toRet = {NULL, -1};
     if (pipe(pipeFd))
     {
         toRet.s = "Could not create pipe";
@@ -161,7 +161,7 @@ stringOrFd startSnake(stringOrFd commandFd, displayStyles *displayStyle)
     return toRet;
 }
 
-stringOrFd setSnakeTheme(stringOrFd commandFd, displayStyles *displayStyle)
+moduleData setSnakeTheme(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -217,45 +217,45 @@ stringOrFd setSnakeTheme(stringOrFd commandFd, displayStyles *displayStyle)
     }
     if (matchFlag)
     {
-        stringOrFd aux = {"Theme set.", -1};
+        moduleData aux = {"Theme set.", -1};
         return aux;
     }
-    stringOrFd aux = {sPrintf("No theme matching %s was found.", commandParameters), -1};
+    moduleData aux = {sPrintf("No theme matching %s was found.", commandParameters), -1};
     return aux;
 }
 
-stringOrFd changehighlightColor(stringOrFd commandFd, displayStyles *displayStyle)
+moduleData changehighlightColor(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
 
     if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
     {
-        stringOrFd aux = {"Hex value given not valid.", -1};
+        moduleData aux = {"Hex value given not valid.", -1};
         return aux;
     }
     setHighlightColor(atoiHex(commandParameters)); // will read until an invalid character is found or 8 characters have been read. If an invalid character was found, what was read so far will be set as the color.
     *displayStyle = 1;
-    stringOrFd aux = {"Highlight color set", -1};
+    moduleData aux = {"Highlight color set", -1};
     return aux;
 }
-stringOrFd changeLetterColor(stringOrFd commandFd, displayStyles *displayStyle)
+moduleData changeLetterColor(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
 
     if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
     {
-        stringOrFd aux = {"Hex value given not valid.", -1};
+        moduleData aux = {"Hex value given not valid.", -1};
         return aux;
     }
     // uint64_t hex = 0;
     setLetterColor(atoiHex(commandParameters));
     *displayStyle = 1;
-    stringOrFd aux = {"Letter color set", -1};
+    moduleData aux = {"Letter color set", -1};
     return aux;
 }
-stringOrFd changeLetterSize(stringOrFd commandFd, displayStyles *displayStyle)
+moduleData changeLetterSize(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -263,7 +263,7 @@ stringOrFd changeLetterSize(stringOrFd commandFd, displayStyles *displayStyle)
     uint64_t newSize = atoi(commandParameters);
     if (newSize < 0 || newSize > MAX_LETTER_SIZE)
     {
-        stringOrFd aux = {"Invalid letter size.", -1};
+        moduleData aux = {"Invalid letter size.", -1};
         return aux;
     }
     if (!newSize) // would be nice to actually handle doubles, however, no parseDouble function can be made (reasonably easily) if SSE registers cannot be used to return the value.
@@ -271,10 +271,10 @@ stringOrFd changeLetterSize(stringOrFd commandFd, displayStyles *displayStyle)
     else
         resize((double)newSize);
     *displayStyle = 1;
-    stringOrFd aux = {"Size set", -1};
+    moduleData aux = {"Size set", -1};
     return aux;
 }
-stringOrFd clearTheShell(stringOrFd commandFd, displayStyles *displayStyle)
+moduleData clearTheShell(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -287,28 +287,28 @@ stringOrFd clearTheShell(stringOrFd commandFd, displayStyles *displayStyle)
     }
     else
         clearShell();
-    stringOrFd aux = {"", -1};
+    moduleData aux = {"", -1};
     return aux;
 }
-stringOrFd readMeTheDump(stringOrFd commandFd, displayStyles *displayStyle)
+moduleData readMeTheDump(moduleData commandFd, displayStyles *displayStyle)
 {
     char *c = getDumpString();
     if (strcmp(c, ""))
     {
-        stringOrFd aux = {"No dump generated. Press 'alt' to generate a dump of the instant of pressing.", -1};
+        moduleData aux = {"No dump generated. Press 'alt' to generate a dump of the instant of pressing.", -1};
         return aux;
     }
-    stringOrFd aux = {sPrintf("The dump generated:\n%s", c), -1};
+    moduleData aux = {sPrintf("The dump generated:\n%s", c), -1};
     return aux;
 }
-stringOrFd playThePiano(stringOrFd commandFd, displayStyles *displayStyle)
+moduleData playThePiano(moduleData commandFd, displayStyles *displayStyle)
 {
     *displayStyle = 1;
     startPiano();
-    stringOrFd aux = {"Now exiting the yellow submarine.", -1};
+    moduleData aux = {"Now exiting the yellow submarine.", -1};
     return aux;
 }
-stringOrFd singToMe(stringOrFd commandFd, displayStyles *displayStyle)
+moduleData singToMe(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
@@ -346,19 +346,19 @@ stringOrFd singToMe(stringOrFd commandFd, displayStyles *displayStyle)
     }
     if (match)
     {
-        stringOrFd aux = {"Song is over. Now it's your turn.", -1};
+        moduleData aux = {"Song is over. Now it's your turn.", -1};
         return aux;
     }
-    stringOrFd aux = {"Found no matching song.", -1};
+    moduleData aux = {"Found no matching song.", -1};
     return aux;
 }
-stringOrFd repeat(stringOrFd commandFd, displayStyles *displayStyle)
+moduleData repeat(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
 
     int pipeFd[2];
-    stringOrFd toRet = {NULL, -1};
+    moduleData toRet = {NULL, -1};
     if (pipe(pipeFd))
     {
         toRet.s = "Could not create pipe";
@@ -371,7 +371,7 @@ stringOrFd repeat(stringOrFd commandFd, displayStyles *displayStyle)
     return toRet;
 }
 
-char *getReadableString(stringOrFd source, char *buffer, int bufferSize)
+char *getReadableString(moduleData source, char *buffer, int bufferSize)
 {
     if (source.s != NULL && *source.s)
         return source.s;
@@ -379,18 +379,18 @@ char *getReadableString(stringOrFd source, char *buffer, int bufferSize)
     return buffer;
 }
 
-stringOrFd pipeAndExec(char *moduleName, char *params, int readFd)
+moduleData pipeAndExec(char *moduleName, char *params, int readFd)
 {
     int pipeFd[2] = {0};
     if (pipe(pipeFd))
     {
-        stringOrFd aux = {"Could not create pipe", -1};
+        moduleData aux = {"Could not create pipe", -1};
         return aux;
     }
     int c_pid = fork();
     if (c_pid == -1)
     {
-        stringOrFd aux = {"Could not create new process", -1};
+        moduleData aux = {"Could not create new process", -1};
         return aux;
     }
     if (!c_pid)
@@ -402,14 +402,14 @@ stringOrFd pipeAndExec(char *moduleName, char *params, int readFd)
         // redirect stdout to the write end of the pipe
         if (dup2(pipeFd[WRITE_END], 1) < 0)
         {
-            stringOrFd aux = {"Could not dup2", -1};
+            moduleData aux = {"Could not dup2", -1};
             return aux;
         }
         if (readFd >= 0)
         {
             if (dup2(readFd, 0) < 0)
             {
-                stringOrFd aux = {"Could not dup2", -1};
+                moduleData aux = {"Could not dup2", -1};
                 return aux;
             }
         }
@@ -432,29 +432,29 @@ stringOrFd pipeAndExec(char *moduleName, char *params, int readFd)
             execv(moduleName, args);
         }
 
-        stringOrFd aux = {"Could not execv", -1};
+        moduleData aux = {"Could not execv", -1};
         return aux;
     }
     else if (c_pid)
     {
         // I am the parent process
         close(pipeFd[WRITE_END]);
-        stringOrFd aux = {NULL, pipeFd[READ_END]};
+        moduleData aux = {NULL, pipeFd[READ_END]};
         return aux;
     }
-    stringOrFd aux = {"How did we get here?", -1};
+    moduleData aux = {"How did we get here?", -1};
     return aux;
 }
 
-stringOrFd cat(stringOrFd commandFd, displayStyles *displayStyle)
+moduleData cat(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("cat", commandFd.s, commandFd.fd);
 }
-stringOrFd wc(stringOrFd commandFd, displayStyles *displayStyle)
+moduleData wc(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("wc", commandFd.s, commandFd.fd);
 }
-stringOrFd filter(stringOrFd commandFd, displayStyles *displayStyle)
+moduleData filter(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("filter", commandFd.s, commandFd.fd);
 }

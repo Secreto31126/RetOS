@@ -162,7 +162,7 @@ void readUntilClose(int fd, displayStyles displayStyle)
 char *passCommand(char *toPass)
 {
     displayStyles displayStyle = 0;
-    stringOrFd pair = handleCommand(toPass, &displayStyle);
+    moduleData pair = handleCommand(toPass, &displayStyle);
 
     if (pair.s == NULL)
     {

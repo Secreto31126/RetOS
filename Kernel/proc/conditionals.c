@@ -90,10 +90,10 @@ bool multi_read_available(pid_t pid)
     int *fds = p->condition_data[1];
     int *ready = p->condition_data[2];
 
-    size_t i = 0;
+    size_t count = 0;
     bool all_closed = true;
 
-    for (i = 0; i < nfds; i++)
+    for (size_t i = 0; i < nfds; i++)
     {
         int file = p->files[*fds];
 
@@ -106,13 +106,13 @@ bool multi_read_available(pid_t pid)
 
         if (!file_empty(file))
         {
-            ready[i++] = *fds;
+            ready[count++] = *fds;
         }
     }
 
-    if (i || all_closed)
+    if (count || all_closed)
     {
-        p->condition_data[0] = NULL + i;
+        p->condition_data[0] = NULL + count;
         return true;
     }
 

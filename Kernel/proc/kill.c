@@ -20,7 +20,7 @@ int kill(pid_t pid, int sig)
     {
     case SIGKILL:
         p->exit_code = 127;
-        kill_process(p);
+        kill_process(p->pid);
         return 0;
 
     case SIGCONT:

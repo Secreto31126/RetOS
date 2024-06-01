@@ -172,7 +172,7 @@ char *passCommand(char *toPass)
         }
         else
         {
-            addStringToBuffer("An invalid return was obtained from this command.\n", 0);
+            addStringToBuffer("\n", 0);
             addStringToBuffer(lineStart, 0);
         }
         return "";

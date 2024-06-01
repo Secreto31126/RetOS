@@ -32,6 +32,22 @@ void addCommand(char *commandCode, char *help, action_t commandAction)
     commandCount++;
 }
 
+void moveToBackground(moduleData *data)
+{
+    if (data->fd >= 0)
+    {
+        close(data->fd);
+        data->fd = -1;
+    }
+    if (data->writeFd >= 0)
+    {
+        close(data->writeFd);
+        data->writeFd = -1;
+    }
+    data->s = NULL;
+    return *data;
+}
+
 moduleData execute(moduleData command, char *params, displayStyles *displayStyle)
 {
     for (int i = 0; i < commandCount; i++)
@@ -39,6 +55,12 @@ moduleData execute(moduleData command, char *params, displayStyles *displayStyle
         if (isFirstWord(commands[i].code, command.s))
         {
             command.s = params;
+            if (isLastAlpha(params, '&'))
+            {
+                moduleData toRet = commands[i].action(command, displayStyle);
+                moveToBackground(&toRet);
+                return toRet;
+            }
             return commands[i].action(command, displayStyle);
         }
     }

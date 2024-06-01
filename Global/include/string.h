@@ -51,4 +51,14 @@ char *strcpy(char *dest, const char *src);
  */
 char *strcat(char *dest, const char *src);
 
+/**
+ * @brief Find the index of a substring in a string
+ * @see https://android.googlesource.com/platform/bionic/+/ics-mr0/libc/string/strstr.c
+ *
+ * @param s The string to search in
+ * @param find The substring to search for
+ * @return char* The index of the substring in the string, NULL if not found
+ */
+char *strstr(const char *s, const char *find);
+
 #endif

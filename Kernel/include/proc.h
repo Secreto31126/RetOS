@@ -239,6 +239,15 @@ void read_block(int file);
  * @param file The file descriptor to write wait for
  */
 void write_block(int file);
+/**
+ * @brief Primitive select implementation
+ *
+ * @param nfds The number of file descriptors to check
+ * @param fds The file descriptors to check
+ * @param ready An array to store the ready file descriptors
+ * @return int The number of ready file descriptors, 0 if all waited files are closed
+ */
+int pselect(int nfds, int *fds, int *ready);
 
 /**
  * @brief Skip remaining CPU time and give it to the next process

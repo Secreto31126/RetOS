@@ -79,6 +79,14 @@ bool read_available(pid_t pid);
  */
 bool write_available(pid_t pid);
 /**
+ * @brief Wait for multiple fds to be read available
+ *
+ * @param pid The process' pid
+ * @return true At least one file is available for reading or all files are closed
+ * @return false No file is available for reading
+ */
+bool multi_read_available(pid_t pid);
+/**
  * @brief Await for a sleep to finish
  *
  * @param pid The process' pid

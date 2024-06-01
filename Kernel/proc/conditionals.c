@@ -80,7 +80,43 @@ bool write_available(pid_t pid)
 {
     Process *p = get_process(pid);
     int file = (uintptr_t)p->condition_data[0];
-    return file_empty(file);
+    return !file_full(file);
+}
+
+bool multi_read_available(pid_t pid)
+{
+    Process *p = get_process(pid);
+    int nfds = (uintptr_t)p->condition_data[0];
+    int *fds = p->condition_data[1];
+    int *ready = p->condition_data[2];
+
+    size_t i = 0;
+    bool all_closed = true;
+
+    for (i = 0; i < nfds; i++)
+    {
+        int file = p->files[*fds];
+
+        if (file == -1)
+        {
+            continue;
+        }
+
+        all_closed = false;
+
+        if (!file_empty(file))
+        {
+            ready[i++] = *fds;
+        }
+    }
+
+    if (i || all_closed)
+    {
+        p->condition_data[0] = NULL + i;
+        return true;
+    }
+
+    return false;
 }
 
 bool sleep_finished(pid_t pid)

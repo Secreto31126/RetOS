@@ -21,17 +21,22 @@ Executable executables[EXECUTABLES] = {
     {
         .mod = 7,
         .filename = "cat",
-        .main = (EntryPoint)0x700000,
+        .main = (EntryPoint)0x605000,
     },
     {
         .mod = 7,
         .filename = "wc",
-        .main = (EntryPoint)0x800000,
+        .main = (EntryPoint)0x610000,
     },
     {
         .mod = 7,
         .filename = "filter",
-        .main = (EntryPoint)0x900000,
+        .main = (EntryPoint)0x615000,
+    },
+    {
+        .mod = 7,
+        .filename = "loop",
+        .main = (EntryPoint)0x620000,
     },
 };
 

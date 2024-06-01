@@ -64,7 +64,6 @@ bool zombie_child(pid_t pid);
 bool semaphore_raised(pid_t pid);
 /**
  * @brief Await for a read to be available
- * @todo Implement kernel read by fd logic
  *
  * @param pid The process' pid
  * @return true Condition met

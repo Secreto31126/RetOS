@@ -18,7 +18,7 @@ uint64_t get_tick();
 void update_tick();
 /**
  * @brief Sleep for a certain amount of ticks
- * @deprecated
+ * @deprecated Bussy waiting sleep, use sleep() or usleep() instead
  *
  * @param ticks Amount of ticks to sleep
  */

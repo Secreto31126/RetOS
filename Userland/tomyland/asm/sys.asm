@@ -21,6 +21,7 @@
     global close
     global dup2
     global usleep
+    global pselect
     global flush
 
 ; size_t read(int fd, void *buf, size_t count);
@@ -155,8 +156,14 @@ usleep:
     int 80h
     ret
 
+; int pselect(int nfds, const int *fds, int *ready);
+pselect:
+    mov rax, 0x17
+    int 80h
+    ret
+
 ; int flush(int fd);
 flush:
-    mov rax, 0x17
+    mov rax, 0x18
     int 80h
     ret

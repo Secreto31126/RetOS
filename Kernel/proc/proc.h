@@ -64,7 +64,6 @@ bool zombie_child(pid_t pid);
 bool semaphore_raised(pid_t pid);
 /**
  * @brief Await for a read to be available
- * @todo Implement kernel read by fd logic
  *
  * @param pid The process' pid
  * @return true Condition met
@@ -79,6 +78,14 @@ bool read_available(pid_t pid);
  * @return false Condition not met
  */
 bool write_available(pid_t pid);
+/**
+ * @brief Wait for multiple fds to be read available
+ *
+ * @param pid The process' pid
+ * @return true At least one file is available for reading or all files are closed
+ * @return false No file is available for reading
+ */
+bool multi_read_available(pid_t pid);
 /**
  * @brief Await for a sleep to finish
  *

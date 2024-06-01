@@ -92,3 +92,11 @@ void write_block(int file)
     add_blocked(p, write_available, NULL + file, NULL, NULL, NULL, NULL);
     yield();
 }
+
+int pselect(int nfds, int *fds, int *ready)
+{
+    Process *p = get_current_process();
+    add_blocked(p, multi_read_available, NULL + nfds, fds, ready, NULL, NULL);
+    yield();
+    return (uintptr_t)p->condition_data[0];
+}

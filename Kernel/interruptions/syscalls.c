@@ -64,7 +64,7 @@ static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)get_lucas,
     (syscall)halt,
     (syscall)exit,
-    (syscall)noop, // semaphore (0xCross-roads)
+    (syscall)kill,
     (syscall)get_pid,
     (syscall)execv,
     (syscall)fork,

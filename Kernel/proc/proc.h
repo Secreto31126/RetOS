@@ -7,6 +7,7 @@
 #include <files.h>
 #include <ticks.h>
 #include <memory.h>
+#include <signal.h>
 #include <console.h>
 #include <stdbool.h>
 
@@ -101,6 +102,13 @@ bool sleep_finished(pid_t pid);
  * @return true Condition always met
  */
 bool no_condition(pid_t pid);
+/**
+ * @brief Keep the process blocked forever
+ *
+ * @param pid The process' pid
+ * @return false Condition never met
+ */
+bool whim_condition(pid_t pid);
 
 /**
  * @brief Loop all the blocked processes and unblock them if the condition is met

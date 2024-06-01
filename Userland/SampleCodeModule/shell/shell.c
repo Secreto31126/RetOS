@@ -1,7 +1,9 @@
 #include "shell.h"
 #include "commandHandler/commandHandler.h"
 #include <stdint.h>
+#include <string.h>
 #define BLOCK 50
+#define READ_BLOCK 500
 #define MOVE_BY 8
 void warpNLines(uint64_t n);
 void warpAndRedraw();
@@ -43,7 +45,7 @@ char shellStart()
         wait();
         if ((c = readChar()))
         {
-            if (c == '\n' && strcmp(commandBuffer, "exit"))
+            if (c == '\n' && !strcmp(commandBuffer, "exit"))
             {
                 blank();
                 free(commandBuffer);
@@ -104,7 +106,7 @@ void addStringToBuffer(const char *s, char ask)
 }
 void paintStringOrWarp(const char *s, char ask)
 {
-    if (strcmp(s, ""))
+    if (!strcmp(s, ""))
         return;
     if (!willFit(buffer))
     {
@@ -141,18 +143,117 @@ void paintCharOrWarp(char c)
         warpAndRedraw();
 }
 
-void readUntilClose(moduleData data, displayStyles displayStyle)
+int handleStdKeys(moduleData data, displayStyles displayStyle)
 {
-    addStringToBuffer("\n", 0);
-    char r_buffer[BLOCK];
-    int n;
-    while ((n = read_sys(data.fd, r_buffer, BLOCK - 1)) > 0)
+    char r_buffer[READ_BLOCK];
+    int n = read_sys(STD_KEYS, r_buffer, READ_BLOCK - 1);
+    if (n < 0)
+        return 1;
+    buffer[n] = 0;
+
+    char ctrlC[] = {LCTRL, 'c', 0};
+    char ctrlD[] = {LCTRL, 'c', 0};
+    char eof = EOF;
+
+    if (strstr(buffer, ctrlC) != NULL)
+        return 2;
+    if (strstr(buffer, ctrlD) != NULL && data.writeFd >= 0 && print_sys(data.writeFd, &eof, 1) < 0)
+        return 1;
+    return 0;
+}
+
+int handleReadFd(moduleData data, displayStyles displayStyle)
+{
+    char r_buffer[READ_BLOCK];
+    int n = read_sys(data.fd, r_buffer, READ_BLOCK - 1);
+    if (n < 0)
+        return 1;
+    r_buffer[n] = 0;
+    addStringToBuffer(r_buffer, 0);
+    return 0;
+}
+
+int handleWriteFd(moduleData data, displayStyles displayStyle)
+{
+    char r_buffer[READ_BLOCK];
+
+    int n = read_sys(STD_IN, r_buffer, READ_BLOCK - 1);
+    if (n < 0)
+        return 1;
+
+    if (displayStyle != REDRAW_ALWAYS)
     {
         r_buffer[n] = 0;
         addStringToBuffer(r_buffer, 0);
     }
 
+    if (data.writeFd >= 0 && print_sys(data.writeFd, r_buffer, n) < 0)
+        return 1;
+    return 0;
+}
+
+void killFgAndLeave(moduleData data, char *message)
+{
+    kill(data.cPid);
+
+    addStringToBuffer(message, 0);
+    addStringToBuffer((char *)lineStart, 0);
+
     close(data.fd);
+    if (data.writeFd >= 0)
+        close(data.writeFd);
+}
+
+void readUntilClose(moduleData data, displayStyles displayStyle)
+{
+    int readFds[3] = {data.fd, STD_KEYS, STD_IN}, availableReadFds[3] = {0};
+    int readFdCount = 3, availableReadFdCount = 0;
+
+    addStringToBuffer("\n", 0);
+
+    // this loop could be simplified with a very ugly and hard to read function
+    while ((availableReadFdCount = pselect(readFdCount, readFds, availableReadFds)) > 0)
+    {
+        for (int i = 0; i < availableReadFdCount; i++)
+        {
+            if (STD_KEYS == availableReadFds[i])
+            {
+                char aux = handleStdKeys(data, displayStyle);
+                if (aux == 1)
+                {
+                    killFgAndLeave(data, "Communication failed, killed foreground process.\n");
+                    return;
+                }
+                if (aux == 2)
+                {
+                    killFgAndLeave(data, "");
+                    return;
+                }
+            }
+            else if (data.fd == availableReadFds[i])
+            {
+                if (handleReadFd(data, displayStyle))
+                {
+                    killFgAndLeave(data, "Communication failed, killed foreground process.\n");
+                    return;
+                }
+            }
+            else if (STD_IN == availableReadFds[i])
+            {
+                if (handleWriteFd(data, displayStyle))
+                {
+                    killFgAndLeave(data, "Communication failed, killed foreground process.\n");
+                    return;
+                }
+            }
+        }
+    }
+
+    close(data.fd);
+    if (data.writeFd >= 0)
+    {
+        close(data.writeFd);
+    }
     waitpid(data.cPid, NULL, 0);
 
     addStringToBuffer("\n", 0);
@@ -183,9 +284,9 @@ char *passCommand(char *toPass)
     if (displayStyle >= REDRAW_ONCE)
     {
         char *toReturn;
-        if (strcmp(toPaint, ""))
+        if (!strcmp(toPaint, ""))
         {
-            if (strcmp(buffer, ""))
+            if (!strcmp(buffer, ""))
                 toReturn = (char *)lineStart;
             else
                 toReturn = sPrintf("%s\n%s", buffer, lineStart);
@@ -198,9 +299,9 @@ char *passCommand(char *toPass)
             blank();
         return toReturn;
     }
-    else if (strcmp(toPaint, ""))
+    else if (!strcmp(toPaint, ""))
     {
-        if (strcmp(buffer, ""))
+        if (!strcmp(buffer, ""))
             return (char *)lineStart;
         else
             return sPrintf("\n%s", lineStart);

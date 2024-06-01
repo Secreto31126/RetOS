@@ -19,6 +19,7 @@
     global pipe
     global close
     global dup2
+    global pselect
 
 ; int read_sys(unsigned int fd, char *str, size_t len);
 read_sys:
@@ -141,5 +142,11 @@ close:
 ; int dup2(int oldfd, int newfd);
 dup2:
     mov rax, 0x15
+    int 80h
+    ret
+
+; int pselect(int nfds, int *fds, int *ready);
+pselect:
+    mov rax, 0x16
     int 80h
     ret

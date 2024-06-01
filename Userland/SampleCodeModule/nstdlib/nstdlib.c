@@ -341,14 +341,6 @@ uint64_t concatFrom(char *sEnd, char *sAdd)
     return count;
 }
 
-uint64_t strlen(char *s)
-{
-    uint64_t len = 0;
-    while (*(s + len))
-        len++;
-    return len;
-}
-
 char readChar()
 {
     char c;
@@ -384,16 +376,6 @@ char strCompare(char *a, char *b)
     }
     int dist = (int)(unsigned char)(*a) - (int)(unsigned char)(*b);
     return dist ? dist > 0 ? 1 : -1 : 0;
-}
-
-char strcmp(const char *s1, const char *s2)
-{
-    while (*s1 || *s2)
-    {
-        if (*(s1++) != *(s2++))
-            return 0;
-    }
-    return 1;
 }
 
 char isFirstWord(char *s1, char *firstWord)
@@ -659,10 +641,10 @@ char timeHasPassed(uint64_t start, uint64_t unit)
 {
     return (get_tick() - start) > unit;
 }
-int separateString(char *s, char **buffer, int bufferSize)
+void separateString(char *s, char **buffer, int bufferSize)
 {
-    if (bufferSize == 0)
-        return 0;
+    if (bufferSize <= 0)
+        return;
     int i = 0;
     while (*s && i < bufferSize - 1)
     {
@@ -675,7 +657,7 @@ int separateString(char *s, char **buffer, int bufferSize)
 }
 char isLastAlpha(const char *s, char alpha)
 {
-    for (int i = strlen(s) - 1; i >= 0 && s[i] == ' ' || s[i] == '\n' || s[i] == '\t' || s[i] == alpha; i--)
+    for (int i = strlen(s) - 1; i >= 0 && (s[i] == ' ' || s[i] == '\n' || s[i] == '\t' || s[i] == alpha); i--)
     {
         if (s[i] == alpha)
             return 1;

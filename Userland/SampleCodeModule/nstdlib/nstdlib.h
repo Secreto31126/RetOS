@@ -6,7 +6,9 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 #define EOF -1
+#define LCTRL (char)0x1D
 
 // syscalls
 extern int print_sys(unsigned int fd, void *str, unsigned long long len);
@@ -27,6 +29,7 @@ extern void sleep(unsigned int seconds);
 extern int pipe(int pipefd[2]);
 extern int close(int fd);
 extern int dup2(int oldfd, int newfd);
+extern int pselect(int nfds, int *fds, int *ready);
 
 // library
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize);
@@ -41,10 +44,8 @@ uint64_t printf(char *format, ...);
 char *sPrintf(char *format, ...);
 uint64_t sPuts(char *receiver, const char *source);
 char sPutChar(char *receiver, char c);
-uint64_t strlen(char *s);
 static const double pi = 3.14159265359;
 uint64_t pow(double base, uint64_t exponent); // can't return doubles in userland because SSE registers aren't usable
-char strcmp(const char *s1, const char *s2);
 char isPrefix(char *prefix, char *word);
 char isFirstWord(char *s1, char *firstWord);
 void wait();
@@ -62,7 +63,7 @@ char *shiftToNextWord(char *s);
 int readNFromFd(int fd, char *buffer, int n);
 char *getDumpString();
 char timeHasPassed(uint64_t start, uint64_t unit);
-int separateString(char *s, char **buffer, int bufferSize);
+void separateString(char *s, char **buffer, int bufferSize);
 char isLastAlpha(const char *s, char alpha);
 
 #endif

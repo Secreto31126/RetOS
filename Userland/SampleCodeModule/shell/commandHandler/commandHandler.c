@@ -171,7 +171,7 @@ moduleData startSnake(moduleData commandFd, displayStyles *displayStyle)
     char *formatString = "Player %d won. Returning to shell";
     int i;
     char *aux = NULL;
-    if (strcmp("", commandParameters) || (i = atoi(commandParameters)) == 1)
+    if (!strcmp("", commandParameters) || (i = atoi(commandParameters)) == 1)
     {
         aux = sPrintf(formatString, playSnake(1));
     }
@@ -196,7 +196,7 @@ moduleData setSnakeTheme(moduleData commandFd, displayStyles *displayStyle)
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
 
     char matchFlag = 0;
-    if (strcmp(commandParameters, "windows"))
+    if (!strcmp(commandParameters, "windows"))
     {
         setBackgroundArray((char *)windowsArray);
         setBackgroundColorMap((HexColor *)windowsColorMap);
@@ -204,7 +204,7 @@ moduleData setSnakeTheme(moduleData commandFd, displayStyles *displayStyle)
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
-    else if (strcmp(commandParameters, "mario"))
+    else if (!strcmp(commandParameters, "mario"))
     {
         setBackgroundArray((char *)marioArray);
         setBackgroundColorMap((HexColor *)marioColorMap);
@@ -212,7 +212,7 @@ moduleData setSnakeTheme(moduleData commandFd, displayStyles *displayStyle)
         setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }
-    else if (strcmp(commandParameters, "pong"))
+    else if (!strcmp(commandParameters, "pong"))
     {
         setBackgroundArray((char *)pongArray);
         setBackgroundColorMap((HexColor *)pongColorMap);
@@ -220,7 +220,7 @@ moduleData setSnakeTheme(moduleData commandFd, displayStyles *displayStyle)
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
-    else if (strcmp(commandParameters, "creation"))
+    else if (!strcmp(commandParameters, "creation"))
     {
         setBackgroundArray((char *)creationArray);
         setBackgroundColorMap((HexColor *)creationColorMap);
@@ -228,7 +228,7 @@ moduleData setSnakeTheme(moduleData commandFd, displayStyles *displayStyle)
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;
     }
-    else if (strcmp(commandParameters, "camelot"))
+    else if (!strcmp(commandParameters, "camelot"))
     {
         setBackgroundArray((char *)camelotArray);
         setBackgroundColorMap((HexColor *)camelotColorMap);
@@ -236,7 +236,7 @@ moduleData setSnakeTheme(moduleData commandFd, displayStyles *displayStyle)
         setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }
-    else if (strcmp(commandParameters, "idyllic"))
+    else if (!strcmp(commandParameters, "idyllic"))
     {
         setBackgroundArray((char *)idyllicArray);
         setBackgroundColorMap((HexColor *)idyllicColorMap);
@@ -322,7 +322,7 @@ moduleData clearTheShell(moduleData commandFd, displayStyles *displayStyle)
 moduleData readMeTheDump(moduleData commandFd, displayStyles *displayStyle)
 {
     char *c = getDumpString();
-    if (strcmp(c, ""))
+    if (!strcmp(c, ""))
     {
         moduleData aux = {"No dump generated. Press 'alt' to generate a dump of the instant of pressing.", -1, -1, -1};
         return aux;
@@ -343,32 +343,32 @@ moduleData singToMe(moduleData commandFd, displayStyles *displayStyle)
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
 
     char match = 0;
-    if (strcmp(commandParameters, "imperial-march"))
+    if (!strcmp(commandParameters, "imperial-march"))
     {
         imperial_march();
         match = 1;
     }
-    else if (strcmp(commandParameters, "hes-a-pirate"))
+    else if (!strcmp(commandParameters, "hes-a-pirate"))
     {
         hes_a_pirate();
         match = 1;
     }
-    else if (strcmp(commandParameters, "outer-wilds"))
+    else if (!strcmp(commandParameters, "outer-wilds"))
     {
         outer_wilds();
         match = 1;
     }
-    else if (strcmp(commandParameters, "do-i-wanna-know"))
+    else if (!strcmp(commandParameters, "do-i-wanna-know"))
     {
         do_i_wanna_know();
         match = 1;
     }
-    else if (strcmp(commandParameters, "sports-center"))
+    else if (!strcmp(commandParameters, "sports-center"))
     {
         sports_center();
         match = 1;
     }
-    else if (strcmp(commandParameters, "here-comes-the-sun"))
+    else if (!strcmp(commandParameters, "here-comes-the-sun"))
     {
         here_comes_the_sun();
         match = 1;
@@ -394,7 +394,7 @@ moduleData repeat(moduleData commandFd, displayStyles *displayStyle)
         return toRet;
     }
     toRet.fd = pipeFd[READ_END];
-    char *aux = strcmp(commandParameters, "") ? " " : commandParameters;
+    char *aux = !strcmp(commandParameters, "") ? " " : commandParameters;
     print_sys(pipeFd[WRITE_END], aux, strlen(aux) + 1);
     close(pipeFd[WRITE_END]);
     return toRet;
@@ -495,7 +495,7 @@ moduleData filter(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("filter", commandFd.s, commandFd.fd, 0);
 }
-moduleData loop(moduleData commandFd, char *mustRedraw)
+moduleData loop(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("loop", commandFd.s, commandFd.fd, 0);
 }

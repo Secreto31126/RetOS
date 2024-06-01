@@ -34,7 +34,7 @@ void *create_process_idle()
         .next_child = NULL,
         .next_brother = NULL,
         .exit_code = 0,
-        .priority = 1,
+        .priority = 19,
         .next_blocked = NULL,
         .block_condition = no_condition,
         .condition_data = {},
@@ -213,7 +213,7 @@ int kill_process(pid_t pid)
 
     for (size_t i = 0; i < MAX_PROCESS_FILES; i++)
     {
-        close(i);
+        close_file(i);
     }
 
     /**
@@ -329,19 +329,30 @@ int open_file(int file, int flags)
     return -1;
 }
 
+int close_file(int file)
+{
+    if (file != -1)
+    {
+        // You can't close stdin, stdout, stderr or stdkey
+
+        if (IS_PIPE(file))
+        {
+            close_pipe(file);
+        }
+
+        return 0;
+    }
+
+    return -1;
+}
+
 int close(int fd)
 {
     Process *p = get_current_process();
 
-    if (0 <= fd && fd < MAX_PROCESS_FILES && p->files[fd] != -1)
+    if (0 <= fd && fd < MAX_PROCESS_FILES)
     {
-        if (IS_PIPE(p->files[fd]))
-        {
-            close_pipe(p->files[fd]);
-        }
-
-        p->files[fd] = -1;
-        return 0;
+        return close_file(p->files[fd]);
     }
 
     return -1;
@@ -367,6 +378,29 @@ int dup2(int oldfd, int newfd)
         }
 
         return newfd;
+    }
+
+    return -1;
+}
+
+int getpriority(int which, id_t who)
+{
+    if (which == PRIO_PROCESS)
+    {
+        Process *p = get_process(who);
+        return p->priority;
+    }
+
+    return -1;
+}
+
+int setpriority(int which, id_t who, int prio)
+{
+    if (which == PRIO_PROCESS)
+    {
+        Process *p = get_process(who);
+        p->priority = MAX(PRIO_MIN, MIN(PRIO_MAX, prio));
+        return 0;
     }
 
     return -1;

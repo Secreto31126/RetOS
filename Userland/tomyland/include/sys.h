@@ -35,5 +35,7 @@ extern int close(int fd);
 extern int dup2(int oldfd, int newfd);
 extern int usleep(unsigned int usec);
 extern int flush(int fd);
+extern int getpriority(int which, unsigned int who);
+extern int setpriority(int which, unsigned int who, int prio);
 
 #endif

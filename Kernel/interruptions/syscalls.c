@@ -49,7 +49,7 @@ static uint64_t halt(uint64_t, uint64_t, uint64_t, uint64_t rax);
  */
 static uint64_t fork(uint64_t, uint64_t, uint64_t, uint64_t, void *rsp);
 
-#define SYSCALL_COUNT 25
+#define SYSCALL_COUNT 27
 typedef uint64_t (*syscall)(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t);
 static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)read,
@@ -77,6 +77,8 @@ static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)usleep,
     (syscall)pselect,
     (syscall)flush,
+    (syscall)getpriority,
+    (syscall)setpriority,
 };
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax, uint64_t rsp)

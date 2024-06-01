@@ -150,3 +150,9 @@ pselect:
     mov rax, 0x16
     int 80h
     ret
+
+; int kill(pid_t pid, int sig);
+kill:
+    mov rax, 0xC
+    int 80h
+    ret

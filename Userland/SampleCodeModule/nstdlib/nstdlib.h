@@ -7,6 +7,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #define EOF -1
 #define LCTRL (char)0x1D
 
@@ -30,6 +31,7 @@ extern int pipe(int pipefd[2]);
 extern int close(int fd);
 extern int dup2(int oldfd, int newfd);
 extern int pselect(int nfds, int *fds, int *ready);
+extern int kill(int pid, int sig);
 
 // library
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize);

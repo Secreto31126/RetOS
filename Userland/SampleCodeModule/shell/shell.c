@@ -194,7 +194,7 @@ int handleWriteFd(moduleData data, displayStyles displayStyle)
 
 void killFgAndLeave(moduleData data, char *message)
 {
-    kill(data.cPid);
+    kill(data.cPid, SIGKILL);
 
     addStringToBuffer(message, 0);
     addStringToBuffer((char *)lineStart, 0);

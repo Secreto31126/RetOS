@@ -447,7 +447,7 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, char makeTerm
         }
         if (readFd >= 0)
         {
-            if (dup2(readFd, 0) < 0)
+            if (dup2(readFd, STD_IN) < 0)
                 exit(1);
         }
         else

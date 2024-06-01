@@ -140,3 +140,8 @@ bool no_condition(pid_t pid)
 {
     return true;
 }
+
+bool whim_condition(pid_t pid)
+{
+    return false;
+}

@@ -214,6 +214,14 @@ int kill_process(pid_t pid);
  */
 int open_file(int file, int flags);
 /**
+ * @brief Close a file
+ * @note Kernel only, use the syscall close() for closing current process' files
+ *
+ * @param file The process file descriptor
+ * @return int 0 if the file was closed, -1 otherwise
+ */
+int close_file(int file);
+/**
  * @brief Close a file in the current process
  *
  * @param fd The process file descriptor

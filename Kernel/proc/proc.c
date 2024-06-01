@@ -334,13 +334,15 @@ int close_file(int file)
     if (file != -1)
     {
         // You can't close stdin, stdout, stderr or stdkey
+        if (0 <= file && file < 4)
+        {
+            return 0;
+        }
 
         if (IS_PIPE(file))
         {
-            close_pipe(file);
+            return close_pipe(file);
         }
-
-        return 0;
     }
 
     return -1;
@@ -350,9 +352,10 @@ int close(int fd)
 {
     Process *p = get_current_process();
 
-    if (0 <= fd && fd < MAX_PROCESS_FILES)
+    if (0 <= fd && fd < MAX_PROCESS_FILES && !close_file(p->files[fd]))
     {
-        return close_file(p->files[fd]);
+        p->files[fd] = -1;
+        return 0;
     }
 
     return -1;

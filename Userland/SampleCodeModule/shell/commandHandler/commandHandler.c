@@ -42,7 +42,7 @@ moduleData execute(moduleData command, char *params, displayStyles *displayStyle
             return commands[i].action(command, displayStyle);
         }
     }
-    moduleData aux = {"Command was not recognized", -1};
+    moduleData aux = {"Command was not recognized", -1, -1, -1};
     return aux;
 }
 
@@ -50,14 +50,22 @@ moduleData wrapExecute(moduleData toPipe, char *command, displayStyles *displayS
 {
     if (toPipe.s != NULL)
     {
-        moduleData aux = {command, -1};
-        return execute(aux, shiftToNextWord(aux.s), displayStyle);
+        moduleData aux = {command, -1, toPipe.writeFd, toPipe.writeFd};
+        toPipe = execute(aux, shiftToNextWord(aux.s), displayStyle);
+        if (aux.fd >= 0)
+            close(aux.fd);
+        if (aux.writeFd >= 0)
+            close(aux.writeFd);
+        return toPipe;
     }
     else
     { // I have an open read fd, I hand it over to the executor, and close it once it is no longer in use
-        moduleData aux = {command, toPipe.fd};
+        moduleData aux = {command, toPipe.fd, toPipe.writeFd, toPipe.writeFd};
         toPipe = execute(aux, shiftToNextWord(aux.s), displayStyle);
-        close(aux.fd);
+        if (aux.fd >= 0)
+            close(aux.fd);
+        if (aux.writeFd >= 0)
+            close(aux.writeFd);
         return toPipe;
     }
 }
@@ -72,7 +80,7 @@ moduleData handleCommand(char *command, displayStyles *displayStyle)
         return aux;
     }
 
-    moduleData toPipe = {shiftToNextWord(command), -1}; // The first set of params I can hand over comes from the second word in my command string
+    moduleData toPipe = {shiftToNextWord(command), -1, -1, -1}; // The first set of params I can hand over comes from the second word in my command string
     char *currentCommandStart = command;
     for (int j = 0; command[j]; j++)
     {
@@ -92,7 +100,7 @@ moduleData getHelp(moduleData commandFd, displayStyles *displayStyle)
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
 
     int pipeFd[2];
-    moduleData toRet = {NULL, -1};
+    moduleData toRet = {NULL, -1, -1, -1};
     if (pipe(pipeFd))
     {
         toRet.s = "Could not create pipe";
@@ -121,7 +129,7 @@ moduleData getHelp(moduleData commandFd, displayStyles *displayStyle)
         }
     }
     close(pipeFd[WRITE_END]);
-    moduleData aux = {sPrintf("No help menu that matches '%s' was found.", commandParameters), -1}; // sPrintf automatically adds created string to list of strings to be freed by freePrints()
+    moduleData aux = {sPrintf("No help menu that matches '%s' was found.", commandParameters), -1, -1, -1}; // sPrintf automatically adds created string to list of strings to be freed by freePrints()
     return aux;
 }
 
@@ -131,7 +139,7 @@ moduleData startSnake(moduleData commandFd, displayStyles *displayStyle)
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
 
     int pipeFd[2];
-    moduleData toRet = {NULL, -1};
+    moduleData toRet = {NULL, -1, -1, -1};
     if (pipe(pipeFd))
     {
         toRet.s = "Could not create pipe";
@@ -217,10 +225,10 @@ moduleData setSnakeTheme(moduleData commandFd, displayStyles *displayStyle)
     }
     if (matchFlag)
     {
-        moduleData aux = {"Theme set.", -1};
+        moduleData aux = {"Theme set.", -1, -1, -1};
         return aux;
     }
-    moduleData aux = {sPrintf("No theme matching %s was found.", commandParameters), -1};
+    moduleData aux = {sPrintf("No theme matching %s was found.", commandParameters), -1, -1, -1};
     return aux;
 }
 
@@ -231,12 +239,12 @@ moduleData changehighlightColor(moduleData commandFd, displayStyles *displayStyl
 
     if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
     {
-        moduleData aux = {"Hex value given not valid.", -1};
+        moduleData aux = {"Hex value given not valid.", -1, -1, -1};
         return aux;
     }
     setHighlightColor(atoiHex(commandParameters)); // will read until an invalid character is found or 8 characters have been read. If an invalid character was found, what was read so far will be set as the color.
     *displayStyle = 1;
-    moduleData aux = {"Highlight color set", -1};
+    moduleData aux = {"Highlight color set", -1, -1, -1};
     return aux;
 }
 moduleData changeLetterColor(moduleData commandFd, displayStyles *displayStyle)
@@ -246,13 +254,13 @@ moduleData changeLetterColor(moduleData commandFd, displayStyles *displayStyle)
 
     if (!((*commandParameters >= '0' && *commandParameters <= '9') || (*commandParameters >= 'A' && *commandParameters <= 'F') || (*commandParameters >= 'a' && *commandParameters <= 'f')))
     {
-        moduleData aux = {"Hex value given not valid.", -1};
+        moduleData aux = {"Hex value given not valid.", -1, -1, -1};
         return aux;
     }
     // uint64_t hex = 0;
     setLetterColor(atoiHex(commandParameters));
     *displayStyle = 1;
-    moduleData aux = {"Letter color set", -1};
+    moduleData aux = {"Letter color set", -1, -1, -1};
     return aux;
 }
 moduleData changeLetterSize(moduleData commandFd, displayStyles *displayStyle)
@@ -263,7 +271,7 @@ moduleData changeLetterSize(moduleData commandFd, displayStyles *displayStyle)
     uint64_t newSize = atoi(commandParameters);
     if (newSize < 0 || newSize > MAX_LETTER_SIZE)
     {
-        moduleData aux = {"Invalid letter size.", -1};
+        moduleData aux = {"Invalid letter size.", -1, -1, -1};
         return aux;
     }
     if (!newSize) // would be nice to actually handle doubles, however, no parseDouble function can be made (reasonably easily) if SSE registers cannot be used to return the value.
@@ -271,7 +279,7 @@ moduleData changeLetterSize(moduleData commandFd, displayStyles *displayStyle)
     else
         resize((double)newSize);
     *displayStyle = 1;
-    moduleData aux = {"Size set", -1};
+    moduleData aux = {"Size set", -1, -1, -1};
     return aux;
 }
 moduleData clearTheShell(moduleData commandFd, displayStyles *displayStyle)
@@ -287,7 +295,7 @@ moduleData clearTheShell(moduleData commandFd, displayStyles *displayStyle)
     }
     else
         clearShell();
-    moduleData aux = {"", -1};
+    moduleData aux = {"", -1, -1, -1};
     return aux;
 }
 moduleData readMeTheDump(moduleData commandFd, displayStyles *displayStyle)
@@ -295,17 +303,17 @@ moduleData readMeTheDump(moduleData commandFd, displayStyles *displayStyle)
     char *c = getDumpString();
     if (strcmp(c, ""))
     {
-        moduleData aux = {"No dump generated. Press 'alt' to generate a dump of the instant of pressing.", -1};
+        moduleData aux = {"No dump generated. Press 'alt' to generate a dump of the instant of pressing.", -1, -1, -1};
         return aux;
     }
-    moduleData aux = {sPrintf("The dump generated:\n%s", c), -1};
+    moduleData aux = {sPrintf("The dump generated:\n%s", c), -1, -1, -1};
     return aux;
 }
 moduleData playThePiano(moduleData commandFd, displayStyles *displayStyle)
 {
     *displayStyle = 1;
     startPiano();
-    moduleData aux = {"Now exiting the yellow submarine.", -1};
+    moduleData aux = {"Now exiting the yellow submarine.", -1, -1, -1};
     return aux;
 }
 moduleData singToMe(moduleData commandFd, displayStyles *displayStyle)
@@ -346,10 +354,10 @@ moduleData singToMe(moduleData commandFd, displayStyles *displayStyle)
     }
     if (match)
     {
-        moduleData aux = {"Song is over. Now it's your turn.", -1};
+        moduleData aux = {"Song is over. Now it's your turn.", -1, -1, -1};
         return aux;
     }
-    moduleData aux = {"Found no matching song.", -1};
+    moduleData aux = {"Found no matching song.", -1, -1, -1};
     return aux;
 }
 moduleData repeat(moduleData commandFd, displayStyles *displayStyle)
@@ -358,7 +366,7 @@ moduleData repeat(moduleData commandFd, displayStyles *displayStyle)
     char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
 
     int pipeFd[2];
-    moduleData toRet = {NULL, -1};
+    moduleData toRet = {NULL, -1, -1, -1};
     if (pipe(pipeFd))
     {
         toRet.s = "Could not create pipe";
@@ -379,21 +387,21 @@ char *getReadableString(moduleData source, char *buffer, int bufferSize)
     return buffer;
 }
 
-moduleData pipeAndExec(char *moduleName, char *params, int readFd)
+moduleData pipeAndExec(char *moduleName, char *params, int readFd, char keepWriteOpen)
 {
     int pipeFd[2] = {0};
     if (pipe(pipeFd))
     {
-        moduleData aux = {"Could not create pipe", -1};
+        moduleData aux = {"Could not create pipe", -1, -1, -1};
         return aux;
     }
-    int c_pid = fork();
-    if (c_pid == -1)
+    int cPid = fork();
+    if (cPid == -1)
     {
-        moduleData aux = {"Could not create new process", -1};
+        moduleData aux = {"Could not create new process", -1, -1, -1};
         return aux;
     }
-    if (!c_pid)
+    if (!cPid)
     {
         // I am the child process
 
@@ -402,14 +410,14 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd)
         // redirect stdout to the write end of the pipe
         if (dup2(pipeFd[WRITE_END], 1) < 0)
         {
-            moduleData aux = {"Could not dup2", -1};
+            moduleData aux = {"Could not dup2", -1, -1, -1};
             return aux;
         }
         if (readFd >= 0)
         {
             if (dup2(readFd, 0) < 0)
             {
-                moduleData aux = {"Could not dup2", -1};
+                moduleData aux = {"Could not dup2", -1, -1, -1};
                 return aux;
             }
         }
@@ -432,31 +440,39 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd)
             execv(moduleName, args);
         }
 
-        moduleData aux = {"Could not execv", -1};
+        moduleData aux = {"Could not execv", -1, -1, -1};
         return aux;
     }
-    else if (c_pid)
+    else if (cPid)
     {
         // I am the parent process
-        close(pipeFd[WRITE_END]);
-        moduleData aux = {NULL, pipeFd[READ_END]};
-        return aux;
+        if (!keepWriteOpen)
+        {
+            close(pipeFd[WRITE_END]);
+            moduleData aux = {NULL, pipeFd[READ_END], -1, cPid};
+            return aux;
+        }
+        else
+        {
+            moduleData aux = {NULL, pipeFd[READ_END], pipeFd[WRITE_END], cPid};
+            return aux;
+        }
     }
-    moduleData aux = {"How did we get here?", -1};
+    moduleData aux = {"How did we get here?", -1, -1, -1};
     return aux;
 }
 
 moduleData cat(moduleData commandFd, displayStyles *displayStyle)
 {
-    return pipeAndExec("cat", commandFd.s, commandFd.fd);
+    return pipeAndExec("cat", commandFd.s, commandFd.fd, 0);
 }
 moduleData wc(moduleData commandFd, displayStyles *displayStyle)
 {
-    return pipeAndExec("wc", commandFd.s, commandFd.fd);
+    return pipeAndExec("wc", commandFd.s, commandFd.fd, 0);
 }
 moduleData filter(moduleData commandFd, displayStyles *displayStyle)
 {
-    return pipeAndExec("filter", commandFd.s, commandFd.fd);
+    return pipeAndExec("filter", commandFd.s, commandFd.fd, 0);
 }
 
 void initializeCommands()

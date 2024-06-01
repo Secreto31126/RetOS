@@ -5,7 +5,7 @@ typedef struct moduleData
     char *s;
     int fd;
     int writeFd;
-    int pid;
+    int cPid;
 } moduleData;
 typedef enum displayStyles
 {

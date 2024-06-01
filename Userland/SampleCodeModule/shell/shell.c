@@ -141,19 +141,19 @@ void paintCharOrWarp(char c)
         warpAndRedraw();
 }
 
-void readUntilClose(int fd, displayStyles displayStyle)
+void readUntilClose(moduleData data, displayStyles displayStyle)
 {
     addStringToBuffer("\n", 0);
     char r_buffer[BLOCK];
     int n;
-    while ((n = read_sys(fd, r_buffer, BLOCK - 1)) > 0)
+    while ((n = read_sys(data.fd, r_buffer, BLOCK - 1)) > 0)
     {
         r_buffer[n] = 0;
         addStringToBuffer(r_buffer, 0);
     }
 
-    close(fd);
-    waitpid(-1, NULL, 0);
+    close(data.fd);
+    waitpid(data.cPid, NULL, 0);
 
     addStringToBuffer("\n", 0);
     addStringToBuffer((char *)lineStart, 0);
@@ -162,13 +162,13 @@ void readUntilClose(int fd, displayStyles displayStyle)
 char *passCommand(char *toPass)
 {
     displayStyles displayStyle = 0;
-    moduleData pair = handleCommand(toPass, &displayStyle);
+    moduleData data = handleCommand(toPass, &displayStyle);
 
-    if (pair.s == NULL)
+    if (data.s == NULL)
     {
-        if (pair.fd >= 0)
+        if (data.fd >= 0)
         {
-            readUntilClose(pair.fd, displayStyle);
+            readUntilClose(data, displayStyle);
         }
         else
         {
@@ -178,7 +178,7 @@ char *passCommand(char *toPass)
         return "";
     }
 
-    char *toPaint = pair.s;
+    char *toPaint = data.s;
 
     if (displayStyle >= REDRAW_ONCE)
     {

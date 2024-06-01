@@ -10,6 +10,7 @@
     global get_dump
     global halt_user
     global exit
+    global kill
     global get_pid
     global execv
     global fork
@@ -84,6 +85,12 @@ halt_user:
 ; void exit();
 exit:
     mov rax, 0xB
+    int 80h
+    ret
+
+; int kill(pid_t pid, int sig);
+kill:
+    mov rax, 0xC
     int 80h
     ret
 

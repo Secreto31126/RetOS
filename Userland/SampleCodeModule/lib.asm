@@ -148,7 +148,7 @@ dup2:
 
 ; int pselect(int nfds, const int *fds, int *ready);
 pselect:
-    mov rax, 0x16
+    mov rax, 0x17
     int 80h
     ret
 

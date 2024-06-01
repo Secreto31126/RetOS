@@ -151,12 +151,17 @@ int handleStdKeys(moduleData data, displayStyles displayStyle)
         return 1;
     buffer[n] = 0;
 
-    char ctrlC[] = {LCTRL, 'c', 0};
-    char ctrlD[] = {LCTRL, 'c', 0};
+    char ctrlC[] = {LCTRL, 0x2E, 0};
+    char ctrlD[] = {LCTRL, 0x20, 0};
     char eof = EOF;
-
+    char buff[100];
+    itoa(r_buffer, buff, 16);
+    addStringToBuffer(buff, 0);
     if (strstr(buffer, ctrlC) != NULL)
+    {
+        addStringToBuffer("killing", 0);
         return 2;
+    }
     if (strstr(buffer, ctrlD) != NULL && data.writeFd >= 0 && print_sys(data.writeFd, &eof, 1) < 0)
         return 1;
     return 0;
@@ -218,14 +223,10 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
     while (!leaveFlag)
     {
         availableReadFdCount = pselect(readFdCount, readFds, availableReadFds);
-        char c[] = {availableReadFdCount + '0', '\t', 0};
-        char c_again[] = {availableReadFds[0] + '0', availableReadFds[1] + '0', availableReadFds[2] + '0', '\t', 0};
-        paintStringOrWarp(c_again, 0);
         for (int i = 0; i < availableReadFdCount; i++)
         {
             if (data.fd == availableReadFds[i])
             {
-                paintStringOrWarp("Read from proc\n", 0);
                 char aux = handleReadFd(data, displayStyle);
                 if (aux == 1)
                 {
@@ -240,7 +241,6 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
             }
             else if (STD_KEYS == availableReadFds[i])
             {
-                paintStringOrWarp("Read from stdk\n", 0);
                 char aux = handleStdKeys(data, displayStyle);
                 if (aux == 1)
                 {
@@ -255,7 +255,6 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
             }
             else if (STD_IN == availableReadFds[i])
             {
-                paintStringOrWarp("Read from stdi\n", 0);
                 if (handleWriteFd(data, displayStyle))
                 {
                     killFgAndLeave(data, "Communication failed, killed foreground process.\n");
@@ -264,7 +263,6 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
             }
         }
     }
-    paintStringOrWarp("Left", 0);
 
     close(data.fd);
     if (data.writeFd >= 0)

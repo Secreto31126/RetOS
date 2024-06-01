@@ -200,6 +200,7 @@ void killFgAndLeave(moduleData data, char *message)
     kill(data.cPid, SIGKILL);
 
     addStringToBuffer(message, 0);
+    addStringToBuffer("\n", 0);
     addStringToBuffer((char *)lineStart, 0);
 
     close(data.fd);

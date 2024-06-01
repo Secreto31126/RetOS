@@ -23,6 +23,7 @@ extern void beep(uint32_t freq);
 extern size_t get_tick();
 extern void halt_user();
 extern void exit(int status);
+extern int kill(int pid, int sig);
 extern int get_pid();
 extern int execv(char *pathname, char *argv[]);
 extern int fork();
@@ -32,5 +33,7 @@ extern void sleep(unsigned int seconds);
 extern int pipe(int pipefd[2]);
 extern int close(int fd);
 extern int dup2(int oldfd, int newfd);
+extern int usleep(unsigned int usec);
+extern int flush(int fd);
 
 #endif

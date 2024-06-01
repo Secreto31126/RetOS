@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 		write(STD_OUT, "Hi there, my pid is: ", sizeof("Hi there, my pid is: ") - 1);
 		write(STD_OUT, pidString, len);
 		write(STD_OUT, "\n", 1);
-		sleep(interval);
+		usleep(interval);
 	}
 	return 0; // Exit handled outside
 }

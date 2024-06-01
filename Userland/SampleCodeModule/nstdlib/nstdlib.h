@@ -32,6 +32,7 @@ extern int close(int fd);
 extern int dup2(int oldfd, int newfd);
 extern int pselect(int nfds, const int *fds, int *ready);
 extern int kill(int pid, int sig);
+extern int flush(int fd);
 
 // library
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize);

@@ -21,6 +21,7 @@
     global dup2
     global pselect
     global kill
+    global flush
 
 ; int read_sys(unsigned int fd, char *str, size_t len);
 read_sys:
@@ -149,6 +150,12 @@ dup2:
 ; int pselect(int nfds, const int *fds, int *ready);
 pselect:
     mov rax, 0x17
+    int 80h
+    ret
+
+; int flush(int fd);
+flush:
+    mov rax, 0x18
     int 80h
     ret
 

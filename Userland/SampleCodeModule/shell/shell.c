@@ -154,15 +154,11 @@ int handleStdKeys(moduleData data, displayStyles displayStyle)
     char ctrlC[] = {LCTRL, 0x2E, 0};
     char ctrlD[] = {LCTRL, 0x20, 0};
     char eof = EOF;
-    char buff[100];
-    itoa(r_buffer, buff, 16);
-    addStringToBuffer(buff, 0);
-    if (strstr(buffer, ctrlC) != NULL)
+    if (strstr(r_buffer, ctrlC) != NULL)
     {
-        addStringToBuffer("killing", 0);
         return 2;
     }
-    if (strstr(buffer, ctrlD) != NULL && data.writeFd >= 0 && print_sys(data.writeFd, &eof, 1) < 0)
+    if (strstr(r_buffer, ctrlD) != NULL && data.writeFd >= 0 && print_sys(data.writeFd, &eof, 1) < 0)
         return 1;
     return 0;
 }
@@ -213,6 +209,7 @@ void killFgAndLeave(moduleData data, char *message)
 
 void readUntilClose(moduleData data, displayStyles displayStyle)
 {
+    flush(STD_KEYS);
     int readFds[3] = {data.fd, STD_KEYS, STD_IN}, availableReadFds[3] = {0};
     int readFdCount = 3, availableReadFdCount = 0;
 

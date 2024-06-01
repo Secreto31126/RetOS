@@ -213,7 +213,8 @@ int kill_process(pid_t pid)
 
     for (size_t i = 0; i < MAX_PROCESS_FILES; i++)
     {
-        close_file(i);
+        close_file(man_im_dead->files[i]);
+        man_im_dead->files[i] = -1;
     }
 
     /**

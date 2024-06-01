@@ -419,6 +419,8 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, char keepWrit
     int cPid = fork();
     if (cPid == -1)
     {
+        close(pipeFd[READ_END]);
+        close(pipeFd[WRITE_END]);
         moduleData aux = {"Could not create new process", -1, -1, -1};
         return aux;
     }
@@ -431,16 +433,12 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, char keepWrit
         // redirect stdout to the write end of the pipe
         if (dup2(pipeFd[WRITE_END], 1) < 0)
         {
-            moduleData aux = {"Could not dup2", -1, -1, -1};
-            return aux;
+            exit(1);
         }
         if (readFd >= 0)
         {
             if (dup2(readFd, 0) < 0)
-            {
-                moduleData aux = {"Could not dup2", -1, -1, -1};
-                return aux;
-            }
+                exit(1);
         }
         else
         {
@@ -460,8 +458,8 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, char keepWrit
             separateString(params, args, MAX_ARGS);
             execv(moduleName, args);
         }
-
-        moduleData aux = {"Could not execv", -1, -1, -1};
+        exit(1);
+        moduleData aux = {"Could not execv and failed to exit, somehow.", -1, -1, -1};
         return aux;
     }
     else if (cPid)

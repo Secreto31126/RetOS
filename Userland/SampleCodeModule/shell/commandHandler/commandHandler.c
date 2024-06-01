@@ -45,7 +45,6 @@ void moveToBackground(moduleData *data)
         data->writeFd = -1;
     }
     data->s = NULL;
-    return *data;
 }
 
 moduleData execute(moduleData command, char *params, displayStyles *displayStyle)
@@ -496,9 +495,9 @@ moduleData filter(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("filter", commandFd.s, commandFd.fd, 0);
 }
-stringOrFd loop(stringOrFd commandFd, char *mustRedraw)
+moduleData loop(moduleData commandFd, char *mustRedraw)
 {
-    return pipeAndExec("loop", commandFd.s, commandFd.fd);
+    return pipeAndExec("loop", commandFd.s, commandFd.fd, 0);
 }
 
 void initializeCommands()

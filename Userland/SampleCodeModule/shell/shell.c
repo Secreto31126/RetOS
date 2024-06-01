@@ -211,7 +211,7 @@ void killFgAndLeave(moduleData data, char *message)
 void readUntilClose(moduleData data, displayStyles displayStyle)
 {
     flush(STD_KEYS);
-    int readFds[3] = {data.fd, STD_KEYS, STD_IN}, availableReadFds[3] = {0};
+    int readFds[3] = {data.fd, STD_IN, STD_KEYS}, availableReadFds[3] = {0};
     int readFdCount = 3, availableReadFdCount = 0;
 
     addStringToBuffer("\n", 0);

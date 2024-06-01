@@ -2,7 +2,7 @@ include Makefile.inc
 
 SAMPLE_DATA=0001-sampleDataModule.bin
 
-all: sampleCodeModule tomyland cat wc filter sampleDataModule
+all: sampleCodeModule tomyland cat wc filter loop sampleDataModule
 
 sampleCodeModule:
 	cd SampleCodeModule; make
@@ -19,6 +19,9 @@ wc:
 filter:
 	cd filter; make
 
+loop:
+	cd loop; make
+
 sampleDataModule:
 	whoami >> $(SAMPLE_DATA) && dd if=/dev/zero bs=1 count=1 >> $(SAMPLE_DATA)
 
@@ -28,7 +31,8 @@ clean:
 	cd cat; make clean
 	cd wc; make clean
 	cd filter; make clean
+	cd loop; make clean
 	rm -rf *.bin
 
 
-.PHONY: sampleCodeModule tomyland cat wc filter all clean
+.PHONY: sampleCodeModule tomyland cat wc filter loop all clean

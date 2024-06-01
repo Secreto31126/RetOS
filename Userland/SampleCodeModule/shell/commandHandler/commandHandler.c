@@ -458,6 +458,10 @@ stringOrFd filter(stringOrFd commandFd, char *mustRedraw)
 {
     return pipeAndExec("filter", commandFd.s, commandFd.fd);
 }
+stringOrFd loop(stringOrFd commandFd, char *mustRedraw)
+{
+    return pipeAndExec("loop", commandFd.s, commandFd.fd);
+}
 
 void initializeCommands()
 {
@@ -475,4 +479,5 @@ void initializeCommands()
     addCommand("cat", "Help display for the cat module.\n Format(s): 'cat [text] | cat [fd]'\nEchoes given text or outputs content of fd received via pipe.", cat);
     addCommand("wc", "Help display for the wc module.\n Format: 'wc [text or fd] | cat [fd]'\nOutputs the number of lines in the given input.", wc);
     addCommand("filter", "Help display for the filter module.\n Format: 'filter [text or fd] | cat [fd]'\nEchoes given input, vowels removed.", filter);
+    addCommand("loop", "Help display for the loop module.\n Formats: 'loop | loop [interval]'\nPrints its process id and a greeting on a set interval.", loop);
 }

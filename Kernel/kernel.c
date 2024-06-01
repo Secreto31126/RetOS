@@ -22,6 +22,7 @@ static void *const tomyland = (void *)0x600000;
 static void *const cat = (void *)0x700000;
 static void *const wc = (void *)0x800000;
 static void *const filter = (void *)0x900000;
+static void *const loop = (void *)0xA00000;
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
@@ -48,6 +49,7 @@ void *initializeKernelBinary()
 		cat,
 		wc,
 		filter,
+		loop,
 	};
 
 	loadModules(&endOfKernelBinary, moduleAddresses);

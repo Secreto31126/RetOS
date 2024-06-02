@@ -173,7 +173,9 @@ int handleStdKeys(moduleData data, displayStyles displayStyle)
         return 2;
     }
     if (strstr(r_buffer, ctrlD) != NULL && data.writeFd >= 0 && print_sys(data.writeFd, &eof, 1) < 0)
+    {
         return 1;
+    }
     return 0;
 }
 
@@ -211,15 +213,18 @@ int handleWriteFd(moduleData data, displayStyles displayStyle)
 
 void killFgAndLeave(moduleData data, char *message)
 {
-    kill(data.cPid, SIGKILL);
+    close(data.fd);
+    if (data.writeFd >= 0)
+        close(data.writeFd);
+    if (data.cPid >= 0)
+    {
+        addStringToBuffer("This crashes", 0);
+        kill(data.cPid, SIGKILL);
+    }
 
     addStringToBuffer(message, 0);
     addStringToBuffer("\n", 0);
     addStringToBuffer((char *)lineStart, 0);
-
-    close(data.fd);
-    if (data.writeFd >= 0)
-        close(data.writeFd);
 }
 
 void readUntilClose(moduleData data, displayStyles displayStyle)

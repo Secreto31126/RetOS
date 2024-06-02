@@ -38,6 +38,11 @@ Executable executables[EXECUTABLES] = {
         .filename = "loop",
         .main = (EntryPoint)0x620000,
     },
+    {
+        .mod = 7,
+        .filename = "grep",
+        .main = (EntryPoint)0x625000,
+    },
 };
 
 int check_args(char *const argv[])

@@ -23,6 +23,7 @@ static void *const cat = (void *)0x605000;
 static void *const wc = (void *)0x610000;
 static void *const filter = (void *)0x615000;
 static void *const loop = (void *)0x620000;
+static void *const grep = (void *)0x625000;
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
@@ -50,6 +51,7 @@ void *initializeKernelBinary()
 		wc,
 		filter,
 		loop,
+		grep,
 	};
 
 	loadModules(&endOfKernelBinary, moduleAddresses);

@@ -226,7 +226,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
 {
     flush(STD_KEYS);
     int readFds[3] = {data.fd, STD_IN, STD_KEYS}, availableReadFds[3] = {0};
-    int readFdCount = 3, availableReadFdCount = 0;
+    int readFdCount = 1, availableReadFdCount = 0;
 
     addStringToBuffer("\n", 0);
 

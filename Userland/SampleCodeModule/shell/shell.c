@@ -167,14 +167,14 @@ int handleStdKeys(moduleData data, displayStyles displayStyle)
 
     char ctrlC[] = {LCTRL, 0x2E, 0};
     char ctrlD[] = {LCTRL, 0x20, 0};
-    char eof = EOF;
     if (strstr(r_buffer, ctrlC) != NULL)
     {
         return 2;
     }
-    if (strstr(r_buffer, ctrlD) != NULL && data.writeFd >= 0 && print_sys(data.writeFd, &eof, 1) < 0)
+    if (strstr(r_buffer, ctrlD) != NULL && data.writeFd >= 0)
     {
-        return 1;
+        // This is equivalent to sending EOF through the pipe
+        close(data.writeFd);
     }
     return 0;
 }

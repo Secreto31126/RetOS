@@ -413,9 +413,11 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, char makeTerm
             close(STD_IN);
         }
 
-        if (makeTermPipe && dup2(termPipe[READ_END], STD_TERM) < 0)
+        if (makeTermPipe)
         {
-            exit(1);
+            if (dup2(termPipe[READ_END], STD_TERM) < 0)
+                exit(1);
+            close(termPipe[WRITE_END]);
         }
 
         // whoosh

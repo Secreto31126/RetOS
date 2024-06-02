@@ -203,7 +203,7 @@ int kill_process(pid_t pid)
     }
 
     // If the dead body is in its parents' house
-    if (man_im_dead->running_stack != man_im_dead->stack)
+    if (man_im_dead->state == PROCESS_RUNNING && man_im_dead->running_stack != man_im_dead->stack)
     {
         memcpy(
             man_im_dead->running_stack,

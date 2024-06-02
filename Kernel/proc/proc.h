@@ -118,6 +118,7 @@ bool whim_condition(pid_t pid);
 void check_blocked_processes();
 /**
  * @brief Add a process to the blocked queue
+ * @note If the process is already blocked, it only updates the condition and data
  *
  * @note It could be a vaargs
  * @note ¯\_(ツ)_/¯

@@ -31,17 +31,22 @@ void check_blocked_processes()
 
 void add_blocked(Process *p, ProcessBlockConditional condition, void *data0, void *data1, void *data2, void *data3, void *data4)
 {
-    Process *idle = get_process(0);
-
-    p->state = PROCESS_BLOCKED;
     p->block_condition = condition;
     p->condition_data[0] = data0;
     p->condition_data[1] = data1;
     p->condition_data[2] = data2;
     p->condition_data[3] = data3;
     p->condition_data[4] = data4;
-    p->next_blocked = idle->next_blocked;
-    idle->next_blocked = p;
+
+    if (p->state != PROCESS_BLOCKED)
+    {
+        Process *idle = get_process(0);
+
+        p->next_blocked = idle->next_blocked;
+        idle->next_blocked = p;
+
+        p->state = PROCESS_BLOCKED;
+    }
 }
 
 pid_t waitpid(pid_t pid, int *wstatus, int options)

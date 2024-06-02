@@ -163,7 +163,7 @@ int handleStdKeys(moduleData data, displayStyles displayStyle)
     int n = read_sys(STD_KEYS, r_buffer, BLOCK - 1);
     if (n < 0)
         return 1;
-    buffer[n] = 0;
+    r_buffer[n] = 0;
 
     char ctrlC[] = {LCTRL, 0x2E, 0};
     char ctrlD[] = {LCTRL, 0x20, 0};

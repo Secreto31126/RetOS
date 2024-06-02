@@ -379,7 +379,7 @@ void playFor(uint32_t freq, uint32_t ticks)
 {
     // uint32_t start = get_tick();
     beep(freq);
-    sleep(ticks);
+    usleep(ticks * 1.8);
     shut();
 }
 

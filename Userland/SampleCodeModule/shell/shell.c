@@ -108,34 +108,48 @@ void paintStringOrWarp(const char *s, char ask)
 {
     if (!strcmp(s, ""))
         return;
-    if (!willFit(buffer))
+    char flag = 0;
+    if (ask)
     {
-        if (ask) // informs user output does not fit, waits for input, warps output, if it still does not fit, continues informing and waiting for input and warping
+        char *prompt = "The output of this command will not fit. Press any key to continue output.";
+        while (!willFit(buffer))
         {
-            char *prompt = "The output of this command will not fit. Press any key to continue output.";
-            do
-            {
-                blank();
-                paintString(buffer, letterColor, highlightColor);
-                drawStringAt(prompt, 0xFF000000, 0xFFFFFFFF, 0, 0);
-                getChar();
-                warpNLines(MOVE_BY);
-            } while (!willFit(buffer));
+            flag = 1;
+            blank();
+            paintString(buffer, letterColor, highlightColor);
+            drawStringAt(prompt, 0xFF000000, 0xFFFFFFFF, 0, 0);
+            getChar();
+            warpNLines(MOVE_BY);
+        }
+        if (flag)
+        {
             blank();
             paintString(buffer, letterColor, highlightColor);
             drawTime();
         }
-        else // simply warps the output
+        else
         {
-            warpOneLine();
-            while (!willFit(buffer))
-                warpOneLine();
-            blank();
-            paintString(buffer, letterColor, highlightColor);
+            paintString(s, letterColor, highlightColor);
         }
     }
     else
-        paintString(s, letterColor, highlightColor);
+    {
+        while (!willFit(buffer))
+        {
+            flag = 1;
+            warpOneLine();
+        }
+        if (flag)
+        {
+            blank();
+            paintString(buffer, letterColor, highlightColor);
+            drawTime();
+        }
+        else
+        {
+            paintString(s, letterColor, highlightColor);
+        }
+    }
 }
 void paintCharOrWarp(char c)
 {

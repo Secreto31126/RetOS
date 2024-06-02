@@ -337,50 +337,6 @@ moduleData playThePiano(moduleData commandFd, displayStyles *displayStyle)
     moduleData aux = {"Now exiting the yellow submarine.", -1, -1, -1};
     return aux;
 }
-moduleData singToMe(moduleData commandFd, displayStyles *displayStyle)
-{
-    char savedSpace[READ_BLOCK];
-    char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
-
-    char match = 0;
-    if (!strcmp(commandParameters, "imperial-march"))
-    {
-        imperial_march();
-        match = 1;
-    }
-    else if (!strcmp(commandParameters, "hes-a-pirate"))
-    {
-        hes_a_pirate();
-        match = 1;
-    }
-    else if (!strcmp(commandParameters, "outer-wilds"))
-    {
-        outer_wilds();
-        match = 1;
-    }
-    else if (!strcmp(commandParameters, "do-i-wanna-know"))
-    {
-        do_i_wanna_know();
-        match = 1;
-    }
-    else if (!strcmp(commandParameters, "sports-center"))
-    {
-        sports_center();
-        match = 1;
-    }
-    else if (!strcmp(commandParameters, "here-comes-the-sun"))
-    {
-        here_comes_the_sun();
-        match = 1;
-    }
-    if (match)
-    {
-        moduleData aux = {"Song is over. Now it's your turn.", -1, -1, -1};
-        return aux;
-    }
-    moduleData aux = {"Found no matching song.", -1, -1, -1};
-    return aux;
-}
 moduleData repeat(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
@@ -520,6 +476,10 @@ moduleData loop(moduleData commandFd, displayStyles *displayStyle)
 moduleData grep(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("grep", commandFd.s, commandFd.fd, 0);
+}
+moduleData singToMe(moduleData commandFd, displayStyles *displayStyle)
+{
+    return pipeAndExec("sing", commandFd.s, commandFd.fd, 0);
 }
 
 void initializeCommands()

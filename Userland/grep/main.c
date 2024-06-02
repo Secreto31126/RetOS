@@ -8,7 +8,7 @@ extern char bss;
 extern char endOfBinary;
 
 #define BLOCK 4096
-
+// Note, doesn't quite work with split reads
 int main(int argc, char *argv[])
 {
 	if (argc < 0)

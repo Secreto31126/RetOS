@@ -63,8 +63,14 @@ pid_t waitpid(pid_t pid, int *wstatus, int options)
         }
     }
 
-    add_blocked(p, zombie_child, NULL + (pid), wstatus, NULL, NULL, NULL);
+    int *wstatus_ptr = malloc(sizeof(int));
+
+    add_blocked(p, zombie_child, NULL + (pid), wstatus_ptr, NULL, NULL, NULL);
     yield();
+
+    *wstatus = wstatus_ptr;
+    free(wstatus_ptr);
+
     return (uintptr_t)p->condition_data[0];
 }
 
@@ -105,16 +111,16 @@ int pselect(int nfds, const int *fds, int *ready)
     int *copy_fds = malloc(nfds * sizeof(int));
     memcpy(copy_fds, fds, nfds * sizeof(int));
 
-    int *copy_ready = malloc(nfds * sizeof(int));
+    int *ready_ptr = malloc(nfds * sizeof(int));
 
-    add_blocked(p, multi_read_available, NULL + nfds, copy_fds, copy_ready, NULL, NULL);
+    add_blocked(p, multi_read_available, NULL + nfds, copy_fds, ready_ptr, NULL, NULL);
     yield();
 
     int ready_count = (uintptr_t)p->condition_data[0];
-    memcpy(ready, copy_ready, ready_count * sizeof(int));
+    memcpy(ready, ready_ptr, ready_count * sizeof(int));
 
     free(copy_fds);
-    free(copy_ready);
+    free(ready_ptr);
 
     return ready_count;
 }

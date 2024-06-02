@@ -517,6 +517,10 @@ moduleData loop(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("loop", commandFd.s, commandFd.fd, 0);
 }
+moduleData grep(moduleData commandFd, displayStyles *displayStyle)
+{
+    return pipeAndExec("grep", commandFd.s, commandFd.fd, 0);
+}
 
 void initializeCommands()
 {
@@ -535,4 +539,5 @@ void initializeCommands()
     addCommand("wc", "Help display for the wc module.\nFormat: 'wc [text or fd] | cat [fd]'\nOutputs the number of lines in the given input.", wc);
     addCommand("filter", "Help display for the filter module.\nFormat: 'filter [text or fd] | cat [fd]'\nEchoes given input, vowels removed.", filter);
     addCommand("loop", "Help display for the loop module.\nFormats: 'loop | loop [interval]'\nPrints its process id and a greeting on a set interval.", loop);
+    addCommand("grep", "Help display for the grep module.\nFormat: 'grep [match]'\nOutputs all lines from content of fd that match [match].", grep);
 }

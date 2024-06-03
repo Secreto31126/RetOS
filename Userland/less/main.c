@@ -8,7 +8,6 @@ extern char bss;
 extern char endOfBinary;
 
 #define READ_PER_INPUT 80
-// Note, doesn't quite work with split reads
 int main(int argc, char *argv[])
 {
 	char buffer[READ_PER_INPUT] = {0};

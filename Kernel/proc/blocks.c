@@ -9,6 +9,15 @@ static Process *loop_blocked_and_unblock(Process *p)
 
     Process *next = p->next_blocked;
 
+    // If for some reason the process is not blocked,
+    // Remove it silently from the blocked list
+    if (p->state != PROCESS_BLOCKED)
+    {
+        p->block_condition = no_condition;
+        p->next_blocked = NULL;
+        return loop_blocked_and_unblock(next);
+    }
+
     if (!(p->block_condition(p->pid)))
     {
         p->next_blocked = loop_blocked_and_unblock(next);

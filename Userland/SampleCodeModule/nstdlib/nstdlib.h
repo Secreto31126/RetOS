@@ -52,7 +52,6 @@ static const double pi = 3.14159265359;
 uint64_t pow(double base, uint64_t exponent); // can't return doubles in userland because SSE registers aren't usable
 char isPrefix(char *prefix, char *word);
 char isFirstWord(char *s1, char *firstWord);
-void wait();
 uint64_t getHours();
 uint64_t getMinutes();
 char *getTimeString();

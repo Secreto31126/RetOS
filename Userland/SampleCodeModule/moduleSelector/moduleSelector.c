@@ -76,7 +76,7 @@ void startModules()
     }
     blank();
     paintString("Exiting module selector.", -1, 0);
-    wait();
+    sleep(1);
     blank();
     endPainter();
     freeCommands();

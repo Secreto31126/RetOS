@@ -10,11 +10,6 @@ uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisMany
 uint64_t concatFrom(char *s1, char *s2);
 void addToAllocated(char *address);
 
-void wait()
-{
-    halt_user();
-}
-
 char *getDumpString()
 {
     uint64_t length = BIG_BLOCK;

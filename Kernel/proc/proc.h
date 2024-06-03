@@ -10,6 +10,7 @@
 #include <signal.h>
 #include <console.h>
 #include <stdbool.h>
+#include <semaphores.h>
 
 #define MIN_STACK_SIZE 0x80000
 #define IDLE_STACK_SIZE 0x400

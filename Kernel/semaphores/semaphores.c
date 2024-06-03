@@ -3,57 +3,40 @@
 size_t open_sems = 0;
 Semaphore semaphores[MAX_SEMS] = {};
 
-int init_sem(sem_t *sem, unsigned int value)
-{
-    if (open_sems >= MAX_SEMS)
-    {
-        return -1;
-    }
-
-    size_t sem_id = 0;
-    while (sem_id < MAX_SEMS && semaphores[sem_id].usages)
-    {
-        sem_id++;
-    }
-
-    sem_t new_sem = {
-        .name = "",
-        .value = value + 0x80000000,
-    };
-
-    semaphores[sem_id].sem = new_sem;
-    semaphores[sem_id].usages = 1;
-    open_sems++;
-
-    return 0;
-}
-
 sem_t *sem_open(const char *name, unsigned int value)
 {
-    for (size_t i = 0; i < MAX_SEMS; i++)
+    size_t i = 0;
+    size_t sem_id = -1;
+    while (i < open_sems)
     {
-        if (strcmp(semaphores[i].sem.name, name) == 0)
+        if (semaphores[i].sem != NULL)
         {
-            semaphores[i].usages++;
-            return &semaphores[i].sem;
+            if (strcmp(semaphores[i].sem->name, name) == 0)
+            {
+                semaphores[i].usages++;
+                return semaphores[i].sem;
+            }
+            i++;
+        }
+        if (sem_id == -1)
+        {
+            sem_id = i;
         }
     }
 
-    if (open_sems >= MAX_SEMS)
+    if (sem_id == -1 || open_sems == MAX_SEMS)
     {
         return NULL;
     }
 
-    size_t sem_id = 0;
-    while (sem_id < MAX_SEMS && semaphores[sem_id].usages)
+    sem_t *new_sem = malloc(sizeof(sem_t));
+    if (!new_sem)
     {
-        sem_id++;
+        return NULL;
     }
 
-    sem_t new_sem = {
-        .name = name,
-        .value = value + 0x80000000,
-    };
+    strcpy(new_sem->name, name);
+    new_sem->value = value;
 
     semaphores[sem_id].sem = new_sem;
     semaphores[sem_id].usages = 1;
@@ -64,7 +47,24 @@ sem_t *sem_open(const char *name, unsigned int value)
 
 int sem_wait(sem_t *sem)
 {
-    while (sem->value & 0x80000000)
+    size_t i = 0;
+    while (i < open_sems)
+    {
+        if (semaphores[i].sem != NULL)
+        {
+            if (semaphores[i].sem == sem)
+            {
+                break;
+            }
+            i++;
+        }
+    }
+    if (i == open_sems)
+    {
+        return -1;
+    }
+
+    while (!(sem->value & 0x80000000))
     {
     }
 
@@ -72,7 +72,7 @@ int sem_wait(sem_t *sem)
     value = exchange(&sem->value, value);
     while (!value)
     {
-        // TODO: block
+        sem_block(sem);
     }
     value--;
     sem->value += value;
@@ -82,35 +82,56 @@ int sem_wait(sem_t *sem)
 
 int sem_post(sem_t *sem)
 {
+    if (sem->value >= 0x7FFFFFFF)
+    {
+        return -1;
+    }
     sem->value++;
 }
 
 int sem_unlink(const char *name)
 {
-    for (size_t i = 0; i < MAX_SEMS; i++)
+    if (!name || !strlen(name))
     {
-        if (strcmp(semaphores[i].sem.name, name) == 0)
+        return -1;
+    }
+
+    for (size_t i = 0; i < open_sems;)
+    {
+        if (semaphores[i].sem != NULL)
         {
-            semaphores[i].usages--;
-            if (!semaphores[i].usages)
+            if (strcmp(semaphores[i].sem->name, name) == 0)
             {
-                semaphores[i] = (Semaphore){};
+                semaphores[i].usages--;
+                if (!semaphores[i].usages)
+                {
+                    sem_close(semaphores[i].sem);
+                    semaphores[i].sem = NULL;
+                    open_sems--;
+                }
+                return 0;
             }
-            return 0;
+            i++;
         }
     }
 
     return -1;
 }
 
-int close_sem(sem_t *sem)
+int sem_close(sem_t *sem)
 {
-    for (size_t i = 0; i < MAX_SEMS; i++)
+    for (size_t i = 0; i < open_sems;)
     {
-        if (&semaphores[i].sem == sem)
+        if (semaphores[i].sem != NULL)
         {
-            semaphores[i] = (Semaphore){};
-            return 0;
+            if (semaphores[i].sem == sem)
+            {
+                free(semaphores[i].sem);
+                semaphores[i].sem = NULL;
+                open_sems--;
+                return 0;
+            }
+            i++;
         }
     }
 

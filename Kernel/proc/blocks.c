@@ -133,3 +133,10 @@ int pselect(int nfds, const int *fds, int *ready)
 
     return ready_count;
 }
+
+void sem_block(sem_t *sem)
+{
+    Process *p = get_current_process();
+    add_blocked(p, semaphore_raised, sem, NULL, NULL, NULL, NULL);
+    yield();
+}

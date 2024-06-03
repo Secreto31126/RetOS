@@ -217,10 +217,8 @@ void killFgAndLeave(moduleData data, char *message)
         close(data.writeFd);
     if (data.cPid >= 0)
     {
-        addStringToBuffer("This crashes", 0);
         kill(data.cPid, SIGKILL);
     }
-
     addStringToBuffer(message, 0);
     addStringToBuffer("\n", 0);
     addStringToBuffer((char *)lineStart, 0);
@@ -264,7 +262,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
                     return;
                 }
                 if (aux == 2)
-                { // sent SIGKILL to process, wait for it to terminate
+                { // send SIGKILL to process, wait for it to terminate
                     killFgAndLeave(data, "");
                     return;
                 }

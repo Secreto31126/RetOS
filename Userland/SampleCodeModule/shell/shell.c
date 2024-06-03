@@ -218,6 +218,7 @@ void killFgAndLeave(moduleData data, char *message)
     if (data.cPid >= 0)
     {
         kill(data.cPid, SIGKILL);
+        waitpid(data.cPid, NULL, 0);
     }
     addStringToBuffer(message, 0);
     addStringToBuffer("\n", 0);

@@ -48,7 +48,8 @@ int pipe(int pipefd[2])
         .write = data,
     };
 
-    pipes[pipe_id++] = pipe;
+    pipes[pipe_id] = pipe;
+    open_pipes++;
 
     pipefd[0] = read_end;
     pipefd[1] = write_end;

@@ -42,7 +42,6 @@ char shellStart()
     while (1)
     {
         drawTime();
-        wait();
         if ((c = readChar()))
         {
             if (c == '\n' && !strcmp(commandBuffer, "exit"))

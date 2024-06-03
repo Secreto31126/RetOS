@@ -62,11 +62,18 @@ bool zombie_child(pid_t pid)
 
 bool semaphore_raised(pid_t pid)
 {
-    // Process *p = get_process(pid);
+    Process *p = get_process(pid);
 
-    // Semaphore logic here
+    if (p->condition_data[0] == NULL)
+    {
+        return true;
+    }
+    if (((sem_t *)p->condition_data[0])->value > 0)
+    {
+        return true;
+    }
 
-    return true;
+    return false;
 }
 
 bool read_available(pid_t pid)

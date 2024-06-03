@@ -199,7 +199,7 @@ int handleWriteFd(moduleData data, displayStyles displayStyle)
     if (n < 0)
         return 1;
 
-    if (displayStyle != REDRAW_ALWAYS)
+    if (displayStyle != REDRAW_ALWAYS && displayStyle != NO_STDIN)
     {
         r_buffer[n] = 0;
         addStringToBuffer(r_buffer, 0);

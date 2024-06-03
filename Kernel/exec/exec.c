@@ -48,6 +48,11 @@ Executable executables[EXECUTABLES] = {
         .filename = "sing",
         .main = (EntryPoint)0x630000,
     },
+    {
+        .mod = 7,
+        .filename = "less",
+        .main = (EntryPoint)0x635000,
+    },
 };
 
 int check_args(char *const argv[])

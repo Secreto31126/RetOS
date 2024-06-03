@@ -25,6 +25,7 @@ static void *const filter = (void *)0x615000;
 static void *const loop = (void *)0x620000;
 static void *const grep = (void *)0x625000;
 static void *const sing = (void *)0x630000;
+static void *const less = (void *)0x635000;
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
@@ -54,6 +55,7 @@ void *initializeKernelBinary()
 		loop,
 		grep,
 		sing,
+		less,
 	};
 
 	loadModules(&endOfKernelBinary, moduleAddresses);

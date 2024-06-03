@@ -12,6 +12,7 @@ typedef enum displayStyles
     APPEND = 0,
     REDRAW_ONCE,
     REDRAW_ALWAYS,
+    NO_STDIN,
 } displayStyles;
 moduleData handleCommand(char *command, displayStyles *displayStyle); // All it does.
 void initializeCommands();

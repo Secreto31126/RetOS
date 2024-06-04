@@ -22,7 +22,7 @@ int phylos = 5;
 
 int child_ids[MAX_PHYLOS + 1];
 
-int main()
+int main(int argc, char *argv[])
 {
 	int pid;
 

@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <memory.h>
 
-#define EXECUTABLES 10
+#define EXECUTABLES 11
 #define MAX_ARGS 256
 /**
  * @brief Each argument max length

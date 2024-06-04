@@ -489,6 +489,11 @@ moduleData less(moduleData commandFd, displayStyles *displayStyle)
     return pipeAndExec("less", commandFd.s, commandFd.fd, 1);
 }
 
+moduleData phylos(moduleData commandFd, displayStyles *displayStyle)
+{
+    return pipeAndExec("phylos", commandFd.s, commandFd.fd, 0);
+}
+
 void initializeCommands()
 {
     addCommand("help", "Help display for help module.\nFormat(s): 'help' | 'help' [MODULE_NAME]\nDisplays the help displays for all modules or the module specified.", getHelp);
@@ -508,4 +513,5 @@ void initializeCommands()
     addCommand("loop", "Help display for the loop module.\nFormats: 'loop | loop [interval]'\nPrints its process id and a greeting on a set interval.", loop);
     addCommand("grep", "Help display for the grep module.\nFormat: 'grep [match]'\nOutputs all lines from content of fd that match [match].", grep);
     addCommand("less", "Help display for the less module.\nFormat: 'less'\nOutputs content from fd upon user input.", less);
+    addCommand("phylos", "Help display for the phylos module.\nFormat: 'phylos'\nStarts the phylos module with 5 phylosophers, click a to add a phylosopher, r to remove one and q to quit.", phylos);
 }

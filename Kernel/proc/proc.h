@@ -57,7 +57,8 @@ bool inherit_parents_house(Process *process);
 bool zombie_child(pid_t pid);
 /**
  * @brief Await a semaphore to be raised
- * @todo Implement semaphore logic
+ * @note The condition returns true if the value isn't 0,
+ * which means it would return true when the spinlock is taken
  *
  * @param pid The process' pid
  * @return true Condition met

@@ -293,6 +293,12 @@ void write_block(int file);
  * @return int The number of ready file descriptors, 0 if all waited files are closed
  */
 int pselect(int nfds, const int *fds, int *ready);
+/**
+ * @brief Add a semaphore block to the current process
+ *
+ * @param sem The semaphore to wait for
+ */
+void sem_block(sem_t *sem);
 
 /**
  * @brief Send a signal to a process

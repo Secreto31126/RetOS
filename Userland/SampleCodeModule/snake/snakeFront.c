@@ -72,7 +72,6 @@ int playSnake(uint16_t snakeCount)
     drawBoard(snakes);
     shut();
 
-    uint64_t time = get_tick();
     while (!gameOver)
     {
         drawScore(score);
@@ -81,6 +80,7 @@ int playSnake(uint16_t snakeCount)
         usleep(MOVE_INTERVAL);
 
         char buffer[MAX_MOVES];
+        print_sys(STD_IN, ".", 1);                   // This is completely illegal
         int n = read_sys(STD_IN, buffer, MAX_MOVES); // yes, if no moves are made this blocks, we need a non-blocking read to fix it (or just write into STD_IN before reading, but that's illegal)
 
         for (int i = 0; i < n; i++)
@@ -101,7 +101,6 @@ int playSnake(uint16_t snakeCount)
             yield();
         }
         shut(); // stops any noises that begun on previous update loop
-        time = get_tick();
         for (int i = 0; i < snakeCount; i++)
             if (snakes[i].nextMove != NONE)
                 setDirection(i, snakes[i].nextMove);

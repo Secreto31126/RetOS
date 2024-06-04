@@ -25,6 +25,11 @@
     global flush
     global getpriority
     global setpriority
+    global sem_open
+    global sem_close
+    global sem_unlink
+    global sem_post
+    global sem_wait
 
 ; size_t read(int fd, void *buf, size_t count);
 read:
@@ -179,5 +184,35 @@ getpriority:
 ; int setpriority(int which, unsigned int who, int prio);
 setpriority:
     mov rax, 0x1A
+    int 80h
+    ret
+
+; sem_t *sem_open(const char *name, unsigned int value);
+sem_open:
+    mov rax, 0x1B
+    int 80h
+    ret
+
+; int sem_close(sem_t *sem)
+sem_close:
+    mov rax, 0x1C
+    int 80h
+    ret
+
+; int sem_unlink(const char *name)
+sem_unlink:
+    mov rax, 0x1D
+    int 80h
+    ret
+
+; int sem_post(sem_t *sem)
+sem_post:
+    mov rax, 0x1E
+    int 80h
+    ret
+
+; int sem_wait(sem_t *sem)
+sem_wait:
+    mov rax, 0x1F
     int 80h
     ret

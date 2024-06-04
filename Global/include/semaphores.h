@@ -19,22 +19,13 @@ typedef struct sem_t
 extern sem_t *sem_open(const char *name, unsigned int value);
 
 /**
- * @brief Waits for the semaphore to be available and decrements its value
+ * @brief Closes the semaphore
  *
- * @param sem Semaphore to wait for
- *
- * @return 0 on success, -1 on error
- */
-extern int sem_wait(sem_t *sem);
-
-/**
- * @brief Increments the semaphore value
- *
- * @param sem Semaphore to post
+ * @param sem Semaphore to close
  *
  * @return 0 on success, -1 on error
  */
-extern int sem_post(sem_t *sem);
+extern int sem_close(sem_t *sem);
 
 /**
  * @brief Closes the semaphore
@@ -46,12 +37,21 @@ extern int sem_post(sem_t *sem);
 extern int sem_unlink(const char *name);
 
 /**
- * @brief Closes the semaphore
+ * @brief Increments the semaphore value
  *
- * @param sem Semaphore to close
+ * @param sem Semaphore to post
  *
  * @return 0 on success, -1 on error
  */
-extern int sem_close(sem_t *sem);
+extern int sem_post(sem_t *sem);
+
+/**
+ * @brief Waits for the semaphore to be available and decrements its value
+ *
+ * @param sem Semaphore to wait for
+ *
+ * @return 0 on success, -1 on error
+ */
+extern int sem_wait(sem_t *sem);
 
 #endif

@@ -252,5 +252,4 @@ void test(int i)
 		states[i] = EATING;
 		sem_post(sems[i]);
 	}
-	return 0;
 }

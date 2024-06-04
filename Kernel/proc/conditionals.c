@@ -63,7 +63,7 @@ bool zombie_child(pid_t pid)
 bool semaphore_raised(pid_t pid)
 {
     Process *p = get_process(pid);
-    sem_t *sem = (uintptr_t)p->condition_data[0];
+    sem_t *sem = (sem_t *)p->condition_data[0];
     return !!sem->value;
 }
 

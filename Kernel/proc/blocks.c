@@ -77,7 +77,7 @@ pid_t waitpid(pid_t pid, int *wstatus, int options)
     add_blocked(p, zombie_child, NULL + (pid), wstatus_ptr, NULL, NULL, NULL);
     yield();
 
-    *wstatus = wstatus_ptr;
+    *wstatus = *wstatus_ptr;
     free(wstatus_ptr);
 
     return (uintptr_t)p->condition_data[0];

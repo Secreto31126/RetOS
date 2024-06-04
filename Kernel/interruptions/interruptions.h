@@ -19,7 +19,7 @@
 #include <header.h>
 #include <images.h>
 #include <console.h>
-#include <semaphore.h>
+#include <semaphores.h>
 #include <localization.h>
 
 typedef void (*InterruptionHandler)();

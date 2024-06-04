@@ -7,6 +7,7 @@
 #include <string.h>
 #include <proc.h>
 #include <malloc.h>
+#include <lib.h>
 
 #define MAX_SEMS 30
 

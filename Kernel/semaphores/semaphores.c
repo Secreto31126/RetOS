@@ -11,7 +11,7 @@ sem_t *sem_open(const char *name, unsigned int value)
     {
         if (semaphores[i].sem != NULL)
         {
-            if (!strncmp(semaphores[i].sem->name, name, semaphores[i].sem->name))
+            if (!strncmp(semaphores[i].sem->name, name, sizeof(semaphores[i].sem->name)))
             {
                 semaphores[i].usages++;
                 return semaphores[i].sem;
@@ -95,7 +95,7 @@ int sem_post(sem_t *sem)
         value = exchange(&sem->value, SPINLOCK);
     } while (SPINLOCK_LOCKED(value));
 
-    if (sem->value + 1 < SPINLOCK)
+    if (value + 1 < SPINLOCK)
     {
         exchange(&sem->value, ++value);
         return 0;

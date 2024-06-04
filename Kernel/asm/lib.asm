@@ -97,10 +97,10 @@ halt_once:
 	hlt
 	ret
 
-; uint64_t exchange(uint64_t *src, uint64_t value);
+; unsigned int exchange(unsigned int *src, unsigned int value);
 exchange:
-	mov		rax, rsi
-	xchg	rax, [rdi]
+	mov		eax, esi
+	xchg	eax, [rdi]
 	ret
 
 %macro save_hex_in_string 0

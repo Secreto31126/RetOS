@@ -7,8 +7,12 @@
 #include <string.h>
 #include <proc.h>
 #include <malloc.h>
+#include <lib.h>
 
 #define MAX_SEMS 30
+
+#define SPINLOCK 0x80000000
+#define SPINLOCK_LOCKED(x) ((x) & SPINLOCK)
 
 typedef struct Semaphore
 {

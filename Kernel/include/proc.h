@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <pipes.h>
+#include <semaphores.h>
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -293,6 +294,12 @@ void write_block(int file);
  * @return int The number of ready file descriptors, 0 if all waited files are closed
  */
 int pselect(int nfds, const int *fds, int *ready);
+/**
+ * @brief Add a semaphore block to the current process
+ *
+ * @param sem The semaphore to wait for
+ */
+void sem_block(sem_t *sem);
 
 /**
  * @brief Send a signal to a process

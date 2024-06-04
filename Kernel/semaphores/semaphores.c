@@ -11,7 +11,7 @@ sem_t *sem_open(const char *name, unsigned int value)
     {
         if (semaphores[i].sem != NULL)
         {
-            if (strcmp(semaphores[i].sem->name, name) == 0)
+            if (!strncmp(semaphores[i].sem->name, name, sizeof(semaphores[i].sem->name)))
             {
                 semaphores[i].usages++;
                 return semaphores[i].sem;
@@ -35,14 +35,14 @@ sem_t *sem_open(const char *name, unsigned int value)
         return NULL;
     }
 
-    strcpy(new_sem->name, name);
+    strncpy(new_sem->name, name, sizeof(semaphores[i].sem->name));
     new_sem->value = value;
 
     semaphores[sem_id].sem = new_sem;
     semaphores[sem_id].usages = 1;
     open_sems++;
 
-    return &new_sem;
+    return new_sem;
 }
 
 int sem_wait(sem_t *sem)
@@ -59,34 +59,49 @@ int sem_wait(sem_t *sem)
             i++;
         }
     }
+
     if (i == open_sems)
     {
         return -1;
     }
 
-    while (!(sem->value & 0x80000000))
+    unsigned int value;
+SPINLOCK_CHECK:
+    do
     {
+        // Loop trying to set the spinlock
+        value = exchange(&sem->value, SPINLOCK);
+    } while (SPINLOCK_LOCKED(value));
+
+    if (!value)
+    {
+        // Set the spinlock to free
+        exchange(&sem->value, value);
+        sem_block(sem);
+        goto SPINLOCK_CHECK;
     }
 
-    int value = 0;
-    value = exchange(&sem->value, value);
-    while (!value)
-    {
-        sem_block(sem);
-    }
-    value--;
-    sem->value += value;
+    exchange(&sem->value, --value);
 
     return 0;
 }
 
 int sem_post(sem_t *sem)
 {
-    if (sem->value >= 0x7FFFFFFF)
+    unsigned int value;
+    do
     {
-        return -1;
+        // Loop trying to set the spinlock
+        value = exchange(&sem->value, SPINLOCK);
+    } while (SPINLOCK_LOCKED(value));
+
+    if (value + 1 < SPINLOCK)
+    {
+        exchange(&sem->value, ++value);
+        return 0;
     }
-    sem->value++;
+
+    return -1;
 }
 
 int sem_unlink(const char *name)
@@ -100,7 +115,7 @@ int sem_unlink(const char *name)
     {
         if (semaphores[i].sem != NULL)
         {
-            if (strcmp(semaphores[i].sem->name, name) == 0)
+            if (strncmp(semaphores[i].sem->name, name, sizeof(semaphores[i].sem->name)) == 0)
             {
                 semaphores[i].usages--;
                 if (!semaphores[i].usages)

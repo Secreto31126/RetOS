@@ -6,7 +6,7 @@ Semaphore semaphores[MAX_SEMS] = {};
 sem_t *sem_open(const char *name, unsigned int value)
 {
     size_t i = 0;
-    size_t sem_id = -1;
+    size_t sem_id = 0;
     while (i < open_sems)
     {
         if (semaphores[i].sem != NULL)
@@ -18,13 +18,13 @@ sem_t *sem_open(const char *name, unsigned int value)
             }
             i++;
         }
-        if (sem_id == -1)
+        if (sem_id == 0)
         {
             sem_id = i;
         }
     }
 
-    if (sem_id == -1 || open_sems == MAX_SEMS)
+    if (open_sems == MAX_SEMS)
     {
         return NULL;
     }

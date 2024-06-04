@@ -5,6 +5,7 @@
 #define BLOCK 50
 #define READ_BLOCK 500
 #define MOVE_BY 8
+#define MAX_ACTIVE 256
 void warpNLines(uint64_t n);
 void warpAndRedraw();
 void warpOneLine();
@@ -20,10 +21,141 @@ static HexColor letterColor = 0xFF000000 | HEX_WHITE, highlightColor = 0xFF00000
 static const char *lineStart = ":~ ";
 static const char *shellIntro = "You are now in shell:\n";
 static char fromLastEnter = 0;
+int handleReadFd(moduleData data, displayStyles displayStyle);
+void killModule(moduleData data, char *message);
+
+static moduleData activeReads[MAX_ACTIVE] = {{NULL, STD_IN, -1, -1}};
+static int activeReadsCount = 1;
+
 void drawTime()
 {
     drawStringAt(getTimeString(), 0xFFFFFFFF, 0xFF000000, 0, 0);
 }
+
+char addToActive(moduleData bgModule)
+{
+    if (activeReadsCount >= MAX_ACTIVE)
+        return 1;
+    activeReads[activeReadsCount++] = bgModule;
+    return 0;
+}
+
+int getFdIndex(int fd)
+{
+    int index;
+    while (activeReads[index].fd != fd)
+        index++;
+    return index;
+}
+
+void removeFromActive(int index)
+{
+    // do not remove STD_IN, do not remove beyond array
+    if (index >= activeReadsCount || !index)
+        return;
+
+    // just shift them all back by 1, starting at the index to remove
+    activeReadsCount--;
+    for (; index < activeReadsCount; index++)
+        activeReads[index] = activeReads[index + 1];
+}
+
+char readAsInput(char c)
+{
+    if (c == '\n' && !strcmp(commandBuffer, "exit"))
+    {
+        return 1;
+    }
+    if (c == '\b')
+    {
+        if (!fromLastEnter || !index)
+        {
+            return 0;
+        }
+        else
+        {
+            paintChar(c, letterColor, highlightColor);
+            index--;
+            commandIndex--;
+            fromLastEnter--;
+        }
+    }
+    else
+    {
+        if (c == '\n')
+        {
+            fromLastEnter = 0;
+            addStringToBuffer(passCommand(commandBuffer), 1); // Nota: las instrucciones del TPE especifican que la shell debe moverse hacia arriba si se excede su espacio para texto.
+            freePrints();                                     // No se especifica el comportamiento esperado si el retorno de un 'comando' es mayor al espacio de la shell.
+            commandIndex = 0;                                 // El comportamiento default es simplemente no imprimir el retorno completo. Esto es lo que ocurre si a passCommand se le da parámetro 'ask' 0.
+        } // De lo contrario, se imprimirá moviendo hacia arriba de a MOVE_BY líneas, requiriendo input del usuario.
+        else
+        {
+            addCharToBuffer(c);
+            fromLastEnter++;
+            if (commandIndex < MAX_COMMAND_LENGTH)
+                commandBuffer[commandIndex++] = c; // ignores commands after a certain length (since no commands should be that long)
+        }
+    }
+    commandBuffer[commandIndex] = 0;
+    buffer[index] = 0;
+    return 0;
+}
+
+char shellLoop()
+{
+    drawTime();
+
+    int canBeRead[MAX_ACTIVE];
+    int activeReadFds[MAX_ACTIVE];
+    for (int i = 0; i < activeReadsCount; i++)
+    {
+        activeReadFds[i] = activeReads[i].fd;
+    }
+    int n = pselect(activeReadsCount, activeReadFds, canBeRead);
+    for (int i = 0; i < n; i++)
+    {
+        if (canBeRead[i] == STD_IN)
+        {
+            char c;
+            int aux = read_sys(STD_IN, &c, 1);
+            if (readAsInput(c))
+            {
+                blank();
+                free(commandBuffer);
+                free(buffer);
+                freePrints();
+                return 1;
+            }
+            // Handle all user input before printing bg processes (makes terminal more reseponsive)
+            break;
+        }
+        else
+        {
+            addCharToBuffer('\n');
+            int index = getFdIndex(canBeRead[i]);
+            moduleData data = activeReads[index];
+            int aux = handleReadFd(data, AS_BACKGROUND);
+            if (aux == 1)
+            {
+                blank();
+                killModule(data, "There was an error communicating with a background process.\n");
+                sleep(1);
+                return 1;
+            }
+            if (aux == 2)
+            {
+                // in case the process did not end on its own, kill it, as it has no useful output to give
+                killModule(data, "");
+                removeFromActive(index);
+            }
+            else
+                addStringToBuffer(lineStart, 0);
+        }
+    }
+    return 0;
+}
+
 char shellStart()
 {
     uint32_t width = getScreenWidth();
@@ -38,55 +170,9 @@ char shellStart()
     index += sPuts(buffer, shellIntro);
     paintString(buffer, letterColor, highlightColor);
     paintLineStart();
-    char c;
-    while (1)
-    {
-        drawTime();
-        if ((c = readChar()))
-        {
-            if (c == '\n' && !strcmp(commandBuffer, "exit"))
-            {
-                blank();
-                free(commandBuffer);
-                free(buffer);
-                freePrints();
-                return 1;
-            }
-            if (c == '\b')
-            {
-                if (!fromLastEnter || !index)
-                {
-                    continue;
-                }
-                else
-                {
-                    paintChar(c, letterColor, highlightColor);
-                    index--;
-                    commandIndex--;
-                    fromLastEnter--;
-                }
-            }
-            else
-            {
-                if (c == '\n')
-                {
-                    fromLastEnter = 0;
-                    addStringToBuffer(passCommand(commandBuffer), 1); // Nota: las instrucciones del TPE especifican que la shell debe moverse hacia arriba si se excede su espacio para texto.
-                    freePrints();                                     // No se especifica el comportamiento esperado si el retorno de un 'comando' es mayor al espacio de la shell.
-                    commandIndex = 0;                                 // El comportamiento default es simplemente no imprimir el retorno completo. Esto es lo que ocurre si a passCommand se le da parámetro 'ask' 0.
-                } // De lo contrario, se imprimirá moviendo hacia arriba de a MOVE_BY líneas, requiriendo input del usuario.
-                else
-                {
-                    addCharToBuffer(c);
-                    fromLastEnter++;
-                    if (commandIndex < MAX_COMMAND_LENGTH)
-                        commandBuffer[commandIndex++] = c; // ignores commands after a certain length (since no commands should be that long)
-                }
-            }
-            commandBuffer[commandIndex] = 0;
-            buffer[index] = 0;
-        }
-    }
+
+    while (!shellLoop())
+        ;
 }
 
 void addCharToBuffer(char c)
@@ -180,8 +266,8 @@ int handleStdKeys(moduleData data, displayStyles displayStyle)
 
 int handleReadFd(moduleData data, displayStyles displayStyle)
 {
-    char r_buffer[BLOCK];
-    int n = read_sys(data.fd, r_buffer, BLOCK - 1);
+    char r_buffer[READ_BLOCK];
+    int n = read_sys(data.fd, r_buffer, READ_BLOCK - 1);
     if (n < 0)
         return 1;
     if (n == 0)
@@ -210,7 +296,7 @@ int handleWriteFd(moduleData data, displayStyles displayStyle)
     return 0;
 }
 
-void killFgAndLeave(moduleData data, char *message)
+void killModule(moduleData data, char *message)
 {
     close(data.fd);
     if (data.writeFd >= 0)
@@ -221,8 +307,6 @@ void killFgAndLeave(moduleData data, char *message)
         waitpid(data.cPid, NULL, 0);
     }
     addStringToBuffer(message, 0);
-    addStringToBuffer("\n", 0);
-    addStringToBuffer((char *)lineStart, 0);
 }
 
 void readUntilClose(moduleData data, displayStyles displayStyle)
@@ -245,7 +329,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
                 char aux = handleReadFd(data, displayStyle);
                 if (aux == 1)
                 {
-                    killFgAndLeave(data, "Communication failed, killed foreground process.\n");
+                    killModule(data, "Communication failed, killed foreground process.\n");
                     return;
                 }
                 if (aux == 2)
@@ -259,12 +343,12 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
                 char aux = handleStdKeys(data, displayStyle);
                 if (aux == 1)
                 {
-                    killFgAndLeave(data, "Communication failed, killed foreground process.\n");
+                    killModule(data, "Communication failed, killed foreground process.\n");
                     return;
                 }
                 if (aux == 2)
                 { // send SIGKILL to process, wait for it to terminate
-                    killFgAndLeave(data, "");
+                    killModule(data, "");
                     return;
                 }
             }
@@ -272,7 +356,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
             {
                 if (handleWriteFd(data, displayStyle))
                 {
-                    killFgAndLeave(data, "Communication failed, killed foreground process.\n");
+                    killModule(data, "Communication failed, killed foreground process.\n");
                     return;
                 }
             }
@@ -285,9 +369,6 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
         close(data.writeFd);
     }
     waitpid(data.cPid, NULL, 0);
-
-    addStringToBuffer("\n", 0);
-    addStringToBuffer((char *)lineStart, 0);
 }
 
 char *passCommand(char *toPass)
@@ -299,13 +380,18 @@ char *passCommand(char *toPass)
     {
         if (data.fd >= 0)
         {
-            readUntilClose(data, displayStyle);
+            if (displayStyle == AS_BACKGROUND)
+            {
+                addToActive(data);
+            }
+            else
+            {
+                readUntilClose(data, displayStyle);
+            }
         }
-        else
-        {
-            addStringToBuffer("\n", 0);
-            addStringToBuffer(lineStart, 0);
-        }
+
+        addStringToBuffer("\n", 0);
+        addStringToBuffer(lineStart, 0);
         return "";
     }
 

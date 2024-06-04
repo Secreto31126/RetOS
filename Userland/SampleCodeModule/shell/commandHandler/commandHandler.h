@@ -13,6 +13,7 @@ typedef enum displayStyles
     REDRAW_ONCE,
     REDRAW_ALWAYS,
     NO_STDIN,
+    AS_BACKGROUND,
 } displayStyles;
 moduleData handleCommand(char *command, displayStyles *displayStyle); // All it does.
 void initializeCommands();

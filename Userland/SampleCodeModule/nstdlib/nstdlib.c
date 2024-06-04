@@ -650,12 +650,12 @@ void separateString(char *s, char **buffer, int bufferSize)
     }
     buffer[i] = (char *)NULL;
 }
-char isLastAlpha(const char *s, char alpha)
+int isLastAlpha(const char *s, char alpha)
 {
     for (int i = strlen(s) - 1; i >= 0 && (s[i] == ' ' || s[i] == '\n' || s[i] == '\t' || s[i] == alpha); i--)
     {
         if (s[i] == alpha)
-            return 1;
+            return i;
     }
     return 0;
 }

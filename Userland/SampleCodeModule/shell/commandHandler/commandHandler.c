@@ -34,17 +34,12 @@ void addCommand(char *commandCode, char *help, action_t commandAction)
 
 void moveToBackground(moduleData *data)
 {
-    if (data->fd >= 0)
-    {
-        close(data->fd);
-        data->fd = -1;
-    }
+    // background processes have their input duped to '/dev/null'
     if (data->writeFd >= 0)
     {
         close(data->writeFd);
         data->writeFd = -1;
     }
-    data->s = NULL;
 }
 
 moduleData execute(moduleData command, char *params, displayStyles *displayStyle)
@@ -54,10 +49,13 @@ moduleData execute(moduleData command, char *params, displayStyles *displayStyle
         if (isFirstWord(commands[i].code, command.s))
         {
             command.s = params;
-            if (isLastAlpha(params, '&'))
+            int index;
+            if ((index = isLastAlpha(params, '&')))
             {
+                params[index] = 0;
                 moduleData toRet = commands[i].action(command, displayStyle);
                 moveToBackground(&toRet);
+                *displayStyle = AS_BACKGROUND;
                 return toRet;
             }
             return commands[i].action(command, displayStyle);

@@ -491,7 +491,7 @@ moduleData less(moduleData commandFd, displayStyles *displayStyle)
 
 moduleData phylos(moduleData commandFd, displayStyles *displayStyle)
 {
-    return pipeAndExec("phylos", commandFd.s, commandFd.fd, 0);
+    return pipeAndExec("phylos", commandFd.s, commandFd.fd, 1);
 }
 
 void initializeCommands()

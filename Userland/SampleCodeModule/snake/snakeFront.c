@@ -98,7 +98,6 @@ int playSnake(uint16_t snakeCount)
                 setSize(size);
             }
             doMovement(c, snakeCount, snakes);
-            yield();
         }
         shut(); // stops any noises that begun on previous update loop
         for (int i = 0; i < snakeCount; i++)

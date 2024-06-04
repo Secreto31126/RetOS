@@ -14,11 +14,11 @@ extern char endOfBinary;
 
 char *strandnum(const char *str, int num);
 
-sem_t *sems[MAX_PHYLOS];
+sem_t **sems;
 sem_t *mutex;
-int states[MAX_PHYLOS];
-int turns[MAX_PHYLOS];
-int phylos = 5;
+int *states;
+int *turns;
+int *phylos;
 
 int child_ids[MAX_PHYLOS + 1];
 
@@ -26,11 +26,17 @@ int main(int argc, char *argv[])
 {
 	int pid;
 
+	sems = malloc(MAX_PHYLOS * sizeof(sem_t *));
+	states = malloc(MAX_PHYLOS * sizeof(int));
+	turns = malloc(MAX_PHYLOS * sizeof(int));
+	phylos = malloc(sizeof(int));
+	phylos[0] = 5;
+
 	// Crear mutex
 	mutex = sem_open("mutex", 0);
 
 	// Crear procesos de los filósofos
-	for (int i = 0; i < phylos; i++)
+	for (int i = 0; i < phylos[0]; i++)
 	{
 		pid = fork();
 		if (pid < 0)
@@ -42,7 +48,9 @@ int main(int argc, char *argv[])
 		{
 			states[i] = THINKING;
 			turns[i] = 0;
-			sem_t *sem = sem_open(strandnum("sem_", i), 0);
+			char *name = strandnum("sem_", i);
+			sem_t *sem = sem_open(name, 0);
+			free(name);
 			if (sem)
 			{
 				sems[i] = sem;
@@ -87,7 +95,7 @@ int main(int argc, char *argv[])
 		{
 		case 'a':
 		{
-			if (phylos < MAX_PHYLOS)
+			if (phylos[0] < MAX_PHYLOS)
 			{
 				int j = fork();
 				if (j < 0)
@@ -96,24 +104,26 @@ int main(int argc, char *argv[])
 				}
 				else if (j == 0)
 				{
-					states[phylos] = THINKING;
-					turns[phylos] = 0;
-					sem_t *sem = sem_open(strandnum("sem_", j), 0);
+					states[phylos[0]] = THINKING;
+					turns[phylos[0]] = 0;
+					char *name = strandnum("sem_", j);
+					sem_t *sem = sem_open(name, 0);
+					free(name);
 					if (sem)
 					{
-						sems[phylos] = sem;
+						sems[phylos[0]] = sem;
 					}
 					else
 					{
 						puts("Error in sem_open\n");
 						return 1;
 					}
-					philosopher(phylos);
+					philosopher(phylos[0]);
 					exit(0);
 				}
 				else
 				{
-					child_ids[phylos++] = j;
+					child_ids[phylos[0]++] = j;
 				}
 			}
 			else
@@ -125,10 +135,11 @@ int main(int argc, char *argv[])
 
 		case 'r':
 		{
-			if (phylos > 0)
+			if (phylos[0] > 0)
 			{
-				kill(child_ids[--phylos], SIGKILL);
-				if (phylos == 0)
+				kill(child_ids[--phylos[0]], SIGKILL);
+				sem_close(sems[phylos[0]]);
+				if (phylos[0] == 0)
 				{
 					kill(child_ids[MAX_PHYLOS], SIGKILL);
 					run = 0;
@@ -139,8 +150,9 @@ int main(int argc, char *argv[])
 
 		case 'q':
 		{
-			for (int i = 0; i < phylos; i++)
+			for (int i = 0; i < phylos[0]; i++)
 			{
+				sem_close(sems[i]);
 				kill(child_ids[i], SIGKILL);
 			}
 			kill(child_ids[MAX_PHYLOS], SIGKILL);
@@ -153,11 +165,18 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	for (int i = 0; i < phylos; i++)
+	for (int i = 0; i < phylos[0]; i++)
 	{
 		waitpid(child_ids[i], NULL, 0);
 	}
 	waitpid(child_ids[MAX_PHYLOS], NULL, 0);
+
+	free(sems);
+	free(states);
+	free(turns);
+	free(phylos);
+
+	sem_close(mutex);
 
 	return 0;
 }
@@ -173,12 +192,15 @@ char *strandnum(const char *str, int num)
 void print_state()
 {
 	int max = 0;
+	char *to_print;
 	while (1)
 	{
-		puts(strandnum("Cantidad de filósofos: ", phylos));
+		to_print = strandnum("Cantidad de filósofos: ", phylos[0]);
+		puts(to_print);
 		puts("\n");
+		free(to_print);
 		sem_wait(mutex); // Mutex lock
-		for (int i = 0; i < phylos; i++)
+		for (int i = 0; i < phylos[0]; i++)
 		{
 			if (states[i] == EATING)
 			{
@@ -189,12 +211,14 @@ void print_state()
 				puts(". ");
 			}
 		}
-		for (int i = 0; i < phylos; i++)
+		for (int i = 0; i < phylos[0]; i++)
 		{
 			max = turns[i] > max ? turns[i] : max;
 		}
-		puts(strandnum("       Max: ", max));
+		to_print = strandnum("       Max: ", max);
+		puts(to_print);
 		puts("\n\n");
+		free(to_print);
 		sem_post(mutex); // Mutex unlock
 		sleep(1);
 	}
@@ -240,14 +264,14 @@ void put_forks(int i)
 {
 	sem_wait(mutex); // Mutex lock
 	states[i] = THINKING;
-	test(RIGHT(i, phylos));
-	test(LEFT(i, phylos));
+	test(RIGHT(i, phylos[0]));
+	test(LEFT(i, phylos[0]));
 	sem_post(mutex); // Mutex unlock
 }
 
 void test(int i)
 {
-	if (states[i] == HUNGRY && states[LEFT(i, phylos)] != EATING && states[RIGHT(i, phylos)] != EATING)
+	if (states[i] == HUNGRY && states[LEFT(i, phylos[0])] != EATING && states[RIGHT(i, phylos[0])] != EATING)
 	{
 		states[i] = EATING;
 		sem_post(sems[i]);

@@ -15,6 +15,11 @@ int main(int argc, char *argv[])
 	write(STD_OUT, "I'm a philosopher\n", sizeof("I'm a philosopher\n") - 1);
 	sem_t *sem = sem_open("phylos", 0);
 	int forked = fork();
+	if (forked < 0)
+	{
+		write(STD_OUT, "Could not fork.\n", sizeof("Could not fork.\n") - 1);
+		return 1;
+	}
 	if (forked == 0)
 	{
 		write(STD_OUT, "I'm suposed to be blocking now\n", sizeof("I'm suposed to be blocking now\n") - 1);
@@ -22,7 +27,7 @@ int main(int argc, char *argv[])
 		puts("I am a philosopher\n");
 		sem_post(sem);
 		sem_close(sem);
-		exit(0);
+		return 0; // Main is wrapped with an exit
 	}
 	else
 	{
@@ -31,4 +36,5 @@ int main(int argc, char *argv[])
 		sem_post(sem);
 		waitpid(forked, NULL, 0);
 	}
+	return 0;
 }

@@ -10,7 +10,7 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 #define MAX_PROCESS_FILES 10
-#define MAX_PROCESSES 10
+#define MAX_PROCESSES 50
 
 #define O_FILE 0x0
 #define O_PIPE 0x8000

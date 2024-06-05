@@ -657,5 +657,5 @@ int isLastAlpha(const char *s, char alpha)
         if (s[i] == alpha)
             return i;
     }
-    return 0;
+    return -1;
 }

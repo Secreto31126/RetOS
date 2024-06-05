@@ -50,7 +50,7 @@ moduleData execute(moduleData command, char *params, displayStyles *displayStyle
         {
             command.s = params;
             int index;
-            if ((index = isLastAlpha(params, '&')))
+            if ((index = isLastAlpha(params, '&')) >= 0)
             {
                 params[index] = 0;
                 moduleData toRet = commands[i].action(command, displayStyle);

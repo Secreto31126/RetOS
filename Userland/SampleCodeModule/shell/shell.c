@@ -2,10 +2,12 @@
 #include "commandHandler/commandHandler.h"
 #include <stdint.h>
 #include <string.h>
+
 #define BLOCK 50
 #define READ_BLOCK 500
 #define MOVE_BY 8
 #define MAX_ACTIVE 256
+
 void warpNLines(uint64_t n);
 void warpAndRedraw();
 void warpOneLine();
@@ -15,15 +17,22 @@ void paintCharOrWarp(char c);
 void paintStringOrWarp(const char *s, char ask);
 void addStringToBuffer(const char *s, char ask);
 void addCharToBuffer(char c);
-static char *buffer, *commandBuffer;
-static uint64_t index, commandIndex;
-static HexColor letterColor = 0xFF000000 | HEX_WHITE, highlightColor = 0xFF000000 | HEX_BLACK;
-static const char *lineStart = ":~ ";
-static const char *shellIntro = "You are now in shell:\n";
-static char fromLastEnter = 0;
 int handleReadFd(moduleData data, displayStyles displayStyle);
 void killModule(moduleData data, char *message);
 
+// String constants
+static const char *lineStart = ":~ ";
+static const char *shellIntro = "You are now in shell:\n";
+
+// Tracks colors for painter
+static HexColor letterColor = 0xFF000000 | HEX_WHITE, highlightColor = 0xFF000000 | HEX_BLACK;
+
+// For input management
+static char *buffer, *commandBuffer;
+static uint64_t index, commandIndex;
+static char fromLastEnter = 0;
+
+// For background module management
 static moduleData activeReads[MAX_ACTIVE] = {{NULL, STD_IN, -1, -1}};
 static int activeReadsCount = 1;
 

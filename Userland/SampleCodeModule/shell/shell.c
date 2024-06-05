@@ -323,8 +323,8 @@ void killModule(moduleData data, char *message)
 void readUntilClose(moduleData data, displayStyles displayStyle)
 {
     flush(STD_KEYS);
-    int readFds[3] = {data.fd, STD_IN, STD_KEYS}, availableReadFds[3] = {0};
-    int readFdCount = 3, availableReadFdCount = 0;
+
+    int fullReadFds[MAX_ACTIVE + 2] = {data.fd, STD_IN, STD_KEYS}, fullReadFdCount, fullAvailableReadFds[MAX_ACTIVE + 2] = {0}, fullAvailableReadFdCount;
 
     addStringToBuffer("\n", 0);
 
@@ -332,11 +332,18 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
     char leaveFlag = 0;
     while (!leaveFlag)
     {
-        availableReadFdCount = pselect(readFdCount, readFds, availableReadFds);
-        for (int i = 0; i < availableReadFdCount; i++)
+        int fullReadFdCount = 2 + activeReadsCount;
+        // Do not start from activeReads[0], as STD_IN is already here. It is best if STD_IN input is processed first (looks better on terminal)
+        for (int i = 3; i < fullReadFdCount; i++)
         {
+            fullReadFds[i] = activeReads[i - 2].fd;
+        }
+        fullAvailableReadFdCount = pselect(fullReadFdCount, fullReadFds, fullAvailableReadFds);
+        for (int i = 0; i < fullAvailableReadFdCount; i++)
+        {
+            int currentFd = fullAvailableReadFds[i];
             // it is foreground process
-            if (data.fd == availableReadFds[i])
+            if (data.fd == currentFd)
             {
                 char aux = handleReadFd(data, displayStyle);
                 if (aux == 1)
@@ -351,7 +358,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
                 }
             }
             // a key has been pressed
-            else if (STD_KEYS == availableReadFds[i])
+            else if (STD_KEYS == currentFd)
             {
                 char aux = handleStdKeys(data, displayStyle);
                 if (aux == 1)
@@ -366,7 +373,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
                 }
             }
             // a key that produces input has been pressed
-            else if (STD_IN == availableReadFds[i])
+            else if (STD_IN == currentFd)
             {
                 if (handleWriteFd(data, displayStyle))
                 {
@@ -374,9 +381,10 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
                     return;
                 }
             }
-            // it is backgrund process
+            // it is background process
             else
             {
+                readAsBackground(getFdIndex(currentFd));
             }
         }
     }

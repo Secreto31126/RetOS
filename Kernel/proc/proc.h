@@ -6,6 +6,7 @@
 #include <mman.h>
 #include <files.h>
 #include <ticks.h>
+#include <sched.h>
 #include <memory.h>
 #include <signal.h>
 #include <console.h>
@@ -32,7 +33,7 @@ pid_t set_pid(pid_t p);
 /**
  * @brief Set the exit code to the current process
  *
- * @note Should only be used by exit()
+ * @note Should only be used by _exit()
  *
  * @param status The exit code
  */
@@ -158,7 +159,7 @@ pid_t robin_next();
 void robin_remove(pid_t pid);
 /**
  * @brief Set the remainin ticks to 0
- * @note This function should only be called from yield()
+ * @note This function should only be called from sched_yield()
  */
 void yield_robin();
 

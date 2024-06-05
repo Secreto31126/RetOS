@@ -6,8 +6,8 @@
 #include <localization.h>
 #include <memory.h>
 #include <proc.h>
-#include <exec.h>
 #include <mman.h>
+#include <unistd.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -101,7 +101,7 @@ void idle(pid_t child_pid)
 {
 	if (!child_pid)
 	{
-		ncPrintDec(get_pid());
+		ncPrintDec(getpid());
 		ncPrint(": I will be init!\n");
 
 		char *argv[] = {"I'm in Userland!", "Hell yeah!", ":]", NULL};
@@ -116,7 +116,7 @@ void idle(pid_t child_pid)
 			return;
 		}
 
-		ncPrintDec(get_pid());
+		ncPrintDec(getpid());
 		ncPrint(": I'm idle!\n");
 
 		while (1)

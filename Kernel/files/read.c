@@ -7,7 +7,7 @@ static FileReader readers[] = {
     read_stdkey,
 };
 
-size_t read(int fd, void *buffer, size_t count)
+ssize_t read(int fd, void *buffer, size_t count)
 {
     int file = get_current_process()->files[fd];
 

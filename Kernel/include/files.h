@@ -5,24 +5,6 @@
 #include <stdbool.h>
 
 /**
- * @brief Read from a file descriptor
- *
- * @param fd The file descriptor to read from
- * @param buffer The buffer to write to
- * @param count The number of bytes to read
- * @return size_t The number of bytes read
- */
-size_t read(int fd, void *buffer, size_t count);
-/**
- * @brief Write to a file descriptor
- *
- * @param fd The file descriptor to write to
- * @param buffer The buffer to write from
- * @param count The number of bytes to write
- * @return size_t The number of bytes written
- */
-size_t write(int fd, const void *buffer, size_t count);
-/**
  * @brief Flush a file descriptor
  * @note Fails if the file is a pipe
  *

@@ -7,7 +7,7 @@ static FileWritter writters[] = {
     write_stdkey,
 };
 
-size_t write(int fd, const void *buffer, size_t count)
+ssize_t write(int fd, const void *buffer, size_t count)
 {
     int file = get_current_process()->files[fd];
 

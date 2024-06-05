@@ -1,6 +1,7 @@
 #ifndef PRC_H
 #define PRC_H
 
+#include <sys/types.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <pipes.h>
@@ -30,13 +31,6 @@ enum __priority_which
     PRIO_USER = 2 /* WHO is a user ID.  */
 #define PRIO_USER PRIO_USER
 };
-
-/**
- * @brief An unique process identifier type
- * @note -1 indicates an invalid pid
- */
-typedef int pid_t;
-typedef unsigned int id_t;
 
 /**
  * @brief Enum of all the possible process' states
@@ -182,12 +176,6 @@ Process *get_current_process();
  */
 Process *get_process(pid_t pid);
 /**
- * @brief Get the currently executing pid
- *
- * @return pid_t The current pid
- */
-pid_t get_pid();
-/**
  * @brief Create a new process
  *
  * @note This function must ALWAYS be called from a interruption context.
@@ -222,57 +210,7 @@ int open_file(int file, int flags);
  * @return int 0 if the file was closed, -1 otherwise
  */
 int close_file(int file);
-/**
- * @brief Close a file in the current process
- *
- * @param fd The process file descriptor
- * @return int 0 if the file was closed, -1 otherwise
- */
-int close(int fd);
-/**
- * @brief Duplicate a file descriptor
- *
- * @param oldfd The old file descriptor to duplicate
- * @param newfd The new file descriptor to use
- * @return int
- */
-int dup2(int oldfd, int newfd);
-/**
- * @brief Get the priority of a resource
- *
- * @param which The resource type of the `who` argument (PRIO_PROCESS (0) is the only valid value)
- * @param who The resource id
- * @return int The priority of the resource
- */
-int getpriority(int which, id_t who);
-/**
- * @brief Set the priority of a resource
- *
- * @param which The resource type of the `who` argument (PRIO_PROCESS (0) is the only valid value)
- * @param who The resource id
- * @param prio The new priority (ranged between -20 and 19, lower is higher priority)
- * @return int 0 on success, -1 on error
- */
-int setpriority(int which, id_t who, int prio);
 
-/**
- * @brief Block the current process until the child pid dies
- */
-pid_t waitpid(pid_t pid, int *wstatus, int options);
-/**
- * @brief Block the current process for a number of ticks
- *
- * @param ticks The number of ticks to sleep
- * @return unsigned int The number of ticks left to sleep (always 0 in RetOS)
- */
-unsigned int sleep(unsigned int ticks);
-/**
- * @brief Block the current process for a number of microseconds (aka ticks)
- *
- * @param usec The number of microseconds to sleep
- * @return unsigned int 0 on success, -1 on error (never happens in RetOS)
- */
-unsigned int usleep(unsigned int usec);
 /**
  * @brief Add a read block to the current process
  *
@@ -286,38 +224,10 @@ void read_block(int file);
  */
 void write_block(int file);
 /**
- * @brief Primitive select implementation
- *
- * @param nfds The number of file descriptors to check
- * @param fds The file descriptors to check
- * @param ready An array to store the ready file descriptors
- * @return int The number of ready file descriptors, 0 if all waited files are closed
- */
-int pselect(int nfds, const int *fds, int *ready);
-/**
  * @brief Add a semaphore block to the current process
  *
  * @param sem The semaphore to wait for
  */
 void sem_block(sem_t *sem);
-
-/**
- * @brief Send a signal to a process
- *
- * @param pid The process' pid to send the signal
- * @param sig The signal to send (defined in Global signal.h)
- * @return int 0 on success, -1 on error
- */
-int kill(pid_t pid, int sig);
-
-/**
- * @brief Skip remaining CPU time and give it to the next process
- */
-extern void yield();
-/**
- * @brief Kill the current process and halt
- * @note This function should only be called from a syscall for "atomicity"
- */
-extern void exit(int status);
 
 #endif

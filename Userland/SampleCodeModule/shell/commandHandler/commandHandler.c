@@ -13,6 +13,13 @@
 #define READ_BLOCK 500 // Any command parameters that exceed this will be ignored. Just don't write commands exceeding 50 letters in terminal/don't feed longer than BLOCK letter input to shell built-ins
 #define MAX_ARGS 255   // for execv
 
+typedef enum routeModes
+{
+    FROM_FD = 0,
+    FROM_TERM,
+    FROM_BOTH
+} routeModes;
+
 static command *commands;
 static uint64_t commandCount = 0;
 
@@ -369,7 +376,7 @@ char *getReadableString(moduleData source, char *buffer, int bufferSize)
     return buffer;
 }
 
-moduleData pipeAndExec(char *moduleName, char *params, int readFd, char makeTermPipe)
+moduleData pipeAndExec(char *moduleName, char *params, int readFd, routeModes routeMode)
 {
     int pipeFd[2] = {0};
     if (pipe(pipeFd))
@@ -379,7 +386,7 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, char makeTerm
     }
 
     int termPipe[2];
-    if (makeTermPipe && pipe(termPipe))
+    if (routeMode >= FROM_FD && pipe(termPipe))
     {
         close(pipeFd[READ_END]);
         close(pipeFd[WRITE_END]);
@@ -406,7 +413,7 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, char makeTerm
         {
             exit(1);
         }
-        if (readFd >= 0)
+        if (routeMode != FROM_TERM && readFd >= 0)
         {
             if (dup2(readFd, STD_IN) < 0)
                 exit(1);
@@ -418,9 +425,15 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, char makeTerm
             close(STD_IN);
         }
 
-        if (makeTermPipe)
+        if (routeMode == FROM_BOTH)
         {
             if (dup2(termPipe[READ_END], STD_TERM) < 0)
+                exit(1);
+            close(termPipe[WRITE_END]);
+        }
+        else if (routeMode == FROM_TERM)
+        {
+            if (dup2(termPipe[READ_END], STD_IN) < 0)
                 exit(1);
             close(termPipe[WRITE_END]);
         }
@@ -444,7 +457,7 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, char makeTerm
     {
         // I am the parent process
         close(pipeFd[WRITE_END]);
-        if (!makeTermPipe)
+        if (routeMode == FROM_FD)
         {
             moduleData aux = {NULL, pipeFd[READ_END], -1, cPid};
             return aux;
@@ -492,38 +505,38 @@ moduleData cat(moduleData commandFd, displayStyles *displayStyle)
 {
     // no params received, no fd to read from, use terminal as fd
     if ((!*commandFd.s || *commandFd.s == ' ') && commandFd.fd < 0)
-        return pipeAndExec("cat", "TERM_MODE", commandFd.fd, 1);
+        return pipeAndExec("cat", "TERM_MODE", commandFd.fd, FROM_BOTH);
     // params/fd received, normal cat
-    return pipeAndExec("cat", commandFd.s, commandFd.fd, 0);
+    return pipeAndExec("cat", commandFd.s, commandFd.fd, FROM_FD);
 }
 moduleData wc(moduleData commandFd, displayStyles *displayStyle)
 {
-    return pipeAndExec("wc", commandFd.s, commandFd.fd, 0);
+    return pipeAndExec("wc", commandFd.s, commandFd.fd, FROM_FD);
 }
 moduleData filter(moduleData commandFd, displayStyles *displayStyle)
 {
-    return pipeAndExec("filter", commandFd.s, commandFd.fd, 0);
+    return pipeAndExec("filter", commandFd.s, commandFd.fd, FROM_FD);
 }
 moduleData loop(moduleData commandFd, displayStyles *displayStyle)
 {
-    return pipeAndExec("loop", commandFd.s, commandFd.fd, 0);
+    return pipeAndExec("loop", commandFd.s, commandFd.fd, FROM_FD);
 }
 moduleData grep(moduleData commandFd, displayStyles *displayStyle)
 {
-    return pipeAndExec("grep", commandFd.s, commandFd.fd, 0);
+    return pipeAndExec("grep", commandFd.s, commandFd.fd, FROM_FD);
 }
 moduleData singToMe(moduleData commandFd, displayStyles *displayStyle)
 {
-    return pipeAndExec("sing", commandFd.s, commandFd.fd, 0);
+    return pipeAndExec("sing", commandFd.s, commandFd.fd, FROM_FD);
 }
 moduleData less(moduleData commandFd, displayStyles *displayStyle)
 {
     *displayStyle = NO_STDIN;
-    return pipeAndExec("less", commandFd.s, commandFd.fd, 1);
+    return pipeAndExec("less", commandFd.s, commandFd.fd, FROM_BOTH);
 }
 moduleData phylos(moduleData commandFd, displayStyles *displayStyle)
 {
-    return pipeAndExec("phylos", commandFd.s, commandFd.fd, 1);
+    return pipeAndExec("phylos", commandFd.s, commandFd.fd, FROM_TERM);
 }
 
 void initializeCommands()

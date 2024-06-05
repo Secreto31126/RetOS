@@ -83,7 +83,8 @@ void *backup_argv_somewhere(int argc, char *const argv[])
 {
     for (int i = 0; i < argc; i++)
     {
-        strcpy(argv_backup[i], argv[i]);
+        strncpy(argv_backup[i], argv[i], MAX_ARG_LEN - 1);
+        argv_backup[i][MAX_ARG_LEN - 1] = '\0';
     }
 
     return argv_backup;

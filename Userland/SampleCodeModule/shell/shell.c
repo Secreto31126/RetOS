@@ -42,7 +42,7 @@ char addToActive(moduleData bgModule)
 
 int getFdIndex(int fd)
 {
-    int index;
+    int index = 0;
     while (activeReads[index].fd != fd)
         index++;
     return index;

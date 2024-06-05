@@ -27,6 +27,7 @@ static void *const grep = (void *)0x625000;
 static void *const sing = (void *)0x630000;
 static void *const less = (void *)0x635000;
 static void *const phylos = (void *)0x640000;
+static void *const tests = (void *)0x645000;
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
@@ -58,6 +59,7 @@ void *initializeKernelBinary()
 		sing,
 		less,
 		phylos,
+		tests,
 	};
 
 	loadModules(&endOfKernelBinary, moduleAddresses);

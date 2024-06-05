@@ -58,6 +58,11 @@ Executable executables[EXECUTABLES] = {
         .filename = "phylos",
         .main = (EntryPoint)0x640000,
     },
+    {
+        .mod = 7,
+        .filename = "tests",
+        .main = (EntryPoint)0x645000,
+    },
 };
 
 int check_args(char *const argv[])

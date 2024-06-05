@@ -1,6 +1,9 @@
 #include <sys.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <semaphores.h>
+
+#define MAX_ARGS 255
 
 int64_t my_getpid()
 {
@@ -11,6 +14,16 @@ int64_t my_getpid()
 // then again, I suppose you just don't
 int64_t my_create_process(char *name, uint64_t argc, char *argv[])
 {
+  // All tests reside in the same module with a switch statement that uses argv[0] to select the test
+  // For this reason, execv in this module has been routed to itself, selecting the test via argv
+
+  char *modArgv[MAX_ARGS];
+  int i = 0;
+  modArgv[0] = name;
+  for (i = 0; i < argc; i++)
+    modArgv[i + 1] = argv[i];
+  modArgv[i + 1] = NULL;
+
   int cPid = fork();
   if (cPid < 0)
   { // Failed to fork
@@ -19,8 +32,15 @@ int64_t my_create_process(char *name, uint64_t argc, char *argv[])
   if (!cPid)
   {
     // child
-    execv(name, argv);
+
+    // whoosh
+    execv("tests", modArgv);
+
+    // If execv fails, kill the child
+    exit(1);
   }
+
+  // parent
   return cPid;
 }
 
@@ -56,7 +76,7 @@ int64_t my_sem_wait(char *sem_id)
 
 int64_t my_sem_post(char *sem_id)
 {
-  return 0;
+  return sem_post((sem_t *)sem_id);
 }
 
 int64_t my_sem_close(char *sem_id)

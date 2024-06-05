@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys.h>
 #include "tests.h"
+#include "test_util.h"
 
 extern char bss;
 extern char endOfBinary;
@@ -23,6 +24,22 @@ int main(int argc, char *argv[])
 	while (test[truncate] && test[truncate] != ' ')
 		truncate++;
 	test[truncate] = 0;
+
+	if (!strcmp(test, "my_process_inc"))
+	{
+		return my_process_inc(argc - 1, argv + 1);
+	}
+	if (!strcmp(test, "endless_loop_print"))
+	{
+		// 1000000 sounds about right idk the only way this function is used is via a single execv with argc 0
+		endless_loop_print(1000000);
+		return 0;
+	}
+	if (!strcmp(test, "endless_loop"))
+	{
+		endless_loop();
+		return 0;
+	}
 
 	if (!strcmp(test, "testmm"))
 	{

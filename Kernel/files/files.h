@@ -3,6 +3,7 @@
 
 #include <files.h>
 
+#include <sys/types.h>
 #include <console.h>
 #include <stddef.h>
 #include <stdin.h>

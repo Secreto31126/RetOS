@@ -55,7 +55,7 @@ void *create_process_idle()
     return processes[0].rsp;
 }
 
-pid_t get_pid()
+pid_t getpid()
 {
     return pid;
 }

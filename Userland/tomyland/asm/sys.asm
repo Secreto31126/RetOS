@@ -9,12 +9,12 @@
     global get_tick
     global get_dump
     global halt_user
-    global exit
+    global _exit
     global kill
-    global get_pid
+    global getpid
     global execv
     global fork
-    global yield
+    global sched_yield
     global waitpid
     global sleep
     global pipe
@@ -26,13 +26,13 @@
     global getpriority
     global setpriority
 
-; size_t read(int fd, void *buf, size_t count);
+; ssize_t read(int fd, void *buf, size_t count);
 read:
     mov rax, 0
     int 80h
     ret
 
-; size_t write(int fd, void *buf, size_t count);
+; ssize_t write(int fd, void *buf, size_t count);
 write:
     mov rax, 1
     int 80h
@@ -87,7 +87,7 @@ halt_user:
     ret
 
 ; void exit();
-exit:
+_exit:
     mov rax, 0xB
     int 80h
     ret
@@ -99,7 +99,7 @@ kill:
     ret
 
 ; int get_pid();
-get_pid:
+getpid:
     mov rax, 0xD
     int 80h
     ret
@@ -116,8 +116,8 @@ fork:
     int 80h
     ret
 
-; void yield();
-yield:
+; int sched_yield();
+sched_yield:
     mov rax, 0x10
     int 80h
     ret

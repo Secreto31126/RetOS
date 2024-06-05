@@ -46,6 +46,18 @@ int main(int argc, char *argv[])
 		}
 		else if (pid == 0)
 		{
+			char *presentation = strandnum("I'm phylo ", i);
+			puts(presentation);
+			puts("\n");
+			free(presentation);
+			puts(presentation);
+			puts("\n");
+			free(presentation);
+			philosopher(i);
+			exit(0);
+		}
+		else
+		{
 			states[i] = THINKING;
 			turns[i] = 0;
 			char *name = strandnum("sem_", i);
@@ -60,11 +72,6 @@ int main(int argc, char *argv[])
 				puts("Error in sem_open\n");
 				return 1;
 			}
-			philosopher(i);
-			exit(0);
-		}
-		else
-		{
 			child_ids[i] = pid;
 		}
 	}
@@ -195,10 +202,6 @@ void print_state()
 	char *to_print;
 	while (1)
 	{
-		to_print = strandnum("Cantidad de filósofos: ", phylos[0]);
-		puts(to_print);
-		puts("\n");
-		free(to_print);
 		sem_wait(mutex); // Mutex lock
 		for (int i = 0; i < phylos[0]; i++)
 		{

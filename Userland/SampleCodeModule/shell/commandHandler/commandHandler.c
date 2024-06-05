@@ -386,7 +386,7 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, routeModes ro
     }
 
     int termPipe[2];
-    if (routeMode >= FROM_FD && pipe(termPipe))
+    if (routeMode > FROM_FD && pipe(termPipe))
     {
         close(pipeFd[READ_END]);
         close(pipeFd[WRITE_END]);

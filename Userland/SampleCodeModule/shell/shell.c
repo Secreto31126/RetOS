@@ -102,6 +102,26 @@ char readAsInput(char c)
     return 0;
 }
 
+void readAsBackground(int index)
+{
+    addCharToBuffer('\n');
+    moduleData data = activeReads[index];
+    int aux = handleReadFd(data, AS_BACKGROUND);
+    if (aux == 1)
+    {
+        killModule(data, "Communication failed, killed background process.\n");
+        removeFromActive(index);
+    }
+    if (aux == 2)
+    {
+        // in case the process did not end on its own, kill it, as it has no useful output to give
+        killModule(data, "");
+        removeFromActive(index);
+    }
+    else
+        addStringToBuffer(lineStart, 0);
+}
+
 char shellLoop()
 {
     drawTime();
@@ -132,25 +152,7 @@ char shellLoop()
         }
         else
         {
-            addCharToBuffer('\n');
-            int index = getFdIndex(canBeRead[i]);
-            moduleData data = activeReads[index];
-            int aux = handleReadFd(data, AS_BACKGROUND);
-            if (aux == 1)
-            {
-                blank();
-                killModule(data, "There was an error communicating with a background process.\n");
-                sleep(1);
-                return 1;
-            }
-            if (aux == 2)
-            {
-                // in case the process did not end on its own, kill it, as it has no useful output to give
-                killModule(data, "");
-                removeFromActive(index);
-            }
-            else
-                addStringToBuffer(lineStart, 0);
+            readAsBackground(getFdIndex(canBeRead[i]));
         }
     }
     return 0;
@@ -324,6 +326,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
         availableReadFdCount = pselect(readFdCount, readFds, availableReadFds);
         for (int i = 0; i < availableReadFdCount; i++)
         {
+            // it is foreground process
             if (data.fd == availableReadFds[i])
             {
                 char aux = handleReadFd(data, displayStyle);
@@ -338,6 +341,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
                     break;
                 }
             }
+            // a key has been pressed
             else if (STD_KEYS == availableReadFds[i])
             {
                 char aux = handleStdKeys(data, displayStyle);
@@ -352,6 +356,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
                     return;
                 }
             }
+            // a key that produces input has been pressed
             else if (STD_IN == availableReadFds[i])
             {
                 if (handleWriteFd(data, displayStyle))
@@ -359,6 +364,10 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
                     killModule(data, "Communication failed, killed foreground process.\n");
                     return;
                 }
+            }
+            // it is backgrund process
+            else
+            {
             }
         }
     }

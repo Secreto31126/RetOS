@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "syscall.h"
 #include "test_util.h"
 
@@ -41,7 +40,7 @@ int64_t test_processes(uint64_t argc, char *argv[])
 
       if (p_rqs[rq].pid == -1)
       {
-        printf("test_processes: ERROR creating process\n");
+        puts("test_processes: ERROR creating process\n");
         return -1;
       }
       else
@@ -66,7 +65,7 @@ int64_t test_processes(uint64_t argc, char *argv[])
           {
             if (my_kill(p_rqs[rq].pid) == -1)
             {
-              printf("test_processes: ERROR killing process\n");
+              puts("test_processes: ERROR killing process\n");
               return -1;
             }
             p_rqs[rq].state = KILLED;
@@ -79,7 +78,7 @@ int64_t test_processes(uint64_t argc, char *argv[])
           {
             if (my_block(p_rqs[rq].pid) == -1)
             {
-              printf("test_processes: ERROR blocking process\n");
+              puts("test_processes: ERROR blocking process\n");
               return -1;
             }
             p_rqs[rq].state = BLOCKED;
@@ -94,7 +93,7 @@ int64_t test_processes(uint64_t argc, char *argv[])
         {
           if (my_unblock(p_rqs[rq].pid) == -1)
           {
-            printf("test_processes: ERROR unblocking process\n");
+            puts("test_processes: ERROR unblocking process\n");
             return -1;
           }
           p_rqs[rq].state = RUNNING;

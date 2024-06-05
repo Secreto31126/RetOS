@@ -1,6 +1,8 @@
 #include <stdint.h>
-#include <stdio.h>
+#include <stdlib.h>
 #include "syscall.h"
+#include <string.h>
+#include "test_util.h"
 
 // Random
 static uint32_t m_z = 362436069;
@@ -78,13 +80,18 @@ void endless_loop_print(uint64_t wait)
 
   while (1)
   {
-    printf("%d ", pid);
+    // MODIFIED TO USE PUTS
+    char buffer[100];
+    itoa(pid, buffer, 10);
+    puts(buffer);
+    // END OF MODIFICATION
+
     bussy_wait(wait);
   }
 }
 
 // ours
-int printf(char *s)
+int puts(char *s)
 {
-  return write(1, s, s);
+  return write(1, s, strlen(s));
 }

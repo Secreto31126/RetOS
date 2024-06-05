@@ -10,4 +10,4 @@ void endless_loop();
 void endless_loop_print(uint64_t wait);
 
 // ours
-int printf(char *s);
+int puts(char *s);

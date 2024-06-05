@@ -1,6 +1,7 @@
 /* main.c */
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys.h>
 
 extern char bss;
 extern char endOfBinary;

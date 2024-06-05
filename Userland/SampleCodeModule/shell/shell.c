@@ -370,7 +370,10 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
         close(data.writeFd);
     }
     addStringToBuffer("Waitpidding", 0);
-    waitpid(data.cPid, NULL, 0);
+    if (data.cPid >= 0)
+    {
+        waitpid(data.cPid, NULL, 0);
+    }
     addStringToBuffer("Out", 0);
 }
 

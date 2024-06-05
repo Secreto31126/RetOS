@@ -486,7 +486,6 @@ moduleData less(moduleData commandFd, displayStyles *displayStyle)
     *displayStyle = NO_STDIN;
     return pipeAndExec("less", commandFd.s, commandFd.fd, 1);
 }
-
 moduleData phylos(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("phylos", commandFd.s, commandFd.fd, 0);

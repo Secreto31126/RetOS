@@ -128,7 +128,10 @@ void readAsBackground(int index)
         removeFromActive(index);
     }
     else
+    {
+        addCharToBuffer('\n');
         addStringToBuffer(lineStart, 0);
+    }
 }
 
 char shellLoop()

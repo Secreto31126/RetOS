@@ -9,7 +9,7 @@
     global get_tick
     global get_dump
     global halt_user
-    global exit
+    global _exit
     global get_pid
     global execv
     global fork
@@ -89,7 +89,7 @@ halt_user:
     int 80h
     ret
 
-exit:
+_exit:
     mov rax, 0xB
     int 80h
     ret

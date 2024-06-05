@@ -49,9 +49,10 @@ int64_t my_nice(uint64_t pid, uint64_t newPrio)
   return 0;
 }
 
+// Added wait, since on being killed, processes can become zombies
 int64_t my_kill(uint64_t pid)
 {
-  return kill(pid, SIGKILL);
+  return kill(pid, SIGKILL) || waitpid(pid, NULL, 0);
 }
 
 int64_t my_block(uint64_t pid)
@@ -86,10 +87,11 @@ int64_t my_sem_close(char *sem_id)
 
 int64_t my_yield()
 {
+  yield();
   return 0;
 }
 
 int64_t my_wait(int64_t pid)
 {
-  return 0;
+  return waitpid(pid, NULL, 0);
 }

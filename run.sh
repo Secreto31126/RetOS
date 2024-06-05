@@ -19,6 +19,10 @@ if [ "$1" = "DEBUG" ]
 then
     echo "Debug mode"
     id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all DEBUG=1)
+elif [ "$1" = "PVS" ]
+then
+    echo "PVS mode"
+    id=$(docker run -d -v "/$path/Image:/root/Image" "$container" pvs)
 else
     id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all)
 fi
@@ -28,7 +32,10 @@ docker wait "$id"
 docker logs "$id"
 docker rm "$id" > /dev/null
 
-if [ "$1" = "DEBUG" ]
+if [ "$1" = "PVS" ]
+then
+    exit 0
+elif [ "$1" = "DEBUG" ]
 then
     echo
     echo "Debug mode"

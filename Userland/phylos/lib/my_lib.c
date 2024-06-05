@@ -1,11 +1,12 @@
-#include <string.h>
 #include "my_lib.h"
+#include <string.h>
 #include <stdlib.h>
+#include <sys.h>
 
-char *strandnum(const char *str, int num)
+char *strandnum(const char *str, unsigned int num)
 {
     char *buffer = malloc(strlen(str) + 3);
     strcpy(buffer, str);
-    itoa(num, buffer + strlen(str), 10);
+    utoa(num, buffer + strlen(str), 10);
     return buffer;
 }

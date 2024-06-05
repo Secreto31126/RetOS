@@ -87,6 +87,7 @@ int close_pipe(int file)
     {
         free(pipe->data);
         pipe->data = NULL;
+        open_pipes--;
     }
 
     return 0;

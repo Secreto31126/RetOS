@@ -505,7 +505,7 @@ moduleData cat(moduleData commandFd, displayStyles *displayStyle)
 {
     // no params received, no fd to read from, use terminal as fd
     if ((!*commandFd.s || *commandFd.s == ' ') && commandFd.fd < 0)
-        return pipeAndExec("cat", "TERM_MODE", commandFd.fd, FROM_BOTH);
+        return pipeAndExec("cat", "TERM_MODE", commandFd.fd, FROM_TERM);
     // params/fd received, normal cat
     return pipeAndExec("cat", commandFd.s, commandFd.fd, FROM_FD);
 }

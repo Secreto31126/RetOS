@@ -13,10 +13,7 @@ int main(int argc, char *argv[])
 {
 	char str[BLOCK] = {0};
 	int n;
-	int willRead = STD_IN;
-	if (argc > 0 && !strcmp(argv[0], "TERM_MODE"))
-		willRead = STD_TERM;
-	while ((n = read(willRead, str, BLOCK)) > 0)
+	while ((n = read(STD_IN, str, BLOCK)) > 0)
 	{
 		write(STD_OUT, str, n);
 	}

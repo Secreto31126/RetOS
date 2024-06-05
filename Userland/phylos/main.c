@@ -90,8 +90,8 @@ int main(int argc, char *argv[])
 	int run = 1;
 	while (run)
 	{
-		read(STD_IN, buffer, 1);
-		switch ((char)buffer[0])
+		read(STD_TERM, buffer, 1);
+		switch (buffer[0])
 		{
 		case 'a':
 		{

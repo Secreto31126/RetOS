@@ -1,5 +1,7 @@
 #ifndef CMND_H
 #define CMND_H
+#define MAX_PIPES 32
+
 typedef struct moduleData
 {
     char *s;
@@ -7,6 +9,12 @@ typedef struct moduleData
     int writeFd;
     int cPid;
 } moduleData;
+typedef struct commandData
+{
+    moduleData data;
+    int *cPid;
+    int cPidCount;
+} commandData;
 typedef enum displayStyles
 {
     APPEND = 0,
@@ -15,7 +23,7 @@ typedef enum displayStyles
     NO_STDIN,
     AS_BACKGROUND,
 } displayStyles;
-moduleData handleCommand(char *command, displayStyles *displayStyle); // All it does.
+commandData handleCommand(char *command, displayStyles *displayStyle, int *cPidBuffer); // All it does.
 void initializeCommands();
 void freeCommands();
 

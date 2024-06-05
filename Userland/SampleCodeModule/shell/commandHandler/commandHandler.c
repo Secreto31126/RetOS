@@ -89,28 +89,35 @@ moduleData wrapExecute(moduleData toPipe, char *command, displayStyles *displayS
     }
 }
 
-moduleData handleCommand(char *command, displayStyles *displayStyle)
+commandData handleCommand(char *command, displayStyles *displayStyle, int *cPidBuffer)
 {
 
     command = shiftToWord(command);
     if (strcmpHandleWhitespace(command, "") || strcmpHandleWhitespace(command, " "))
     { // if command is empty or whitespace, it is ignored
-        moduleData aux = {"", -1};
+        commandData aux = {{"", -1, -1, -1}, cPidBuffer, 0};
         return aux;
     }
 
     moduleData toPipe = {shiftToNextWord(command), -1, -1, -1}; // The first set of params I can hand over comes from the second word in my command string
     char *currentCommandStart = command;
-    for (int j = 0; command[j]; j++)
+    int cPidCount = 0;
+    for (int j = 0; command[j] && cPidCount < MAX_PIPES; j++)
     {
         if (command[j] == '|')
         {
             command[j] = 0; // Cut off the string, so I do not hand other commands over to the executor
             toPipe = wrapExecute(toPipe, currentCommandStart, displayStyle);
             currentCommandStart = shiftToWord(command + j + 1); // this is also safe, as '|' is not considered whitespace and would stop the shift, so j catches up
+            if (toPipe.cPid >= 0)
+                cPidBuffer[cPidCount++] = toPipe.cPid;
         }
     }
-    return wrapExecute(toPipe, currentCommandStart, displayStyle);
+    toPipe = wrapExecute(toPipe, currentCommandStart, displayStyle);
+    if (toPipe.cPid >= 0)
+        cPidBuffer[cPidCount++] = toPipe.cPid;
+    commandData toRet = {toPipe, cPidBuffer, cPidCount};
+    return toRet;
 }
 
 moduleData getHelp(moduleData commandFd, displayStyles *displayStyle)

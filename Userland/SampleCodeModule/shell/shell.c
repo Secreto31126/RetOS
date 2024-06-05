@@ -18,7 +18,7 @@ void paintStringOrWarp(const char *s, char ask);
 void addStringToBuffer(const char *s, char ask);
 void addCharToBuffer(char c);
 int handleReadFd(moduleData data, displayStyles displayStyle);
-void killModule(moduleData data, char *message);
+void killModule(commandData cData, char *message);
 
 // String constants
 static const char *lineStart = ":~ ";
@@ -33,7 +33,7 @@ static uint64_t index, commandIndex;
 static char fromLastEnter = 0;
 
 // For background module management
-static moduleData activeReads[MAX_ACTIVE] = {{NULL, STD_IN, -1, -1}};
+static commandData activeReads[MAX_ACTIVE] = {{{NULL, STD_IN, -1, -1}, NULL, 0}};
 static int activeReadsCount = 1;
 
 void drawTime()
@@ -41,7 +41,7 @@ void drawTime()
     drawStringAt(getTimeString(), 0xFFFFFFFF, 0xFF000000, 0, 0);
 }
 
-char addToActive(moduleData bgModule)
+char addToActive(commandData bgModule)
 {
     if (activeReadsCount >= MAX_ACTIVE)
         return 1;
@@ -52,7 +52,7 @@ char addToActive(moduleData bgModule)
 int getFdIndex(int fd)
 {
     int index = 0;
-    while (activeReads[index].fd != fd)
+    while (activeReads[index].data.fd != fd)
         index++;
     return index;
 }
@@ -114,18 +114,18 @@ char readAsInput(char c)
 // returns 1 if content was printed
 int readAsBackground(int index, displayStyles displayStyle)
 {
-    moduleData data = activeReads[index];
-    int aux = handleReadFd(data, displayStyle);
+    commandData cData = activeReads[index];
+    int aux = handleReadFd(cData.data, displayStyle);
     if (aux == 1)
     {
-        killModule(data, "Communication failed, killed background process.\n");
+        killModule(cData, "Communication failed, killed background process.\n");
         removeFromActive(index);
         return 1;
     }
     if (aux == 2)
     {
         // in case the process did not end on its own, kill it, as it has no useful output to give
-        killModule(data, "");
+        killModule(cData, "");
         removeFromActive(index);
         return 0;
     }
@@ -140,7 +140,7 @@ char shellLoop()
     int activeReadFds[MAX_ACTIVE];
     for (int i = 0; i < activeReadsCount; i++)
     {
-        activeReadFds[i] = activeReads[i].fd;
+        activeReadFds[i] = activeReads[i].data.fd;
     }
     int n = pselect(activeReadsCount, activeReadFds, canBeRead);
     for (int i = 0; i < n; i++)
@@ -323,22 +323,27 @@ int handleWriteFd(moduleData data, displayStyles displayStyle)
     return 0;
 }
 
-void killModule(moduleData data, char *message)
+void killModule(commandData cData, char *message)
 {
+    moduleData data = cData.data;
     close(data.fd);
     if (data.writeFd >= 0)
         close(data.writeFd);
-    if (data.cPid >= 0)
-    {
-        kill(data.cPid, SIGKILL);
-        waitpid(data.cPid, NULL, 0);
-    }
+
+    for (int i = 0; i < cData.cPidCount; i++)
+        if (cData.cPid[i] >= 0)
+        {
+            kill(cData.cPid[i], SIGKILL);
+            waitpid(cData.cPid[i], NULL, 0);
+        }
+
     addStringToBuffer(message, 0);
 }
 
-void readUntilClose(moduleData data, displayStyles displayStyle)
+void readUntilClose(commandData cData, displayStyles displayStyle)
 {
     flush(STD_KEYS);
+    moduleData data = cData.data;
 
     int fullReadFds[MAX_ACTIVE + 2] = {data.fd, STD_IN, STD_KEYS}, fullReadFdCount, fullAvailableReadFds[MAX_ACTIVE + 2] = {0}, fullAvailableReadFdCount;
 
@@ -352,7 +357,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
         // Do not start from activeReads[0], as STD_IN is already here. It is best if STD_IN input is processed first (looks better on terminal)
         for (int i = 3; i < fullReadFdCount; i++)
         {
-            fullReadFds[i] = activeReads[i - 2].fd;
+            fullReadFds[i] = activeReads[i - 2].data.fd;
         }
         fullAvailableReadFdCount = pselect(fullReadFdCount, fullReadFds, fullAvailableReadFds);
         for (int i = 0; i < fullAvailableReadFdCount; i++)
@@ -364,7 +369,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
                 char aux = handleReadFd(data, displayStyle);
                 if (aux == 1)
                 {
-                    killModule(data, "Communication failed, killed foreground process.\n");
+                    killModule(cData, "Communication failed, killed foreground process.\n");
                     return;
                 }
                 if (aux == 2)
@@ -379,12 +384,12 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
                 char aux = handleStdKeys(data, displayStyle);
                 if (aux == 1)
                 {
-                    killModule(data, "Communication failed, killed foreground process.\n");
+                    killModule(cData, "Communication failed, killed foreground process.\n");
                     return;
                 }
                 if (aux == 2)
                 { // send SIGKILL to process, wait for it to terminate
-                    killModule(data, "");
+                    killModule(cData, "");
                     return;
                 }
             }
@@ -393,7 +398,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
             {
                 if (handleWriteFd(data, displayStyle))
                 {
-                    killModule(data, "Communication failed, killed foreground process.\n");
+                    killModule(cData, "Communication failed, killed foreground process.\n");
                     return;
                 }
             }
@@ -418,19 +423,21 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
 char *passCommand(char *toPass)
 {
     displayStyles displayStyle = 0;
-    moduleData data = handleCommand(toPass, &displayStyle);
+    int cPidBuffer[MAX_PIPES];
+    commandData cData = handleCommand(toPass, &displayStyle, cPidBuffer);
+    moduleData mData = cData.data;
 
-    if (data.s == NULL)
+    if (mData.s == NULL)
     {
-        if (data.fd >= 0)
+        if (mData.fd >= 0)
         {
             if (displayStyle == AS_BACKGROUND)
             {
-                addToActive(data);
+                addToActive(cData);
             }
             else
             {
-                readUntilClose(data, displayStyle);
+                readUntilClose(cData, displayStyle);
             }
         }
 
@@ -439,7 +446,7 @@ char *passCommand(char *toPass)
         return "";
     }
 
-    char *toPaint = data.s;
+    char *toPaint = mData.s;
 
     if (displayStyle >= REDRAW_ONCE)
     {

@@ -363,12 +363,15 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
         }
     }
 
+    addStringToBuffer("Here", 0);
     close(data.fd);
     if (data.writeFd >= 0)
     {
         close(data.writeFd);
     }
+    addStringToBuffer("Waitpidding", 0);
     waitpid(data.cPid, NULL, 0);
+    addStringToBuffer("Out", 0);
 }
 
 char *passCommand(char *toPass)

@@ -188,5 +188,5 @@ pid_t robin_next()
 
 void yield_robin()
 {
-    remaining = 20;
+    remaining = PRIO_MAX + 1;
 }

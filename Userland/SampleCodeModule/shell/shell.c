@@ -113,7 +113,6 @@ char readAsInput(char c)
 
 void readAsBackground(int index)
 {
-    addCharToBuffer('\n');
     moduleData data = activeReads[index];
     int aux = handleReadFd(data, AS_BACKGROUND);
     if (aux == 1)
@@ -287,6 +286,8 @@ int handleReadFd(moduleData data, displayStyles displayStyle)
     if (n == 0)
         return 2;
     r_buffer[n] = 0;
+    if (displayStyle == AS_BACKGROUND)
+        addCharToBuffer('\n');
     addStringToBuffer(r_buffer, 0);
     return 0;
 }

@@ -111,26 +111,25 @@ char readAsInput(char c)
     return 0;
 }
 
-void readAsBackground(int index)
+// returns 1 if content was printed
+int readAsBackground(int index, displayStyles displayStyle)
 {
     moduleData data = activeReads[index];
-    int aux = handleReadFd(data, AS_BACKGROUND);
+    int aux = handleReadFd(data, displayStyle);
     if (aux == 1)
     {
         killModule(data, "Communication failed, killed background process.\n");
         removeFromActive(index);
+        return 1;
     }
     if (aux == 2)
     {
         // in case the process did not end on its own, kill it, as it has no useful output to give
         killModule(data, "");
         removeFromActive(index);
+        return 0;
     }
-    else
-    {
-        addCharToBuffer('\n');
-        addStringToBuffer(lineStart, 0);
-    }
+    return 1;
 }
 
 char shellLoop()
@@ -150,6 +149,14 @@ char shellLoop()
         {
             char c;
             int aux = read_sys(STD_IN, &c, 1);
+            if (aux <= 0)
+            {
+                blank();
+                addStringToBuffer("There was an error reading STD_IN.\nExiting.", 0);
+                sleep(1);
+                exit(1);
+                return 1;
+            }
             if (readAsInput(c))
             {
                 blank();
@@ -163,7 +170,11 @@ char shellLoop()
         }
         else
         {
-            readAsBackground(getFdIndex(canBeRead[i]));
+            if (readAsBackground(getFdIndex(canBeRead[i]), AS_BACKGROUND))
+            {
+                addCharToBuffer('\n');
+                addStringToBuffer(lineStart, 0);
+            }
         }
     }
     return 0;
@@ -186,6 +197,7 @@ char shellStart()
 
     while (!shellLoop())
         ;
+    return 0;
 }
 
 void addCharToBuffer(char c)
@@ -336,7 +348,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
     char leaveFlag = 0;
     while (!leaveFlag)
     {
-        int fullReadFdCount = 2 + activeReadsCount;
+        fullReadFdCount = 2 + activeReadsCount;
         // Do not start from activeReads[0], as STD_IN is already here. It is best if STD_IN input is processed first (looks better on terminal)
         for (int i = 3; i < fullReadFdCount; i++)
         {
@@ -388,7 +400,7 @@ void readUntilClose(moduleData data, displayStyles displayStyle)
             // it is background process
             else
             {
-                readAsBackground(getFdIndex(currentFd));
+                readAsBackground(getFdIndex(currentFd), APPEND);
             }
         }
     }

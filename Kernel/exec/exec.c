@@ -124,12 +124,12 @@ RSP set_process_args(int argc, char const argv[MAX_ARGS][MAX_ARG_LEN], Process *
 
 char argv_backup[MAX_ARGS][MAX_ARG_LEN];
 
-char *const *const backup_argv_somewhere(int argc, char *const argv[])
+void *backup_argv_somewhere(int argc, char *const argv[])
 {
     for (int i = 0; i < argc; i++)
     {
         strcpy(argv_backup[i], argv[i]);
     }
 
-    return (char *const *const)argv_backup;
+    return argv_backup;
 }

@@ -26,6 +26,13 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 	char *song = argv[0];
+
+	// Remove trailing whitespace
+	int truncate = 0;
+	while (song[truncate] && song[truncate] != ' ')
+		truncate++;
+	song[truncate] = 0;
+
 	char match = 0;
 	if (!strcmp(song, "imperial-march"))
 	{

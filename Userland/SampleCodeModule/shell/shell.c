@@ -338,6 +338,7 @@ void killModule(commandData cData, char *message)
         }
 
     addStringToBuffer(message, 0);
+    shut();
 }
 
 void readUntilClose(commandData cData, displayStyles displayStyle)

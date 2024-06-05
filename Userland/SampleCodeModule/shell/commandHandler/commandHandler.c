@@ -453,6 +453,34 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, char makeTerm
     return aux;
 }
 
+moduleData killer(moduleData commandFd, displayStyles *displayStyle)
+{
+    char savedSpace[READ_BLOCK];
+    char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
+
+    char *args[MAX_ARGS];
+    separateString(commandParameters, args, MAX_ARGS);
+
+    if (args[0] == NULL)
+    {
+        moduleData toRet = {"No valid arguments read.", -1, -1, -1};
+        return toRet;
+    }
+
+    for (int i = 0; args[i] != NULL; i++)
+    {
+        int aux = atoi(args[i]);
+        if (aux)
+        {
+            kill(aux, SIGKILL);
+            waitpid(aux, NULL, 0);
+        }
+    }
+
+    moduleData toRet = {"Killed.", -1, -1, -1};
+    return toRet;
+}
+
 moduleData cat(moduleData commandFd, displayStyles *displayStyle)
 {
     // no params received, no fd to read from, use terminal as fd
@@ -510,5 +538,6 @@ void initializeCommands()
     addCommand("loop", "Help display for the loop module.\nFormats: 'loop | loop [interval]'\nPrints its process id and a greeting on a set interval.", loop);
     addCommand("grep", "Help display for the grep module.\nFormat: 'grep [match]'\nOutputs all lines from content of fd that match [match].", grep);
     addCommand("less", "Help display for the less module.\nFormat: 'less'\nOutputs content from fd upon user input.", less);
+    addCommand("kill", "Help display for the kill module.\nFormat: 'kill [process id list]'\nKills every process given.", killer);
     addCommand("phylos", "Help display for the phylos module.\nFormat: 'phylos'\nStarts the phylos module with 5 phylosophers, click a to add a phylosopher, r to remove one and q to quit.", phylos);
 }

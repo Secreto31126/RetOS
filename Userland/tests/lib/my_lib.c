@@ -1,6 +1,6 @@
 #include <string.h>
 #include "my_lib.h"
-#include <stdlib.h>
+#include <sys.h>
 
 char *strandnum(const char *str, int num)
 {

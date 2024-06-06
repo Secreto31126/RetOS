@@ -76,7 +76,7 @@ moduleData wrapExecute(moduleData toPipe, char *command, displayStyles *displayS
 {
     if (toPipe.s != NULL)
     {
-        moduleData aux = {command, -1, toPipe.writeFd, toPipe.writeFd};
+        moduleData aux = {command, toPipe.fd, toPipe.writeFd, toPipe.cPid};
         toPipe = execute(aux, shiftToNextWord(aux.s), displayStyle);
         if (aux.fd >= 0)
             close(aux.fd);

@@ -14,7 +14,11 @@ static font fonts[FONT_COUNT] = {{.name = "Default",
 static font *currentFont = fonts;
 void setFont(int fontNumber) // was intended to allow changing fonts. Memory limitations prevented this
 {
-    currentFont = fonts + (fontNumber % FONT_COUNT);
+    if (FONT_COUNT > 1)
+    {
+        currentFont = fonts + (fontNumber % FONT_COUNT);
+    }
+    currentFont = fonts;
 }
 
 // Whole window will not be colored. Shell must handle backspace and whatnot (Literally just draw an ascii value that is all zeroes (such as '\b'), then reduce index).

@@ -58,6 +58,11 @@ Executable executables[EXECUTABLES] = {
         .filename = "phylos",
         .main = (EntryPoint)0x640000,
     },
+    {
+        .mod = 7,
+        .filename = "tests",
+        .main = (EntryPoint)0x645000,
+    },
 };
 
 int check_args(char *const argv[])
@@ -119,12 +124,13 @@ RSP set_process_args(int argc, char const argv[MAX_ARGS][MAX_ARG_LEN], Process *
 
 char argv_backup[MAX_ARGS][MAX_ARG_LEN];
 
-char *const *const backup_argv_somewhere(int argc, char *const argv[])
+void *backup_argv_somewhere(int argc, char *const argv[])
 {
     for (int i = 0; i < argc; i++)
     {
-        strcpy(argv_backup[i], argv[i]);
+        strncpy(argv_backup[i], argv[i], MAX_ARG_LEN - 1);
+        argv_backup[i][MAX_ARG_LEN - 1] = '\0';
     }
 
-    return (char *const *const)argv_backup;
+    return argv_backup;
 }

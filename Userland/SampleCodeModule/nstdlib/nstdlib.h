@@ -8,32 +8,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/pselect.h>
 #define EOF -1
 #define LCTRL (char)0x1D
 
 // syscalls
-extern int print_sys(unsigned int fd, void *str, unsigned long long len);
-extern int read_sys(unsigned int fd, void *str, unsigned long long len);
+#define read_sys read
+#define print_sys write
 extern uint64_t get_tick();
 extern unsigned long long get_unix_time(void);
 extern void *malloc(uint64_t size);
 extern void free(void *ptr);
 extern void beep(uint32_t freq);
 extern void halt_user();
-extern void exit(int status);
-extern int get_pid();
-extern int execv(char *pathname, char *argv[]);
 extern int fork();
-extern void yield();
-extern int waitpid(int pid, int *wstatus, int options);
-extern void sleep(unsigned int seconds);
-extern int pipe(int pipefd[2]);
-extern int close(int fd);
-extern int dup2(int oldfd, int newfd);
-extern int pselect(int nfds, const int *fds, int *ready);
-extern int kill(int pid, int sig);
 extern int flush(int fd);
-extern int usleep(unsigned int usec);
 
 // library
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize);
@@ -41,7 +32,6 @@ uint64_t atoiHex(char *s);
 char putChar(char c);
 char readChar();
 char getChar();
-int read(char *buffer, int count);
 uint64_t scanf(char *format, ...);
 uint64_t puts(char *string);
 uint64_t printf(char *format, ...);

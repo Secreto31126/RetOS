@@ -539,6 +539,10 @@ moduleData phylos(moduleData commandFd, displayStyles *displayStyle)
     *displayStyle = REDRAW_ALWAYS;
     return pipeAndExec("phylos", commandFd.s, commandFd.fd, FROM_TERM);
 }
+moduleData tests(moduleData commandFd, displayStyles *displayStyle)
+{
+    return pipeAndExec("tests", commandFd.s, commandFd.fd, FROM_FD);
+}
 
 void initializeCommands()
 {
@@ -561,4 +565,5 @@ void initializeCommands()
     addCommand("less", "Help display for the less module.\nFormat: 'less'\nOutputs content from fd upon user input.", less);
     addCommand("kill", "Help display for the kill module.\nFormat: 'kill [process id list]'\nKills every process given.", killer);
     addCommand("phylos", "Help display for the phylos module.\nFormat: 'phylos'\nStarts the phylos module with 5 phylosophers, click a to add a phylosopher, r to remove one and q to quit.", phylos);
+    addCommand("tests", "Help display for the tests module.\n This is a placeholder module.", tests);
 }

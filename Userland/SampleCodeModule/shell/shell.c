@@ -346,6 +346,8 @@ void killModule(commandData cData, char *message)
         }
 
     addStringToBuffer(message, 0);
+
+    // just in case
     shut();
 }
 

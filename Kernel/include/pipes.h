@@ -8,13 +8,6 @@
 #define IS_PIPE(x) ((x) & O_PIPE)
 
 /**
- * @brief Creates a pipe
- *
- * @param pipefd Where to store the read and write ends of the pipes
- * @return int 0 on success, else -1
- */
-int pipe(int pipefd[2]);
-/**
  * @brief Add an end to a pipe
  *
  * @param file The pipe to add an end to

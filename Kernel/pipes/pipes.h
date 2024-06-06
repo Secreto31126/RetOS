@@ -6,6 +6,7 @@
 #include <mman.h>
 #include <memory.h>
 #include <proc.h>
+#include <unistd.h>
 
 #define MAX_PIPES 10
 #define PIPE_SIZE 0x8000

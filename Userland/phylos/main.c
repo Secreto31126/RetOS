@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 		{
 		case 'a':
 		{
-			puts("dding\n");
+			puts("adding\n");
 			if (*phylo_count < MAX_PHYLOS)
 			{
 				pid = fork();
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 		}
 		case 'r':
 		{
-			puts("emoving\n");
+			puts("removing\n");
 			*phylo_count = *phylo_count - 1;
 			sem_close(phylos[*phylo_count].sem);
 			kill(children[*phylo_count], SIGKILL);
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 		}
 		case 'q':
 		{
-			puts("uiting\n");
+			puts("quiting\n");
 			leave();
 		}
 		default:

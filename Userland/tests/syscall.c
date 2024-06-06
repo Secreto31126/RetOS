@@ -74,17 +74,17 @@ sem_t *my_sem_open(char *sem_id, uint64_t initialValue)
 
 int64_t my_sem_wait(sem_t *sem)
 {
-  return 0;
+  return sem_wait(sem);
 }
 
 int64_t my_sem_post(sem_t *sem)
 {
-  return 0;
+  return sem_post(sem);
 }
 
 int64_t my_sem_close(sem_t *sem)
 {
-  return sem_close(sem);
+  return sem_unlink(sem->name);
 }
 
 int64_t my_yield()

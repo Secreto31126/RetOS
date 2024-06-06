@@ -31,6 +31,7 @@ uint64_t my_process_inc(uint64_t argc, char *argv[])
     return -1;
   if ((use_sem = satoi(argv[2])) < 0)
     return -1;
+
   sem_t *sem;
   if (use_sem)
     if ((sem = my_sem_open(SEM_ID, 1)) == NULL)

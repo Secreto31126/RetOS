@@ -18,7 +18,8 @@ void setFont(int fontNumber) // was intended to allow changing fonts. Memory lim
     {
         currentFont = fonts + (fontNumber % FONT_COUNT);
     }
-    currentFont = fonts;
+    else
+        currentFont = fonts;
 }
 
 // Whole window will not be colored. Shell must handle backspace and whatnot (Literally just draw an ascii value that is all zeroes (such as '\b'), then reduce index).

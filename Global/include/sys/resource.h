@@ -20,5 +20,12 @@ extern int getpriority(int which, id_t who);
  * @return int 0 on success, -1 on error
  */
 extern int setpriority(int which, id_t who, int prio);
+/**
+ * @brief Open a pipe with the information of the process
+ * @note You are responsible for closing the file descriptor
+ *
+ * @return int The file descriptor of the pipe, -1 on error
+ */
+extern int ps();
 
 #endif

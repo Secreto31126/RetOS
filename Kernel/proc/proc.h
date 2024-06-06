@@ -7,6 +7,9 @@
 #include <files.h>
 #include <ticks.h>
 #include <sched.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 #include <memory.h>
 #include <signal.h>
 #include <console.h>

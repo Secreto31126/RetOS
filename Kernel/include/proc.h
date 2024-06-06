@@ -87,6 +87,10 @@ typedef struct Process
      */
     pid_t ppid;
     /**
+     * @brief The process name
+     */
+    char *name;
+    /**
      * @brief The process allocated stack
      */
     void *stack;

@@ -28,10 +28,18 @@ void take_forks(unsigned int i)
     sem_wait(phylos[i].sem); // Wait until able to eat
 }
 
+void updatePrinter()
+{
+    puts(".");       // Tell printer that state has changed. Printer will lift mutex once done
+    sem_wait(mutex); // Recover mutex
+    // It is fine to lose the mutex in between tests: As phylo is THINKING, its state will not be changed by another, while all other states are checked safely within test, inside a mutex
+}
+
 void put_forks(unsigned int i)
 {
     sem_wait(mutex); // Mutex lock
     phylos[i].state = THINKING;
+    updatePrinter();
     test(RIGHT(i, *phylo_count));
     test(LEFT(i, *phylo_count));
     sem_post(mutex); // Mutex unlock
@@ -43,5 +51,6 @@ void test(unsigned int i)
     {
         phylos[i].state = EATING;
         sem_post(phylos[i].sem);
+        updatePrinter();
     }
 }

@@ -16,6 +16,12 @@ int children[MAX_PHYLOS + 1];
 int main(int argc, char *argv[])
 {
 	puts("Initializing phylos\n");
+	int pipeFd[2]; // For allowing phylos to write to printer
+	if (pipe(pipeFd))
+	{
+		puts("Failed to create pipe\n");
+		return 1;
+	}
 	mutex = sem_open("mutex", 0);
 	phylo_t *phylos = malloc(MAX_PHYLOS * sizeof(phylo_t));
 	if (phylos == NULL)
@@ -48,6 +54,12 @@ int main(int argc, char *argv[])
 		}
 		else if (pid == 0)
 		{
+			close(pipeFd[READ_END]);
+			if (dup2(pipeFd[WRITE_END], STD_OUT) < 0)
+			{
+				puts("Failed to dup2\n");
+				return 1;
+			}
 			phylos[i].sem = sem_open(strandnum("sem_", i), 0);
 			if (phylos[i].sem == NULL)
 			{
@@ -62,6 +74,7 @@ int main(int argc, char *argv[])
 			children[i] = pid;
 		}
 	}
+	close(pipeFd[WRITE_END]);
 
 	pid = fork();
 	if (pid < 0)
@@ -71,11 +84,17 @@ int main(int argc, char *argv[])
 	}
 	else if (pid == 0)
 	{
+		if (dup2(pipeFd[READ_END], STD_IN) < 0)
+		{
+			puts("Failed to dup2\n");
+			return 1;
+		}
 		print_state();
 		return 0;
 	}
 	else
 	{
+		close(pipeFd[READ_END]);
 		children[MAX_PHYLOS] = pid;
 	}
 

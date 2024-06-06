@@ -2,16 +2,20 @@
 
 void print_state()
 {
+    char devNull;
     unsigned int max = 0;
     char *to_print;
     while (1)
     {
-        sem_wait(mutex); // Mutex lock
         for (unsigned int i = 0; i < *phylo_count; i++)
         {
             if (phylos[i].state == EATING)
             {
                 puts("E ");
+            }
+            else if (phylos[i].state == THINKING)
+            {
+                puts("T ");
             }
             else
             {
@@ -24,7 +28,7 @@ void print_state()
         puts(to_print);
         puts("\n");
         free(to_print);
-        sem_post(mutex); // Mutex unlock
-        sleep(1);
+        sem_post(mutex);           // Mutex unlock
+        read(STD_IN, &devNull, 1); // dupped to a write pipe on phylos, gets written to whenever state updates. Before this write, mutex is waited on
     }
 }

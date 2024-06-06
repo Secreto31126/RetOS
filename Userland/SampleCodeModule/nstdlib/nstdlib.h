@@ -11,8 +11,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/pselect.h>
-#define EOF -1
-#define LCTRL (char)0x1D
+#define EOF ((char)-1)
+#define LCTRL ((char)0x1D)
 
 // syscalls
 #define read_sys read
@@ -44,7 +44,7 @@ char isPrefix(char *prefix, char *word);
 char isFirstWord(char *s1, char *firstWord);
 uint64_t getHours();
 uint64_t getMinutes();
-char *getTimeString();
+char *getTimeString(char *buffer);
 void freePrints();
 char *concatUnlimited(char *s1, char *s2);
 uint64_t concatFrom(char *sEnd, char *sAdd);

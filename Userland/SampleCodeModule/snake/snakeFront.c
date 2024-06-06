@@ -55,10 +55,25 @@ int playSnake(uint16_t snakeCount)
     setBoard(snakeCount);
 
     frontSnake *snakes = malloc(snakeCount * sizeof(frontSnake)); // Still saves space for second snake. Simpler than checking snakeCount for every non-complex operation
+    if (snakes == NULL)
+    {
+        paintString("Painting failed", 0xFF000000 | HEX_RED, 0xFF | HEX_BLACK);
+        gameOver = 1;
+        snakeCount = 0;
+    }
+
     for (int i = 0; i < snakeCount; i++)
     {
         snakes[i].nextMove = NONE;
         snakes[i].colorMap = malloc(MAX_SNAKE_COLORS * sizeof(HexColor));
+
+        if (snakes[i].colorMap == NULL)
+        {
+            paintString("Painting failed", 0xFF000000 | HEX_RED, 0xFF | HEX_BLACK);
+            gameOver = 1;
+            break;
+        }
+
         for (int j = 1; j < MAX_SNAKE_COLORS - 1; j++)
         {
             snakes[i].colorMap[j] = getHexColor();

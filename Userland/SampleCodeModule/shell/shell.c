@@ -38,7 +38,8 @@ static int activeReadsCount = 1;
 
 void drawTime()
 {
-    drawStringAt(getTimeString(), 0xFFFFFFFF, 0xFF000000, 0, 0);
+    char buffer[6];
+    drawStringAt(getTimeString(buffer), 0xFFFFFFFF, 0xFF000000, 0, 0);
 }
 
 char addToActive(commandData bgModule)
@@ -189,6 +190,12 @@ char shellStart()
     commandIndex = 0;
     commandBuffer = malloc(sizeof(char) * (MAX_COMMAND_LENGTH + 1));
     buffer = malloc((width * height) / TRUE_LETTER_HEIGHT / TRUE_LETTER_WIDTH);
+    if (buffer == NULL || commandBuffer == NULL)
+    {
+        paintStringOrWarp("Could not initialize shell.\n", 0);
+        sleep(1);
+        return 0;
+    }
     *buffer = 0;
     *commandBuffer = 0;
     index += sPuts(buffer, shellIntro);

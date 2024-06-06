@@ -17,7 +17,6 @@ extern size_t get_unix_time(void);
 extern size_t get_screen_size();
 extern void beep(uint32_t freq);
 extern size_t get_tick();
-extern void halt_user();
 extern int fork();
 extern int flush(int fd);
 

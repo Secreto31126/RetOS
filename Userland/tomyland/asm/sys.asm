@@ -8,7 +8,7 @@
     global beep
     global get_tick
     global get_dump
-    global halt_user
+    global ps
     global _exit
     global kill
     global getpid
@@ -80,8 +80,8 @@ get_tick:
     int 80h
     ret
 
-; void halt_user();
-halt_user:
+; int ps();
+ps:
     mov rax, 0xA
     int 80h
     ret

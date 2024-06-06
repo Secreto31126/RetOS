@@ -1,8 +1,9 @@
 #include <sys.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <semaphores.h>
 #include <sys/resource.h>
+#include "syscall.h"
+#include <sched.h>
 
 #define MAX_ARGS 255
 
@@ -66,24 +67,24 @@ int64_t my_unblock(uint64_t pid)
   return kill(pid, SIGCONT);
 }
 
-int64_t my_sem_open(char *sem_id, uint64_t initialValue)
+sem_t *my_sem_open(char *sem_id, uint64_t initialValue)
+{
+  return sem_open(sem_id, initialValue);
+}
+
+int64_t my_sem_wait(sem_t *sem)
 {
   return 0;
 }
 
-int64_t my_sem_wait(char *sem_id)
+int64_t my_sem_post(sem_t *sem)
 {
   return 0;
 }
 
-int64_t my_sem_post(char *sem_id)
+int64_t my_sem_close(sem_t *sem)
 {
-  return 0;
-}
-
-int64_t my_sem_close(char *sem_id)
-{
-  return 0;
+  return sem_close(sem);
 }
 
 int64_t my_yield()

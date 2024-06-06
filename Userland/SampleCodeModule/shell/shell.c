@@ -298,9 +298,17 @@ int handleReadFd(moduleData data, displayStyles displayStyle)
     if (n == 0)
         return 2;
     r_buffer[n] = 0;
-    if (displayStyle == AS_BACKGROUND)
-        addCharToBuffer('\n');
-    addStringToBuffer(r_buffer, 0);
+    if (displayStyle == REDRAW_ALWAYS)
+    {
+        blank();
+        paintStringOrWarp(r_buffer, 0);
+    }
+    else
+    {
+        if (displayStyle == AS_BACKGROUND)
+            addCharToBuffer('\n');
+        addStringToBuffer(r_buffer, 0);
+    }
     return 0;
 }
 
@@ -439,6 +447,11 @@ char *passCommand(char *toPass)
             else
             {
                 readUntilClose(cData, displayStyle);
+                if (displayStyle == REDRAW_ALWAYS || displayStyle == REDRAW_ONCE)
+                {
+                    blank();
+                    paintStringOrWarp(buffer, 0);
+                }
             }
         }
 

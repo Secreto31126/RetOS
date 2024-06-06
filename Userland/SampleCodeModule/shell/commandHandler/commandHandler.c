@@ -536,7 +536,7 @@ moduleData less(moduleData commandFd, displayStyles *displayStyle)
 }
 moduleData phylos(moduleData commandFd, displayStyles *displayStyle)
 {
-    *displayStyle = NO_STDIN;
+    *displayStyle = REDRAW_ALWAYS;
     return pipeAndExec("phylos", commandFd.s, commandFd.fd, FROM_TERM);
 }
 

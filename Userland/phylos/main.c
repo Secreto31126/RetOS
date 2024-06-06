@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "lib/my_lib.h"
 #include "phylos.h"
+#include "random.h"
 
 extern char bss;
 extern char endOfBinary;
@@ -15,6 +16,8 @@ int children[MAX_PHYLOS + 1];
 
 int main(int argc, char *argv[])
 {
+	setSeed((unsigned int)"Phylos"); // This is questionable, but we aren't cryptographers
+
 	puts("Initializing phylos\n");
 	int pipeFd[2]; // For allowing phylos to write to printer
 	if (pipe(pipeFd))
@@ -74,7 +77,6 @@ int main(int argc, char *argv[])
 			children[i] = pid;
 		}
 	}
-	close(pipeFd[WRITE_END]);
 
 	pid = fork();
 	if (pid < 0)
@@ -84,6 +86,7 @@ int main(int argc, char *argv[])
 	}
 	else if (pid == 0)
 	{
+		close(pipeFd[WRITE_END]);
 		if (dup2(pipeFd[READ_END], STD_IN) < 0)
 		{
 			puts("Failed to dup2\n");
@@ -120,6 +123,11 @@ int main(int argc, char *argv[])
 				}
 				else if (pid == 0)
 				{
+					if (dup2(pipeFd[WRITE_END], STD_OUT) < 0)
+					{
+						puts("Failed to dup2\n");
+						return 1;
+					}
 					phylos[num].state = THINKING;
 					phylos[num].turn = 0;
 					phylos[num].sem = sem_open(strandnum("sem_", num), 0);
@@ -170,7 +178,7 @@ int main(int argc, char *argv[])
 
 		sem_post(mutex);
 	}
-
+	close(pipeFd[WRITE_END]);
 	leave();
 	exit(0);
 }

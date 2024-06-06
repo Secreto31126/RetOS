@@ -11,6 +11,8 @@
 #define THINKING 0
 #define HUNGRY 1
 #define EATING 2
+#define MIN_SLEEP 20
+#define MAX_SLEEP 200
 #define puts(str) write(1, (str), strlen(str))
 
 typedef struct

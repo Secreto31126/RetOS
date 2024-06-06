@@ -1,13 +1,14 @@
 #include "phylos.h"
+#include "random.h"
 
 void phylosopher(unsigned int i)
 {
     while (1)
     {
         take_forks(i);
-        sleep(1);
+        usleep(randBetween(MIN_SLEEP, MAX_SLEEP)); // comer
         put_forks(i);
-        sleep(1);
+        usleep(randBetween(MIN_SLEEP, MAX_SLEEP)); // pensar
     }
 }
 

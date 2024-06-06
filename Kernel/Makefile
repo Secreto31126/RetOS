@@ -9,7 +9,7 @@ OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
 LOADERSRC=loader.asm
 
 LOADEROBJECT=$(LOADERSRC:.asm=.o)
-STATICLIBS=$(wildcard ../Global/memory/*.o) $(wildcard ../Global/string/*.o)
+STATICLIBS=$(wildcard ../Global/memory/*.o) $(wildcard ../Global/string/*.o) $(wildcard ../Global/stdlib/*.o)
 
 all: log $(KERNEL)
 

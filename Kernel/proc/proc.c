@@ -25,6 +25,7 @@ void *create_process_idle()
     processes[0] = (Process){
         .pid = 0,
         .ppid = 0,
+        .name = "idle",
         .stack = new_stack,
         .running_stack = new_stack,
         .stack_size = IDLE_STACK_SIZE,
@@ -128,6 +129,7 @@ FIND_PID:
     // Set the new process' basic properties
     processes[new_pid].pid = new_pid;
     processes[new_pid].ppid = parent->pid;
+    processes[new_pid].name = parent->name;
     processes[new_pid].stack = new_stack;
     processes[new_pid].running_stack = parent->running_stack;
     processes[new_pid].stack_size = new_stack_size;
@@ -408,4 +410,67 @@ int setpriority(int which, id_t who, int prio)
     }
 
     return -1;
+}
+
+int ps()
+{
+    __label__ exit;
+
+    int pipesfd[2];
+    if (pipe(pipesfd) == -1)
+    {
+        return -1;
+    }
+
+    ssize_t written;
+    size_t expected;
+#define pipe_write(x)                                       \
+    written = write(pipesfd[1], (x), expected = strlen(x)); \
+    if (written < expected)                                 \
+        goto exit;
+
+    pipe_write("PID\tPPID\tSTATE\tPRIO\t\tSTACK\tCOMMAND\n");
+
+    char buffer[1024];
+    size_t remaining = active_processes_count;
+    for (size_t i = 0; i < MAX_PROCESSES && remaining; i++)
+    {
+        Process *p = get_process(i);
+
+        if (p->state == NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR || p->state == PROCESS_DEAD)
+        {
+            continue;
+        }
+
+        utoa(p->pid, buffer, 10);
+        pipe_write(buffer);
+        pipe_write("\t");
+
+        utoa(p->ppid, buffer, 10);
+        pipe_write(buffer);
+        pipe_write("\t\t");
+
+        char state[2] = {p->state, 0};
+        pipe_write(state);
+        pipe_write("\t\t");
+
+        itoa(p->priority, buffer, 10);
+        pipe_write(buffer);
+        pipe_write("\t\t");
+
+        ultoa((unsigned long)p->stack, buffer, 16);
+        pipe_write(buffer);
+        pipe_write("\t");
+
+        pipe_write(p->name);
+
+        pipe_write("\n");
+        remaining--;
+    }
+
+exit:
+#undef print
+
+    close(pipesfd[1]);
+    return pipesfd[0];
 }

@@ -19,6 +19,8 @@ int execv(const char *pathname, char *const argv[])
                 return -argc;
             }
 
+            get_current_process()->name = executables[i].filename;
+
             portal_to_userland(
                 argc,
                 backup_argv_somewhere(argc, argv),

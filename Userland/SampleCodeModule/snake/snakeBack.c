@@ -213,7 +213,7 @@ unsigned int getNthEmpty(unsigned int n)
         if ((board[0][j].toDraw == APPLE || board[0][j].toDraw == TAIL || !(board[0][j].health == 0 || (board[0][j].health == 1 && board[0][j].toDraw == BLANK)))) // inefficient to look through whole array. Also inefficient to ask for more random numbers if spot selected is occupied. This was chosen because our rng is not particularly random, so repeated calls not particularly good.
             n++;                                                                                                                                                   // only advances position if there is not an object on the board. This serves to select the n-th empty tile
     }
-    return j - 1 >= BOARD_SIZE ? BOARD_SIZE - 1 : j - 1;
+    return j > BOARD_SIZE ? BOARD_SIZE - 1 : j - 1;
 }
 char isHead(tile t)
 {

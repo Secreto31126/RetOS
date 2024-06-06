@@ -58,8 +58,8 @@ int playSnake(uint16_t snakeCount)
     if (snakes == NULL)
     {
         paintString("Painting failed", 0xFF000000 | HEX_RED, 0xFF | HEX_BLACK);
-        gameOver = 1;
-        snakeCount = 0;
+        sleep(1);
+        goto end;
     }
 
     for (int i = 0; i < snakeCount; i++)
@@ -70,8 +70,8 @@ int playSnake(uint16_t snakeCount)
         if (snakes[i].colorMap == NULL)
         {
             paintString("Painting failed", 0xFF000000 | HEX_RED, 0xFF | HEX_BLACK);
-            gameOver = 1;
-            break;
+            sleep(1);
+            goto end;
         }
 
         for (int j = 1; j < MAX_SNAKE_COLORS - 1; j++)
@@ -138,8 +138,8 @@ int playSnake(uint16_t snakeCount)
 
     play(440);
     blank();
+end:
     shut();
-
     // drawBackground();  // undecided between a blank background or the snake background.
     flush(STD_IN);
     setSize(oldSize);

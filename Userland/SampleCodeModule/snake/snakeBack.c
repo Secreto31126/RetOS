@@ -91,7 +91,7 @@ unsigned int update(int snakeCount, int *deathCount, int *madeApple)
                 {
                     int nextX = j + parseDirX(snakes[lookingAt.player].direction);
                     int nextY = i + parseDirY(snakes[lookingAt.player].direction);
-                    if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].health != 0 && board[nextX][nextY].toDraw != BLANK && board[nextX][nextY].toDraw != APPLE))
+                    if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].health != 0 && board[nextY][nextX].toDraw != BLANK && board[nextY][nextX].toDraw != APPLE))
                     {
                         killSnake(lookingAt.player);
                         (*deathCount)++;

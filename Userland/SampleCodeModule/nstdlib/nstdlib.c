@@ -579,8 +579,6 @@ char strcmpHandleWhitespace(char *s1, char *s2)
         }
         if (*(s1++) != *(s2++))
         {
-            printf("s1: \'%c\' ", *(s1 - 1));
-            printf("s2: \'%c\' \n", *(s2 - 1));
             return 0;
         }
     }

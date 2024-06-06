@@ -20,6 +20,11 @@ uint64_t test_mm(uint64_t argc, char *argv[])
   uint32_t total;
   uint64_t max_memory;
 
+  /*
+  unsigned char count = 0;
+  char buffer[3];
+  */
+
   if (argc != 1)
     return -1;
 
@@ -63,5 +68,10 @@ uint64_t test_mm(uint64_t argc, char *argv[])
     for (i = 0; i < rq; i++)
       if (mm_rqs[i].address)
         free(mm_rqs[i].address);
+    /*
+    itoa(++count, buffer, 10);
+    puts(buffer);
+    puts(" ");
+    */
   }
 }

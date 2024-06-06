@@ -10,6 +10,19 @@
     global get_dump
     global halt_user
     global exit
+    global get_pid
+    global execv
+    global fork
+    global yield
+    global waitpid
+    global sleep
+    global pipe
+    global close
+    global dup2
+    global pselect
+    global kill
+    global flush
+    global usleep
 
 ; int read_sys(unsigned int fd, char *str, size_t len);
 read_sys:
@@ -78,5 +91,83 @@ halt_user:
 
 exit:
     mov rax, 0xB
+    int 80h
+    ret
+
+; int get_pid();
+get_pid:
+    mov rax, 0xD
+    int 80h
+    ret
+
+; int execv(char *pathname, char *argv[]);
+execv:
+    mov rax, 0xE
+    int 80h
+    ret
+
+; int fork();
+fork:
+    mov rax, 0xF
+    int 80h
+    ret
+
+; void yield();
+yield:
+    mov rax, 0x10
+    int 80h
+    ret
+
+; void waitpid();
+waitpid:
+    mov rax, 0x11
+    int 80h
+    ret
+
+; void sleep(size_t ticks);
+sleep:
+    mov rax, 0x12
+    int 80h
+    ret
+
+; int pipe(int pipefd[2]);
+pipe:
+    mov rax, 0x13
+    int 80h
+    ret
+
+; int close(int fd);
+close:
+    mov rax, 0x14
+    int 80h
+    ret
+
+; int dup2(int oldfd, int newfd);
+dup2:
+    mov rax, 0x15
+    int 80h
+    ret
+
+; int usleep(unsigned int usec);
+usleep:
+    mov rax, 0x16
+    int 80h
+    ret
+
+; int pselect(int nfds, const int *fds, int *ready);
+pselect:
+    mov rax, 0x17
+    int 80h
+    ret
+
+; int flush(int fd);
+flush:
+    mov rax, 0x18
+    int 80h
+    ret
+
+; int kill(pid_t pid, int sig);
+kill:
+    mov rax, 0xC
     int 80h
     ret

@@ -10,11 +10,6 @@ uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisMany
 uint64_t concatFrom(char *s1, char *s2);
 void addToAllocated(char *address);
 
-void wait()
-{
-    halt_user();
-}
-
 char *getDumpString()
 {
     uint64_t length = BIG_BLOCK;
@@ -49,60 +44,6 @@ void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize)
     return aux;
 }
 
-char *ultoa(unsigned long l, char *buffer, int radix)
-{
-    char *toRet = buffer;
-    while (l >= radix)
-    {
-        *buffer = (l % radix) + '0';
-        if (*buffer > '9')
-            *buffer += 'A' - '9' - 1;
-        buffer++;
-        l /= radix;
-    }
-
-    *buffer = l + '0';
-    if (*buffer > '9')
-        *buffer += 'A' - '9' - 1;
-    *(buffer + 1) = 0;
-    int halfLen = (buffer - toRet) / 2;
-    for (int i = 0; i <= halfLen; i++)
-    {
-        char aux = *(toRet + i);
-        *(toRet + i) = *(buffer - i);
-        *(buffer - i) = aux;
-    }
-    return toRet;
-}
-
-char *utoa(unsigned int n, char *buffer, int radix)
-{
-    return ultoa((unsigned long)n, buffer, radix);
-}
-
-char *itoa(int n, char *buffer, int radix)
-{
-    if (n < 0)
-    {
-        *buffer = '-';
-        buffer++;
-        n = -n;
-    }
-
-    return utoa((unsigned int)n, buffer, radix) - (n < 0);
-}
-
-uint64_t atoi(char *s)
-{
-    uint64_t ret = 0;
-    while (*s >= '0' && *s <= '9')
-    {
-        ret *= 10;
-        ret += *s - '0';
-        s++;
-    }
-    return ret;
-}
 uint64_t atoiHex(char *s)
 {
     char maxLength = 8; // max number of hex digits in a uint64_t
@@ -395,14 +336,6 @@ uint64_t concatFrom(char *sEnd, char *sAdd)
     return count;
 }
 
-uint64_t strlen(char *s)
-{
-    uint64_t len = 0;
-    while (*(s + len))
-        len++;
-    return len;
-}
-
 char readChar()
 {
     char c;
@@ -412,8 +345,7 @@ char readChar()
 char getChar()
 {
     char c;
-    while (!read_sys(0, &c, 1))
-        wait();
+    read_sys(0, &c, 1);
     return c;
 }
 
@@ -439,16 +371,6 @@ char strCompare(char *a, char *b)
     }
     int dist = (int)(unsigned char)(*a) - (int)(unsigned char)(*b);
     return dist ? dist > 0 ? 1 : -1 : 0;
-}
-
-char strcmp(char *s1, char *s2)
-{
-    while (*s1 || *s2)
-    {
-        if (*(s1++) != *(s2++))
-            return 0;
-    }
-    return 1;
 }
 
 char isFirstWord(char *s1, char *firstWord)
@@ -692,16 +614,48 @@ char *shiftToWord(char *s)
         s++;
     return s;
 }
+char *shiftToNextWord(char *s)
+{
+    while (*s != ' ' && *s != 0)
+        s++;
+    return shiftToWord(s);
+}
+
+int readNFromFd(int fd, char *buffer, int n)
+{
+    if (fd < 0)
+        return 0;
+    int count = 1, aux; // count starts as 1, save space for the '\0'
+    while ((aux = read_sys(fd, buffer + count - 1, n - count)) > 0 && count < n)
+        count += aux;
+    buffer[count - 1] = 0;
+    return count;
+}
 
 char timeHasPassed(uint64_t start, uint64_t unit)
 {
     return (get_tick() - start) > unit;
 }
-void sleep(uint64_t ticks)
+void separateString(char *s, char **buffer, int bufferSize)
 {
-    uint64_t time = get_tick();
-    while (!timeHasPassed(time, ticks))
+    if (bufferSize <= 0)
+        return;
+    int i = 0;
+    while (*s && i < bufferSize - 1)
     {
-        wait();
+        buffer[i++] = s;
+        s = shiftToNextWord(s);
+        if (*s)
+            *(s - 1) = 0;
     }
+    buffer[i] = (char *)NULL;
+}
+int isLastAlpha(const char *s, char alpha)
+{
+    for (int i = strlen(s) - 1; i >= 0 && (s[i] == ' ' || s[i] == '\n' || s[i] == '\t' || s[i] == alpha); i--)
+    {
+        if (s[i] == alpha)
+            return i;
+    }
+    return -1;
 }

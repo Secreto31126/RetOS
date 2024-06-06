@@ -68,7 +68,7 @@ char *strcat(char *dest, const char *src);
  *
  * @param s The string to search in
  * @param find The substring to search for
- * @return char* The index of the substring in the string
+ * @return char* The index of the substring in the string, NULL if not found
  */
 char *strstr(const char *s, const char *find);
 

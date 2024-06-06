@@ -19,6 +19,14 @@ extern uint8_t endOfKernel;
 static void *const sampleCodeModuleAddress = (void *)0x400000;
 static void *const sampleDataModuleAddress = (void *)0x500000;
 static void *const tomyland = (void *)0x600000;
+static void *const cat = (void *)0x605000;
+static void *const wc = (void *)0x610000;
+static void *const filter = (void *)0x615000;
+static void *const loop = (void *)0x620000;
+static void *const grep = (void *)0x625000;
+static void *const sing = (void *)0x630000;
+static void *const less = (void *)0x635000;
+static void *const phylos = (void *)0x640000;
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
@@ -42,6 +50,14 @@ void *initializeKernelBinary()
 		sampleCodeModuleAddress,
 		sampleDataModuleAddress,
 		tomyland,
+		cat,
+		wc,
+		filter,
+		loop,
+		grep,
+		sing,
+		less,
+		phylos,
 	};
 
 	loadModules(&endOfKernelBinary, moduleAddresses);

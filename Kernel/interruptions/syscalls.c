@@ -81,9 +81,9 @@ static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)setpriority,
     (syscall)sem_open,
     (syscall)sem_close,
-    (syscall)sem_wait,
-    (syscall)sem_post,
     (syscall)sem_unlink,
+    (syscall)sem_post,
+    (syscall)sem_wait,
 };
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax, uint64_t rsp)

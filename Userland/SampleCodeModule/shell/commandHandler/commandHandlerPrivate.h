@@ -2,6 +2,7 @@
 #define CMNDP_H
 #define COMMAND_COUNT 7
 #include <stdint.h>
+#include <stdlib.h>
 /**
  * Currently:
  * set highlight and letter colors .
@@ -14,14 +15,14 @@
  * exit
  * help .
  */
+typedef moduleData (*action_t)(moduleData, displayStyles *);
 typedef struct command
 {
     char *code;
     char *help;
-    char *(*action)(char *, char *);
+    action_t action;
 } command;
 
-void addCommand(char *commandCode, char *help, char *(*action)(char *, char *));
-char *handleCommand(char *command, char *mustRedraw);
+void addCommand(char *commandCode, char *help, action_t action);
 
 #endif

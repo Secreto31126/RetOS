@@ -20,6 +20,14 @@
                 "add-symbol-file /tmp/retos/kernel.elf 0x00100000",
                 "add-symbol-file /tmp/retos/0000-sampleCodeModule.elf 0x00400000",
                 "add-symbol-file /tmp/retos/0002-tomyland.elf 0x00600000",
+                "add-symbol-file /tmp/retos/0003-cat.elf 0x00605000",
+                "add-symbol-file /tmp/retos/0004-wc.elf 0x00610000",
+                "add-symbol-file /tmp/retos/0005-filter.elf 0x00615000",
+                "add-symbol-file /tmp/retos/0006-loop.elf 0x00620000",
+                "add-symbol-file /tmp/retos/0007-grep.elf 0x00625000",
+                "add-symbol-file /tmp/retos/0008-sing.elf 0x00630000",
+                "add-symbol-file /tmp/retos/0009-less.elf 0x00635000",
+                "add-symbol-file /tmp/retos/000a-phylos.elf 0x00640000"
             ],
             "stopAtConnect": true
         }

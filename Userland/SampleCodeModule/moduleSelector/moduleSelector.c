@@ -42,7 +42,7 @@ void startModules()
         {
             blank();
             char *c = getDumpString();
-            if (strcmp(c, ""))
+            if (!strcmp(c, ""))
                 paintString("No dump has been generated. Press 'alt' to generate a dump of the instant of pressing.\n\nPress any key to return to module selector.", -1, 0);
             else
                 paintString(sPrintf("%s\n\nPress any key to return to module selector.", c), -1, 0);
@@ -76,7 +76,7 @@ void startModules()
     }
     blank();
     paintString("Exiting module selector.", -1, 0);
-    wait();
+    sleep(1);
     blank();
     endPainter();
     freeCommands();

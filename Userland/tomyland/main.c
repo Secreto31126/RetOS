@@ -40,6 +40,8 @@ int main(int argc, char *argv[])
 	// sleep(100);
 	// return 1;
 
+	// 🧦
+
 	int pid = fork();
 	if (pid)
 	{

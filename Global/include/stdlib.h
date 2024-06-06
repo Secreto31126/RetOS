@@ -9,6 +9,15 @@
 #define ISUPPER(c) ((c) >= 'A' && (c) <= 'Z')
 #define ISLOWER(c) ((c) >= 'a' && (c) <= 'z')
 
+#define NULL ((void *)0)
+#define READ_END 0
+#define WRITE_END 1
+#define STD_IN 0
+#define STD_OUT 1
+#define STD_ERR 2
+#define STD_KEYS 3
+#define STD_TERM 4
+
 char *itoa(int n, char *buffer, int radix);
 char *utoa(unsigned int n, char *buffer, int radix);
 char *ultoa(unsigned long l, char *buffer, int radix);

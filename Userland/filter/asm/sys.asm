@@ -9,12 +9,12 @@
     global get_tick
     global get_dump
     global halt_user
-    global exit
+    global _exit
     global kill
-    global get_pid
+    global getpid
     global execv
     global fork
-    global yield
+    global sched_yield
     global waitpid
     global sleep
     global pipe
@@ -92,7 +92,7 @@ halt_user:
     ret
 
 ; void exit();
-exit:
+_exit:
     mov rax, 0xB
     int 80h
     ret
@@ -104,7 +104,7 @@ kill:
     ret
 
 ; int get_pid();
-get_pid:
+getpid:
     mov rax, 0xD
     int 80h
     ret
@@ -122,7 +122,7 @@ fork:
     ret
 
 ; void yield();
-yield:
+sched_yield:
     mov rax, 0x10
     int 80h
     ret

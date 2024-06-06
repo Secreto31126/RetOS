@@ -349,11 +349,6 @@ char getChar()
     return c;
 }
 
-int read(char *buffer, int count)
-{
-    return read_sys(0, buffer, count);
-}
-
 uint64_t pow(double base, uint64_t exponent)
 {
     uint64_t ans = 1.0;

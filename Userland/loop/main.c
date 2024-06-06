@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 		interval = 1;
 
 	char pidString[BLOCK];
-	itoa(get_pid(), pidString, 10);
+	itoa(getpid(), pidString, 10);
 	int len = strlen(pidString);
 
 	while (1)

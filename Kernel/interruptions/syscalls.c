@@ -62,7 +62,7 @@ static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)beep_bop,
     (syscall)get_tick,
     (syscall)get_lucas,
-    (syscall)halt,
+    (syscall)ps,
     (syscall)_exit,
     (syscall)kill,
     (syscall)getpid,

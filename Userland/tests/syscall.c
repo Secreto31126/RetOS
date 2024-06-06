@@ -57,12 +57,12 @@ int64_t my_kill(uint64_t pid)
 
 int64_t my_block(uint64_t pid)
 {
-  return 0;
+  return kill(pid, SIGSTOP);
 }
 
 int64_t my_unblock(uint64_t pid)
 {
-  return 0;
+  return kill(pid, SIGCONT);
 }
 
 int64_t my_sem_open(char *sem_id, uint64_t initialValue)

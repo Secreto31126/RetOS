@@ -76,9 +76,9 @@ RSP set_process_args(int argc, char const argv[MAX_ARGS][MAX_ARG_LEN], Process *
  *
  * @param argc The number of arguments (asumes it was validated with check_args())
  * @param argv The argument values, NULL terminated
- * @return char* const* const The backup pointer
+ * @return void* The backup pointer
  */
-char *const *const backup_argv_somewhere(int argc, char *const argv[]);
+void *backup_argv_somewhere(int argc, char *const argv[]);
 
 extern void portal_to_userland(int argc, char *const argv[], Process *process, EntryPoint code);
 

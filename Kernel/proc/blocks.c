@@ -72,12 +72,16 @@ pid_t waitpid(pid_t pid, int *wstatus, int options)
         }
     }
 
-    int *wstatus_ptr = malloc(sizeof(int));
+    int *wstatus_ptr = wstatus ? malloc(sizeof(int)) : NULL;
 
     add_blocked(p, zombie_child, NULL + (pid), wstatus_ptr, NULL, NULL, NULL);
     sched_yield();
 
-    *wstatus = *wstatus_ptr;
+    if (wstatus)
+    {
+        *wstatus = *wstatus_ptr;
+    }
+
     free(wstatus_ptr);
 
     return (uintptr_t)p->condition_data[0];
@@ -118,9 +122,21 @@ int pselect(int nfds, const int *fds, int *ready)
     Process *p = get_current_process();
 
     int *copy_fds = malloc(nfds * sizeof(int));
+
+    if (!copy_fds)
+    {
+        return -1;
+    }
+
     memcpy(copy_fds, fds, nfds * sizeof(int));
 
     int *ready_ptr = malloc(nfds * sizeof(int));
+
+    if (!ready_ptr)
+    {
+        free(copy_fds);
+        return -1;
+    }
 
     add_blocked(p, multi_read_available, NULL + nfds, copy_fds, ready_ptr, NULL, NULL);
     sched_yield();

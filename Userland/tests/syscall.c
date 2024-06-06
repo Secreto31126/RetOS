@@ -2,7 +2,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <semaphores.h>
-#include <resource.h>
+#include <sys/resource.h>
 
 #define MAX_ARGS 255
 

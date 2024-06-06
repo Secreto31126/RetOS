@@ -3,6 +3,8 @@
 
 #include <sys/types.h>
 
+#define PRIO_PROCESS 0
+
 /**
  * @brief Get the priority of a resource
  *

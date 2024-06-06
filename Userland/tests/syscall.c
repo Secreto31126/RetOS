@@ -2,12 +2,13 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <semaphores.h>
+#include <resource.h>
 
 #define MAX_ARGS 255
 
 int64_t my_getpid()
 {
-  return get_pid();
+  return getpid();
 }
 
 // don't know how on earth you plan on making a pipe with this
@@ -46,7 +47,7 @@ int64_t my_create_process(char *name, uint64_t argc, char *argv[])
 
 int64_t my_nice(uint64_t pid, uint64_t newPrio)
 {
-  return 0;
+  return setpriority(PRIO_PROCESS, pid, newPrio);
 }
 
 // Added wait, since on being killed, processes can become zombies
@@ -77,7 +78,7 @@ int64_t my_sem_wait(char *sem_id)
 
 int64_t my_sem_post(char *sem_id)
 {
-  return sem_post((sem_t *)sem_id);
+  return 0;
 }
 
 int64_t my_sem_close(char *sem_id)
@@ -87,8 +88,7 @@ int64_t my_sem_close(char *sem_id)
 
 int64_t my_yield()
 {
-  yield();
-  return 0;
+  return sched_yield();
 }
 
 int64_t my_wait(int64_t pid)

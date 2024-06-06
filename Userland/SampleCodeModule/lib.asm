@@ -1,5 +1,5 @@
-    global read_sys
-    global print_sys
+    global read
+    global write
     global draw
     global malloc
     global free
@@ -10,10 +10,10 @@
     global get_dump
     global halt_user
     global _exit
-    global get_pid
+    global getpid
     global execv
     global fork
-    global yield
+    global sched_yield
     global waitpid
     global sleep
     global pipe
@@ -25,13 +25,13 @@
     global usleep
 
 ; int read_sys(unsigned int fd, char *str, size_t len);
-read_sys:
+read:
     mov rax, 0
     int 80h
     ret
 
 ; int print_sys(unsigned int fd, char *str, size_t len);
-print_sys:
+write:
     mov rax, 1
     int 80h
     ret
@@ -94,8 +94,8 @@ _exit:
     int 80h
     ret
 
-; int get_pid();
-get_pid:
+; int getpid();
+getpid:
     mov rax, 0xD
     int 80h
     ret
@@ -113,7 +113,7 @@ fork:
     ret
 
 ; void yield();
-yield:
+sched_yield:
     mov rax, 0x10
     int 80h
     ret

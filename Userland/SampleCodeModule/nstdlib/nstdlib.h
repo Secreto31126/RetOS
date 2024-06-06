@@ -8,27 +8,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/pselect.h>
 #define EOF -1
 #define LCTRL (char)0x1D
 
 // syscalls
-extern int print_sys(unsigned int fd, void *str, unsigned long long len);
-extern int read_sys(unsigned int fd, void *str, unsigned long long len);
+#define read_sys read
+#define print_sys write
 extern uint64_t get_tick();
 extern unsigned long long get_unix_time(void);
 extern void *malloc(uint64_t size);
 extern void free(void *ptr);
 extern void beep(uint32_t freq);
 extern void halt_user();
-extern int get_pid();
 extern int fork();
-extern void yield();
-extern int waitpid(int pid, int *wstatus, int options);
-extern int pipe(int pipefd[2]);
-extern int close(int fd);
-extern int dup2(int oldfd, int newfd);
-extern int pselect(int nfds, const int *fds, int *ready);
-extern int kill(int pid, int sig);
 extern int flush(int fd);
 
 // library

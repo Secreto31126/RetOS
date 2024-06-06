@@ -7,34 +7,38 @@
 extern char bss;
 extern char endOfBinary;
 
-#define puts(str) write(1, (str), strlen(str))
-
-sem_t *mutex;
-sem_t **sems;
-int *states;
+sem_t *mutex = NULL;
+phylo_t *phylos = NULL;
+unsigned int *phylo_count = NULL;
 
 int children[MAX_PHYLOS + 1];
 
 int main(int argc, char *argv[])
 {
 	puts("Initializing phylos\n");
-	mutex = sem_open("mutex", 1);
-	states = malloc(MAX_PHYLOS * sizeof(int));
-	sems = malloc(MAX_PHYLOS * sizeof(sem_t *));
-
-	for (int i = 0; i < 3; i++)
+	mutex = sem_open("mutex", 0);
+	phylo_t *phylos = malloc(MAX_PHYLOS * sizeof(phylo_t));
+	if (phylos == NULL)
 	{
-		states[i] = THINKING;
-		sems[i] = sem_open(strandnum("sem", i), 0);
-		if (sems[i] == NULL)
-		{
-			puts("Failed to open semaphore\n");
-			return 1;
-		}
+		puts("Failed to allocate memory\n");
+		return 1;
+	}
+	phylo_count = malloc(sizeof(unsigned int));
+	if (phylo_count == NULL)
+	{
+		puts("Failed to allocate memory\n");
+		return 1;
+	}
+	*phylo_count = 3;
+
+	for (unsigned int i = 0; i < MAX_PHYLOS; i++)
+	{
+		phylos[i].state = THINKING;
+		phylos[i].turn = 0;
 	}
 
 	int pid;
-	for (int i = 0; i < 3; i++)
+	for (unsigned int i = 0; i < *phylo_count; i++)
 	{
 		pid = fork();
 		if (pid < 0)
@@ -44,6 +48,12 @@ int main(int argc, char *argv[])
 		}
 		else if (pid == 0)
 		{
+			phylos[i].sem = sem_open(strandnum("sem_", i), 0);
+			if (phylos[i].sem == NULL)
+			{
+				puts("Failed to open semaphore\n");
+				return 1;
+			}
 			phylosopher(i);
 			return 0;
 		}
@@ -52,9 +62,6 @@ int main(int argc, char *argv[])
 			children[i] = pid;
 		}
 	}
-
-	puts("I'm the manager\n");
-	states[1] = HUNGRY;
 
 	pid = fork();
 	if (pid < 0)
@@ -72,79 +79,96 @@ int main(int argc, char *argv[])
 		children[MAX_PHYLOS] = pid;
 	}
 
-	for (int i = 0; i < 3; i++)
-	{
-		waitpid(children[i], NULL, 0);
-	}
-	waitpid(-1, NULL, 0);
-	puts("Exiting phylos\n");
-	free(states);
-	sem_close(mutex);
-
-	exit(0);
-}
-
-void phylosopher(int i)
-{
-	char *presentation = strandnum("I'm phylosopher ", i);
-	puts(presentation);
-	puts("\n");
-	free(presentation);
+	puts("I'm the manager\n");
+	sem_post(mutex);
+	char buffer[15] = {0};
 	while (1)
 	{
-		take_forks(i);
-		sleep(1);
-		put_forks(i);
-		sleep(1);
-	}
-}
-
-void print_state()
-{
-	char *to_print;
-	while (1)
-	{
-		sem_wait(mutex); // Mutex lock
-		for (int i = 0; i < 3; i++)
+		read(STD_IN, buffer, 1);
+		sem_wait(mutex);
+		switch (buffer[0])
 		{
-			if (states[i] == EATING)
+		case 'a':
+		{
+			puts("adding\n");
+			if (*phylo_count < MAX_PHYLOS)
 			{
-				puts("E ");
+				pid = fork();
+				unsigned int num = *phylo_count;
+				if (pid < 0)
+				{
+					puts("Failed to fork");
+				}
+				else if (pid == 0)
+				{
+					phylos[num].state = THINKING;
+					phylos[num].turn = 0;
+					phylos[num].sem = sem_open(strandnum("sem_", num), 0);
+					if (phylos[num].sem == NULL)
+					{
+						puts("Failed to open semaphore\n");
+						break;
+					}
+					phylosopher(num);
+					return 0;
+				}
+				else
+				{
+					children[num] = pid;
+					*phylo_count = *phylo_count + 1;
+				}
 			}
 			else
 			{
-				puts(". ");
+				puts("Limit reached\n");
 			}
+
+			break;
 		}
-		puts("\n");
-		sem_post(mutex); // Mutex unlock
-		sleep(1);
+		case 'r':
+		{
+			puts("removing\n");
+			*phylo_count = *phylo_count - 1;
+			sem_close(phylos[*phylo_count].sem);
+			kill(children[*phylo_count], SIGKILL);
+			waitpid(children[*phylo_count], NULL, 0);
+			if (*phylo_count <= 0)
+			{
+				puts("No more phylos\n");
+				leave();
+			}
+
+			break;
+		}
+		case 'q':
+		{
+			puts("quiting\n");
+			leave();
+		}
+		default:
+			break;
+		}
+
+		sem_post(mutex);
 	}
+
+	leave();
+	exit(0);
 }
 
-void take_forks(int i)
+void leave()
 {
-	sem_wait(mutex); // Mutex lock
-	states[i] = HUNGRY;
-	test(i);
-	sem_post(mutex);   // Mutex unlock
-	sem_wait(sems[i]); // Wait until able to eat
-}
-
-void put_forks(int i)
-{
-	sem_wait(mutex); // Mutex lock
-	states[i] = THINKING;
-	test(RIGHT(i, 3));
-	test(LEFT(i, 3));
-	sem_post(mutex); // Mutex unlock
-}
-
-void test(int i)
-{
-	if (states[i] == HUNGRY && states[LEFT(i, 3)] != EATING && states[RIGHT(i, 3)] != EATING)
+	for (unsigned int i = 0; i < *phylo_count; i++)
 	{
-		states[i] = EATING;
-		sem_post(sems[i]);
+		sem_close(phylos[i].sem);
+		kill(children[i], SIGKILL);
+		waitpid(children[i], NULL, 0);
 	}
+	kill(children[MAX_PHYLOS], SIGKILL);
+	waitpid(children[MAX_PHYLOS], NULL, 0);
+	free(phylos);
+	sem_close(mutex);
+	free(phylo_count);
+	puts("byee!\n");
+	exit(0);
 }

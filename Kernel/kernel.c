@@ -18,7 +18,7 @@ extern uint8_t endOfKernel;
 
 static void *const sampleCodeModuleAddress = (void *)0x400000;
 static void *const sampleDataModuleAddress = (void *)0x500000;
-static void *const tomyland = (void *)0x600000;
+static void *const init = (void *)0x600000;
 static void *const cat = (void *)0x605000;
 static void *const wc = (void *)0x610000;
 static void *const filter = (void *)0x615000;
@@ -50,7 +50,7 @@ void *initializeKernelBinary()
 	void *moduleAddresses[] = {
 		sampleCodeModuleAddress,
 		sampleDataModuleAddress,
-		tomyland,
+		init,
 		cat,
 		wc,
 		filter,
@@ -102,10 +102,11 @@ void idle(pid_t child_pid)
 	if (!child_pid)
 	{
 		ncPrintDec(getpid());
-		ncPrint(": I will be init!\n");
+		ncPrint(": I will be init!\n"); // 🥚
+		ncPrint(": Huh, I swear I used to be called something else\n");
 
 		char *argv[] = {"I'm in Userland!", "Hell yeah!", ":]", NULL};
-		ncPrintDec(execv("tomyland", argv));
+		ncPrintDec(execv("init", argv));
 		ncPrint(" error: Failed to start userland\n");
 	}
 	else

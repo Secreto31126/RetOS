@@ -15,7 +15,7 @@ Executable executables[EXECUTABLES] = {
     },
     {
         .mod = 7,
-        .filename = "tomyland",
+        .filename = "init",
         .main = (EntryPoint)0x600000,
     },
     {

@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 		}
 		else if (pid == 0)
 		{
-			data->phylos[i].sem = sem_open(strandnum("sem_", i), 0);
+			data->phylos[i].sem = sem_open(strandnum("sem_", i), 1);
 			if (data->phylos[i].sem == NULL)
 			{
 				puts("Failed to open semaphore\n");

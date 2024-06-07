@@ -21,7 +21,7 @@ void take_forks(unsigned int i)
     else
     {
         sem_wait(data->phylos[RIGHT(i, data->phylo_count)].sem);
-        sem_wait(data->phylos[LEFT(i, data->phylo_count)].sem);
+        sem_wait(data->phylos[i].sem);
     }
     data->phylos[i].state = EATING;
 }

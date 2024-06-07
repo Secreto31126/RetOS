@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
 		}
 		else if (pid == 0)
 		{
+			sem_unlink(strandnum("sem_", i));
 			data->phylos[i].sem = sem_open(strandnum("sem_", i), 1);
 			if (data->phylos[i].sem == NULL)
 			{
@@ -53,7 +54,6 @@ int main(int argc, char *argv[])
 				leave(i + 1);
 				return 1;
 			}
-			phylosopher(i);
 			return 0;
 		}
 		else
@@ -78,6 +78,10 @@ int main(int argc, char *argv[])
 		children[MAX_PHYLOS] = pid;
 	}
 
+	for (int i = 0; i < data->phylo_count; i++)
+	{
+		phylosopher(i);
+	}
 	sem_post(data->mutex);
 	char buffer[15] = {0};
 	while (1)
@@ -100,6 +104,7 @@ int main(int argc, char *argv[])
 				else if (pid == 0)
 				{
 					data->phylos[num].state = THINKING;
+					sem_unlink(strandnum("sem_", num));
 					data->phylos[num].sem = sem_open(strandnum("sem_", num), 0);
 					if (data->phylos[num].sem == NULL)
 					{

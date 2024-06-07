@@ -84,7 +84,12 @@ char readAsInput(char c)
         }
         else
         {
-            paintChar(c, letterColor, highlightColor);
+            int charsToErase = buffer[index - 1] == '\t' ? SPACES_IN_TAB : 1;
+            while (charsToErase > 0)
+            {
+                paintChar(c, letterColor, highlightColor);
+                charsToErase--;
+            }
             index--;
             commandIndex--;
             fromLastEnter--;

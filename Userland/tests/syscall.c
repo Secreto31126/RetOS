@@ -5,7 +5,7 @@
 #include "syscall.h"
 #include <sched.h>
 
-#define MAX_ARGS 255
+#define MAX_ARGS 32
 
 int64_t my_getpid()
 {

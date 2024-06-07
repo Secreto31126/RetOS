@@ -2,6 +2,7 @@
 #define MMN_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 #define NULL ((void *)0)
 
@@ -9,6 +10,14 @@
  * @brief Initializes the memory manager.
  */
 void init_memory_manager();
+/**
+ * @brief Get a stringification of the memory state
+ *
+ * @param output The output buffer
+ * @param length The length of the output buffer
+ * @return int The length of the output
+ */
+int memory_state(char *output, size_t length);
 
 /**
  * @brief Reserves a block of memory of the given size.

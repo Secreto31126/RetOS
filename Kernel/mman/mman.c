@@ -1,6 +1,4 @@
 #include "mman.h"
-#include <string.h>
-#include <stdlib.h>
 
 void init_memory_manager()
 {

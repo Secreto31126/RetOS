@@ -527,8 +527,6 @@ moduleData doNice(moduleData commandFd, displayStyles *displayStyle)
 
 moduleData cat(moduleData commandFd, displayStyles *displayStyle)
 {
-    if (*displayStyle == REDRAW_ALWAYS)
-        *displayStyle = REDRAW_ONCE;
     // no params received, no fd to read from, use terminal as fd
     if ((!*commandFd.s || *commandFd.s == ' ') && commandFd.fd < 0)
         return pipeAndExec("cat", "TERM_MODE", commandFd.fd, FROM_TERM);
@@ -562,7 +560,8 @@ moduleData less(moduleData commandFd, displayStyles *displayStyle)
 }
 moduleData phylos(moduleData commandFd, displayStyles *displayStyle)
 {
-    *displayStyle = REDRAW_ALWAYS;
+    if (strstr(commandFd.s, "-l") == NULL)
+        *displayStyle = REDRAW_ALWAYS;
     return pipeAndExec("phylos", commandFd.s, commandFd.fd, FROM_TERM);
 }
 moduleData tests(moduleData commandFd, displayStyles *displayStyle)
@@ -602,7 +601,7 @@ void initializeCommands()
     addCommand("grep", "Help display for the grep module.\nFormat: 'grep [match]'\nOutputs all lines from content of fd that match [match].", grep);
     addCommand("less", "Help display for the less module.\nFormat: 'less'\nOutputs content from fd upon user input.", less);
     addCommand("kill", "Help display for the kill module.\nFormat: 'kill [process id list]'\nKills every process given.", killer);
-    addCommand("phylos", "Help display for the phylos module.\nFormat: 'phylos'\nStarts the phylos module with 5 phylosophers, click a to add a phylosopher, r to remove one and q to quit.", phylos);
+    addCommand("phylos", "Help display for the phylos module.\nFormat: 'phylos'\nUse -l flag to keep logs on screen.\nStarts the phylos module with 5 phylosophers, click a to add a phylosopher, r to remove one and q to quit.", phylos);
     addCommand("ps", "Help display for the ps module.\nFormat: 'ps'\nDisplays data about current running processes.", getPs);
     addCommand("nice", "Help display for the nice module.\nFormat: 'nice [process id] [new priority]'\nSets the priority of the process. Priority can range between -20 and 19, any values not in this range will be clamped to the range.\nNote: A lower priority correlates to greater time in execution.", doNice);
     addCommand("tests", "Help display for the tests module.\n This is a placeholder module.", tests);

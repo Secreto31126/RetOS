@@ -24,6 +24,7 @@ extern void free(void *ptr);
 extern void beep(uint32_t freq);
 extern int fork();
 extern int flush(int fd);
+extern int memory_state(char *output, size_t length);
 
 // library
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize);

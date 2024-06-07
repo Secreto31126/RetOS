@@ -11,8 +11,9 @@
 #include <sys/resource.h>
 #define BLOCK 5
 #define MAX_LETTER_SIZE 4
-#define READ_BLOCK 500 // Any command parameters that exceed this will be ignored. Just don't write commands exceeding 50 letters in terminal/don't feed longer than BLOCK letter input to shell built-ins
-#define MAX_ARGS 255   // for execv
+#define READ_BLOCK 500      // Any command parameters that exceed this will be ignored. Just don't write commands exceeding 500 letters in terminal/don't feed longer than BLOCK letter input to shell built-ins
+#define MAX_READ_BLOCK 7999 // as much as can fit in a pipe at once
+#define MAX_ARGS 255        // for execv
 
 typedef enum routeModes
 {
@@ -571,6 +572,13 @@ moduleData getPs(moduleData commandFd, displayStyles *displayStyle)
     moduleData toRet = {NULL, ps(), -1, -1};
     return toRet;
 }
+moduleData getMem(moduleData commandFd, displayStyles *displayStyle)
+{
+    char buffer[MAX_READ_BLOCK];
+    memory_state(buffer, MAX_READ_BLOCK);
+    moduleData aux = {buffer, -1, -1, -1};
+    return repeat(aux, displayStyle);
+}
 
 void initializeCommands()
 {
@@ -596,4 +604,5 @@ void initializeCommands()
     addCommand("ps", "Help display for the ps module.\nFormat: 'ps'\nDisplays data about current running processes.", getPs);
     addCommand("nice", "Help display for the nice module.\nFormat: 'nice [process id] [new priority]'\nSets the priority of the process. Priority can range between -20 and 19, any values not in this range will be clamped to the range.\nNote: A lower priority correlates to greater time in execution.", doNice);
     addCommand("tests", "Help display for the tests module.\n This is a placeholder module.", tests);
+    addCommand("mem", "Help display for the mem module.\nFormat: 'mem'\nOutputs a report on the memory state.", getMem);
 }

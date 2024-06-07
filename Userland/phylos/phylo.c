@@ -3,6 +3,8 @@
 
 void phylosopher(unsigned int i)
 {
+    sem_wait(data->mutex);
+    sem_post(data->mutex); // wait for other phylosophers to be born
     while (1)
     {
         take_forks(i);

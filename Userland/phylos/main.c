@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
 					}
 					data->phylos[num].state = THINKING;
 					sem_unlink(strandnum("sem_", num));
-					data->phylos[num].sem = sem_open(strandnum("sem_", num), 0);
+					data->phylos[num].sem = sem_open(strandnum("sem_", num), 1);
 					if (data->phylos[num].sem == NULL)
 					{
 						puts("Failed to open semaphore\n");

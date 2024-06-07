@@ -31,7 +31,6 @@ void take_forks(unsigned int i)
 
 void put_forks(unsigned int i)
 {
-
     sem_wait(data->mutex);
     data->phylos[i].state = THINKING;
     sem_post(data->mutex);

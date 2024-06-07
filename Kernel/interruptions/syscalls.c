@@ -35,13 +35,6 @@ static uint64_t beep_bop(uint64_t rdi, uint64_t, uint64_t, uint64_t rax);
  */
 static uint64_t get_lucas(uint8_t *buffer, uint64_t count);
 /**
- * @brief halt once
- *
- * @param rax The value to return
- * @return uint64_t rax
- */
-static uint64_t halt(uint64_t, uint64_t, uint64_t, uint64_t rax);
-/**
  * @brief create a new process from the current one
  *
  * @param rsp The interruption rsp
@@ -136,13 +129,6 @@ static uint64_t beep_bop(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 static uint64_t get_lucas(uint8_t *buffer, uint64_t count)
 {
     return read_stderr(buffer, count);
-}
-
-static uint64_t halt(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
-{
-    set_interrupt_flag();
-    halt_once();
-    return rax;
 }
 
 static uint64_t fork(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, void *rsp)

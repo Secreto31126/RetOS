@@ -502,6 +502,28 @@ moduleData killer(moduleData commandFd, displayStyles *displayStyle)
     return toRet;
 }
 
+moduleData doNice(moduleData commandFd, displayStyles *displayStyle)
+{
+    char savedSpace[READ_BLOCK];
+    char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
+
+    char *args[3];
+    separateString(commandParameters, args, 3);
+    if (args[0] == NULL || args[1] == NULL)
+    {
+        moduleData toRet = {"Not enough arguments provided.", -1, -1, -1};
+        return toRet;
+    }
+    if (setpriority(PRIO_PROCESS, atoi(args[0]), atoi(args[1])))
+    {
+
+        moduleData toRet = {"Could not set priority.", -1, -1, -1};
+        return toRet;
+    }
+    moduleData toRet = {"Set.", -1, -1, -1};
+    return toRet;
+}
+
 moduleData cat(moduleData commandFd, displayStyles *displayStyle)
 {
     // no params received, no fd to read from, use terminal as fd
@@ -571,6 +593,7 @@ void initializeCommands()
     addCommand("less", "Help display for the less module.\nFormat: 'less'\nOutputs content from fd upon user input.", less);
     addCommand("kill", "Help display for the kill module.\nFormat: 'kill [process id list]'\nKills every process given.", killer);
     addCommand("phylos", "Help display for the phylos module.\nFormat: 'phylos'\nStarts the phylos module with 5 phylosophers, click a to add a phylosopher, r to remove one and q to quit.", phylos);
-    addCommand("ps", "Help display for the ps module.\nFormat: 'ps'\nDisplays data about current running processes", getPs);
+    addCommand("ps", "Help display for the ps module.\nFormat: 'ps'\nDisplays data about current running processes.", getPs);
+    addCommand("nice", "Help display for the nice module.\nFormat: 'nice [process id] [new priority]'\nSets the priority of the process. Priority can range between -20 and 19, any out of bounds will be truncated.\nNote: A lower priority correlates to greater time in execution.", doNice);
     addCommand("tests", "Help display for the tests module.\n This is a placeholder module.", tests);
 }

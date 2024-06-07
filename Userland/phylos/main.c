@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
 				leave(i + 1);
 				return 1;
 			}
+			phylosopher(i);
 			return 0;
 		}
 		else
@@ -78,10 +79,6 @@ int main(int argc, char *argv[])
 		children[MAX_PHYLOS] = pid;
 	}
 
-	for (int i = 0; i < data->phylo_count; i++)
-	{
-		phylosopher(i);
-	}
 	sem_post(data->mutex);
 	char buffer[15] = {0};
 	while (1)

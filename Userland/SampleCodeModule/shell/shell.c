@@ -175,6 +175,7 @@ char shellLoop()
             {
                 addCharToBuffer('\n');
                 addStringToBuffer(lineStart, 0);
+                fromLastEnter = 0;
             }
         }
     }

@@ -71,8 +71,17 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
                 return 1;
         }
     }
-    drawCharAt(c, letterColor, highlightColor, xPointer, yPointer);
-    moveCursor();
+
+    if (c == '\t')
+    {
+        for (int i = 0; i < SPACES_IN_TAB; i++)
+            paintChar(' ', letterColor, highlightColor);
+    }
+    else
+    {
+        drawCharAt(c, letterColor, highlightColor, xPointer, yPointer);
+        moveCursor();
+    }
     return 1;
 }
 char paintString(const char *c, HexColor letterColor, HexColor highlightColor)

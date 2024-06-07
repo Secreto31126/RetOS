@@ -562,6 +562,8 @@ moduleData phylos(moduleData commandFd, displayStyles *displayStyle)
 {
     if (strstr(commandFd.s, "-l") == NULL)
         *displayStyle = REDRAW_ALWAYS;
+    else
+        *displayStyle = NO_STDIN;
     return pipeAndExec("phylos", commandFd.s, commandFd.fd, FROM_TERM);
 }
 moduleData tests(moduleData commandFd, displayStyles *displayStyle)

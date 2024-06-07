@@ -64,9 +64,13 @@ void set_heap(void *start, size_t_m size)
 }
 */
 void *heap_start;
-void set_heap(void *start, size_t_m size)
+void malloc_init(void *start, size_t_m size)
 {
     heap_start = start;
+
+    // Initialize binary tree
+    for (char *i = MAP_START; i < MAP_END; i++)
+        *((uint64_t *)i) = EMPTY;
 }
 void *get_heap_start()
 {

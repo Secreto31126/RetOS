@@ -14,7 +14,7 @@ typedef signed long int size_t_m;
 
 // Syscall to detect the start of the heap for the running process
 // void *(*get_heap_start)(void);
-void set_heap(void *start, size_t_m size);
+void malloc_init(void *start, size_t_m size);
 
 typedef signed long int size_t_m;
 

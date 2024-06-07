@@ -6,7 +6,7 @@
 #include "lib/my_lib.h"
 
 #define MAX_PHYLOS 15
-#define LEFT(i, p) (i + p - 1) % p
+#define LEFT(i, p) p
 #define RIGHT(i, p) (i + 1) % p
 #define THINKING 0
 #define HUNGRY 1
@@ -17,12 +17,16 @@ typedef struct
 {
     int state;
     sem_t *sem;
-    unsigned int turn;
 } phylo_t;
 
-extern sem_t *mutex;
-extern phylo_t *phylos;
-extern unsigned int *phylo_count;
+typedef struct
+{
+    sem_t *mutex;
+    phylo_t phylos[MAX_PHYLOS];
+    unsigned int phylo_count;
+} Data;
+
+extern Data *data;
 
 void print_state();
 void phylosopher(unsigned int i);

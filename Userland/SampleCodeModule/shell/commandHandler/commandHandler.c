@@ -527,6 +527,8 @@ moduleData doNice(moduleData commandFd, displayStyles *displayStyle)
 
 moduleData cat(moduleData commandFd, displayStyles *displayStyle)
 {
+    if (*displayStyle == REDRAW_ALWAYS)
+        *displayStyle = REDRAW_ONCE;
     // no params received, no fd to read from, use terminal as fd
     if ((!*commandFd.s || *commandFd.s == ' ') && commandFd.fd < 0)
         return pipeAndExec("cat", "TERM_MODE", commandFd.fd, FROM_TERM);

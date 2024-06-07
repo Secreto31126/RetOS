@@ -520,18 +520,18 @@ int signalAll(moduleData commandFd, int signal)
 moduleData killer(moduleData commandFd, displayStyles *displayStyle)
 {
 
-    moduleData toRet = {"No valid arguments read.", -1, -1, -1};
+    moduleData toRet = {"Signal sent.", -1, -1, -1};
     if (!signalAll(commandFd, SIGKILL))
-        toRet.s = "Signal sent.";
+        toRet.s = "No valid arguments read.";
 
     return toRet;
 }
 
 moduleData blocker(moduleData commandFd, displayStyles *displayStyle)
 {
-    moduleData toRet = {"No valid arguments read.", -1, -1, -1};
+    moduleData toRet = {"Blocked.", -1, -1, -1};
     if (!signalAll(commandFd, SIGSTOP))
-        toRet.s = "Blocked.";
+        toRet.s = "No valid arguments read.";
 
     return toRet;
 }
@@ -539,9 +539,9 @@ moduleData blocker(moduleData commandFd, displayStyles *displayStyle)
 moduleData unblocker(moduleData commandFd, displayStyles *displayStyle)
 {
 
-    moduleData toRet = {"No valid arguments read.", -1, -1, -1};
+    moduleData toRet = {"Unblocked.", -1, -1, -1};
     if (!signalAll(commandFd, SIGCONT))
-        toRet.s = "Unblocked.";
+        toRet.s = "No valid arguments read.";
 
     return toRet;
 }

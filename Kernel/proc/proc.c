@@ -469,7 +469,7 @@ int ps()
     }
 
 exit:
-#undef print
+#undef pipe_write
 
     close(pipesfd[1]);
     return pipesfd[0];

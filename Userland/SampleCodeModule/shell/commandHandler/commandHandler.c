@@ -8,6 +8,7 @@
 #include "./../shell.h"
 #include "./../../piano/piano.h"
 #include "./../../piano/sound.h"
+#include <sys/resource.h>
 #define BLOCK 5
 #define MAX_LETTER_SIZE 4
 #define READ_BLOCK 500 // Any command parameters that exceed this will be ignored. Just don't write commands exceeding 50 letters in terminal/don't feed longer than BLOCK letter input to shell built-ins
@@ -543,6 +544,11 @@ moduleData tests(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("tests", commandFd.s, commandFd.fd, FROM_FD);
 }
+moduleData getPs(moduleData commandFd, displayStyles *displayStyle)
+{
+    moduleData toRet = {NULL, ps(), -1, -1};
+    return toRet;
+}
 
 void initializeCommands()
 {
@@ -565,5 +571,6 @@ void initializeCommands()
     addCommand("less", "Help display for the less module.\nFormat: 'less'\nOutputs content from fd upon user input.", less);
     addCommand("kill", "Help display for the kill module.\nFormat: 'kill [process id list]'\nKills every process given.", killer);
     addCommand("phylos", "Help display for the phylos module.\nFormat: 'phylos'\nStarts the phylos module with 5 phylosophers, click a to add a phylosopher, r to remove one and q to quit.", phylos);
+    addCommand("ps", "Help display for the ps module.\nFormat: 'ps'\nDisplays data about current running processes", getPs);
     addCommand("tests", "Help display for the tests module.\n This is a placeholder module.", tests);
 }

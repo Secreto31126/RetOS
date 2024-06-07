@@ -30,6 +30,8 @@
     global sem_unlink
     global sem_post
     global sem_wait
+    global sbrk
+    global memory_state
 
 ; ssize_t read(int fd, void *buf, size_t count);
 read:
@@ -181,9 +183,15 @@ getpriority:
     int 80h
     ret
 
-; int setpriority(int which, unsigned int who, int prio);
-setpriority:
-    mov rax, 0x1A
+; void *sbrk(intptr_t increment);
+sbrk:
+    mov rax, 0x20
+    int 80h
+    ret
+
+; int memory_state(char *output, size_t length);
+memory_state:
+    mov rax, 0x21
     int 80h
     ret
 

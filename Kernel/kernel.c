@@ -6,8 +6,8 @@
 #include <localization.h>
 #include <memory.h>
 #include <proc.h>
-#include <exec.h>
 #include <mman.h>
+#include <unistd.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -27,6 +27,7 @@ static void *const grep = (void *)0x625000;
 static void *const sing = (void *)0x630000;
 static void *const less = (void *)0x635000;
 static void *const phylos = (void *)0x640000;
+static void *const tests = (void *)0x645000;
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
@@ -58,6 +59,7 @@ void *initializeKernelBinary()
 		sing,
 		less,
 		phylos,
+		tests,
 	};
 
 	loadModules(&endOfKernelBinary, moduleAddresses);
@@ -99,7 +101,7 @@ void idle(pid_t child_pid)
 {
 	if (!child_pid)
 	{
-		ncPrintDec(get_pid());
+		ncPrintDec(getpid());
 		ncPrint(": I will be init!\n");
 
 		char *argv[] = {"I'm in Userland!", "Hell yeah!", ":]", NULL};
@@ -114,7 +116,7 @@ void idle(pid_t child_pid)
 			return;
 		}
 
-		ncPrintDec(get_pid());
+		ncPrintDec(getpid());
 		ncPrint(": I'm idle!\n");
 
 		while (1)

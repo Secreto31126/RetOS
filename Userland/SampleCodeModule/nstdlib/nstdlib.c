@@ -14,6 +14,8 @@ char *getDumpString()
 {
     uint64_t length = BIG_BLOCK;
     char *c = malloc(length * sizeof(char));
+    if (c == NULL)
+        return "";
     char lastAdded = 0;
     if ((lastAdded = get_dump(c + length - BIG_BLOCK, BIG_BLOCK)))
     {
@@ -37,6 +39,8 @@ char *getDumpString()
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize)
 {
     void *aux = malloc(newSize);
+    if (aux == NULL)
+        return NULL;
     oldSize = oldSize > newSize ? newSize : oldSize;
     for (uint64_t i = 0; i < oldSize; i++)
         *((char *)(aux + i)) = *((char *)(ptr + i));
@@ -349,11 +353,6 @@ char getChar()
     return c;
 }
 
-int read(char *buffer, int count)
-{
-    return read_sys(0, buffer, count);
-}
-
 uint64_t pow(double base, uint64_t exponent)
 {
     uint64_t ans = 1.0;
@@ -454,6 +453,8 @@ char *sPrintf(char *format, ...)
     uint64_t allocated = BLOCK;
     uint64_t count = 1; // counts null termination
     char *toReturn = malloc(sizeof(char) * allocated);
+    if (toReturn == NULL)
+        return "";
     *toReturn = 0;
     while (*format != 0 && *format != EOF)
     {
@@ -530,10 +531,8 @@ uint64_t getHours()
 }
 
 // User should call freePrints() to free memory allocated for returned string
-char *getTimeString()
+char *getTimeString(char *buffer)
 {
-    char *buffer = malloc(6 * sizeof(char)); // return string format will be 6 chars long. defining a value for this is unnecessary and confusing
-    addToAllocated(buffer);
     uint64_t min = getMinutes(), hr = getHours();
     char addedZeroFlag = 0;
     if (hr < 10)
@@ -564,27 +563,6 @@ char isPrefix(char *prefix, char *word)
     return 1;
 }
 
-char *concatUnlimited(char *s1, char *s2)
-{
-    uint64_t index = 0;
-    char *toReturn = null;
-    while (*s1)
-    {
-        if (!(index % BLOCK))
-            toReturn = realloc(toReturn, index * sizeof(char), (index + BLOCK) * sizeof(char));
-        *(toReturn + index++) = *s1;
-    }
-    while (*s2)
-    {
-        if (!(index % BLOCK))
-            toReturn = realloc(toReturn, index * sizeof(char), (index + BLOCK) * sizeof(char));
-        *(toReturn + index++) = *s2;
-    }
-    *(toReturn + index) = 0;
-    addToAllocated(toReturn);
-    return toReturn;
-}
-
 char strcmpHandleWhitespace(char *s1, char *s2)
 {
     char wFlag = 0; //
@@ -601,8 +579,6 @@ char strcmpHandleWhitespace(char *s1, char *s2)
         }
         if (*(s1++) != *(s2++))
         {
-            printf("s1: \'%c\' ", *(s1 - 1));
-            printf("s2: \'%c\' \n", *(s2 - 1));
             return 0;
         }
     }

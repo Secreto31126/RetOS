@@ -2,6 +2,8 @@
 #define PMMAN_H
 
 #include <mman.h>
+#include <string.h>
+#include <stdlib.h>
 
 typedef uint32_t map_entry;
 

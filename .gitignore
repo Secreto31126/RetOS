@@ -14,6 +14,9 @@
 # Elfos files
 *.elf
 
+# Sarif files
+*.sarif
+
 docs/
 
 .vercel

@@ -31,7 +31,8 @@ void startModules()
         case '2':
         {
             blank();
-            paintString(sPrintf("Time is %s.\n\nPress any key to return to module selector.", getTimeString()), -1, 0);
+            char buffer[6];
+            paintString(sPrintf("Time is %s.\n\nPress any key to return to module selector.", getTimeString(buffer)), -1, 0);
             freePrints();
             getChar();
             blank();

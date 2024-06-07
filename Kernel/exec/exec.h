@@ -8,13 +8,13 @@
 #include <stdint.h>
 #include <memory.h>
 
-#define EXECUTABLES 11
-#define MAX_ARGS 256
+#define EXECUTABLES 12
+#define MAX_ARGS 32
 /**
  * @brief Each argument max length
- * @note Includes the NULL terminator
+ * @note Includes the '\0' terminator
  */
-#define MAX_ARG_LEN 1024
+#define MAX_ARG_LEN 32
 
 /**
  * @brief Userland entry point
@@ -76,9 +76,9 @@ RSP set_process_args(int argc, char const argv[MAX_ARGS][MAX_ARG_LEN], Process *
  *
  * @param argc The number of arguments (asumes it was validated with check_args())
  * @param argv The argument values, NULL terminated
- * @return char* const* const The backup pointer
+ * @return void* The backup pointer
  */
-char *const *const backup_argv_somewhere(int argc, char *const argv[]);
+void *backup_argv_somewhere(int argc, char *const argv[]);
 
 extern void portal_to_userland(int argc, char *const argv[], Process *process, EntryPoint code);
 

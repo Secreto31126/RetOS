@@ -19,16 +19,20 @@ typedef struct
 {
     int state;
     sem_t *sem;
-    unsigned int turn;
 } phylo_t;
 
-extern sem_t *mutex;
-extern phylo_t *phylos;
-extern unsigned int *phylo_count;
+typedef struct
+{
+    sem_t *mutex;
+    phylo_t phylos[MAX_PHYLOS];
+    unsigned int phylo_count;
+} Data;
+
+extern Data *data;
 
 void print_state();
 void phylosopher(unsigned int i);
 void take_forks(unsigned int i);
 void put_forks(unsigned int i);
 void test(unsigned int i);
-void leave();
+void leave(int count);

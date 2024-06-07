@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 					write(STD_OUT, "\n", 1);
 				}
 
-				while (buffer[i] == '\n' && buffer[i])
+				while (buffer[i] == '\n')
 				{
 					i++;
 				}

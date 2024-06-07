@@ -3,17 +3,15 @@
 void print_state()
 {
     char devNull;
-    unsigned int max = 0;
-    char *to_print;
     while (1)
     {
-        for (unsigned int i = 0; i < *phylo_count; i++)
+        for (unsigned int i = 0; i < data->phylo_count; i++)
         {
-            if (phylos[i].state == EATING)
+            if (data->phylos[i].state == EATING)
             {
                 puts("E ");
             }
-            else if (phylos[i].state == THINKING)
+            else if (data->phylos[i].state == THINKING)
             {
                 puts("T ");
             }
@@ -21,14 +19,9 @@ void print_state()
             {
                 puts(". ");
             }
-
-            max = max > phylos[i].turn ? max : phylos[i].turn;
         }
-        to_print = strandnum("    Max: ", max);
-        puts(to_print);
         puts("\n");
-        free(to_print);
-        sem_post(mutex);           // Mutex unlock
-        read(STD_IN, &devNull, 1); // dupped to a write pipe on phylos, gets written to whenever state updates. Before this write, mutex is waited on
+        sem_post(data->mutex);     // Mutex unlock, should be locked by phylos before writing to this pipe
+        read(STD_IN, &devNull, 1); // only unblocked once notified via pipe by a phylo
     }
 }

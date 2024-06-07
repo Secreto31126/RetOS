@@ -8,10 +8,12 @@
 #include "./../shell.h"
 #include "./../../piano/piano.h"
 #include "./../../piano/sound.h"
+#include <sys/resource.h>
 #define BLOCK 5
 #define MAX_LETTER_SIZE 4
-#define READ_BLOCK 500 // Any command parameters that exceed this will be ignored. Just don't write commands exceeding 50 letters in terminal/don't feed longer than BLOCK letter input to shell built-ins
-#define MAX_ARGS 255   // for execv
+#define READ_BLOCK 500      // Any command parameters that exceed this will be ignored. Just don't write commands exceeding 500 letters in terminal/don't feed longer than BLOCK letter input to shell built-ins
+#define MAX_READ_BLOCK 7999 // as much as can fit in a pipe at once
+#define MAX_ARGS 255        // for execv
 
 typedef enum routeModes
 {
@@ -76,7 +78,7 @@ moduleData wrapExecute(moduleData toPipe, char *command, displayStyles *displayS
 {
     if (toPipe.s != NULL)
     {
-        moduleData aux = {command, -1, toPipe.writeFd, toPipe.writeFd};
+        moduleData aux = {command, toPipe.fd, toPipe.writeFd, toPipe.cPid};
         toPipe = execute(aux, shiftToNextWord(aux.s), displayStyle);
         if (aux.fd >= 0)
             close(aux.fd);
@@ -501,6 +503,28 @@ moduleData killer(moduleData commandFd, displayStyles *displayStyle)
     return toRet;
 }
 
+moduleData doNice(moduleData commandFd, displayStyles *displayStyle)
+{
+    char savedSpace[READ_BLOCK];
+    char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
+
+    char *args[3];
+    separateString(commandParameters, args, 3);
+    if (args[0] == NULL || args[1] == NULL)
+    {
+        moduleData toRet = {"Not enough arguments provided.", -1, -1, -1};
+        return toRet;
+    }
+    if (setpriority(PRIO_PROCESS, atoi(args[0]), atoi(args[1])))
+    {
+
+        moduleData toRet = {"Could not set priority.", -1, -1, -1};
+        return toRet;
+    }
+    moduleData toRet = {"Set.", -1, -1, -1};
+    return toRet;
+}
+
 moduleData cat(moduleData commandFd, displayStyles *displayStyle)
 {
     // no params received, no fd to read from, use terminal as fd
@@ -536,8 +560,27 @@ moduleData less(moduleData commandFd, displayStyles *displayStyle)
 }
 moduleData phylos(moduleData commandFd, displayStyles *displayStyle)
 {
-    *displayStyle = REDRAW_ALWAYS;
+    if (strstr(commandFd.s, "-l") == NULL)
+        *displayStyle = REDRAW_ALWAYS;
+    else
+        *displayStyle = NO_STDIN;
     return pipeAndExec("phylos", commandFd.s, commandFd.fd, FROM_TERM);
+}
+moduleData tests(moduleData commandFd, displayStyles *displayStyle)
+{
+    return pipeAndExec("tests", commandFd.s, commandFd.fd, FROM_FD);
+}
+moduleData getPs(moduleData commandFd, displayStyles *displayStyle)
+{
+    moduleData toRet = {NULL, ps(), -1, -1};
+    return toRet;
+}
+moduleData getMem(moduleData commandFd, displayStyles *displayStyle)
+{
+    char buffer[MAX_READ_BLOCK];
+    memory_state(buffer, MAX_READ_BLOCK);
+    moduleData aux = {buffer, -1, -1, -1};
+    return repeat(aux, displayStyle);
 }
 
 void initializeCommands()
@@ -560,5 +603,9 @@ void initializeCommands()
     addCommand("grep", "Help display for the grep module.\nFormat: 'grep [match]'\nOutputs all lines from content of fd that match [match].", grep);
     addCommand("less", "Help display for the less module.\nFormat: 'less'\nOutputs content from fd upon user input.", less);
     addCommand("kill", "Help display for the kill module.\nFormat: 'kill [process id list]'\nKills every process given.", killer);
-    addCommand("phylos", "Help display for the phylos module.\nFormat: 'phylos'\nStarts the phylos module with 5 phylosophers, click a to add a phylosopher, r to remove one and q to quit.", phylos);
+    addCommand("phylos", "Help display for the phylos module.\nFormat: 'phylos'\nUse -l flag to keep logs on screen.\nStarts the phylos module with 5 phylosophers, click a to add a phylosopher, r to remove one and q to quit.", phylos);
+    addCommand("ps", "Help display for the ps module.\nFormat: 'ps'\nDisplays data about current running processes.", getPs);
+    addCommand("nice", "Help display for the nice module.\nFormat: 'nice [process id] [new priority]'\nSets the priority of the process. Priority can range between -20 and 19, any values not in this range will be clamped to the range.\nNote: A lower priority correlates to greater time in execution.", doNice);
+    addCommand("tests", "Help display for the tests module.\n This is a placeholder module.", tests);
+    addCommand("mem", "Help display for the mem module.\nFormat: 'mem'\nOutputs a report on the memory state.", getMem);
 }

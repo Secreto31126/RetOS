@@ -35,13 +35,6 @@ static uint64_t beep_bop(uint64_t rdi, uint64_t, uint64_t, uint64_t rax);
  */
 static uint64_t get_lucas(uint8_t *buffer, uint64_t count);
 /**
- * @brief halt once
- *
- * @param rax The value to return
- * @return uint64_t rax
- */
-static uint64_t halt(uint64_t, uint64_t, uint64_t, uint64_t rax);
-/**
  * @brief create a new process from the current one
  *
  * @param rsp The interruption rsp
@@ -49,7 +42,7 @@ static uint64_t halt(uint64_t, uint64_t, uint64_t, uint64_t rax);
  */
 static uint64_t fork(uint64_t, uint64_t, uint64_t, uint64_t, void *rsp);
 
-#define SYSCALL_COUNT 32
+#define SYSCALL_COUNT 34
 typedef uint64_t (*syscall)(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t);
 static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)read,
@@ -62,13 +55,13 @@ static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)beep_bop,
     (syscall)get_tick,
     (syscall)get_lucas,
-    (syscall)halt,
-    (syscall)exit,
+    (syscall)ps,
+    (syscall)_exit,
     (syscall)kill,
-    (syscall)get_pid,
+    (syscall)getpid,
     (syscall)execv,
     (syscall)fork,
-    (syscall)yield,
+    (syscall)sched_yield,
     (syscall)waitpid,
     (syscall)sleep,
     (syscall)pipe,
@@ -84,6 +77,8 @@ static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)sem_unlink,
     (syscall)sem_post,
     (syscall)sem_wait,
+    (syscall)sbrk,
+    (syscall)memory_state,
 };
 
 uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax, uint64_t rsp)
@@ -136,13 +131,6 @@ static uint64_t beep_bop(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
 static uint64_t get_lucas(uint8_t *buffer, uint64_t count)
 {
     return read_stderr(buffer, count);
-}
-
-static uint64_t halt(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
-{
-    set_interrupt_flag();
-    halt_once();
-    return rax;
 }
 
 static uint64_t fork(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, void *rsp)

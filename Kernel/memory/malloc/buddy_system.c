@@ -3,8 +3,8 @@
 // Of course, since a binary tree is traditionally just a two-tailed list there are two options
 // Use a naïve malloc to manage this binary tree
 
-// Or implement as
-// An array binary tree
+// Or implement it
+// As a tree in an array
 // Like barbarian
 
 // The latter is a

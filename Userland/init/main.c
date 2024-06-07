@@ -42,6 +42,8 @@ int main(int argc, char *argv[])
 
 	// 🧦
 
+	puts("Welcome to init");
+
 	int pid = fork();
 	if (pid)
 	{

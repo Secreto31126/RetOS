@@ -2,13 +2,13 @@ include Makefile.inc
 
 SAMPLE_DATA=0001-sampleDataModule.bin
 
-all: sampleCodeModule tomyland cat wc filter loop grep sing less phylos tests sampleDataModule
+all: sampleCodeModule init cat wc filter loop grep sing less phylos tests sampleDataModule
 
 sampleCodeModule:
 	cd SampleCodeModule; make
 
-tomyland:
-	cd tomyland; make
+init:
+	cd init; make
 
 cat:
 	cd cat; make
@@ -42,7 +42,7 @@ sampleDataModule:
 
 clean:
 	cd SampleCodeModule; make clean
-	cd tomyland; make clean
+	cd init; make clean
 	cd cat; make clean
 	cd wc; make clean
 	cd filter; make clean
@@ -55,4 +55,4 @@ clean:
 	rm -rf *.bin
 
 
-.PHONY: sampleCodeModule tomyland cat wc filter loop grep sing less phylos tests all clean
+.PHONY: sampleCodeModule init cat wc filter loop grep sing less phylos tests all clean

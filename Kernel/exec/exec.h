@@ -9,12 +9,12 @@
 #include <memory.h>
 
 #define EXECUTABLES 3
-#define MAX_ARGS 256
+#define MAX_ARGS 32
 /**
  * @brief Each argument max length
- * @note Includes the NULL terminator
+ * @note Includes the '\0' terminator
  */
-#define MAX_ARG_LEN 1024
+#define MAX_ARG_LEN 32
 
 /**
  * @brief Userland entry point

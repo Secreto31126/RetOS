@@ -124,7 +124,7 @@ void cascade_state(char *x, size_t_m i, states s)
     }
 }
 
-void buddy_init(void *start, size_t_m size)
+void malloc_init(void *start, size_t_m size)
 {
     // A complete binary tree has (2*LEAVES)-1 nodes
     // Unit represents the number of MEMORY_BLOCK-NODE pairs that can fit into the given heap

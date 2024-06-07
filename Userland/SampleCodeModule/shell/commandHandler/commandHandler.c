@@ -487,7 +487,22 @@ int signalAll(moduleData commandFd, int signal)
         return 1;
     }
 
-    for (int i = 0; args[i] != NULL; i++)
+    int i = 0;
+    // functionality for kill KILL, kill BLOCK, kill UNBLOCK
+    if (!strcmp("KILL", args[0]))
+        i = 1;
+    else if (!strcmp("BLOCK", args[0]))
+    {
+        signal = SIGSTOP;
+        i = 1;
+    }
+    else if (!strcmp("UNBLOCK", args[0]))
+    {
+        signal = SIGCONT;
+        i = 1;
+    }
+
+    for (int i; args[i] != NULL; i++)
     {
         int aux = atoi(args[i]);
         if (aux)
@@ -507,7 +522,7 @@ moduleData killer(moduleData commandFd, displayStyles *displayStyle)
 
     moduleData toRet = {"No valid arguments read.", -1, -1, -1};
     if (!signalAll(commandFd, SIGKILL))
-        toRet.s = "Killed.";
+        toRet.s = "Signal sent.";
 
     return toRet;
 }
@@ -631,7 +646,7 @@ void initializeCommands()
     addCommand("loop", "Help display for the loop module.\nFormats: 'loop | loop [interval]'\nPrints its process id and a greeting on a set interval.", loop);
     addCommand("grep", "Help display for the grep module.\nFormat: 'grep [match]'\nOutputs all lines from content of fd that match [match].", grep);
     addCommand("less", "Help display for the less module.\nFormat: 'less'\nOutputs content from fd upon user input.", less);
-    addCommand("kill", "Help display for the kill module.\nFormat: 'kill [process id list]'\nKills every process given.", killer);
+    addCommand("kill", "Help display for the kill module.\nFormat(s): 'kill [process id list] | kill [KILL | BLOCK | UNBLOCK] [process id list]'\nSends a signal to every process given, kill by default.", killer);
     addCommand("block", "Help display for the block module.\nFormat: 'block [process id list]'\nBlocks every process given.", blocker);
     addCommand("unblock", "Help display for the unblock module.\nFormat: 'unblock [process id list]'\nUnblocks every process given.", unblocker);
     addCommand("phylos", "Help display for the phylos module.\nFormat: 'phylos'\nUse -l flag to enable dynamic logging.\nStarts the phylos module with 5 phylosophers, click a to add a phylosopher, r to remove one and q to quit.", phylos);

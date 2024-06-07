@@ -412,6 +412,18 @@ int setpriority(int which, id_t who, int prio)
     return -1;
 }
 
+void *sbrk(intptr_t increment)
+{
+    Process *p = get_current_process();
+
+    if (increment == 0)
+    {
+        return p->running_stack;
+    }
+
+    return (void *)-1;
+}
+
 int ps()
 {
     __label__ exit;

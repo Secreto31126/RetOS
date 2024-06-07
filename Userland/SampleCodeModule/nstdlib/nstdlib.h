@@ -22,7 +22,6 @@ extern unsigned long long get_unix_time(void);
 extern void *malloc(uint64_t size);
 extern void free(void *ptr);
 extern void beep(uint32_t freq);
-extern void halt_user();
 extern int fork();
 extern int flush(int fd);
 

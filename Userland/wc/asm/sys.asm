@@ -8,7 +8,7 @@
     global beep
     global get_tick
     global get_dump
-    global halt_user
+    global ps
     global _exit
     global kill
     global getpid
@@ -31,13 +31,13 @@
     global sem_post
     global sem_wait
 
-; size_t read(int fd, void *buf, size_t count);
+; ssize_t read(int fd, void *buf, size_t count);
 read:
     mov rax, 0
     int 80h
     ret
 
-; size_t write(int fd, void *buf, size_t count);
+; ssize_t write(int fd, void *buf, size_t count);
 write:
     mov rax, 1
     int 80h
@@ -85,8 +85,14 @@ get_tick:
     int 80h
     ret
 
-; void halt_user();
-halt_user:
+; 
+    get_dump:
+    mov rax, 9
+    int 80h,
+    ret
+
+; int ps();
+ps:
     mov rax, 0xA
     int 80h
     ret
@@ -121,7 +127,7 @@ fork:
     int 80h
     ret
 
-; void yield();
+; int sched_yield();
 sched_yield:
     mov rax, 0x10
     int 80h

@@ -76,7 +76,7 @@ int64_t test_processes(uint64_t argc, char *argv[])
               puts("test_processes: ERROR killing process\n");
               return -1;
             }
-            my_wait(p_rqs[rq].pid); // MODIFIED ADDED A WAIT TO PREVENT ACCUMULATING ZOMBIE STATES
+            my_wait(p_rqs[rq].pid); // MODIFIED ADDED A WAIT TO PREVENT ACCUMULATING ZOMBIE PROCESSES
             p_rqs[rq].state = KILLED;
             alive--;
           }

@@ -85,7 +85,7 @@ void *initializeKernelBinary()
 
 	ncPrint("\n[Done]\n\n");
 
-	ncPrint("[Initializing main files]");
+	ncPrint("Initializing main files");
 	init_stdin();
 	init_stdout();
 	init_stderr();
@@ -94,7 +94,7 @@ void *initializeKernelBinary()
 
 	ncPrint("Setting OS's language to ES_AR");
 	set_language(ES_AR);
-	ncPrint(" [Done]\n");
+	ncPrint(" [Done]\n\n");
 
 	ncPrint("Initializing kernel's IDT");
 	initialize_idt();

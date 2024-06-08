@@ -44,7 +44,6 @@ int main(int argc, char *argv[])
 	if (!strcmp(test, "endless_loop"))
 	{
 		my_nice(my_getpid(), 19); // Since I'm not too eager to give extra cpu time to a process stuck in a busy wait
-
 		endless_loop();
 		return 0;
 	}
@@ -53,7 +52,9 @@ int main(int argc, char *argv[])
 	{
 		int aux = test_mm(argc - 1, argv + 1);
 		puts("Test done.");
-		if (aux < 0)
+		if (aux == -2)
+			puts("\nTest reported incorrect parameters. This test expects one parameter: max_memory");
+		else if (aux < 0)
 			puts("\nTest reported an error.");
 		return aux;
 	}
@@ -61,7 +62,9 @@ int main(int argc, char *argv[])
 	{
 		int aux = test_sync(argc - 1, argv + 1);
 		puts("Test done.");
-		if (aux < 0)
+		if (aux == -2)
+			puts("\nTest reported incorrect parameters. This test expects two parameters: inc, use_sem");
+		else if (aux < 0)
 			puts("\nTest reported an error.");
 		return aux;
 	}
@@ -75,7 +78,9 @@ int main(int argc, char *argv[])
 	{
 		int aux = test_processes(argc - 1, argv + 1);
 		puts("Test done.");
-		if (aux < 0)
+		if (aux == -2)
+			puts("\nTest reported incorrect parameters. This test expects one parameter: max_processes");
+		else if (aux < 0)
 			puts("\nTest reported an error.");
 		return aux;
 	}

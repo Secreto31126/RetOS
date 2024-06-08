@@ -2,8 +2,8 @@
 #include "syscall.h"
 #include "test_util.h"
 
-#define MINOR_WAIT "100000000" // TODO: Change this value to prevent a process from flooding the screen
-#define WAIT 10                // TODO: Change this value to make the wait long enough to see these processes beeing run at least twice
+#define MINOR_WAIT "100000" // TODO: Change this value to prevent a process from flooding the screen
+#define WAIT 1000           // TODO: Change this value to make the wait long enough to see these processes beeing run at least twice
 
 #define TOTAL_PROCESSES 3
 #define LOWEST 19  // TODO: Change as required
@@ -17,7 +17,8 @@ void test_prio(uint64_t argc, char *argv[])
   // MODIFIED TO PREVENT TAKING TOO MUCH TIME AWAY FROM SHELL
 
   // MODIFIED TO RECEIVE WAIT TIMES VIA ARGV, OR USE DEFAULTS IF NOT PRESENT
-  uint64_t long_wait = WAIT, short_wait = MINOR_WAIT, aux = 0;
+  uint64_t long_wait = WAIT, aux = 0;
+  char *short_wait = MINOR_WAIT;
   if (argc >= 1 && (aux = satoi(argv[0])) > 0)
   {
     puts("\nUSING LONG WAIT FROM PARAMS\n");

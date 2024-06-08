@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 	{
 		children[MAX_PHYLOS] = pid;
 	}
-
+	sem_post(data->mutex);
 	char buffer[15] = {0};
 	while (1)
 	{

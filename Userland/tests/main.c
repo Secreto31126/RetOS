@@ -7,7 +7,7 @@
 
 extern char bss;
 extern char endOfBinary;
-#define MIN_WAIT 1000000
+#define MIN_WAIT 10000
 
 #define puts(str) write(1, (str), strlen(str))
 

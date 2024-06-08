@@ -31,13 +31,13 @@ void take_forks(unsigned int i)
     set_state(i, HUNGRY);
     if (i % 2)
     {
-        sem_wait(data->phylos[i].sem);
+        sem_wait(data->phylos[LEFT(i, data->phylo_count)].sem);
         sem_wait(data->phylos[RIGHT(i, data->phylo_count)].sem);
     }
     else
     {
         sem_wait(data->phylos[RIGHT(i, data->phylo_count)].sem);
-        sem_wait(data->phylos[i].sem);
+        sem_wait(data->phylos[LEFT(i, data->phylo_count)].sem);
     }
 
     set_state(i, EATING);
@@ -48,6 +48,6 @@ void put_forks(unsigned int i)
 
     set_state(i, THINKING);
 
-    sem_post(data->phylos[i].sem);
+    sem_post(data->phylos[LEFT(i, data->phylo_count)].sem);
     sem_post(data->phylos[RIGHT(i, data->phylo_count)].sem);
 }

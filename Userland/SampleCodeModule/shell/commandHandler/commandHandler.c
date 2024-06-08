@@ -408,6 +408,8 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, routeModes ro
     {
         // I am the child process
 
+        setpriority(PRIO_PROCESS, getpid(), 5);
+
         // close the read end of the pipe
         close(pipeFd[READ_END]);
         // redirect stdout to the write end of the pipe

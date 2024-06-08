@@ -62,7 +62,18 @@
                 "kind": "test",
                 "isDefault": true
             },
-            "isBackground": true
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(qemu-system-x86_64)",
+                    "line": 1,
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^(qemu-system-x86_64)",
+                    "endsPattern": "^(qemu-system-x86_64)"
+                }
+            }
         }
     ]
 }

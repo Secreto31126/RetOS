@@ -521,7 +521,7 @@ moduleData killer(moduleData commandFd, displayStyles *displayStyle)
 {
 
     moduleData toRet = {"Signal sent.", -1, -1, -1};
-    if (!signalAll(commandFd, SIGKILL))
+    if (signalAll(commandFd, SIGKILL))
         toRet.s = "No valid arguments read.";
 
     return toRet;
@@ -530,7 +530,7 @@ moduleData killer(moduleData commandFd, displayStyles *displayStyle)
 moduleData blocker(moduleData commandFd, displayStyles *displayStyle)
 {
     moduleData toRet = {"Blocked.", -1, -1, -1};
-    if (!signalAll(commandFd, SIGSTOP))
+    if (signalAll(commandFd, SIGSTOP))
         toRet.s = "No valid arguments read.";
 
     return toRet;
@@ -540,7 +540,7 @@ moduleData unblocker(moduleData commandFd, displayStyles *displayStyle)
 {
 
     moduleData toRet = {"Unblocked.", -1, -1, -1};
-    if (!signalAll(commandFd, SIGCONT))
+    if (signalAll(commandFd, SIGCONT))
         toRet.s = "No valid arguments read.";
 
     return toRet;

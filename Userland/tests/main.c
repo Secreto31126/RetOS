@@ -44,8 +44,7 @@ int main(int argc, char *argv[])
 	if (!strcmp(test, "testmm"))
 	{
 		// these args should probably be hardcoded, I haven't fully read the tests yet
-		char *argv[] = {"100000"};
-		int aux = test_mm(1, argv);
+		int aux = test_mm(argc - 1, argv + 1);
 		puts("Test done.");
 		if (aux < 0)
 			puts("\nTest reported an error.");

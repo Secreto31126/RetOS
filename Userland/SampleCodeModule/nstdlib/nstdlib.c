@@ -590,11 +590,15 @@ char *shiftToWord(char *s)
         s++;
     return s;
 }
+char *shiftToWhitespace(char *s)
+{
+    while (*s != ' ' && *s)
+        s++;
+    return s;
+}
 char *shiftToNextWord(char *s)
 {
-    while (*s != ' ' && *s != 0)
-        s++;
-    return shiftToWord(s);
+    return shiftToWord(shiftToWhitespace(s));
 }
 
 int readNFromFd(int fd, char *buffer, int n)
@@ -620,7 +624,9 @@ void separateString(char *s, char **buffer, int bufferSize)
     while (*s && i < bufferSize - 1)
     {
         buffer[i++] = s;
-        s = shiftToNextWord(s);
+        char *aux = shiftToWhitespace(s);
+        s = shiftToWord(aux);
+        *aux = 0;
         if (*s)
             *(s - 1) = 0;
     }

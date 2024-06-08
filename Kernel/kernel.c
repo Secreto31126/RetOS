@@ -1,9 +1,14 @@
 #include <stdint.h>
+#include <stdin.h>
+#include <stdout.h>
+#include <stderr.h>
+#include <stdkey.h>
 #include <lib.h>
 #include <interruptions.h>
 #include <modules.h>
 #include <console.h>
 #include <localization.h>
+#include <semaphores.h>
 #include <memory.h>
 #include <proc.h>
 #include <mman.h>
@@ -79,6 +84,13 @@ void *initializeKernelBinary()
 	ncPrintHex((uint64_t)&bss);
 
 	ncPrint("\n[Done]\n\n");
+
+	ncPrint("[Initializing main files]");
+	init_stdin();
+	init_stdout();
+	init_stderr();
+	init_stdkey();
+	ncPrint(" [Done]\n");
 
 	ncPrint("Setting OS's language to ES_AR");
 	set_language(ES_AR);

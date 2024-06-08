@@ -16,11 +16,6 @@ ssize_t write(int fd, const void *buffer, size_t count)
         return 0;
     }
 
-    while (file_full(file))
-    {
-        write_block(file);
-    }
-
     if (0 <= file && file < 4)
     {
         return writters[fd]((unsigned char *)buffer, count);

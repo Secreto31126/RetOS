@@ -16,11 +16,6 @@ ssize_t read(int fd, void *buffer, size_t count)
         return 0;
     }
 
-    while (file_empty(file))
-    {
-        read_block(file);
-    }
-
     if (0 <= file && file < 4)
     {
         return readers[fd]((unsigned char *)buffer, count);

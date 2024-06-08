@@ -3,7 +3,14 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <semaphores.h>
 
+/**
+ * @brief Set up stdout
+ *
+ * @return int 0 on success, -1 on failure
+ */
+int init_stdout();
 /**
  * @brief Read from stdout
  *

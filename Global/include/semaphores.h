@@ -1,9 +1,9 @@
 #ifndef GSEM_H
 #define GSEM_H
 
-typedef struct sem_t
+typedef struct
 {
-    char name[255];
+    char name[32];
     unsigned int value;
 } sem_t;
 
@@ -53,5 +53,32 @@ extern int sem_post(sem_t *sem);
  * @return 0 on success, -1 on error
  */
 extern int sem_wait(sem_t *sem);
+
+/**
+ * @brief Retrieves the value of the semaphore
+ *
+ * @param sem The semaphore to get the value from
+ * @param sval The direction to store the value
+ * @return int 0 on success, -1 on error
+ */
+extern int sem_getvalue(sem_t *sem, int *sval);
+
+/**
+ * @brief Initializes an anonymous semaphore
+ *
+ * @param sem Where to store the semaphore
+ * @param pshared Wether or not the semaphore is shared between processes
+ * @param value The initial value of the semaphore
+ * @return int 0 on success, -1 on error
+ */
+extern int sem_init(sem_t *sem, int pshared, unsigned int value);
+
+/**
+ * @brief Destroys the semaphore
+ *
+ * @param sem The semaphore to destroy
+ * @return int 0 on success, -1 on error
+ */
+extern int sem_destroy(sem_t *sem);
 
 #endif

@@ -25,11 +25,13 @@ int kill(pid_t pid, int sig)
 
     case SIGCONT:
         p->block_condition = no_condition;
+        Process **head = p->block_list;
+        *head = loop_blocked_and_unblock(*head);
         p->condition_data[0] = NULL;
         return 0;
 
     case SIGSTOP:
-        add_blocked(p, whim_condition, NULL, NULL, NULL, NULL, NULL);
+        add_tick_blocked(p, whim_condition, NULL, NULL, NULL, NULL, NULL);
         return 0;
 
     default:

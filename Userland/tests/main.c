@@ -4,10 +4,11 @@
 #include <sys.h>
 #include "tests.h"
 #include "test_util.h"
+#include "syscall.h"
 
 extern char bss;
 extern char endOfBinary;
-#define MIN_WAIT 10000
+#define MIN_WAIT 10
 
 #define puts(str) write(1, (str), strlen(str))
 
@@ -32,16 +33,18 @@ int main(int argc, char *argv[])
 	}
 	if (!strcmp(test, "endless_loop_print"))
 	{
-		// 1000000 sounds about right idk the only way this function is used is via a single execv with argc 0
+		my_nice(my_getpid(), 19); // Since I'm not too eager to give extra cpu time to a process stuck in a busy wait
 		uint64_t aux = 0;
 		if (argc <= 1 || (aux = satoi(argv[1]) <= MIN_WAIT))
-			endless_loop_print(1000000);
+			endless_loop_print(MIN_WAIT);
 		endless_loop_print(aux);
 
 		return 0;
 	}
 	if (!strcmp(test, "endless_loop"))
 	{
+		my_nice(my_getpid(), 19); // Since I'm not too eager to give extra cpu time to a process stuck in a busy wait
+
 		endless_loop();
 		return 0;
 	}

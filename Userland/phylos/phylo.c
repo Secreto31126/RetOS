@@ -14,6 +14,11 @@ void phylosopher(unsigned int i)
     }
 }
 
+void updatePrinter()
+{
+    puts("."); // Tell printer that state has changed. Printer will lift mutex once done
+}
+
 void set_state(int i, int state)
 {
     sem_wait(data->mutex);
@@ -36,11 +41,6 @@ void take_forks(unsigned int i)
     }
 
     set_state(i, EATING);
-}
-
-void updatePrinter()
-{
-    puts("."); // Tell printer that state has changed. Printer will lift mutex once done
 }
 
 void put_forks(unsigned int i)

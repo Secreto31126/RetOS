@@ -1,4 +1,4 @@
-#include "semaphores.h"
+#include "semaphore.h"
 
 size_t open_sems = 0;
 Semaphore semaphores[MAX_SEMS] = {};
@@ -8,7 +8,7 @@ int usable(const sem_t *sem);
 
 sem_t *sem_open(const char *name, unsigned int value)
 {
-    if (!name || !strlen(name))
+    if (!name || !*name)
     {
         return NULL;
     }

@@ -48,7 +48,7 @@ int64_t my_create_process(char *name, uint64_t argc, char *argv[])
 
 int64_t my_nice(uint64_t pid, uint64_t newPrio)
 {
-  return setpriority(PRIO_PROCESS, pid, newPrio);
+  return setpriority(PRIO_PROC, pid, newPrio);
 }
 
 int64_t my_kill(uint64_t pid)

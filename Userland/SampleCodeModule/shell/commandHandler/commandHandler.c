@@ -408,7 +408,7 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, routeModes ro
     {
         // I am the child process
 
-        setpriority(PRIO_PROCESS, getpid(), 5);
+        setpriority(PRIO_PROC, getpid(), 5);
 
         // close the read end of the pipe
         close(pipeFd[READ_END]);
@@ -504,7 +504,7 @@ int signalAll(moduleData commandFd, int signal)
         i = 1;
     }
 
-    for (int i; args[i] != NULL; i++)
+    for (; args[i] != NULL; i++)
     {
         int aux = atoi(args[i]);
         if (aux)
@@ -561,7 +561,7 @@ moduleData doNice(moduleData commandFd, displayStyles *displayStyle)
         moduleData toRet = {"Not enough arguments provided.", -1, -1, -1};
         return toRet;
     }
-    if (setpriority(PRIO_PROCESS, atoi(args[0]), atoi(args[1])))
+    if (setpriority(PRIO_PROC, atoi(args[0]), atoi(args[1])))
     {
 
         moduleData toRet = {"Could not set priority.", -1, -1, -1};

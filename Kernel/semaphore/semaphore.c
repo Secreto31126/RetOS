@@ -3,8 +3,11 @@
 size_t open_sems = 0;
 Semaphore semaphores[MAX_SEMS] = {};
 
-int exists(const char *name, int *i);
-int usable(const sem_t *sem);
+static int exists(const char *name, int *i);
+static int usable(const sem_t *sem);
+static int block(const sem_t *sem);
+static int unblock(const sem_t *sem);
+static unsigned int fkutex(sem_t *sem);
 
 sem_t *sem_open(const char *name, unsigned int value)
 {
@@ -31,7 +34,7 @@ sem_t *sem_open(const char *name, unsigned int value)
         return NULL;
     }
 
-    strncpy(new_sem->name, name, sizeof(semaphores[id].sem->name));
+    strncpy(new_sem->name, name, sizeof(new_sem->name));
     new_sem->value = value;
 
     semaphores[id].sem = new_sem;
@@ -50,15 +53,12 @@ int sem_close(sem_t *sem)
 
     for (size_t i = 0; i < MAX_SEMS; i++)
     {
-        if (semaphores[i].sem != NULL)
+        if (semaphores[i].sem == sem)
         {
-            if (semaphores[i].sem == sem)
-            {
-                free(semaphores[i].sem);
-                semaphores[i].sem = NULL;
-                open_sems--;
-                return 0;
-            }
+            free(semaphores[i].sem);
+            semaphores[i].sem = NULL;
+            open_sems--;
+            return 0;
         }
     }
 
@@ -67,7 +67,7 @@ int sem_close(sem_t *sem)
 
 int sem_unlink(const char *name)
 {
-    if (!name || !strlen(name))
+    if (!name || !*name)
     {
         return -1;
     }
@@ -82,6 +82,7 @@ int sem_unlink(const char *name)
             semaphores[i].sem = NULL;
             open_sems--;
         }
+
         return 0;
     }
 
@@ -95,15 +96,15 @@ int sem_post(sem_t *sem)
         return -1;
     }
 
-    unsigned int value;
-    do
+    unsigned int value = fkutex(sem);
+    if (value + 1 < INVALID_SEM)
     {
-        // Loop trying to set the spinlock
-        value = exchange(&sem->value, SPINLOCK);
-    } while (SPINLOCK_LOCKED(value));
+        if (unblock(sem))
+        {
+            exchange(&sem->value, value);
+            return -1;
+        }
 
-    if (value + 1 < SPINLOCK)
-    {
         exchange(&sem->value, ++value);
         return 0;
     }
@@ -113,8 +114,6 @@ int sem_post(sem_t *sem)
 
 int sem_wait(sem_t *sem)
 {
-    size_t i = 0;
-
     if (!usable(sem))
     {
         return -1;
@@ -122,17 +121,16 @@ int sem_wait(sem_t *sem)
 
     unsigned int value;
 SPINLOCK_CHECK:
-    do
-    {
-        // Loop trying to set the spinlock
-        value = exchange(&sem->value, SPINLOCK);
-    } while (SPINLOCK_LOCKED(value));
-
+    value = fkutex(sem);
     if (!value)
     {
         // Set the spinlock to free
         exchange(&sem->value, value);
-        sem_block(sem);
+        if (block(sem))
+        {
+            return -1;
+        }
+        sched_yield();
         goto SPINLOCK_CHECK;
     }
 
@@ -141,14 +139,93 @@ SPINLOCK_CHECK:
     return 0;
 }
 
-int exists(const char *name, int *i)
+int sem_getvalue(sem_t *sem, int *sval)
+{
+    if (!sem || !usable(sem))
+    {
+        return -1;
+    }
+
+    unsigned int value = fkutex(sem);
+    *sval = value & ~SPINLOCK;
+    exchange(&sem->value, value);
+
+    return 0;
+}
+
+int sem_init(sem_t *sem, int pshared, unsigned int value)
+{
+    if (!sem)
+    {
+        return -1;
+    }
+
+    if (pshared)
+    {
+        if (open_sems == MAX_SEMS)
+        {
+            return -1;
+        }
+
+        int id = 0;
+        if (exists(NULL, &id))
+        {
+            // Weird, shouldn't happen
+            return -1;
+        }
+
+        semaphores[id].sem = sem;
+        semaphores[id].usages = 1;
+        open_sems++;
+    }
+
+    sem->name[0] = '\0';
+    sem->value = value & ~SPINLOCK;
+    return 0;
+}
+
+int sem_destroy(sem_t *sem)
+{
+    if (!usable(sem))
+    {
+        return -1;
+    }
+
+    fkutex(sem);
+    for (size_t i = 0; i < MAX_SEMS; i++)
+    {
+        if (semaphores[i].sem == sem)
+        {
+            semaphores[i].sem = NULL;
+            open_sems--;
+            break;
+        }
+    }
+
+    exchange(&sem->value, INVALID_SEM);
+    return 0;
+}
+
+static int exists(const char *name, int *i)
 {
     int free = -1;
     for (size_t j = 0; j < MAX_SEMS; j++)
     {
-        if (semaphores[j].sem != NULL)
+        // If we aren't serching by name, return the first free slot
+        if (!name)
         {
-            if (strncmp(semaphores[j].sem->name, name, strlen(name)) == 0)
+            if (semaphores[j].sem)
+            {
+                continue;
+            }
+
+            free = j;
+            break;
+        }
+
+        if (semaphores[j].sem)
+        {
+            if (*semaphores[j].sem->name && strncmp(semaphores[j].sem->name, name, sizeof(semaphores[j].sem->name)) == 0)
             {
                 *i = j;
                 return 1;
@@ -164,15 +241,111 @@ int exists(const char *name, int *i)
     return 0;
 }
 
-int usable(const sem_t *sem)
+static int usable(const sem_t *sem)
 {
+    return sem && sem->value != INVALID_SEM;
+}
+
+static bool block_condition()
+{
+    return false;
+}
+
+static int block(const sem_t *sem)
+{
+    Process *p = get_current_process();
+    if (p->state != PROCESS_RUNNING)
+    {
+        return -1;
+    }
+
+    Semaphore *s = NULL;
     for (size_t i = 0; i < MAX_SEMS; i++)
     {
         if (semaphores[i].sem == sem)
         {
-            return 1;
+            s = semaphores + i;
+            break;
         }
     }
 
+    if (!s)
+    {
+        return -1;
+    }
+
+    Process *blocked = s->blocked;
+    if (!blocked)
+    {
+        s->blocked = p;
+    }
+    else
+    {
+        while (blocked->next_blocked)
+        {
+            blocked = blocked->next_blocked;
+        }
+
+        blocked->next_blocked = p;
+    }
+
+    p->state = PROCESS_BLOCKED;
+    p->next_blocked = NULL;
+    p->block_condition = block_condition;
+    p->condition_data[0] = &s->blocked;
+
     return 0;
+}
+
+static bool unblock_condition(pid_t pid)
+{
+    return true;
+}
+
+static int unblock(const sem_t *sem)
+{
+    if (!sem)
+    {
+        return -1;
+    }
+
+    Semaphore *s = NULL;
+    for (size_t i = 0; i < MAX_SEMS; i++)
+    {
+        if (semaphores[i].sem == sem)
+        {
+            s = semaphores + i;
+            break;
+        }
+    }
+
+    if (!s)
+    {
+        return -1;
+    }
+
+    Process *p = s->blocked;
+    if (!p)
+    {
+        return 0;
+    }
+
+    p->block_condition = unblock_condition;
+    s->blocked = p->next_blocked;
+    p->next_blocked = NULL;
+    loop_blocked_and_unblock(p);
+
+    return 0;
+}
+
+static unsigned int fkutex(sem_t *sem)
+{
+    unsigned int value;
+    do
+    {
+        // Loop trying to set the spinlock
+        value = exchange(&sem->value, SPINLOCK);
+    } while (SPINLOCK_LOCKED(value));
+
+    return value;
 }

@@ -36,9 +36,11 @@ void *create_process_idle()
         .next_brother = NULL,
         .exit_code = 0,
         .priority = 19,
+        .block_list = NULL,
         .next_blocked = NULL,
         .block_condition = no_condition,
         .condition_data = {},
+        .zombie_sem = NULL,
         .files = {0, 1, 2, 3},
     };
 
@@ -126,6 +128,16 @@ FIND_PID:
         return -1;
     }
 
+    void *zombie_sem = malloc(sizeof(sem_t));
+
+    if (!zombie_sem)
+    {
+        free(new_stack);
+        return -1;
+    }
+
+    sem_init(zombie_sem, 1, 0);
+
     // Set the new process' basic properties
     processes[new_pid].pid = new_pid;
     processes[new_pid].ppid = parent->pid;
@@ -141,10 +153,12 @@ FIND_PID:
     parent->next_child = get_process(new_pid);
     processes[new_pid].exit_code = 0;
     processes[new_pid].priority = parent->priority;
+    processes[new_pid].block_list = NULL;
     processes[new_pid].next_blocked = NULL;
     processes[new_pid].block_condition = no_condition;
     // Not worth looping, there's no biggie if it's trash
     // processes[new_pid].condition_data = {};
+    processes[new_pid].zombie_sem = zombie_sem;
     for (size_t i = 0; i < MAX_PROCESS_FILES; i++)
     {
         if (IS_PIPE(parent->files[i]))
@@ -212,6 +226,16 @@ int kill_process(pid_t pid)
             STACK_END(man_im_dead->stack, man_im_dead->stack_size) - man_im_dead->running_stack_size,
             man_im_dead->running_stack_size);
     }
+
+    if (man_im_dead->state == PROCESS_BLOCKED)
+    {
+        man_im_dead->block_condition = no_condition;
+        Process **head = man_im_dead->block_list;
+        *head = loop_blocked_and_unblock(*head);
+    }
+
+    sem_post(get_process(man_im_dead->ppid)->zombie_sem);
+    sem_destroy(man_im_dead->zombie_sem);
 
     for (size_t i = 0; i < MAX_PROCESS_FILES; i++)
     {
@@ -438,7 +462,7 @@ int ps()
     size_t expected;
 #define pipe_write(x)                                       \
     written = write(pipesfd[1], (x), expected = strlen(x)); \
-    if (written < expected)                                 \
+    if (written < 0 || (size_t)written < expected)          \
         goto exit;
 
     pipe_write("PID\tPPID\tSTATE\tPRIO\t\tSTACK\tCOMMAND\n");

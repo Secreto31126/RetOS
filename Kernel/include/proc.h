@@ -137,6 +137,10 @@ typedef struct Process
      */
     signed char priority;
     /**
+     * @brief The list head that holds the process blocked
+     */
+    struct Process **block_list;
+    /**
      * @brief Points to the next blocked process
      *
      * @note The list head is always stored in the idle process (pid 0)
@@ -150,6 +154,10 @@ typedef struct Process
      * @brief Any data required by the condition
      */
     void *condition_data[5];
+    /**
+     * @brief The children's death semaphore
+     */
+    sem_t *zombie_sem;
     /**
      * @brief Process open file descriptors
      */
@@ -214,24 +222,12 @@ int open_file(int file, int flags);
  * @return int 0 if the file was closed, -1 otherwise
  */
 int close_file(int file);
-
 /**
- * @brief Add a read block to the current process
+ * @brief Iterate over a blocked process list and unblock the ones that satisfy the condition
  *
- * @param file The file descriptor to read wait for
+ * @param p The head of the blocked process list
+ * @return Process* The new head of the blocked process list
  */
-void read_block(int file);
-/**
- * @brief Add a write block to the current process
- *
- * @param file The file descriptor to write wait for
- */
-void write_block(int file);
-/**
- * @brief Add a semaphore block to the current process
- *
- * @param sem The semaphore to wait for
- */
-void sem_block(sem_t *sem);
+Process *loop_blocked_and_unblock(Process *p);
 
 #endif

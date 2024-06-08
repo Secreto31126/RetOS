@@ -14,7 +14,7 @@ int children[MAX_PHYLOS + 1];
 
 int main(int argc, char *argv[])
 {
-	setSeed((unsigned int)"Phylos"); // This is questionable, but we aren't cryptographers
+	setSeed(get_tick()); // This is questionable, but we aren't cryptographers
 
 	puts("Initializing phylos\n");
 	int pipeFd[2]; // For allowing phylos to write to printer

@@ -654,6 +654,6 @@ void initializeCommands()
     addCommand("phylos", "Help display for the phylos module.\nFormat: 'phylos'\nUse -l flag to enable dynamic logging.\nStarts the phylos module with 5 phylosophers, click a to add a phylosopher, r to remove one and q to quit.", phylos);
     addCommand("ps", "Help display for the ps module.\nFormat: 'ps'\nDisplays data about current running processes.", getPs);
     addCommand("nice", "Help display for the nice module.\nFormat: 'nice [process id] [new priority]'\nSets the priority of the process. Priority can range between -20 and 19, any values not in this range will be clamped to the range.\nNote: A lower priority correlates to greater time in execution.", doNice);
-    addCommand("tests", "Help display for the tests module.\n This is a placeholder module.", tests);
     addCommand("mem", "Help display for the mem module.\nFormat: 'mem'\nOutputs a report on the memory state.", getMem);
+    addCommand("tests", "Help display for the tests module.\nFormat: 'tests [test name] [test parameters]' \nThis module accepts the following tests:\ntestmm [max_memory]\ntestsync [inc] [use_sem]\ntestprocesses [max_processes]\ntestprio\ntestprio [long_wait]\ntestprio [long_wait] [short_wait]", tests);
 }

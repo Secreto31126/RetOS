@@ -17,12 +17,6 @@ int main(int argc, char *argv[])
 	setSeed(get_tick()); // This is questionable, but we aren't cryptographers
 
 	puts("Initializing phylos\n");
-	int pipeFd[2]; // For allowing phylos to write to printer
-	if (pipe(pipeFd))
-	{
-		puts("Failed to create pipe\n");
-		return 1;
-	}
 	data = malloc(sizeof(Data));
 	if (data == NULL)
 	{
@@ -31,7 +25,9 @@ int main(int argc, char *argv[])
 	}
 	sem_unlink("mutex");
 	data->mutex = sem_open("mutex", 0);
-	if (data->mutex == NULL)
+	sem_unlink("printex");
+	data->printex = sem_open("printex", 0);
+	if (data->mutex == NULL || data->printex == NULL)
 	{
 		puts("Failed to open semaphore\n");
 		free(data);
@@ -56,12 +52,6 @@ int main(int argc, char *argv[])
 		}
 		else if (pid == 0)
 		{
-			close(pipeFd[READ_END]);
-			if (dup2(pipeFd[WRITE_END], STD_OUT) < 0)
-			{
-				puts("Failed to dup2\n");
-				return 1;
-			}
 			sem_unlink(strandnum("sem_", i));
 			data->phylos[i].sem = sem_open(strandnum("sem_", i), 1);
 			if (data->phylos[i].sem == NULL)
@@ -87,18 +77,11 @@ int main(int argc, char *argv[])
 	}
 	else if (pid == 0)
 	{
-		close(pipeFd[WRITE_END]);
-		if (dup2(pipeFd[READ_END], STD_IN) < 0)
-		{
-			puts("Failed to dup2\n");
-			return 1;
-		}
 		print_state();
 		return 0;
 	}
 	else
 	{
-		close(pipeFd[READ_END]);
 		children[MAX_PHYLOS] = pid;
 	}
 
@@ -123,11 +106,6 @@ int main(int argc, char *argv[])
 				}
 				else if (pid == 0)
 				{
-					if (dup2(pipeFd[WRITE_END], STD_OUT) < 0)
-					{
-						puts("Failed to dup2\n");
-						return 1;
-					}
 					data->phylos[num].state = THINKING;
 					sem_unlink(strandnum("sem_", num));
 					data->phylos[num].sem = sem_open(strandnum("sem_", num), 1);
@@ -181,7 +159,6 @@ int main(int argc, char *argv[])
 
 		sem_post(data->mutex);
 	}
-	close(pipeFd[WRITE_END]);
 	leave(data->phylo_count);
 	return 0;
 }
@@ -197,6 +174,7 @@ void leave(int count)
 	kill(children[MAX_PHYLOS], SIGKILL);
 	waitpid(children[MAX_PHYLOS], NULL, 0);
 	sem_close(data->mutex);
+	sem_close(data->printex);
 	free(data);
 	puts("byee!\n");
 }

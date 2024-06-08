@@ -16,7 +16,7 @@ void phylosopher(unsigned int i)
 
 void updatePrinter()
 {
-    puts("."); // Tell printer that state has changed. Printer will lift mutex once done
+    sem_post(data->printex); // Tell printer that state has changed. Printer will lift mutex once done
 }
 
 void set_state(int i, int state)

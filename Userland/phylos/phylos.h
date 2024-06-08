@@ -24,6 +24,7 @@ typedef struct
 typedef struct
 {
     sem_t *mutex;
+    sem_t *printex;
     phylo_t phylos[MAX_PHYLOS];
     unsigned int phylo_count;
 } Data;

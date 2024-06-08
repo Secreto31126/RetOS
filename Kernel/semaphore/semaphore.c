@@ -130,7 +130,6 @@ SPINLOCK_CHECK:
         {
             return -1;
         }
-        sched_yield();
         goto SPINLOCK_CHECK;
     }
 
@@ -246,7 +245,7 @@ static int usable(const sem_t *sem)
     return sem && sem->value != INVALID_SEM;
 }
 
-static bool block_condition()
+static bool semaphore_signal()
 {
     return false;
 }
@@ -291,13 +290,15 @@ static int block(const sem_t *sem)
 
     p->state = PROCESS_BLOCKED;
     p->next_blocked = NULL;
-    p->block_condition = block_condition;
-    p->condition_data[0] = &s->blocked;
+    p->block_condition = semaphore_signal;
+    p->block_list = &s->blocked;
+    p->condition_data[0] = 0;
+    sched_yield();
 
-    return 0;
+    return (uintptr_t)p->condition_data[0];
 }
 
-static bool unblock_condition(pid_t pid)
+static bool semaphore_unlocked(pid_t pid)
 {
     return true;
 }
@@ -330,7 +331,8 @@ static int unblock(const sem_t *sem)
         return 0;
     }
 
-    p->block_condition = unblock_condition;
+    p->block_condition = semaphore_unlocked;
+    // p = s.blocked.pop()
     s->blocked = p->next_blocked;
     p->next_blocked = NULL;
     loop_blocked_and_unblock(p);

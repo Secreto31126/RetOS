@@ -8,6 +8,7 @@
             "type": "gdb",
             "request": "attach",
             "name": "Attach to QEMU",
+            "preLaunchTask": "Launch in debug mode",
             "target": ":1234",
             "pathSubstitutions": {
                 "/root": "${workspaceRoot}"

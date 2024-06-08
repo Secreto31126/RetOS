@@ -34,5 +34,4 @@ void print_state();
 void phylosopher(unsigned int i);
 void take_forks(unsigned int i);
 void put_forks(unsigned int i);
-void test(unsigned int i);
 void leave(int count);

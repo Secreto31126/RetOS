@@ -5,7 +5,7 @@
 #include "syscall.h"
 #include <sched.h>
 
-#define MAX_ARGS 255
+#define MAX_ARGS 32
 
 int64_t my_getpid()
 {
@@ -48,13 +48,12 @@ int64_t my_create_process(char *name, uint64_t argc, char *argv[])
 
 int64_t my_nice(uint64_t pid, uint64_t newPrio)
 {
-  return setpriority(PRIO_PROCESS, pid, newPrio);
+  return setpriority(PRIO_PROC, pid, newPrio);
 }
 
-// Added wait, since on being killed, processes can become zombies
 int64_t my_kill(uint64_t pid)
 {
-  return kill(pid, SIGKILL) || waitpid(pid, NULL, 0);
+  return kill(pid, SIGKILL);
 }
 
 int64_t my_block(uint64_t pid)

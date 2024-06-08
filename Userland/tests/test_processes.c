@@ -1,5 +1,6 @@
 #include "syscall.h"
 #include "test_util.h"
+#define MAX_PROCS 32
 
 enum State
 {
@@ -23,12 +24,19 @@ int64_t test_processes(uint64_t argc, char *argv[])
   char *argvAux[] = {0};
 
   if (argc != 1)
-    return -1;
-
+    return -2;
   if ((max_processes = satoi(argv[0])) <= 0)
-    return -1;
+    return -2;
 
-  p_rq p_rqs[max_processes];
+  // MODIFIED TO AVOID INVALID PARAMETERS
+  if (max_processes > MAX_PROCS)
+  {
+    puts("REDUCED NUMBER OF PROCESSES REQUESTED TO 32");
+    max_processes = MAX_PROCS;
+  }
+  // END OF MODIFICATION
+
+  p_rq p_rqs[MAX_PROCS];
 
   while (1)
   {
@@ -68,6 +76,7 @@ int64_t test_processes(uint64_t argc, char *argv[])
               puts("test_processes: ERROR killing process\n");
               return -1;
             }
+            my_wait(p_rqs[rq].pid); // MODIFIED ADDED A WAIT TO PREVENT ACCUMULATING ZOMBIE PROCESSES
             p_rqs[rq].state = KILLED;
             alive--;
           }

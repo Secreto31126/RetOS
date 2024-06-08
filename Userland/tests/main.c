@@ -4,9 +4,11 @@
 #include <sys.h>
 #include "tests.h"
 #include "test_util.h"
+#include "syscall.h"
 
 extern char bss;
 extern char endOfBinary;
+#define MIN_WAIT 10
 
 #define puts(str) write(1, (str), strlen(str))
 
@@ -31,47 +33,54 @@ int main(int argc, char *argv[])
 	}
 	if (!strcmp(test, "endless_loop_print"))
 	{
-		// 1000000 sounds about right idk the only way this function is used is via a single execv with argc 0
-		endless_loop_print(1000000);
+		my_nice(my_getpid(), 19); // Since I'm not too eager to give extra cpu time to a process stuck in a busy wait
+		uint64_t aux = 0;
+		if (argc <= 1 || (aux = satoi(argv[1]) <= MIN_WAIT))
+			endless_loop_print(MIN_WAIT);
+		endless_loop_print(aux);
+
 		return 0;
 	}
 	if (!strcmp(test, "endless_loop"))
 	{
+		my_nice(my_getpid(), 19); // Since I'm not too eager to give extra cpu time to a process stuck in a busy wait
 		endless_loop();
 		return 0;
 	}
 
 	if (!strcmp(test, "testmm"))
 	{
-		// these args should probably be hardcoded, I haven't fully read the tests yet
-		char *argv[] = {"100000"};
-		int aux = test_mm(1, argv);
+		int aux = test_mm(argc - 1, argv + 1);
 		puts("Test done.");
-		if (aux < 0)
+		if (aux == -2)
+			puts("\nTest reported incorrect parameters. This test expects one parameter: max_memory");
+		else if (aux < 0)
 			puts("\nTest reported an error.");
 		return aux;
 	}
 	if (!strcmp(test, "testsync"))
 	{
-		// these args should probably be hardcoded, I haven't fully read the tests yet
 		int aux = test_sync(argc - 1, argv + 1);
 		puts("Test done.");
-		if (aux < 0)
+		if (aux == -2)
+			puts("\nTest reported incorrect parameters. This test expects two parameters: inc, use_sem");
+		else if (aux < 0)
 			puts("\nTest reported an error.");
 		return aux;
 	}
 	if (!strcmp(test, "testprio"))
 	{
-		test_prio();
+		test_prio(argc - 1, argv + 1);
 		puts("Test done.");
 		return 0;
 	}
 	if (!strcmp(test, "testprocesses"))
 	{
-		// these args should probably be hardcoded, I haven't fully read the tests yet
 		int aux = test_processes(argc - 1, argv + 1);
 		puts("Test done.");
-		if (aux < 0)
+		if (aux == -2)
+			puts("\nTest reported incorrect parameters. This test expects one parameter: max_processes");
+		else if (aux < 0)
 			puts("\nTest reported an error.");
 		return aux;
 	}

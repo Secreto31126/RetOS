@@ -3,6 +3,7 @@
     "files.associations": {
         "test_util.h": "c",
         "memory.h": "c",
-        "resource.h": "c"
-    }
+        "resource.h": "c",
+        "my_lib.h": "c"
+    },
 }

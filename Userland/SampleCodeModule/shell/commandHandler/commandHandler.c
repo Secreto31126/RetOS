@@ -13,7 +13,7 @@
 #define MAX_LETTER_SIZE 4
 #define READ_BLOCK 500      // Any command parameters that exceed this will be ignored. Just don't write commands exceeding 500 letters in terminal/don't feed longer than BLOCK letter input to shell built-ins
 #define MAX_READ_BLOCK 7999 // as much as can fit in a pipe at once
-#define MAX_ARGS 255        // for execv
+#define MAX_ARGS 32         // for execv
 
 typedef enum routeModes
 {
@@ -408,6 +408,8 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, routeModes ro
     {
         // I am the child process
 
+        setpriority(PRIO_PROC, getpid(), 5);
+
         // close the read end of the pipe
         close(pipeFd[READ_END]);
         // redirect stdout to the write end of the pipe
@@ -475,31 +477,74 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, routeModes ro
     return aux;
 }
 
-moduleData killer(moduleData commandFd, displayStyles *displayStyle)
+int signalAll(moduleData commandFd, int signal)
 {
     char savedSpace[READ_BLOCK];
-    char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
-
     char *args[MAX_ARGS];
+    char *commandParameters = getReadableString(commandFd, savedSpace, READ_BLOCK);
     separateString(commandParameters, args, MAX_ARGS);
 
     if (args[0] == NULL)
     {
-        moduleData toRet = {"No valid arguments read.", -1, -1, -1};
-        return toRet;
+        return 1;
     }
 
-    for (int i = 0; args[i] != NULL; i++)
+    int i = 0;
+    // functionality for kill KILL, kill BLOCK, kill UNBLOCK
+    if (!strcmp("KILL", args[0]))
+        i = 1;
+    else if (!strcmp("BLOCK", args[0]))
+    {
+        signal = SIGSTOP;
+        i = 1;
+    }
+    else if (!strcmp("UNBLOCK", args[0]))
+    {
+        signal = SIGCONT;
+        i = 1;
+    }
+
+    for (; args[i] != NULL; i++)
     {
         int aux = atoi(args[i]);
         if (aux)
         {
-            kill(aux, SIGKILL);
-            waitpid(aux, NULL, 0);
+            kill(aux, signal);
+            if (signal == SIGKILL)
+            {
+                waitpid(aux, NULL, 0);
+            }
         }
     }
+    return 0;
+}
 
-    moduleData toRet = {"Killed.", -1, -1, -1};
+moduleData killer(moduleData commandFd, displayStyles *displayStyle)
+{
+
+    moduleData toRet = {"Signal sent.", -1, -1, -1};
+    if (signalAll(commandFd, SIGKILL))
+        toRet.s = "No valid arguments read.";
+
+    return toRet;
+}
+
+moduleData blocker(moduleData commandFd, displayStyles *displayStyle)
+{
+    moduleData toRet = {"Blocked.", -1, -1, -1};
+    if (signalAll(commandFd, SIGSTOP))
+        toRet.s = "No valid arguments read.";
+
+    return toRet;
+}
+
+moduleData unblocker(moduleData commandFd, displayStyles *displayStyle)
+{
+
+    moduleData toRet = {"Unblocked.", -1, -1, -1};
+    if (signalAll(commandFd, SIGCONT))
+        toRet.s = "No valid arguments read.";
+
     return toRet;
 }
 
@@ -510,12 +555,13 @@ moduleData doNice(moduleData commandFd, displayStyles *displayStyle)
 
     char *args[3];
     separateString(commandParameters, args, 3);
+
     if (args[0] == NULL || args[1] == NULL)
     {
         moduleData toRet = {"Not enough arguments provided.", -1, -1, -1};
         return toRet;
     }
-    if (setpriority(PRIO_PROCESS, atoi(args[0]), atoi(args[1])))
+    if (setpriority(PRIO_PROC, atoi(args[0]), atoi(args[1])))
     {
 
         moduleData toRet = {"Could not set priority.", -1, -1, -1};
@@ -602,10 +648,12 @@ void initializeCommands()
     addCommand("loop", "Help display for the loop module.\nFormats: 'loop | loop [interval]'\nPrints its process id and a greeting on a set interval.", loop);
     addCommand("grep", "Help display for the grep module.\nFormat: 'grep [match]'\nOutputs all lines from content of fd that match [match].", grep);
     addCommand("less", "Help display for the less module.\nFormat: 'less'\nOutputs content from fd upon user input.", less);
-    addCommand("kill", "Help display for the kill module.\nFormat: 'kill [process id list]'\nKills every process given.", killer);
+    addCommand("kill", "Help display for the kill module.\nFormat(s): 'kill [process id list] | kill [KILL | BLOCK | UNBLOCK] [process id list]'\nSends a signal to every process given, kill by default.", killer);
+    addCommand("block", "Help display for the block module.\nFormat: 'block [process id list]'\nBlocks every process given.", blocker);
+    addCommand("unblock", "Help display for the unblock module.\nFormat: 'unblock [process id list]'\nUnblocks every process given.", unblocker);
     addCommand("phylos", "Help display for the phylos module.\nFormat: 'phylos'\nUse -l flag to enable dynamic logging.\nStarts the phylos module with 5 phylosophers, click a to add a phylosopher, r to remove one and q to quit.", phylos);
     addCommand("ps", "Help display for the ps module.\nFormat: 'ps'\nDisplays data about current running processes.", getPs);
     addCommand("nice", "Help display for the nice module.\nFormat: 'nice [process id] [new priority]'\nSets the priority of the process. Priority can range between -20 and 19, any values not in this range will be clamped to the range.\nNote: A lower priority correlates to greater time in execution.", doNice);
-    addCommand("tests", "Help display for the tests module.\n This is a placeholder module.", tests);
     addCommand("mem", "Help display for the mem module.\nFormat: 'mem'\nOutputs a report on the memory state.", getMem);
+    addCommand("tests", "Help display for the tests module.\nFormat: 'tests [test name] [test parameters]' \nThis module accepts the following tests:\ntestmm [max_memory]\ntestsync [inc] [use_sem]\ntestprocesses [max_processes]\ntestprio\ntestprio [long_wait]\ntestprio [long_wait] [short_wait]", tests);
 }

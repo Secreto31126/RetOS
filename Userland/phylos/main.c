@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
 		puts("Failed to allocate memory\n");
 		return 1;
 	}
+	sem_unlink("mutex");
 	data->mutex = sem_open("mutex", 0);
 	if (data->mutex == NULL)
 	{

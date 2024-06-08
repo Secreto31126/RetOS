@@ -18,9 +18,10 @@ typedef struct
     sem_t *sem;
 } phylo_t;
 
-typedef struct
+typedef struct Data
 {
     sem_t *mutex;
+    sem_t *childex;
     phylo_t phylos[MAX_PHYLOS];
     unsigned int phylo_count;
 } Data;

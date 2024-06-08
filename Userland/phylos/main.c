@@ -11,6 +11,52 @@ Data *data = NULL;
 
 int children[MAX_PHYLOS + 1];
 
+int add_phylo()
+{
+	unsigned int num = data->phylo_count;
+
+	sem_wait(data->phylos[num - 1].sem); // only add a philosopher when no one is using the right-most fork
+	puts("Here");
+
+	sem_unlink(strandnum("sem_", num));
+	data->phylos[num].sem = sem_open(strandnum("sem_", num), 0);
+	if (data->phylos[num].sem == NULL)
+	{
+		puts("Failed to open semaphore\n");
+		return 1;
+	}
+
+	data->phylos[num].state = THINKING;
+
+	int pid = fork();
+
+	if (pid < 0)
+	{
+		// fork failed
+
+		puts("Failed to fork");
+		sem_unlink(strandnum("sem_", num));
+		return 1;
+	}
+
+	if (!pid)
+	{
+		// child process
+
+		sem_wait(data->childex); // wait until father has made room for you
+		phylosopher(num);
+		exit(0); // shouldn't get here
+	}
+	// parent process
+
+	children[num] = pid;
+	data->phylo_count++;
+	sem_post(data->phylos[num - 1].sem); // return the fork
+	puts("Here");
+	sem_post(data->childex); // tell child it is ready to philosophyze
+	return 0;
+}
+
 int main(int argc, char *argv[])
 {
 	puts("Initializing phylos\n");
@@ -20,9 +66,11 @@ int main(int argc, char *argv[])
 		puts("Failed to allocate memory\n");
 		return 1;
 	}
-	sem_unlink("mutex"); // mutex para controlar el acceso a los estados de los filósofos
+	sem_unlink("mutex");   // mutex para controlar el acceso a los estados de los filósofos
+	sem_unlink("childex"); // mutex para controlar el acceso a los estados de los filósofos
 	data->mutex = sem_open("mutex", 1);
-	if (data->mutex == NULL)
+	data->childex = sem_open("childex", 0);
+	if (data->mutex == NULL || data->childex == NULL)
 	{
 		puts("Failed to open semaphore\n");
 		free(data);
@@ -84,7 +132,6 @@ int main(int argc, char *argv[])
 	while (1)
 	{
 		read(STD_IN, buffer, 1);
-		sem_wait(data->mutex);
 		switch (buffer[0])
 		{
 		case 'a':
@@ -92,31 +139,7 @@ int main(int argc, char *argv[])
 			puts("adding\n");
 			if (data->phylo_count < MAX_PHYLOS)
 			{
-				pid = fork();
-				unsigned int num = data->phylo_count;
-				if (pid < 0)
-				{
-					puts("Failed to fork");
-				}
-				else if (pid == 0)
-				{
-					data->phylos[num].state = THINKING;
-					sem_unlink(strandnum("sem_", num));
-					data->phylos[num].sem = sem_open(strandnum("sem_", num), 0);
-					if (data->phylos[num].sem == NULL)
-					{
-						puts("Failed to open semaphore\n");
-						leave(num + 1);
-						break;
-					}
-					phylosopher(num);
-					return 0;
-				}
-				else
-				{
-					children[num] = pid;
-					data->phylo_count = data->phylo_count + 1;
-				}
+				add_phylo();
 			}
 			else
 			{
@@ -150,8 +173,6 @@ int main(int argc, char *argv[])
 		default:
 			break;
 		}
-
-		sem_post(data->mutex);
 	}
 
 	return 0;

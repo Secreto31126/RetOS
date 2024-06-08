@@ -14,14 +14,14 @@ int children[MAX_PHYLOS + 1];
 int main(int argc, char *argv[])
 {
 	puts("Initializing phylos\n");
-	data = malloc(sizeof(Data));
+	data = malloc(sizeof(Data)); // cumple la función de pseudo shm
 	if (data == NULL)
 	{
 		puts("Failed to allocate memory\n");
 		return 1;
 	}
-	sem_unlink("mutex");
-	data->mutex = sem_open("mutex", 0);
+	sem_unlink("mutex"); // mutex para controlar el acceso a los estados de los filósofos
+	data->mutex = sem_open("mutex", 1);
 	if (data->mutex == NULL)
 	{
 		puts("Failed to open semaphore\n");
@@ -33,6 +33,14 @@ int main(int argc, char *argv[])
 	for (unsigned int i = 0; i < MAX_PHYLOS; i++)
 	{
 		data->phylos[i].state = THINKING;
+		sem_unlink(strandnum("sem_", i));
+		data->phylos[i].sem = sem_open(strandnum("sem_", i), 1);
+		if (data->phylos[i].sem == NULL)
+		{
+			puts("Failed to open semaphore\n");
+			leave(i + 1);
+			return 1;
+		}
 	}
 
 	int pid;
@@ -47,14 +55,6 @@ int main(int argc, char *argv[])
 		}
 		else if (pid == 0)
 		{
-			sem_unlink(strandnum("sem_", i));
-			data->phylos[i].sem = sem_open(strandnum("sem_", i), 1);
-			if (data->phylos[i].sem == NULL)
-			{
-				puts("Failed to open semaphore\n");
-				leave(i + 1);
-				return 1;
-			}
 			phylosopher(i);
 			return 0;
 		}
@@ -80,7 +80,6 @@ int main(int argc, char *argv[])
 		children[MAX_PHYLOS] = pid;
 	}
 
-	sem_post(data->mutex);
 	char buffer[15] = {0};
 	while (1)
 	{

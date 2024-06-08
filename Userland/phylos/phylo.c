@@ -15,13 +15,13 @@ void take_forks(unsigned int i)
 {
     if (i % 2)
     {
-        sem_wait(data->phylos[i].sem);
+        sem_wait(data->phylos[LEFT(i, data->phylo_count)].sem);
         sem_wait(data->phylos[RIGHT(i, data->phylo_count)].sem);
     }
     else
     {
         sem_wait(data->phylos[RIGHT(i, data->phylo_count)].sem);
-        sem_wait(data->phylos[i].sem);
+        sem_wait(data->phylos[LEFT(i, data->phylo_count)].sem);
     }
 
     sem_wait(data->mutex);
@@ -35,6 +35,6 @@ void put_forks(unsigned int i)
     data->phylos[i].state = THINKING;
     sem_post(data->mutex);
 
-    sem_post(data->phylos[i].sem);
+    sem_post(data->phylos[LEFT(i, data->phylo_count)].sem);
     sem_post(data->phylos[RIGHT(i, data->phylo_count)].sem);
 }

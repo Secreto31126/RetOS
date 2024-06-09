@@ -161,7 +161,7 @@ FIND_PID:
     processes[new_pid].zombie_sem = zombie_sem;
     for (size_t i = 0; i < MAX_PROCESS_FILES; i++)
     {
-        if (IS_PIPE(parent->files[i]))
+        if (parent->files[i] != -1 && IS_PIPE(parent->files[i]))
         {
             add_pipe_end(parent->files[i]);
         }

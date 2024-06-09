@@ -81,7 +81,7 @@ pid_t waitpid(pid_t pid, int *wstatus, int options)
         return -1;
     }
 
-    if (sem_wait(p->zombie_sem))
+    if (sem_wait(&p->zombie_sem))
     {
         return -1;
     }
@@ -178,7 +178,11 @@ int pselect(int nfds, const int *fds, int *ready)
     sched_yield();
 
     int ready_count = (uintptr_t)p->condition_data[0];
-    memcpy(ready, ready_ptr, ready_count * sizeof(int));
+
+    if (ready_count > 0)
+    {
+        memcpy(ready, ready_ptr, ready_count * sizeof(int));
+    }
 
     free(copy_fds);
     free(ready_ptr);

@@ -19,8 +19,8 @@ typedef struct Pipe
     void *data;
     void *read;
     void *write;
-    sem_t *read_sem;
-    sem_t *write_sem;
+    sem_t read_sem;
+    sem_t write_sem;
 } Pipe;
 
 #endif

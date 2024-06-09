@@ -40,7 +40,7 @@ void *create_process_idle()
         .next_blocked = NULL,
         .block_condition = no_condition,
         .condition_data = {},
-        .zombie_sem = NULL,
+        .zombie_sem = {},
         .files = {0, 1, 2, 3},
     };
 
@@ -128,15 +128,11 @@ FIND_PID:
         return -1;
     }
 
-    void *zombie_sem = malloc(sizeof(sem_t));
-
-    if (!zombie_sem)
+    if (sem_init(&processes[new_pid].zombie_sem, 1, 0))
     {
         free(new_stack);
         return -1;
     }
-
-    sem_init(zombie_sem, 1, 0);
 
     // Set the new process' basic properties
     processes[new_pid].pid = new_pid;
@@ -158,7 +154,6 @@ FIND_PID:
     processes[new_pid].block_condition = no_condition;
     // Not worth looping, there's no biggie if it's trash
     // processes[new_pid].condition_data = {};
-    processes[new_pid].zombie_sem = zombie_sem;
     for (size_t i = 0; i < MAX_PROCESS_FILES; i++)
     {
         if (parent->files[i] != -1 && IS_PIPE(parent->files[i]))
@@ -234,8 +229,8 @@ int kill_process(pid_t pid)
         *head = loop_blocked_and_unblock(*head);
     }
 
-    sem_post(get_process(man_im_dead->ppid)->zombie_sem);
-    sem_destroy(man_im_dead->zombie_sem);
+    sem_post(&get_process(man_im_dead->ppid)->zombie_sem);
+    sem_destroy(&man_im_dead->zombie_sem);
 
     for (size_t i = 0; i < MAX_PROCESS_FILES; i++)
     {

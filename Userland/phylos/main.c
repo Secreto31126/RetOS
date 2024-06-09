@@ -114,6 +114,53 @@ int make_mutexes()
 	return 0;
 }
 
+int main_loop()
+{
+	char c;
+	read(STD_IN, &c, 1);
+	switch (c)
+	{
+	case 'a':
+	case 'A':
+	{
+		if (data->phylo_count < MAX_PHYLOS)
+		{
+			puts("Adding\n");
+			add_philo(1);
+			sem_post(data->childex); // wake up the philo
+			break;
+		}
+		puts("Limit reached\n");
+		break;
+	}
+	case 'r':
+	case 'R':
+	{
+		puts("Removing\n");
+		sem_close(data->phylos[data->phylo_count].sem);
+		kill(children[data->phylo_count], SIGKILL);
+		waitpid(children[data->phylo_count], NULL, 0);
+		(data->phylo_count)--;
+		if (data->phylo_count < 0)
+		{
+			puts("No more phylos\n");
+			return 1;
+		}
+
+		break;
+	}
+	case 'q':
+	case 'Q':
+	{
+		puts("Quitting\n");
+		return 1;
+	}
+	default:
+		break;
+	}
+	return 0;
+}
+
 int main(int argc, char *argv[])
 {
 	puts("Initializing phylos\n");
@@ -155,55 +202,8 @@ int main(int argc, char *argv[])
 		return 1;
 
 	char buffer[15] = {0};
-	while (1)
-	{
-		read(STD_IN, buffer, 1);
-		switch (buffer[0])
-		{
-		case 'a':
-		case 'A':
-		{
-			puts("adding\n");
-			if (data->phylo_count < MAX_PHYLOS)
-			{
-				add_philo(1);
-				sem_post(data->childex); // wake up the philo
-			}
-			else
-			{
-				puts("Limit reached\n");
-			}
-
-			break;
-		}
-		case 'r':
-		case 'R':
-		{
-			puts("removing\n");
-			sem_close(data->phylos[data->phylo_count].sem);
-			kill(children[data->phylo_count], SIGKILL);
-			waitpid(children[data->phylo_count], NULL, 0);
-			(data->phylo_count)--;
-			if (data->phylo_count < 0)
-			{
-				puts("No more phylos\n");
-				leave();
-				return 0;
-			}
-
-			break;
-		}
-		case 'q':
-		case 'Q':
-		{
-			puts("quitting\n");
-			leave();
-			return 0;
-		}
-		default:
-			break;
-		}
-	}
+	while (!main_loop())
+		;
 	leave();
 	return 0;
 }

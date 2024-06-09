@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 	{
 		if (add_philo(0))
 		{
-			leave(i);
+			leave();
 			return 1;
 		}
 	}
@@ -180,14 +180,14 @@ int main(int argc, char *argv[])
 		case 'R':
 		{
 			puts("removing\n");
-			(data->phylo_count)--;
 			sem_close(data->phylos[data->phylo_count].sem);
 			kill(children[data->phylo_count], SIGKILL);
 			waitpid(children[data->phylo_count], NULL, 0);
-			if (data->phylo_count <= 0)
+			(data->phylo_count)--;
+			if (data->phylo_count < 0)
 			{
 				puts("No more phylos\n");
-				leave(0);
+				leave();
 				return 0;
 			}
 
@@ -197,20 +197,20 @@ int main(int argc, char *argv[])
 		case 'Q':
 		{
 			puts("quitting\n");
-			leave(data->phylo_count);
+			leave();
 			return 0;
 		}
 		default:
 			break;
 		}
 	}
-	leave(data->phylo_count);
+	leave();
 	return 0;
 }
 
-void leave(int count)
+void leave()
 {
-	for (unsigned int i = 0; i < count; i++)
+	for (unsigned int i = 0; i < data->phylo_count; i++)
 	{
 		sem_close(data->phylos[i].sem);
 		kill(children[i], SIGKILL);

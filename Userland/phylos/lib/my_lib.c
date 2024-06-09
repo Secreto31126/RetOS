@@ -3,10 +3,9 @@
 #include <stdlib.h>
 #include <sys.h>
 
-char *strandnum(const char *str, unsigned int num)
+// This function lets you create a new (consistent) name for a sem without appending a number to the original string, which would require a buffer or memory allocation
+void rot_n(char *s, unsigned int num)
 {
-    char *buffer = malloc(strlen(str) + 3);
-    strcpy(buffer, str);
-    utoa(num, buffer + strlen(str), 10);
-    return buffer;
+    while (*s)
+        *(s++) += num;
 }

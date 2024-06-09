@@ -41,16 +41,6 @@ void addCommand(char *commandCode, char *help, action_t commandAction)
     commandCount++;
 }
 
-void moveToBackground(moduleData *data)
-{
-    // background processes have their input duped to '/dev/null'
-    if (data->writeFd >= 0)
-    {
-        close(data->writeFd);
-        data->writeFd = -1;
-    }
-}
-
 moduleData execute(moduleData command, char *params, displayStyles *displayStyle)
 {
     for (int i = 0; i < commandCount; i++)
@@ -63,7 +53,6 @@ moduleData execute(moduleData command, char *params, displayStyles *displayStyle
             {
                 params[index] = 0;
                 moduleData toRet = commands[i].action(command, displayStyle);
-                moveToBackground(&toRet);
                 *displayStyle = AS_BACKGROUND;
                 return toRet;
             }

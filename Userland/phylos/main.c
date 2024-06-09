@@ -33,8 +33,10 @@ int make_printer()
 int make_sem(int i)
 {
 	data->phylos[i].state = THINKING;
-	sem_unlink(strandnum("sem_", i));
-	data->phylos[i].sem = sem_open(strandnum("sem_", i), 1);
+	char sem_name[] = "sem_";
+	rot_n(sem_name, i);
+	sem_unlink(sem_name);
+	data->phylos[i].sem = sem_open(sem_name, 1);
 	if (data->phylos[i].sem == NULL)
 	{
 		puts("Failed to open semaphore\n");
@@ -100,6 +102,8 @@ int remove_phylo()
 	int i = data->phylo_count;
 
 	sem_wait(data->mutex); // acquire mutex
+	data->adding = i - 2;  // notify last philo that will remain that you will remove its neighbour
+	sem_wait(data->addex); // wait for philo that must be notified to be in right state
 	data->adding = i - 1;  // notify phylo that will be removed so it gives back its right fork
 	sem_wait(data->addex);
 
@@ -109,7 +113,7 @@ int remove_phylo()
 	(data->phylo_count)--;
 
 	data->adding = -1;
-	sem_post(data->mutex); // Interestingly, the process that was blocked on this is dead, I still need to lift it up though
+	sem_post(data->mutex); // One of the processes blocked on this is dead, so I only need to post it once
 
 	return 0;
 }
@@ -182,9 +186,15 @@ int main(int argc, char *argv[])
 	puts("Creating pseudo-shm\n");
 
 	data = malloc(sizeof(Data)); // cumple la función de pseudo shm
-	data->printex = malloc(sizeof(sem_t *) * 2);
-	if (data == NULL || data->printex == NULL)
+	if (data == NULL)
 	{
+		puts("Failed to allocate memory\n");
+		return 1;
+	}
+	data->printex = malloc(sizeof(sem_t *) * 2);
+	if (data->printex == NULL)
+	{
+		free(data);
 		puts("Failed to allocate memory\n");
 		return 1;
 	}

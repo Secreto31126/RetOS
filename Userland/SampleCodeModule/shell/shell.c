@@ -19,6 +19,7 @@ void addStringToBuffer(const char *s, char ask);
 void addCharToBuffer(char c);
 int handleReadFd(moduleData data, displayStyles displayStyle);
 void killModule(commandData cData, char *message);
+void readUntilClose(commandData cData, displayStyles displayStyle);
 
 // String constants
 static const char *lineStart = ":~ ";
@@ -70,11 +71,45 @@ void removeFromActive(int index)
         activeReads[index] = activeReads[index + 1];
 }
 
+int getPidIndex(int pid)
+{
+    for (int i = 1; i < activeReadsCount; i++)
+    {
+        int count = activeReads[i].cPidCount;
+        int *cPids = activeReads[i].cPid;
+        for (int j = 0; j < count; j++)
+        {
+            if (cPids[j] == pid)
+                return i;
+        }
+    }
+    return -1;
+}
+
+void bringToFg(int pid)
+{
+    int index;
+    if (activeReadsCount <= 1)
+        return;
+    if (pid < 0)
+        index = 1;
+    else
+        index = getPidIndex(pid);
+    if (index < 1)
+        return;
+    commandData toBring = activeReads[index];
+    removeFromActive(index);
+    readUntilClose(toBring, APPEND);
+}
+
 char readAsInput(char c)
 {
-    if (c == '\n' && !strcmp(commandBuffer, "exit"))
+    if (c == '\n')
     {
-        return 1;
+        if (!strcmp(commandBuffer, "exit"))
+            return 1;
+        if (isPrefix("fg", commandBuffer))
+            return 2;
     }
     if (c == '\b')
     {
@@ -163,7 +198,8 @@ char shellLoop()
                 exit(1);
                 return 1;
             }
-            if (readAsInput(c))
+            aux = readAsInput(c);
+            if (aux == 1) // exit
             {
                 blank();
                 free(commandBuffer);
@@ -171,8 +207,16 @@ char shellLoop()
                 freePrints();
                 return 1;
             }
+            if (aux == 2) // bring to fg
+            {
+                bringToFg(atoi(shiftToNextWord(commandBuffer)));
+                addCharToBuffer('\n');
+                addStringToBuffer(lineStart, 0);
+                commandIndex = 0;
+                fromLastEnter = 0;
+            }
             // Handle all user input before printing bg processes (makes terminal more reseponsive)
-            break;
+            return 0;
         }
         else
         {
@@ -290,9 +334,14 @@ int handleStdKeys(moduleData data, displayStyles displayStyle)
 
     char ctrlC[] = {LCTRL, 0x2E, 0};
     char ctrlD[] = {LCTRL, 0x20, 0};
+    char ctrlZ[] = {LCTRL, 0x2C, 0};
     if (strstr(r_buffer, ctrlC) != NULL)
     {
         return 2;
+    }
+    if (strstr(r_buffer, ctrlZ) != NULL)
+    {
+        return 3;
     }
     if (strstr(r_buffer, ctrlD) != NULL && data.writeFd >= 0)
     {
@@ -357,7 +406,7 @@ void killModule(commandData cData, char *message)
             kill(cData.cPid[i], SIGKILL);
             waitpid(cData.cPid[i], NULL, 0);
         }
-
+    free(cData.cPid);
     addStringToBuffer(message, 0);
 
     // just in case
@@ -416,6 +465,12 @@ void readUntilClose(commandData cData, displayStyles displayStyle)
                     killModule(cData, "");
                     return;
                 }
+                if (aux == 3)
+                { // user wants it moved to bg
+                    addStringToBuffer("Moved to background", 0);
+                    addToActive(cData);
+                    return;
+                }
             }
             // a key that produces input has been pressed
             else if (STD_IN == currentFd)
@@ -442,12 +497,19 @@ void readUntilClose(commandData cData, displayStyles displayStyle)
     {
         waitpid(data.cPid, NULL, 0);
     }
+    free(cData.cPid);
 }
 
 char *passCommand(char *toPass)
 {
     displayStyles displayStyle = 0;
-    int cPidBuffer[MAX_PIPES];
+    int *cPidBuffer = malloc(sizeof(int) * MAX_PIPES);
+    if (cPidBuffer == NULL)
+    {
+        addStringToBuffer("\nCould not allocate memory for command\n", 0);
+        addStringToBuffer(lineStart, 0);
+        return "";
+    }
     commandData cData = handleCommand(toPass, &displayStyle, cPidBuffer);
     moduleData mData = cData.data;
 

@@ -1,6 +1,7 @@
 #include "syscall.h"
 #include "test_util.h"
-#define MAX_PROCS 32
+#define MAX_PROCS 32 // This isn't the OS's max process capacity
+// However, managing more than this amount of processes in this test will almost certainly affect performance enough to make reading its results next to impossible
 
 enum State
 {

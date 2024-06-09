@@ -45,7 +45,6 @@ int make_sem(int i)
 
 int make_philo(int i)
 {
-
 	int pid = fork();
 	if (pid < 0)
 	{
@@ -64,26 +63,25 @@ int make_philo(int i)
 	return 0;
 }
 
-int add_philo()
+int add_philo(int use_addex)
 {
 	int i = data->phylo_count;
 
-	if (i)
+	if (i && use_addex)
 	{
 		sem_wait(data->mutex); // acquire mutex
+
 		data->adding = i - 1;  // notify last philo you will add a new one
 		sem_wait(data->addex); // wait for philo that must be notified to be in right state
 	}
-
 	data->phylos[i].state = THINKING; // All philos start in THINKING state
 	if (make_sem(i) || make_philo(i))
 	{
-		if (i)
+		if (i && use_addex)
 		{
 			data->adding = -1;
 			sem_post(data->mutex);
 		}
-		sem_post(data->childex);
 		return 1;
 	}
 
@@ -109,7 +107,7 @@ int make_mutexes()
 	data->mutex = sem_open("mutex", 1);
 	data->childex = sem_open("childex", 0);
 	data->addex = sem_open("addex", 0);
-	data->printex[0] = sem_open("printex0", 0);
+	data->printex[0] = sem_open("printex0", 1);
 	data->printex[1] = sem_open("printex1", 0);
 
 	if (data->mutex == NULL || data->childex == NULL || data->addex == NULL || data->printex[0] == NULL || data->printex[1] == NULL)
@@ -124,7 +122,8 @@ int main(int argc, char *argv[])
 	setSeed(get_tick()); // This is questionable, but we aren't cryptographers
 
 	data = malloc(sizeof(Data)); // cumple la función de pseudo shm
-	if (data == NULL)
+	data->printex = malloc(sizeof(sem_t *) * 2);
+	if (data == NULL || data->printex == NULL)
 	{
 		puts("Failed to allocate memory\n");
 		return 1;
@@ -141,13 +140,16 @@ int main(int argc, char *argv[])
 
 	for (unsigned int i = 0; i < INITIAL_PHYLOS; i++)
 	{
-		if (add_philo())
+		if (add_philo(0))
 		{
 			leave(i);
 			return 1;
 		}
 	}
-
+	for (unsigned int i = 0; i < INITIAL_PHYLOS; i++)
+	{
+		sem_post(data->childex); // wake up the philos all at once
+	}
 	if (make_printer())
 		return 1;
 
@@ -163,7 +165,8 @@ int main(int argc, char *argv[])
 			puts("adding\n");
 			if (data->phylo_count < MAX_PHYLOS)
 			{
-				add_philo();
+				add_philo(1);
+				sem_post(data->childex); // wake up the philo
 			}
 			else
 			{
@@ -216,6 +219,7 @@ void leave(int count)
 	waitpid(children[MAX_PHYLOS], NULL, 0);
 	sem_close(data->mutex);
 	sem_close(data->printex);
+	free(data->printex);
 	free(data);
 	puts("byee!\n");
 }

@@ -6,6 +6,7 @@
 #include "lib/my_lib.h"
 
 #define MAX_PHYLOS 15
+#define INITIAL_PHYLOS 5
 #define LEFT(i, p) i
 #define RIGHT(i, p) (i + 1) % p
 #define THINKING 0

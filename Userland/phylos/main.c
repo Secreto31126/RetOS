@@ -11,49 +11,98 @@ Data *data = NULL;
 
 int children[MAX_PHYLOS + 1];
 
-int add_phylo()
+int make_printer()
 {
-	unsigned int num = data->phylo_count;
+	int pid = fork();
+	if (pid < 0)
+	{
+		puts("Failed to fork");
+		return 1;
+	}
+	else if (pid == 0)
+	{
+		// child process
+		print_state();
+		exit(1);
+	}
+	children[MAX_PHYLOS] = pid;
+	return 0;
+}
 
-	sem_wait(data->phylos[num - 1].sem); // only add a philosopher when no one is using the right-most fork
-	puts("Here");
-
-	sem_unlink(strandnum("sem_", num));
-	data->phylos[num].sem = sem_open(strandnum("sem_", num), 0);
-	if (data->phylos[num].sem == NULL)
+int make_sem(int i)
+{
+	data->phylos[i].state = THINKING;
+	sem_unlink(strandnum("sem_", i));
+	data->phylos[i].sem = sem_open(strandnum("sem_", i), 1);
+	if (data->phylos[i].sem == NULL)
 	{
 		puts("Failed to open semaphore\n");
 		return 1;
 	}
+	return 0;
+}
 
-	data->phylos[num].state = THINKING;
+void hold_forks(int i)
+{
+	if (i <= 0)
+		return;
+
+	sem_wait(data->phylos[0].sem); // take the leftmost fork
+
+	if (i > 1)
+		sem_wait(data->phylos[i - 1].sem); // if the rightmost fork isn't also the leftmost fork, take it as well
+}
+
+void return_forks(int i)
+{
+	if (i <= 0)
+		return;
+
+	sem_post(data->phylos[0].sem); // return the leftmost fork
+
+	if (i > 1)
+		sem_post(data->phylos[i - 1].sem); // if the rightmost fork isn't also the leftmost fork, return it as well
+}
+
+int make_philo(int i)
+{
 
 	int pid = fork();
-
 	if (pid < 0)
 	{
-		// fork failed
-
 		puts("Failed to fork");
-		sem_unlink(strandnum("sem_", num));
+		return 1;
+	}
+	else if (!pid)
+	{
+		// child process
+		sem_wait(data->childex);
+		phylosopher(i);
+		exit(1);
+	}
+	// parent process
+	children[i] = pid;
+	return 0;
+}
+
+int add_philo()
+{
+	int i = data->phylo_count;
+
+	hold_forks(i);
+
+	data->phylos[i].state = THINKING; // All philos start in THINKING state
+	if (make_sem(i) || make_philo(i))
+	{
+		return_forks(i);
+		sem_post(data->childex);
 		return 1;
 	}
 
-	if (!pid)
-	{
-		// child process
+	(data->phylo_count)++;
+	return_forks(i);
+	sem_post(data->childex);
 
-		sem_wait(data->childex); // wait until father has made room for you
-		phylosopher(num);
-		exit(0); // shouldn't get here
-	}
-	// parent process
-
-	children[num] = pid;
-	data->phylo_count++;
-	sem_post(data->phylos[num - 1].sem); // return the fork
-	puts("Here");
-	sem_post(data->childex); // tell child it is ready to philosophyze
 	return 0;
 }
 
@@ -66,6 +115,7 @@ int main(int argc, char *argv[])
 		puts("Failed to allocate memory\n");
 		return 1;
 	}
+
 	sem_unlink("mutex");   // mutex para controlar el acceso a los estados de los filósofos
 	sem_unlink("childex"); // mutex para controlar el acceso a los estados de los filósofos
 	data->mutex = sem_open("mutex", 1);
@@ -76,17 +126,14 @@ int main(int argc, char *argv[])
 		free(data);
 		return 1;
 	}
-	data->phylo_count = 5;
 
-	for (unsigned int i = 0; i < MAX_PHYLOS; i++)
+	data->phylo_count = 0;
+
+	for (unsigned int i = 0; i < INITIAL_PHYLOS; i++)
 	{
-		data->phylos[i].state = THINKING;
-		sem_unlink(strandnum("sem_", i));
-		data->phylos[i].sem = sem_open(strandnum("sem_", i), 1);
-		if (data->phylos[i].sem == NULL)
+		if (add_philo())
 		{
-			puts("Failed to open semaphore\n");
-			leave(i + 1);
+			leave(i);
 			return 1;
 		}
 	}
@@ -112,21 +159,8 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	pid = fork();
-	if (pid < 0)
-	{
-		puts("Failed to fork");
+	if (make_printer())
 		return 1;
-	}
-	else if (pid == 0)
-	{
-		print_state();
-		return 0;
-	}
-	else
-	{
-		children[MAX_PHYLOS] = pid;
-	}
 
 	char buffer[15] = {0};
 	while (1)
@@ -135,11 +169,12 @@ int main(int argc, char *argv[])
 		switch (buffer[0])
 		{
 		case 'a':
+		case 'A':
 		{
 			puts("adding\n");
 			if (data->phylo_count < MAX_PHYLOS)
 			{
-				add_phylo();
+				add_philo();
 			}
 			else
 			{
@@ -149,6 +184,7 @@ int main(int argc, char *argv[])
 			break;
 		}
 		case 'r':
+		case 'R':
 		{
 			puts("removing\n");
 			data->phylo_count = data->phylo_count - 1;
@@ -165,6 +201,7 @@ int main(int argc, char *argv[])
 			break;
 		}
 		case 'q':
+		case 'Q':
 		{
 			puts("quitting\n");
 			leave(data->phylo_count);

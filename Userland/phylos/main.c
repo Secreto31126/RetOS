@@ -100,8 +100,6 @@ int remove_phylo()
 	int i = data->phylo_count;
 
 	sem_wait(data->mutex); // acquire mutex
-	data->adding = i - 2;  // notify last philo that will remain that you will remove its neighbour
-	sem_wait(data->addex); // wait for philo that must be notified to be in right state
 	data->adding = i - 1;  // notify phylo that will be removed so it gives back its right fork
 	sem_wait(data->addex);
 
@@ -111,7 +109,7 @@ int remove_phylo()
 	(data->phylo_count)--;
 
 	data->adding = -1;
-	sem_post(data->mutex); // I only need to do it once, the other process that was blocked on this is dead
+	sem_post(data->mutex); // Interestingly, the process that was blocked on this is dead, I still need to lift it up though
 
 	return 0;
 }
@@ -158,7 +156,7 @@ int main_loop()
 	case 'r':
 	case 'R':
 	{
-		if (data->phylo_count <= 1)
+		if (data->phylo_count <= 2)
 		{
 			puts("Can't have less than 2 phylos\n");
 			break;

@@ -28,7 +28,8 @@
                 "add-symbol-file /tmp/retos/0007-grep.elf 0x00625000",
                 "add-symbol-file /tmp/retos/0008-sing.elf 0x00630000",
                 "add-symbol-file /tmp/retos/0009-less.elf 0x00635000",
-                "add-symbol-file /tmp/retos/000a-phylos.elf 0x00640000"
+                "add-symbol-file /tmp/retos/000a-phylos.elf 0x00640000",
+                "add-symbol-file /tmp/retos/000b-tests.elf 0x00645000"
             ],
             "stopAtConnect": true
         }

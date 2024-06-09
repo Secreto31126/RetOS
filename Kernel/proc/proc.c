@@ -293,6 +293,31 @@ int kill_process(pid_t pid)
         p = p->next_brother;
     }
 
+    size_t count = active_processes_count;
+    for (size_t i = 0; i < MAX_PROCESS_FILES && count && (free_stack || free_running_stack); i++)
+    {
+        Process *p = get_process(i);
+
+        if (p->pid != man_im_dead->pid)
+        {
+            if (p->running_stack == man_im_dead->running_stack)
+            {
+                free_running_stack = false;
+            }
+
+            if (!stack_inherited && p->running_stack == man_im_dead->stack)
+            {
+                free_stack = false;
+                stack_inherited = inherit_parents_house(p);
+            }
+        }
+
+        if (p->running_stack)
+        {
+            count--;
+        }
+    }
+
     if (!free_stack && !stack_inherited)
     {
         ncPrint("Probably a memory leak just happened\n");
@@ -309,26 +334,7 @@ int kill_process(pid_t pid)
 
     if (free_running_stack)
     {
-        size_t count = active_processes_count;
-        for (size_t i = 0; i < MAX_PROCESS_FILES && count; i++)
-        {
-            Process *p = get_process(i);
-
-            if (p->pid != man_im_dead->pid && p->running_stack == man_im_dead->running_stack)
-            {
-                break;
-            }
-
-            if (p->running_stack)
-            {
-                count--;
-            }
-        }
-
-        if (!count)
-        {
-            free(man_im_dead->running_stack);
-        }
+        free(man_im_dead->running_stack);
     }
 
     sem_post(&man_im_dead->exit_sem);

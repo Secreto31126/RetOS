@@ -150,6 +150,7 @@ int main(int argc, char *argv[])
 	{
 		sem_post(data->childex); // wake up the philos all at once
 	}
+
 	if (make_printer())
 		return 1;
 

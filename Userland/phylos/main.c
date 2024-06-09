@@ -42,26 +42,20 @@ int make_sem(int i)
 	return 0;
 }
 
-void hold_forks(int i)
+void hold_fork(int i)
 {
 	if (i <= 0)
 		return;
 
-	sem_wait(data->phylos[0].sem); // take the leftmost fork
-
-	if (i > 1)
-		sem_wait(data->phylos[i - 1].sem); // if the rightmost fork isn't also the leftmost fork, take it as well
+	sem_wait(data->phylos[0].sem); // take the leftmost fork, as new phylo will affect it
 }
 
-void return_forks(int i)
+void return_fork(int i)
 {
 	if (i <= 0)
 		return;
 
-	sem_post(data->phylos[0].sem); // return the leftmost fork
-
-	if (i > 1)
-		sem_post(data->phylos[i - 1].sem); // if the rightmost fork isn't also the leftmost fork, return it as well
+	sem_post(data->phylos[0].sem); // return the leftmost fork, as new phylo will affect it
 }
 
 int make_philo(int i)
@@ -89,26 +83,38 @@ int add_philo()
 {
 	int i = data->phylo_count;
 
-	hold_forks(i);
+	hold_fork(i);
 
 	data->phylos[i].state = THINKING; // All philos start in THINKING state
 	if (make_sem(i) || make_philo(i))
 	{
-		return_forks(i);
+		return_fork(i);
 		sem_post(data->childex);
 		return 1;
 	}
 
 	(data->phylo_count)++;
-	return_forks(i);
+	return_fork(i);
 	sem_post(data->childex);
 
+	return 0;
+}
+
+int make_mutexes()
+{
+	sem_unlink("mutex");   // mutex para controlar el acceso a los estados de los filósofos
+	sem_unlink("childex"); // mutex para controlar el acceso a los estados de los filósofos
+	data->mutex = sem_open("mutex", 1);
+	data->childex = sem_open("childex", 0);
+	if (data->mutex == NULL || data->childex == NULL)
+		return 1;
 	return 0;
 }
 
 int main(int argc, char *argv[])
 {
 	puts("Initializing phylos\n");
+
 	data = malloc(sizeof(Data)); // cumple la función de pseudo shm
 	if (data == NULL)
 	{
@@ -116,11 +122,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	sem_unlink("mutex");   // mutex para controlar el acceso a los estados de los filósofos
-	sem_unlink("childex"); // mutex para controlar el acceso a los estados de los filósofos
-	data->mutex = sem_open("mutex", 1);
-	data->childex = sem_open("childex", 0);
-	if (data->mutex == NULL || data->childex == NULL)
+	if (make_mutexes())
 	{
 		puts("Failed to open semaphore\n");
 		free(data);
@@ -166,7 +168,7 @@ int main(int argc, char *argv[])
 		case 'R':
 		{
 			puts("removing\n");
-			data->phylo_count = data->phylo_count - 1;
+			(data->phylo_count)--;
 			sem_close(data->phylos[data->phylo_count].sem);
 			kill(children[data->phylo_count], SIGKILL);
 			waitpid(children[data->phylo_count], NULL, 0);

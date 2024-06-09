@@ -42,22 +42,6 @@ int make_sem(int i)
 	return 0;
 }
 
-void hold_fork(int i)
-{
-	if (i <= 0)
-		return;
-
-	sem_wait(data->phylos[0].sem); // take the leftmost fork, as new phylo will affect it
-}
-
-void return_fork(int i)
-{
-	if (i <= 0)
-		return;
-
-	sem_post(data->phylos[0].sem); // return the leftmost fork, as new phylo will affect it
-}
-
 int make_philo(int i)
 {
 
@@ -83,19 +67,32 @@ int add_philo()
 {
 	int i = data->phylo_count;
 
-	hold_fork(i);
+	if (i)
+	{
+		sem_wait(data->mutex); // acquire mutex
+		data->adding = i - 1;  // notify last philo you will add a new one
+		sem_wait(data->addex); // wait for philo that must be notified to be in right state
+	}
 
 	data->phylos[i].state = THINKING; // All philos start in THINKING state
 	if (make_sem(i) || make_philo(i))
 	{
-		return_fork(i);
+		if (i)
+		{
+			data->adding = -1;
+			sem_post(data->mutex);
+		}
 		sem_post(data->childex);
 		return 1;
 	}
 
 	(data->phylo_count)++;
-	return_fork(i);
-	sem_post(data->childex);
+	if (i)
+	{
+		data->adding = -1;
+		sem_post(data->mutex);
+	}
+	sem_post(data->childex); // wake up new philo
 
 	return 0;
 }
@@ -103,10 +100,12 @@ int add_philo()
 int make_mutexes()
 {
 	sem_unlink("mutex");   // mutex para controlar el acceso a los estados de los filósofos
-	sem_unlink("childex"); // mutex para controlar el acceso a los estados de los filósofos
+	sem_unlink("childex"); // mutex para controlar la inicialización de un nuevo filósofo
+	sem_unlink("addex");   // mutex para controlar el acceso al último tenedor al añadir un filosofo
 	data->mutex = sem_open("mutex", 1);
 	data->childex = sem_open("childex", 0);
-	if (data->mutex == NULL || data->childex == NULL)
+	data->addex = sem_open("addex", 0);
+	if (data->mutex == NULL || data->childex == NULL || data->addex == NULL)
 		return 1;
 	return 0;
 }

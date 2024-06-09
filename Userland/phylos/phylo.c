@@ -1,13 +1,25 @@
 #include "phylos.h"
-
+void check_adding(unsigned int i);
 void phylosopher(unsigned int i)
 {
     while (1)
     {
+        check_adding(i); // See if manager wants to add a philosopher to my right
         take_forks(i);
         sleep(1); // Eating
         put_forks(i);
         sleep(1); // Thinking
+    }
+}
+
+void check_adding(unsigned int i)
+{
+    if (data->adding == i)
+    {
+        puts("Here");
+        sem_post(data->addex);
+        sem_wait(data->mutex);
+        sem_post(data->mutex);
     }
 }
 

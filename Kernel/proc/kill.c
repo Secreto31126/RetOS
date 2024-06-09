@@ -27,7 +27,7 @@ int kill(pid_t pid, int sig)
         p->block_condition = no_condition;
         Process **head = p->block_list;
         *head = loop_blocked_and_unblock(*head);
-        p->condition_data[0] = -1;
+        p->condition_data[0] = (void *)-1;
         return 0;
 
     case SIGSTOP:

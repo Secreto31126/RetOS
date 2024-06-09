@@ -6,11 +6,11 @@ void phylosopher(unsigned int i)
 {
     while (1)
     {
-        check_adding(i); // See if manager wants to add a philosopher to my right
+        usleep(randBetween(MIN_SLEEP, MAX_SLEEP)); // Thinking
+        check_adding(i);                           // See if manager wants to add a philosopher to my right (I can't be holding a fork when that happens)
         take_forks(i);
         usleep(randBetween(MIN_SLEEP, MAX_SLEEP)); // Eating
         put_forks(i);
-        usleep(randBetween(MIN_SLEEP, MAX_SLEEP)); // Thinking
     }
 }
 

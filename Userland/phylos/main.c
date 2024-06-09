@@ -163,18 +163,17 @@ int main_loop()
 
 int main(int argc, char *argv[])
 {
-	puts("Initializing phylos\n");
-
-	setSeed(get_tick()); // This is questionable, but we aren't cryptographers
+	puts("Creating pseudo-shm\n");
 
 	data = malloc(sizeof(Data)); // cumple la función de pseudo shm
 	data->printex = malloc(sizeof(sem_t *) * 2);
-	data->adding = -1;
 	if (data == NULL || data->printex == NULL)
 	{
 		puts("Failed to allocate memory\n");
 		return 1;
 	}
+
+	puts("Initializing mutexes\n");
 
 	if (make_mutexes())
 	{
@@ -183,7 +182,11 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	puts("Initializing philos\n");
+
 	data->phylo_count = 0;
+	data->adding = -1;
+	setSeed(get_tick()); // This is questionable, but we aren't cryptographers
 
 	for (unsigned int i = 0; i < INITIAL_PHYLOS; i++)
 	{
@@ -193,6 +196,9 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 	}
+
+	puts("Waking up philos\n");
+
 	for (unsigned int i = 0; i < INITIAL_PHYLOS; i++)
 	{
 		sem_post(data->childex); // wake up the philos all at once
@@ -201,7 +207,6 @@ int main(int argc, char *argv[])
 	if (make_printer())
 		return 1;
 
-	char buffer[15] = {0};
 	while (!main_loop())
 		;
 	leave();

@@ -10,7 +10,7 @@
 #include <sched.h>
 #include <lib.h>
 
-#define MAX_SEMS 30
+#define MAX_SEMS 300
 
 #define SPINLOCK (1 << (sizeof(unsigned int) * 8 - 1))
 #define SPINLOCK_LOCKED(x) ((x) & SPINLOCK)

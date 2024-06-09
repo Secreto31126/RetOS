@@ -16,17 +16,13 @@ void phylosopher(unsigned int i)
     }
 }
 
-void updatePrinter()
-{
-    sem_post(data->printex); // Tell printer that state has changed. Printer will lift mutex once done
-}
-
 void set_state(int i, int state)
 {
-    sem_wait(data->mutex);
+    sem_wait(data->printex[0]);
     data->phylos[i].state = state;
-    updatePrinter(); // The printer lifts the mutex once done printing, ensures all logs are printed
+    sem_post(data->printex[1]); // Tell printer that state has changed. Printer will lift mutex once done
 }
+
 void check_adding(unsigned int i)
 {
     if (data->adding == i)

@@ -25,7 +25,7 @@ typedef struct
 typedef struct Data
 {
     sem_t *mutex;
-    sem_t *printex;
+    sem_t *printex[2];
     sem_t *childex;
     phylo_t phylos[MAX_PHYLOS];
     int adding;

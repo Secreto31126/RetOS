@@ -103,13 +103,16 @@ int make_mutexes()
 	sem_unlink("mutex");   // mutex para controlar el acceso a los estados de los filósofos
 	sem_unlink("childex"); // mutex para controlar la inicialización de un nuevo filósofo
 	sem_unlink("addex");   // mutex para controlar el acceso al último tenedor al añadir un filosofo
-	sem_unlink("printex");
+	sem_unlink("printex0");
+	sem_unlink("printex1");
+
 	data->mutex = sem_open("mutex", 1);
 	data->childex = sem_open("childex", 0);
 	data->addex = sem_open("addex", 0);
-	data->printex = sem_open("printex", 0);
+	data->printex[0] = sem_open("printex0", 0);
+	data->printex[1] = sem_open("printex1", 0);
 
-	if (data->mutex == NULL || data->childex == NULL || data->addex == NULL || data->printex == NULL)
+	if (data->mutex == NULL || data->childex == NULL || data->addex == NULL || data->printex[0] == NULL || data->printex[1] == NULL)
 		return 1;
 	return 0;
 }

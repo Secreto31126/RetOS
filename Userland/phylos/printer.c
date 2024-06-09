@@ -2,7 +2,6 @@
 
 void print_state()
 {
-    char devNull;
     while (1)
     {
         sem_wait(data->printex[1]);

@@ -219,7 +219,8 @@ void leave()
 	kill(children[MAX_PHYLOS], SIGKILL);
 	waitpid(children[MAX_PHYLOS], NULL, 0);
 	sem_close(data->mutex);
-	sem_close(data->printex);
+	sem_close(data->printex[0]);
+	sem_close(data->printex[1]);
 	free(data->printex);
 	free(data);
 	puts("byee!\n");

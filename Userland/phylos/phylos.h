@@ -6,6 +6,7 @@
 #include "lib/my_lib.h"
 
 #define MAX_PHYLOS 15
+#define INITIAL_PHYLOS 5
 #define LEFT(i, p) i
 #define RIGHT(i, p) (i + 1) % p
 #define THINKING 0
@@ -21,11 +22,14 @@ typedef struct
     sem_t *sem;
 } phylo_t;
 
-typedef struct
+typedef struct Data
 {
     sem_t *mutex;
     sem_t *printex;
+    sem_t *childex;
     phylo_t phylos[MAX_PHYLOS];
+    int adding;
+    sem_t *addex;
     unsigned int phylo_count;
 } Data;
 

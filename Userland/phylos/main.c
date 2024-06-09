@@ -12,64 +12,9 @@ Data *data = NULL;
 
 int children[MAX_PHYLOS + 1];
 
-int main(int argc, char *argv[])
+int make_printer()
 {
-	setSeed(get_tick()); // This is questionable, but we aren't cryptographers
-
-	puts("Initializing phylos\n");
-	data = malloc(sizeof(Data)); // cumple la función de pseudo shm
-	if (data == NULL)
-	{
-		puts("Failed to allocate memory\n");
-		return 1;
-	}
-	sem_unlink("mutex");   // mutex para controlar el acceso a los estados de los filósofos
-	sem_unlink("printex"); // mutex para asegurar que los estados no sean sobreescritos durante su lectura
-	data->mutex = sem_open("mutex", 0);
-	data->printex = sem_open("printex", 0);
-	if (data->mutex == NULL || data->printex == NULL)
-	{
-		puts("Failed to open semaphore\n");
-		free(data);
-		return 1;
-	}
-	data->phylo_count = 5;
-
-	for (unsigned int i = 0; i < MAX_PHYLOS; i++)
-	{
-		data->phylos[i].state = THINKING;
-		sem_unlink(strandnum("sem_", i));
-		data->phylos[i].sem = sem_open(strandnum("sem_", i), 1);
-		if (data->phylos[i].sem == NULL)
-		{
-			puts("Failed to open semaphore\n");
-			leave(i + 1);
-			return 1;
-		}
-	}
-
-	int pid;
-	for (unsigned int i = 0; i < data->phylo_count; i++)
-	{
-		pid = fork();
-		if (pid < 0)
-		{
-			puts("Failed to fork");
-			leave(i);
-			return 1;
-		}
-		else if (pid == 0)
-		{
-			phylosopher(i);
-			return 0;
-		}
-		else
-		{
-			children[i] = pid;
-		}
-	}
-
-	pid = fork();
+	int pid = fork();
 	if (pid < 0)
 	{
 		puts("Failed to fork");
@@ -77,51 +22,145 @@ int main(int argc, char *argv[])
 	}
 	else if (pid == 0)
 	{
+		// child process
 		print_state();
-		return 0;
+		exit(1);
 	}
-	else
+	children[MAX_PHYLOS] = pid;
+	return 0;
+}
+
+int make_sem(int i)
+{
+	data->phylos[i].state = THINKING;
+	sem_unlink(strandnum("sem_", i));
+	data->phylos[i].sem = sem_open(strandnum("sem_", i), 1);
+	if (data->phylos[i].sem == NULL)
 	{
-		children[MAX_PHYLOS] = pid;
+		puts("Failed to open semaphore\n");
+		return 1;
 	}
-	sem_post(data->mutex);
+	return 0;
+}
+
+int make_philo(int i)
+{
+
+	int pid = fork();
+	if (pid < 0)
+	{
+		puts("Failed to fork");
+		return 1;
+	}
+	else if (!pid)
+	{
+		// child process
+		sem_wait(data->childex);
+		phylosopher(i);
+		exit(1);
+	}
+	// parent process
+	children[i] = pid;
+	return 0;
+}
+
+int add_philo()
+{
+	int i = data->phylo_count;
+
+	if (i)
+	{
+		sem_wait(data->mutex); // acquire mutex
+		data->adding = i - 1;  // notify last philo you will add a new one
+		sem_wait(data->addex); // wait for philo that must be notified to be in right state
+	}
+
+	data->phylos[i].state = THINKING; // All philos start in THINKING state
+	if (make_sem(i) || make_philo(i))
+	{
+		if (i)
+		{
+			data->adding = -1;
+			sem_post(data->mutex);
+		}
+		sem_post(data->childex);
+		return 1;
+	}
+
+	(data->phylo_count)++;
+	if (i)
+	{
+		data->adding = -1;
+		sem_post(data->mutex);
+	}
+	sem_post(data->childex); // wake up new philo
+
+	return 0;
+}
+
+int make_mutexes()
+{
+	sem_unlink("mutex");   // mutex para controlar el acceso a los estados de los filósofos
+	sem_unlink("childex"); // mutex para controlar la inicialización de un nuevo filósofo
+	sem_unlink("addex");   // mutex para controlar el acceso al último tenedor al añadir un filosofo
+	sem_unlink("printex");
+	data->mutex = sem_open("mutex", 1);
+	data->childex = sem_open("childex", 0);
+	data->addex = sem_open("addex", 0);
+	data->printex = sem_open("printex", 0);
+
+	if (data->mutex == NULL || data->childex == NULL || data->addex == NULL || data->printex == NULL)
+		return 1;
+	return 0;
+}
+
+int main(int argc, char *argv[])
+{
+	puts("Initializing phylos\n");
+
+	setSeed(get_tick()); // This is questionable, but we aren't cryptographers
+
+	data = malloc(sizeof(Data)); // cumple la función de pseudo shm
+	if (data == NULL)
+	{
+		puts("Failed to allocate memory\n");
+		return 1;
+	}
+
+	if (make_mutexes())
+	{
+		puts("Failed to open semaphore\n");
+		free(data);
+		return 1;
+	}
+
+	data->phylo_count = 0;
+
+	for (unsigned int i = 0; i < INITIAL_PHYLOS; i++)
+	{
+		if (add_philo())
+		{
+			leave(i);
+			return 1;
+		}
+	}
+
+	if (make_printer())
+		return 1;
+
 	char buffer[15] = {0};
 	while (1)
 	{
 		read(STD_IN, buffer, 1);
-		sem_wait(data->mutex);
 		switch (buffer[0])
 		{
 		case 'a':
+		case 'A':
 		{
 			puts("adding\n");
 			if (data->phylo_count < MAX_PHYLOS)
 			{
-				pid = fork();
-				unsigned int num = data->phylo_count;
-				if (pid < 0)
-				{
-					puts("Failed to fork");
-				}
-				else if (pid == 0)
-				{
-					data->phylos[num].state = THINKING;
-					sem_unlink(strandnum("sem_", num));
-					data->phylos[num].sem = sem_open(strandnum("sem_", num), 1);
-					if (data->phylos[num].sem == NULL)
-					{
-						puts("Failed to open semaphore\n");
-						leave(num + 1);
-						break;
-					}
-					phylosopher(num);
-					return 0;
-				}
-				else
-				{
-					children[num] = pid;
-					data->phylo_count = data->phylo_count + 1;
-				}
+				add_philo();
 			}
 			else
 			{
@@ -131,9 +170,10 @@ int main(int argc, char *argv[])
 			break;
 		}
 		case 'r':
+		case 'R':
 		{
 			puts("removing\n");
-			data->phylo_count = data->phylo_count - 1;
+			(data->phylo_count)--;
 			sem_close(data->phylos[data->phylo_count].sem);
 			kill(children[data->phylo_count], SIGKILL);
 			waitpid(children[data->phylo_count], NULL, 0);
@@ -147,6 +187,7 @@ int main(int argc, char *argv[])
 			break;
 		}
 		case 'q':
+		case 'Q':
 		{
 			puts("quitting\n");
 			leave(data->phylo_count);
@@ -155,8 +196,6 @@ int main(int argc, char *argv[])
 		default:
 			break;
 		}
-
-		sem_post(data->mutex);
 	}
 	leave(data->phylo_count);
 	return 0;

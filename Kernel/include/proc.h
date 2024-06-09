@@ -157,7 +157,7 @@ typedef struct Process
     /**
      * @brief The children's death semaphore
      */
-    sem_t *zombie_sem;
+    sem_t zombie_sem;
     /**
      * @brief Process open file descriptors
      */

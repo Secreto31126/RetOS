@@ -122,6 +122,7 @@ int main(int argc, char *argv[])
 
 	data = malloc(sizeof(Data)); // cumple la función de pseudo shm
 	data->printex = malloc(sizeof(sem_t *) * 2);
+	data->adding = -1;
 	if (data == NULL || data->printex == NULL)
 	{
 		puts("Failed to allocate memory\n");

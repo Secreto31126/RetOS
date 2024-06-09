@@ -33,8 +33,10 @@ int make_printer()
 int make_sem(int i)
 {
 	data->phylos[i].state = THINKING;
-	sem_unlink(strandnum("sem_", i));
-	data->phylos[i].sem = sem_open(strandnum("sem_", i), 1);
+	char sem_name[] = "sem_";
+	rot_n(sem_name, i);
+	sem_unlink(sem_name);
+	data->phylos[i].sem = sem_open(sem_name, 1);
 	if (data->phylos[i].sem == NULL)
 	{
 		puts("Failed to open semaphore\n");
@@ -100,7 +102,9 @@ int remove_phylo()
 	int i = data->phylo_count;
 
 	sem_wait(data->mutex); // acquire mutex
-	data->adding = i - 1;  // notify phylo that will be removed so it gives back its right fork
+	data->adding = i - 2;  // notify phylo whose right fork will be removed so it isn't using it when I do
+	sem_wait(data->addex);
+	data->adding = i - 1; // notify phylo that will be removed so it gives back its right fork
 	sem_wait(data->addex);
 
 	kill(children[i - 1], SIGKILL);
@@ -109,7 +113,7 @@ int remove_phylo()
 	(data->phylo_count)--;
 
 	data->adding = -1;
-	sem_post(data->mutex); // Interestingly, the process that was blocked on this is dead, I still need to lift it up though
+	sem_post(data->mutex); // One of the processes blocked on this is dead, so I only need to post it once
 
 	return 0;
 }

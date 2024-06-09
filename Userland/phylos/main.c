@@ -182,9 +182,15 @@ int main(int argc, char *argv[])
 	puts("Creating pseudo-shm\n");
 
 	data = malloc(sizeof(Data)); // cumple la función de pseudo shm
-	data->printex = malloc(sizeof(sem_t *) * 2);
-	if (data == NULL || data->printex == NULL)
+	if (data == NULL)
 	{
+		puts("Failed to allocate memory\n");
+		return 1;
+	}
+	data->printex = malloc(sizeof(sem_t *) * 2);
+	if (data->printex == NULL)
+	{
+		free(data);
 		puts("Failed to allocate memory\n");
 		return 1;
 	}

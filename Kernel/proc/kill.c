@@ -20,19 +20,27 @@ int kill(pid_t pid, int sig)
     {
     case SIGKILL:
         p->exit_code = 127;
-        kill_process(p->pid);
-        return 0;
+        if (kill_process(p->pid))
+        {
+            return -1;
+        }
+        break;
 
     case SIGCONT:
         p->block_condition = no_condition;
-        p->condition_data[0] = NULL;
-        return 0;
+        Process **head = p->block_list;
+        *head = loop_blocked_and_unblock(*head);
+        p->condition_data[0] = (void *)-1;
+        break;
 
     case SIGSTOP:
-        add_blocked(p, whim_condition, NULL, NULL, NULL, NULL, NULL);
-        return 0;
+        add_tick_blocked(p, whim_condition, NULL, NULL, NULL, NULL, NULL);
+        break;
 
     default:
         return -1;
     }
+
+    sched_yield();
+    return 0;
 }

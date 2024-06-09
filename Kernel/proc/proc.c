@@ -25,6 +25,7 @@ void *create_process_idle()
     processes[0] = (Process){
         .pid = 0,
         .ppid = 0,
+        .name = "idle",
         .stack = new_stack,
         .running_stack = new_stack,
         .stack_size = IDLE_STACK_SIZE,
@@ -35,9 +36,12 @@ void *create_process_idle()
         .next_brother = NULL,
         .exit_code = 0,
         .priority = 19,
+        .block_list = NULL,
         .next_blocked = NULL,
         .block_condition = no_condition,
         .condition_data = {},
+        .zombie_sem = {},
+        .exit_sem = {},
         .files = {0, 1, 2, 3},
     };
 
@@ -125,9 +129,23 @@ FIND_PID:
         return -1;
     }
 
+    if (sem_init(&processes[new_pid].exit_sem, 1, 0))
+    {
+        free(new_stack);
+        return -1;
+    }
+
+    if (sem_init(&processes[new_pid].zombie_sem, 1, 0))
+    {
+        sem_destroy(&processes[new_pid].exit_sem);
+        free(new_stack);
+        return -1;
+    }
+
     // Set the new process' basic properties
     processes[new_pid].pid = new_pid;
     processes[new_pid].ppid = parent->pid;
+    processes[new_pid].name = parent->name;
     processes[new_pid].stack = new_stack;
     processes[new_pid].running_stack = parent->running_stack;
     processes[new_pid].stack_size = new_stack_size;
@@ -139,13 +157,14 @@ FIND_PID:
     parent->next_child = get_process(new_pid);
     processes[new_pid].exit_code = 0;
     processes[new_pid].priority = parent->priority;
+    processes[new_pid].block_list = NULL;
     processes[new_pid].next_blocked = NULL;
     processes[new_pid].block_condition = no_condition;
     // Not worth looping, there's no biggie if it's trash
     // processes[new_pid].condition_data = {};
     for (size_t i = 0; i < MAX_PROCESS_FILES; i++)
     {
-        if (IS_PIPE(parent->files[i]))
+        if (parent->files[i] != -1 && IS_PIPE(parent->files[i]))
         {
             add_pipe_end(parent->files[i]);
         }
@@ -211,6 +230,15 @@ int kill_process(pid_t pid)
             man_im_dead->running_stack_size);
     }
 
+    if (man_im_dead->state == PROCESS_BLOCKED)
+    {
+        man_im_dead->block_condition = no_condition;
+        Process **head = man_im_dead->block_list;
+        *head = loop_blocked_and_unblock(*head);
+    }
+
+    sem_destroy(&man_im_dead->zombie_sem);
+
     for (size_t i = 0; i < MAX_PROCESS_FILES; i++)
     {
         close_file(man_im_dead->files[i]);
@@ -265,6 +293,31 @@ int kill_process(pid_t pid)
         p = p->next_brother;
     }
 
+    size_t count = active_processes_count;
+    for (size_t i = 0; i < MAX_PROCESS_FILES && count && (free_stack || free_running_stack); i++)
+    {
+        Process *p = get_process(i);
+
+        if (p->pid != man_im_dead->pid)
+        {
+            if (p->running_stack == man_im_dead->running_stack)
+            {
+                free_running_stack = false;
+            }
+
+            if (!stack_inherited && p->running_stack == man_im_dead->stack)
+            {
+                free_stack = false;
+                stack_inherited = inherit_parents_house(p);
+            }
+        }
+
+        if (p->running_stack)
+        {
+            count--;
+        }
+    }
+
     if (!free_stack && !stack_inherited)
     {
         ncPrint("Probably a memory leak just happened\n");
@@ -281,27 +334,11 @@ int kill_process(pid_t pid)
 
     if (free_running_stack)
     {
-        size_t count = active_processes_count;
-        for (size_t i = 0; i < MAX_PROCESS_FILES && count; i++)
-        {
-            Process *p = get_process(i);
-
-            if (p->pid != man_im_dead->pid && p->running_stack == man_im_dead->running_stack)
-            {
-                break;
-            }
-
-            if (p->running_stack)
-            {
-                count--;
-            }
-        }
-
-        if (!count)
-        {
-            free(man_im_dead->running_stack);
-        }
+        free(man_im_dead->running_stack);
     }
+
+    sem_post(&man_im_dead->exit_sem);
+    sem_post(&get_process(man_im_dead->ppid)->zombie_sem);
 
     man_im_dead->state = PROCESS_ZOMBIE;
     man_im_dead->running_stack = NULL;
@@ -408,4 +445,79 @@ int setpriority(int which, id_t who, int prio)
     }
 
     return -1;
+}
+
+void *sbrk(intptr_t increment)
+{
+    Process *p = get_current_process();
+
+    if (increment == 0)
+    {
+        return p->running_stack;
+    }
+
+    return (void *)-1;
+}
+
+int ps()
+{
+    __label__ exit;
+
+    int pipesfd[2];
+    if (pipe(pipesfd) == -1)
+    {
+        return -1;
+    }
+
+    ssize_t written;
+    size_t expected;
+#define pipe_write(x)                                       \
+    written = write(pipesfd[1], (x), expected = strlen(x)); \
+    if (written < 0 || (size_t)written < expected)          \
+        goto exit;
+
+    pipe_write("PID\tPPID\tSTATE\tPRIO\t\tSTACK\tCOMMAND\n");
+
+    char buffer[1024];
+    size_t remaining = active_processes_count;
+    for (size_t i = 0; i < MAX_PROCESSES && remaining; i++)
+    {
+        Process *p = get_process(i);
+
+        if (p->state == NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR || p->state == PROCESS_DEAD)
+        {
+            continue;
+        }
+
+        utoa(p->pid, buffer, 10);
+        pipe_write(buffer);
+        pipe_write("\t");
+
+        utoa(p->ppid, buffer, 10);
+        pipe_write(buffer);
+        pipe_write("\t\t");
+
+        char state[2] = {p->state, 0};
+        pipe_write(state);
+        pipe_write("\t\t");
+
+        itoa(p->priority, buffer, 10);
+        pipe_write(buffer);
+        pipe_write("\t\t");
+
+        ultoa((unsigned long)p->stack, buffer, 16);
+        pipe_write(buffer);
+        pipe_write("\t");
+
+        pipe_write(p->name);
+
+        pipe_write("\n");
+        remaining--;
+    }
+
+exit:
+#undef pipe_write
+
+    close(pipesfd[1]);
+    return pipesfd[0];
 }

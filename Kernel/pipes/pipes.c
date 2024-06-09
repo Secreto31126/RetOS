@@ -40,7 +40,7 @@ int pipe(int pipefd[2])
         return -1;
     }
 
-    Pipe pipe = {
+    pipes[pipe_id] = (Pipe){
         .read_ends = 1,
         .write_ends = 1,
         .data = data,
@@ -48,7 +48,25 @@ int pipe(int pipefd[2])
         .write = data,
     };
 
-    pipes[pipe_id] = pipe;
+    if (sem_init(&pipes[pipe_id].read_sem, 1, 0))
+    {
+        // _shouldn't_ fail
+        free(data);
+        close(read_end);
+        close(write_end);
+        return -1;
+    }
+
+    if (sem_init(&pipes[pipe_id].write_sem, 1, 1))
+    {
+        // _shouldn't_ fail
+        sem_destroy(&pipes[pipe_id].read_sem);
+        free(data);
+        close(read_end);
+        close(write_end);
+        return -1;
+    }
+
     open_pipes++;
 
     pipefd[0] = read_end;
@@ -76,11 +94,17 @@ int close_pipe(int file)
 
     if (file & 1)
     {
-        pipe->write_ends--;
+        if (!--pipe->write_ends)
+        {
+            sem_destroy(&pipe->write_sem);
+        }
     }
     else
     {
-        pipe->read_ends--;
+        if (!--pipe->read_ends)
+        {
+            sem_destroy(&pipe->read_sem);
+        }
     }
 
     if (!pipe->read_ends && !pipe->write_ends)
@@ -100,7 +124,17 @@ int read_pipe(int file, void *buf, size_t count)
         return -1;
     }
 
+    if (!count)
+    {
+        return 0;
+    }
+
     Pipe *pipe = pipes + (file ^ O_PIPE) / 2;
+
+    if (pipe->write_ends && sem_wait(&pipe->read_sem))
+    {
+        return -1;
+    }
 
     size_t avail = pipe->write - pipe->read;
     if (!avail)
@@ -116,8 +150,17 @@ int read_pipe(int file, void *buf, size_t count)
 
     if (pipe->read == pipe->write)
     {
+        if (pipe->write == pipe->data + PIPE_SIZE)
+        {
+            sem_post(&pipe->write_sem);
+        }
+
         pipe->read = pipe->data;
         pipe->write = pipe->data;
+    }
+    else
+    {
+        sem_post(&pipe->read_sem);
     }
 
     return read;
@@ -130,13 +173,38 @@ int write_pipe(int file, const void *buf, size_t count)
         return -1;
     }
 
+    if (!count)
+    {
+        return 0;
+    }
+
     Pipe *pipe = pipes + ((file ^ O_PIPE) - 1) / 2;
+
+    if (!pipe->read_ends)
+    {
+        return -1;
+    }
+
+    if (sem_wait(&pipe->write_sem))
+    {
+        return -1;
+    }
 
     size_t written = pipe->write + count >= pipe->data + PIPE_SIZE ? pipe->data + PIPE_SIZE - pipe->write : count;
 
     memcpy(pipe->write, buf, written);
 
+    if (pipe->write == pipe->data)
+    {
+        sem_post(&pipe->read_sem);
+    }
+
     pipe->write += written;
+
+    if (pipe->write != pipe->data + PIPE_SIZE)
+    {
+        sem_post(&pipe->write_sem);
+    }
 
     return written;
 }

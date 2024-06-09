@@ -38,7 +38,7 @@ void *context_switch(void *rsp)
         robin_remove(old_process->pid);
     }
 
-    check_blocked_processes();
+    check_tick_blocked_processes();
     set_pid(robin_next());
 
     Process *new_process = get_current_process();

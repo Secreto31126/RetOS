@@ -53,7 +53,7 @@ int check_args(char *const argv[])
 RSP set_process_args(int argc, char const argv[MAX_ARGS][MAX_ARG_LEN], Process *process)
 {
     RSP *rsp = (RSP *)&process->rsp;
-    Stack heap = process->stack;
+    Stack args = (Stack)((uintptr_t)(process->stack + process->stack_size) / 2);
 
     *rsp = process->stack + process->stack_size;
 
@@ -61,12 +61,12 @@ RSP set_process_args(int argc, char const argv[MAX_ARGS][MAX_ARG_LEN], Process *
 
     for (int i = argc - 1; i >= 0; i--)
     {
-        char const *args = argv[i];
+        char const *arg = argv[i];
 
-        char *copy = heap;
-        heap += strlen(args) + 1;
+        char *copy = args;
+        args += strlen(arg) + 1;
 
-        strcpy(copy, args);
+        strcpy(copy, arg);
         PUSH(*rsp, copy);
     }
 
@@ -79,12 +79,13 @@ RSP set_process_args(int argc, char const argv[MAX_ARGS][MAX_ARG_LEN], Process *
 
 char argv_backup[MAX_ARGS][MAX_ARG_LEN];
 
-char *const *const backup_argv_somewhere(int argc, char *const argv[])
+void *backup_argv_somewhere(int argc, char *const argv[])
 {
     for (int i = 0; i < argc; i++)
     {
-        strcpy(argv_backup[i], argv[i]);
+        strncpy(argv_backup[i], argv[i], MAX_ARG_LEN - 1);
+        argv_backup[i][MAX_ARG_LEN - 1] = '\0';
     }
 
-    return (char *const *const)argv_backup;
+    return argv_backup;
 }

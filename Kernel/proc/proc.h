@@ -7,6 +7,9 @@
 #include <files.h>
 #include <ticks.h>
 #include <sched.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 #include <memory.h>
 #include <signal.h>
 #include <console.h>
@@ -49,40 +52,6 @@ void set_exit_code(int status);
 bool inherit_parents_house(Process *process);
 
 /**
- * @brief Await the death of a children
- *
- * @param pid The process' pid
- * @return true Condition met
- * @return false Condition not met
- */
-bool zombie_child(pid_t pid);
-/**
- * @brief Await a semaphore to be raised
- * @note The condition returns true if the value isn't 0,
- * which means it would return true when the spinlock is taken
- *
- * @param pid The process' pid
- * @return true Condition met
- * @return false Condition not met
- */
-bool semaphore_raised(pid_t pid);
-/**
- * @brief Await for a read to be available
- *
- * @param pid The process' pid
- * @return true Condition met
- * @return false Condition not met
- */
-bool read_available(pid_t pid);
-/**
- * @brief Await for a write to be available
- *
- * @param pid The process' pid
- * @return true Condition met
- * @return false Condition not met
- */
-bool write_available(pid_t pid);
-/**
  * @brief Wait for multiple fds to be read available
  * @note The process' pointers will be invalid while checking because the running stack is not loaded
  * Aka, you must allocate global memory to preserve the data
@@ -118,7 +87,7 @@ bool whim_condition(pid_t pid);
 /**
  * @brief Loop all the blocked processes and unblock them if the condition is met
  */
-void check_blocked_processes();
+void check_tick_blocked_processes();
 /**
  * @brief Add a process to the blocked queue
  * @note If the process is already blocked, it only updates the condition and data
@@ -134,7 +103,7 @@ void check_blocked_processes();
  * @param data3 Condition data
  * @param data4 Condition data
  */
-void add_blocked(Process *p, ProcessBlockConditional condition, void *data0, void *data1, void *data2, void *data3, void *data4);
+void add_tick_blocked(Process *p, ProcessBlockConditional condition, void *data0, void *data1, void *data2, void *data3, void *data4);
 
 /**
  * @brief Add a process to the round robin queue

@@ -3,7 +3,14 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <semaphores.h>
 
+/**
+ * @brief Set up stdin
+ *
+ * @return int 0 on success, -1 on failure
+ */
+int init_stdin();
 /**
  * @brief Read from stdin
  *

@@ -180,14 +180,22 @@ int write_pipe(int file, const void *buf, size_t count)
 
     Pipe *pipe = pipes + ((file ^ O_PIPE) - 1) / 2;
 
-    sem_wait(&pipe->write_sem);
+    if (sem_wait(&pipe->write_sem))
+    {
+        return -1;
+    }
+
     size_t written = pipe->write + count >= pipe->data + PIPE_SIZE ? pipe->data + PIPE_SIZE - pipe->write : count;
 
     memcpy(pipe->write, buf, written);
 
+    if (pipe->write == pipe->data)
+    {
+        sem_post(&pipe->read_sem);
+    }
+
     pipe->write += written;
 
-    sem_post(&pipe->read_sem);
     if (pipe->write != pipe->data + PIPE_SIZE)
     {
         sem_post(&pipe->write_sem);

@@ -18,7 +18,7 @@ void set_state(int i, int state)
 {
     sem_wait(data->printex[0]);
     data->phylos[i].state = state;
-    sem_post(data->printex[1]); // Tell printer that state has changed. Printer will lift mutex once done
+    sem_post(data->printex[1]); // Tell printer that state has changed. Printer will lift printex once done
 }
 
 void check_adding(unsigned int i)

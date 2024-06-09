@@ -503,7 +503,7 @@ void readUntilClose(commandData cData, displayStyles displayStyle)
 char *passCommand(char *toPass)
 {
     displayStyles displayStyle = 0;
-    int cPidBuffer = malloc(sizeof(int) * MAX_PIPES);
+    int *cPidBuffer = malloc(sizeof(int) * MAX_PIPES);
     if (cPidBuffer == NULL)
     {
         addStringToBuffer("\nCould not allocate memory for command\n", 0);

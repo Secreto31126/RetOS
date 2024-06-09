@@ -2,6 +2,7 @@
 #include <lib.h>
 #include <modules.h>
 #include <console.h>
+#include <memory.h>
 
 static void loadModule(uint8_t **module, void *targetModuleAddress);
 static uint32_t readUint32(uint8_t **address);
@@ -31,8 +32,7 @@ static void loadModule(uint8_t **module, void *targetModuleAddress)
 	memcpy(targetModuleAddress, *module, moduleSize);
 	*module += moduleSize;
 
-	ncPrint(" [Done]");
-	ncNewline();
+	ncPrint(" [Done]\n");
 }
 
 static uint32_t readUint32(uint8_t **address)

@@ -1,4 +1,5 @@
 #include <console.h>
+#include <lib.h>
 
 static uint32_t uintToBase(uint64_t value, char *buffer, uint32_t base);
 
@@ -7,12 +8,26 @@ static uint32_t uintToBase(uint64_t value, char *buffer, uint32_t base);
 #define BODY_COLOR 0x1F
 #define TEXT_COLOR 0x0F
 
+#define PORT_COM1 0x3F8
+
 static char buffer[64] = {'0'};
 static const uint32_t width = WIDTH;
 static const uint32_t height = 24;
 static uint8_t *const header = (uint8_t *)0xB8000;
 static uint8_t *const video = (uint8_t *)0xB8000 + WIDTH * 2; // 2 bytes per character
 static uint8_t *currentVideo = (uint8_t *)0xB8000 + WIDTH * 2;
+
+int is_transmit_empty()
+{
+	return input_byte(PORT_COM1 + 5) & 0x20;
+}
+
+void write_serial(char a)
+{
+	while (!is_transmit_empty())
+		;
+	output_byte(PORT_COM1, a);
+}
 
 void ncPrintHeader(const char *string)
 {
@@ -131,6 +146,9 @@ void ncPrintChar(char character, char color)
 		return;
 	}
 
+	if (color == TEXT_COLOR)
+		write_serial(character);
+
 	*currentVideo = character;
 	currentVideo++;
 	*currentVideo = color;
@@ -139,6 +157,8 @@ void ncPrintChar(char character, char color)
 
 void ncNewline()
 {
+	write_serial('\n');
+
 	ncPrintChar(' ', TEXT_COLOR);
 	while ((uint64_t)(currentVideo - video) % (width * 2))
 	{
@@ -148,6 +168,8 @@ void ncNewline()
 
 void ncDeleteChar()
 {
+	write_serial('\b');
+
 	if (currentVideo <= video + 1)
 	{
 		*currentVideo = ' ';
@@ -169,6 +191,8 @@ void ncDeleteChar()
 
 void ncTab()
 {
+	write_serial('\t');
+
 	ncPrintChar(' ', TEXT_COLOR);
 	while ((uint64_t)(currentVideo - video) % (4 * 2))
 	{

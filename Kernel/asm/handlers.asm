@@ -5,7 +5,8 @@
 	extern dump_regs
 	extern dump_regs_include_rip
 
-	extern execv
+	; extern execv
+	extern scheduler
 
 	global zero_division_exception_handler
 	global invalid_opcode_exception_handler
@@ -45,7 +46,7 @@ userland	db "module", 0
 
 	mov		rdi, userland
 	mov		rsi, 0
-	call 	execv
+	; call 	execv
 .hang:
 	cli
 	hlt
@@ -87,7 +88,19 @@ sus_exception_handler:
 
 ; void tick_handler(void);
 tick_handler:
-	master_pic_handler 0
+	pushall
+
+	mov		rdi, 0
+	call	pic_manager
+
+	call	scheduler
+
+	mov		al, 0x20
+	out		0x20, al
+
+	popall
+
+	iretq
 
 ; void keyboard_handler(void);
 keyboard_handler:
@@ -113,7 +126,16 @@ usb_handler:
 ; uint64_t syscall_handler(void);
 syscall_handler:
 	pushall_not_rax
+	; Set rax to 0 if a fork is requested
+	push	qword 0
+
 	mov		rcx, rax
+	mov		r8, rsp
+
 	call	syscall_manager
+
+	; Ignore rax value
+	add		rsp, 8
 	popall_not_rax
+
 	iretq

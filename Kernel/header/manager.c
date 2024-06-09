@@ -1,3 +1,8 @@
+/**
+ * @brief A cool header manager for text mode
+ * @deprecated It was fun while it lasted
+ */
+
 #include <lib.h>
 #include <interruptions.h>
 #include <stdint.h>

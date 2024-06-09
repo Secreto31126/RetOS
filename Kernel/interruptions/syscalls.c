@@ -1,16 +1,6 @@
 #include "interruptions.h"
 
 /**
- * @brief Read from a file descriptor
- *
- * @param fd 0 for stdin, 3 for stdkey
- * @param buffer The buffer to write to
- * @param count The number of bytes to read
- * @return uint64_t The number of bytes read
- */
-static uint64_t read(uint64_t fd, char *buffer, uint64_t count);
-static uint64_t write(uint64_t fd, const char *buffer, uint64_t count);
-/**
  * @brief Draw a pixel array to the screen via syscall
  *
  * @param figure Contiguous HexColor memory pointer to draw
@@ -45,15 +35,15 @@ static uint64_t beep_bop(uint64_t rdi, uint64_t, uint64_t, uint64_t rax);
  */
 static uint64_t get_lucas(uint8_t *buffer, uint64_t count);
 /**
- * @brief halt once
+ * @brief create a new process from the current one
  *
- * @param rax The value to return
- * @return uint64_t rax
+ * @param rsp The interruption rsp
+ * @return uint64_t The new process' pid
  */
-static uint64_t halt(uint64_t, uint64_t, uint64_t, uint64_t rax);
+static uint64_t fork(uint64_t, uint64_t, uint64_t, uint64_t, void *rsp);
 
-#define SYSCALL_COUNT 11
-typedef uint64_t (*syscall)(uint64_t, uint64_t, uint64_t, uint64_t);
+#define SYSCALL_COUNT 34
+typedef uint64_t (*syscall)(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t);
 static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)read,
     (syscall)write,
@@ -65,48 +55,40 @@ static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)beep_bop,
     (syscall)get_tick,
     (syscall)get_lucas,
-    (syscall)halt,
+    (syscall)ps,
+    (syscall)_exit,
+    (syscall)kill,
+    (syscall)getpid,
+    (syscall)execv,
+    (syscall)fork,
+    (syscall)sched_yield,
+    (syscall)waitpid,
+    (syscall)sleep,
+    (syscall)pipe,
+    (syscall)close,
+    (syscall)dup2,
+    (syscall)usleep,
+    (syscall)pselect,
+    (syscall)flush,
+    (syscall)getpriority,
+    (syscall)setpriority,
+    (syscall)sem_open,
+    (syscall)sem_close,
+    (syscall)sem_wait,
+    (syscall)sem_post,
+    (syscall)sem_unlink,
+    (syscall)sbrk,
+    (syscall)memory_state,
 };
 
-uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
+uint64_t syscall_manager(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax, uint64_t rsp)
 {
     if (rax < SYSCALL_COUNT)
     {
-        return syscall_handlers[rax](rdi, rsi, rdx, rax);
+        return syscall_handlers[rax](rdi, rsi, rdx, rax, rsp);
     }
 
     return -1;
-}
-
-typedef uint16_t (*FileReader)(uint8_t *, uint16_t);
-static FileReader files[] = {
-    read_stdin,
-    (FileReader)noop,
-    read_stderr,
-    read_stdkey,
-};
-
-static uint64_t read(uint64_t fd, char *buffer, uint64_t count)
-{
-    if (fd < 4)
-        return files[fd]((uint8_t *)buffer, count);
-    return -1;
-}
-
-static uint64_t write(uint64_t fd, const char *buffer, uint64_t count)
-{
-    if (fd != 1)
-    {
-        return -1;
-    }
-
-    uint64_t i;
-    for (i = 0; i < count; i++)
-    {
-        ncPrintChar(buffer[i], 0x0F);
-    }
-
-    return i;
 }
 
 static uint64_t draw(HexColor *figure, uint32_t dimensions, uint32_t position)
@@ -151,9 +133,7 @@ static uint64_t get_lucas(uint8_t *buffer, uint64_t count)
     return read_stderr(buffer, count);
 }
 
-static uint64_t halt(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rax)
+static uint64_t fork(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, void *rsp)
 {
-    set_interrupt_flag();
-    halt_once();
-    return rax;
+    return create_process(rsp);
 }

@@ -1,9 +1,10 @@
-#ifndef PMEM_H
-#define PMEM_H
+#ifndef PMMAN_H
+#define PMMAN_H
 
-#include <memory.h>
+#include <mman.h>
+#include <string.h>
+#include <stdlib.h>
 
-typedef uint32_t heap_entry;
 typedef uint32_t map_entry;
 
 // 256 MB
@@ -37,8 +38,8 @@ static const uint64_t map_size = MAP_SIZE;
  */
 static map_entry *const map_start = (map_entry *)MAP_START;
 /**
- * @brief Start of the heap memory.
+ * @brief End of the heap's map memory (excluded).
  */
-static heap_entry *const heap_start = (heap_entry *)(MAP_START + MAP_SIZE);
+static map_entry *const map_end = (map_entry *)(MAP_START + MAP_SIZE);
 
 #endif

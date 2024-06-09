@@ -8,13 +8,21 @@
             "type": "gdb",
             "request": "attach",
             "name": "Attach to QEMU",
-            "executable": "./Image/packedKernel.bin",
+            "preLaunchTask": "Launch in debug mode",
             "target": ":1234",
+            "pathSubstitutions": {
+                "/root": "${workspaceRoot}"
+            },
             "remote": true,
             "cwd": "${workspaceRoot}",
             "valuesFormatting": "parseText",
-            "preLaunchTask": "Build and execute in debug mode",
-            "printCalls": true
+            "printCalls": true,
+            "autorun": [
+                "add-symbol-file /tmp/retos/kernel.elf 0x00100000",
+                "add-symbol-file /tmp/retos/0000-sampleCodeModule.elf 0x00400000",
+                "add-symbol-file /tmp/retos/0002-tomyland.elf 0x00600000",
+            ],
+            "stopAtConnect": true
         }
     ]
 }

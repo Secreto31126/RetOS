@@ -38,8 +38,8 @@ static void keyboard_handler()
     // Read the scancode from the keyboard controller
     uint8_t scancode = input_byte(0x60);
 
-    ncPrintHex(scancode);
-    ncTab();
+    // ncPrintHex(scancode);
+    // ncTab();
 
     stdkey_keyevent(scancode);
 

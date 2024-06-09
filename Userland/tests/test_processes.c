@@ -65,7 +65,7 @@ int64_t test_processes(uint64_t argc, char *argv[])
 
       for (rq = 0; rq < max_processes; rq++)
       {
-        action = GetUniform(100) % 2;
+        action = get_tick() % 2;
 
         switch (action)
         {
@@ -99,7 +99,7 @@ int64_t test_processes(uint64_t argc, char *argv[])
 
       // Randomly unblocks processes
       for (rq = 0; rq < max_processes; rq++)
-        if (p_rqs[rq].state == BLOCKED && GetUniform(100) % 2)
+        if (p_rqs[rq].state == BLOCKED && get_tick() % 2)
         {
           if (my_unblock(p_rqs[rq].pid) == -1)
           {

@@ -131,7 +131,7 @@ int read_pipe(int file, void *buf, size_t count)
 
     Pipe *pipe = pipes + (file ^ O_PIPE) / 2;
 
-    if (sem_wait(&pipe->read_sem))
+    if (pipe->write_ends && sem_wait(&pipe->read_sem))
     {
         return -1;
     }
@@ -179,6 +179,11 @@ int write_pipe(int file, const void *buf, size_t count)
     }
 
     Pipe *pipe = pipes + ((file ^ O_PIPE) - 1) / 2;
+
+    if (!pipe->read_ends)
+    {
+        return -1;
+    }
 
     if (sem_wait(&pipe->write_sem))
     {

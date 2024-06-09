@@ -146,13 +146,13 @@ pid_t waitpid(pid_t pid, int *wstatus, int options)
 
     // We must search the previous child to unlink it from the list (O(n))
     Process *prev = NULL;
-    Process *child = p->next_child;
-    while (pid != child->pid && !(pid == -1 && child->state == PROCESS_ZOMBIE))
+    Process *curr = p->next_child;
+    while (pid != curr->pid)
     {
-        prev = child;
-        child = child->next_brother;
+        prev = curr;
+        curr = curr->next_brother;
 
-        if (!child)
+        if (!curr)
         {
             return -1;
         }
@@ -160,11 +160,11 @@ pid_t waitpid(pid_t pid, int *wstatus, int options)
 
     if (prev)
     {
-        prev->next_brother = child->next_brother;
+        prev->next_brother = curr->next_brother;
     }
     else
     {
-        p->next_child = child->next_brother;
+        p->next_child = curr->next_brother;
     }
 
     if (wstatus)

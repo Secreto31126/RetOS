@@ -54,6 +54,7 @@ _exit:
 
 	; Keep killing until it's dead dead or the scheduler stops you
 	cmp		rax, 0
+	sti
 	jne		.kill
 
 	; Let the scheduler pick your soul and die happily

@@ -9,5 +9,5 @@ char *itoa(int n, char *string, int radix)
         n = -n;
     }
 
-    return utoa((unsigned int)n, string, radix) - (n < 0);
+    return utoa((unsigned int)n, string, radix);
 }

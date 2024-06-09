@@ -159,6 +159,10 @@ typedef struct Process
      */
     sem_t zombie_sem;
     /**
+     * @brief The process' death semaphore
+     */
+    sem_t exit_sem;
+    /**
      * @brief Process open file descriptors
      */
     int files[MAX_PROCESS_FILES];

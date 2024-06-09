@@ -62,24 +62,16 @@ void add_tick_blocked(Process *p, ProcessBlockConditional condition, void *data0
     p->state = PROCESS_BLOCKED;
 }
 
-pid_t waitpid(pid_t pid, int *wstatus, int options)
+/**
+ * @brief Wait any pid
+ *
+ * @param wstatus The exit status of the process
+ * @param options The wait options
+ * @return pid_t The pid of the process that exited, -1 if error
+ */
+static pid_t waitapid(int *wstatus, int options)
 {
     Process *p = get_current_process();
-
-    if (pid != -1)
-    {
-        Process *child = get_process(pid);
-
-        if (child->ppid != p->pid)
-        {
-            return -1;
-        }
-    }
-
-    if (!p->next_child)
-    {
-        return -1;
-    }
 
     if (sem_wait(&p->zombie_sem))
     {
@@ -92,18 +84,67 @@ pid_t waitpid(pid_t pid, int *wstatus, int options)
         return -1;
     }
 
-    // If looking for a specific process and it's not a zombie, O(1)
-    if (pid != -1)
+    Process *prev = NULL;
+    Process *child = p->next_child;
+    while (child->state != PROCESS_ZOMBIE)
     {
-        Process *child = get_process(pid);
+        prev = child;
+        child = child->next_brother;
 
-        if (child->state != PROCESS_ZOMBIE)
+        if (!child)
         {
-            return false;
+            return -1;
         }
     }
-    // If it is a zombie, O(n) (we must search the previous child to unlink it from the list)
 
+    if (prev)
+    {
+        prev->next_brother = child->next_brother;
+    }
+    else
+    {
+        p->next_child = child->next_brother;
+    }
+
+    if (wstatus)
+    {
+        *wstatus = child->exit_code;
+    }
+
+    sem_destroy(&child->exit_sem);
+    child->state = PROCESS_DEAD;
+    child->ppid = 0;
+
+    return child->pid;
+}
+
+pid_t waitpid(pid_t pid, int *wstatus, int options)
+{
+    Process *p = get_current_process();
+
+    if (!p->next_child)
+    {
+        return -1;
+    }
+
+    if (pid == -1)
+    {
+        return waitapid(wstatus, options);
+    }
+
+    Process *child = get_process(pid);
+
+    if (child->ppid != p->pid)
+    {
+        return -1;
+    }
+
+    if (sem_wait(&child->exit_sem))
+    {
+        return -1;
+    }
+
+    // We must search the previous child to unlink it from the list (O(n))
     Process *prev = NULL;
     Process *child = p->next_child;
     while (pid != child->pid && !(pid == -1 && child->state == PROCESS_ZOMBIE))
@@ -131,6 +172,9 @@ pid_t waitpid(pid_t pid, int *wstatus, int options)
         *wstatus = child->exit_code;
     }
 
+    // Discard the dead process from the zombie's semaphore
+    sem_wait(&p->zombie_sem);
+    sem_destroy(&child->exit_sem);
     child->state = PROCESS_DEAD;
     child->ppid = 0;
 

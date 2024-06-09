@@ -41,6 +41,7 @@ void *create_process_idle()
         .block_condition = no_condition,
         .condition_data = {},
         .zombie_sem = {},
+        .exit_sem = {},
         .files = {0, 1, 2, 3},
     };
 
@@ -128,8 +129,15 @@ FIND_PID:
         return -1;
     }
 
+    if (sem_init(&processes[new_pid].exit_sem, 1, 0))
+    {
+        free(new_stack);
+        return -1;
+    }
+
     if (sem_init(&processes[new_pid].zombie_sem, 1, 0))
     {
+        sem_destroy(&processes[new_pid].exit_sem);
         free(new_stack);
         return -1;
     }
@@ -229,7 +237,6 @@ int kill_process(pid_t pid)
         *head = loop_blocked_and_unblock(*head);
     }
 
-    sem_post(&get_process(man_im_dead->ppid)->zombie_sem);
     sem_destroy(&man_im_dead->zombie_sem);
 
     for (size_t i = 0; i < MAX_PROCESS_FILES; i++)
@@ -323,6 +330,9 @@ int kill_process(pid_t pid)
             free(man_im_dead->running_stack);
         }
     }
+
+    sem_post(&man_im_dead->exit_sem);
+    sem_post(&get_process(man_im_dead->ppid)->zombie_sem);
 
     man_im_dead->state = PROCESS_ZOMBIE;
     man_im_dead->running_stack = NULL;

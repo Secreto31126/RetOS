@@ -178,8 +178,6 @@ void set_keyboard_language(Language lang)
     switch (lang)
     {
     case ES_AR:
-        keyboard_scancodes = spanish_keyboard_layout;
-        break;
     case FR_FR:
         // Nah, I'm too lazy to do France too
         keyboard_scancodes = spanish_keyboard_layout;

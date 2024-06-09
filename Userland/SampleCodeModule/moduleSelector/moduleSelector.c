@@ -13,7 +13,7 @@ void setEnvironment();
 
 void startModules()
 {
-    setpriority(PRIO_PROCESS, getpid(), -20); // Shell is usually very I/O bound, this prevents modules that are not I/O bound from producing more input than the shell can print.
+    setpriority(PRIO_PROC, getpid(), -20); // Shell is usually very I/O bound, this prevents modules that are not I/O bound from producing more input than the shell can print.
     startPainter(getScreenWidth(), getScreenHeight());
     // sports_center(); // por ahora no :D
     setEnvironment();

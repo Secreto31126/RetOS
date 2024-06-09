@@ -4,12 +4,16 @@ void print_state()
 {
     while (1)
     {
-        sem_wait(data->mutex); // Mutex lock
+        sem_wait(data->printex[1]); // printex lock, should be posted by phylos when a state changes
         for (unsigned int i = 0; i < data->phylo_count; i++)
         {
             if (data->phylos[i].state == EATING)
             {
                 puts("E ");
+            }
+            else if (data->phylos[i].state == THINKING)
+            {
+                puts("T ");
             }
             else
             {
@@ -17,7 +21,6 @@ void print_state()
             }
         }
         puts("\n");
-        sem_post(data->mutex); // Mutex unlock
-        sleep(1);
+        sem_post(data->printex[0]); // printex unlock, should be waited by phylos when a state changes
     }
 }

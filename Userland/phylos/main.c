@@ -102,9 +102,9 @@ int remove_phylo()
 	int i = data->phylo_count;
 
 	sem_wait(data->mutex); // acquire mutex
-	data->adding = i - 2;  // notify phylo whose right fork will be removed so it isn't using it when I do
-	sem_wait(data->addex);
-	data->adding = i - 1; // notify phylo that will be removed so it gives back its right fork
+	data->adding = i - 2;  // notify last philo that will remain that you will remove its neighbour
+	sem_wait(data->addex); // wait for philo that must be notified to be in right state
+	data->adding = i - 1;  // notify phylo that will be removed so it gives back its right fork
 	sem_wait(data->addex);
 
 	kill(children[i - 1], SIGKILL);

@@ -334,9 +334,14 @@ int handleStdKeys(moduleData data, displayStyles displayStyle)
 
     char ctrlC[] = {LCTRL, 0x2E, 0};
     char ctrlD[] = {LCTRL, 0x20, 0};
+    char ctrlZ[] = {LCTRL, 0x2C, 0};
     if (strstr(r_buffer, ctrlC) != NULL)
     {
         return 2;
+    }
+    if (strstr(r_buffer, ctrlZ) != NULL)
+    {
+        return 3;
     }
     if (strstr(r_buffer, ctrlD) != NULL && data.writeFd >= 0)
     {
@@ -458,6 +463,12 @@ void readUntilClose(commandData cData, displayStyles displayStyle)
                 if (aux == 2)
                 { // send SIGKILL to process, wait for it to terminate
                     killModule(cData, "");
+                    return;
+                }
+                if (aux == 3)
+                { // user wants it moved to bg
+                    addStringToBuffer("Moved to background", 0);
+                    addToActive(cData);
                     return;
                 }
             }

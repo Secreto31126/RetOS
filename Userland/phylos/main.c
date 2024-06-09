@@ -138,27 +138,6 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	int pid;
-	for (unsigned int i = 0; i < data->phylo_count; i++)
-	{
-		pid = fork();
-		if (pid < 0)
-		{
-			puts("Failed to fork");
-			leave(i);
-			return 1;
-		}
-		else if (pid == 0)
-		{
-			phylosopher(i);
-			return 0;
-		}
-		else
-		{
-			children[i] = pid;
-		}
-	}
-
 	if (make_printer())
 		return 1;
 

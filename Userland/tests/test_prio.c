@@ -14,8 +14,6 @@ int64_t prio[TOTAL_PROCESSES] = {LOWEST, MEDIUM, HIGHEST};
 
 void test_prio(uint64_t argc, char *argv[])
 {
-  // MODIFIED TO PREVENT TAKING TOO MUCH TIME AWAY FROM SHELL
-
   // MODIFIED TO RECEIVE WAIT TIMES VIA ARGV, OR USE DEFAULTS IF NOT PRESENT
   uint64_t long_wait = WAIT, aux = 0;
   char *short_wait = MINOR_WAIT;

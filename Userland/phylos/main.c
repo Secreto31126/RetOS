@@ -60,6 +60,7 @@ int make_philo(int i)
 	}
 	// parent process
 	children[i] = pid;
+	(data->phylo_count)++;
 	return 0;
 }
 
@@ -85,13 +86,30 @@ int add_philo(int use_addex)
 		return 1;
 	}
 
-	(data->phylo_count)++;
 	if (i && use_addex)
 	{
 		data->adding = -1;
 		sem_post(data->mutex);
 	}
 
+	return 0;
+}
+
+int remove_phylo()
+{
+	int i = data->phylo_count;
+
+	sem_wait(data->mutex); // acquire mutex
+	data->adding = i - 2;  // notify last philo that will remain that you will remove its neighbour
+	sem_wait(data->addex); // wait for philo that must be notified to be in right state
+
+	kill(children[i - 1], SIGKILL);
+	waitpid(children[i - 1], NULL, 0);
+	sem_close(data->phylos[i - 1].sem);
+	(data->phylo_count)--;
+
+	data->adding = -1;
+	sem_post(data->mutex);
 	return 0;
 }
 
@@ -126,7 +144,8 @@ int main_loop()
 		if (data->phylo_count < MAX_PHYLOS)
 		{
 			puts("Adding\n");
-			add_philo(1);
+			if (add_philo(1))
+				return 1;
 			sem_post(data->childex); // wake up the philo
 			break;
 		}
@@ -136,17 +155,13 @@ int main_loop()
 	case 'r':
 	case 'R':
 	{
-		puts("Removing\n");
-		sem_close(data->phylos[data->phylo_count].sem);
-		kill(children[data->phylo_count], SIGKILL);
-		waitpid(children[data->phylo_count], NULL, 0);
-		(data->phylo_count)--;
-		if (data->phylo_count < 0)
+		if (data->phylo_count <= 1)
 		{
-			puts("No more phylos\n");
-			return 1;
+			puts("Can't have less than 2 phylos\n");
+			break;
 		}
-
+		puts("Removing\n");
+		remove_phylo();
 		break;
 	}
 	case 'q':

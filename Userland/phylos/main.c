@@ -102,6 +102,8 @@ int remove_phylo()
 	sem_wait(data->mutex); // acquire mutex
 	data->adding = i - 2;  // notify last philo that will remain that you will remove its neighbour
 	sem_wait(data->addex); // wait for philo that must be notified to be in right state
+	data->adding = i - 1;  // notify phylo that will be removed so it gives back its right fork
+	sem_wait(data->addex);
 
 	kill(children[i - 1], SIGKILL);
 	waitpid(children[i - 1], NULL, 0);
@@ -109,7 +111,8 @@ int remove_phylo()
 	(data->phylo_count)--;
 
 	data->adding = -1;
-	sem_post(data->mutex);
+	sem_post(data->mutex); // I only need to do it once, the other process that was blocked on this is dead
+
 	return 0;
 }
 

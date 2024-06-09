@@ -1,9 +1,3 @@
 {
-    "editor.formatOnSave": true,
-    "files.associations": {
-        "test_util.h": "c",
-        "memory.h": "c",
-        "resource.h": "c",
-        "my_lib.h": "c"
-    },
+    "editor.formatOnSave": true
 }

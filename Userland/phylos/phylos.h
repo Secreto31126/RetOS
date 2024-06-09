@@ -27,9 +27,9 @@ typedef struct Data
     sem_t *mutex;
     sem_t **printex;
     sem_t *childex;
-    phylo_t phylos[MAX_PHYLOS];
-    int adding;
     sem_t *addex;
+    int adding;
+    phylo_t phylos[MAX_PHYLOS];
     int phylo_count;
 } Data;
 

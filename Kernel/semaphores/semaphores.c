@@ -113,7 +113,6 @@ int sem_post(sem_t *sem)
 
 int sem_wait(sem_t *sem)
 {
-    size_t i = 0;
 
     if (!usable(sem))
     {

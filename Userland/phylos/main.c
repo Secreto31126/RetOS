@@ -86,12 +86,11 @@ int add_philo(int use_addex)
 	}
 
 	(data->phylo_count)++;
-	if (i)
+	if (i && use_addex)
 	{
 		data->adding = -1;
 		sem_post(data->mutex);
 	}
-	sem_post(data->childex); // wake up new philo
 
 	return 0;
 }

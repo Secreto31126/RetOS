@@ -2,11 +2,21 @@
 
 #ifdef BUDDY_SYSTEM
 
+size_t round_to_power_of_two(size_t s)
+{
+    if (!s)
+        return 0;
+    int i = 1;
+    while ((i << 1) <= s)
+        i <<= 1;
+    return i;
+}
+
 void init_memory_manager()
 {
     // A complete binary tree has (2*LEAVES)-1 nodes
     // Unit represents the number of MEMORY_BLOCK-NODE pairs that can fit into the given heap
-    size_t unit = size / (BLOCK + HEAD_SIZE * 2 - 1);
+    size_t unit = HEAP_SIZE / (BLOCK + HEAD_SIZE * 2 - 1);
 
     mem_end = mem_start + round_to_power_of_two(BLOCK * unit);
 
@@ -185,6 +195,11 @@ size_t find_buddy(size_t size, size_t index, size_t current_size)
         return find_buddy(size, GET_RIGHT(index), current_size / 2);
     }
     return left;
+}
+
+int memory_state(char *output, size_t length)
+{
+    return 1;
 }
 
 #else

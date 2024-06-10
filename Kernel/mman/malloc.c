@@ -6,7 +6,7 @@ void *malloc(uint32_t size)
 {
     if (size > MEM_END - MEM_START)
         return NULL;
-    size_t index = find_buddy(size, 0, MEM_END - MEM_START);
+    size_t index = find_buddy(size * 2, 0, MEM_END - MEM_START);
     if (index == -1)
     {
         return NULL;

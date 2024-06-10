@@ -40,6 +40,10 @@ int main(int argc, char *argv[])
 	// sleep(100);
 	// return 1;
 
+	// 🧦
+
+	puts("Welcome to init");
+
 	int pid = fork();
 	if (pid)
 	{
@@ -55,7 +59,7 @@ int main(int argc, char *argv[])
 	execv("module", NULL);
 	return 1;
 
-	// char char_pid = get_pid() + '0';
+	// char char_pid = getpid() + '0';
 	// for (int i = 0; i < argc; i++)
 	// {
 	// 	write(1, &char_pid, 1);

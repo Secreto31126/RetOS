@@ -6,12 +6,14 @@
 #include "./../window/fontInterface.h"
 #include "./../nstdlib/nstdlib.h"
 #include "./../piano/sound.h"
+#include <sys/resource.h>
 
 static const char prompt[] = "You are now in the module selector.\nPress 1 to continue to shell.\nPress 2 to get the current time.\nPress 3 to dump all registers.\nPress 4 to test exceptions.\nPress 5 to end program (shut down).\n";
 void setEnvironment();
 
 void startModules()
 {
+    setpriority(PRIO_PROC, getpid(), -20); // Shell is usually very I/O bound, this prevents modules that are not I/O bound from producing more input than the shell can print.
     startPainter(getScreenWidth(), getScreenHeight());
     // sports_center(); // por ahora no :D
     setEnvironment();
@@ -31,7 +33,8 @@ void startModules()
         case '2':
         {
             blank();
-            paintString(sPrintf("Time is %s.\n\nPress any key to return to module selector.", getTimeString()), -1, 0);
+            char buffer[6];
+            paintString(sPrintf("Time is %s.\n\nPress any key to return to module selector.", getTimeString(buffer)), -1, 0);
             freePrints();
             getChar();
             blank();
@@ -42,7 +45,7 @@ void startModules()
         {
             blank();
             char *c = getDumpString();
-            if (strcmp(c, ""))
+            if (!strcmp(c, ""))
                 paintString("No dump has been generated. Press 'alt' to generate a dump of the instant of pressing.\n\nPress any key to return to module selector.", -1, 0);
             else
                 paintString(sPrintf("%s\n\nPress any key to return to module selector.", c), -1, 0);
@@ -76,7 +79,7 @@ void startModules()
     }
     blank();
     paintString("Exiting module selector.", -1, 0);
-    wait();
+    sleep(1);
     blank();
     endPainter();
     freeCommands();

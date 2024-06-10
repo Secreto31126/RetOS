@@ -43,8 +43,8 @@ void setBoard(int snakeCount)
         unsigned int j = getNthEmpty(randBetween(0, boardSizeNoMargins - i)); // no objects will be placed on edges upon setting board.
         if (j < boardSizeNoMargins)
         { // No objects will be added if board is full.
-            board[0][j].toDraw = APPLE;
-            board[0][j].health = 1;
+            board[(int)(j / BOARD_WIDTH)][j % BOARD_WIDTH].toDraw = APPLE;
+            board[(int)(j / BOARD_WIDTH)][j % BOARD_WIDTH].health = 1;
         }
     }
     for (int i = 0; i < snakeCount; i++)
@@ -52,9 +52,9 @@ void setBoard(int snakeCount)
         unsigned int j = getNthEmpty(randBetween(0, boardSizeNoMargins - i - APPLE_COUNT)); // no objects will be placed on edges on setting board.
         if (j < boardSizeNoMargins)
         {
-            board[0][j].player = i; // No objects will be added if board is full.
-            board[0][j].health = START_PLAYER_LENGTH;
-            board[0][j].toDraw = HEAD;
+            board[(int)(j / BOARD_WIDTH)][j % BOARD_WIDTH].player = i; // No objects will be added if board is full.
+            board[(int)(j / BOARD_WIDTH)][j % BOARD_WIDTH].health = START_PLAYER_LENGTH;
+            board[(int)(j / BOARD_WIDTH)][j % BOARD_WIDTH].toDraw = HEAD;
         }
         snakes[i].length = START_PLAYER_LENGTH;
         snakes[i].color = getHexColor();
@@ -91,7 +91,7 @@ unsigned int update(int snakeCount, int *deathCount, int *madeApple)
                 {
                     int nextX = j + parseDirX(snakes[lookingAt.player].direction);
                     int nextY = i + parseDirY(snakes[lookingAt.player].direction);
-                    if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].health != 0 && board[nextX][nextY].toDraw != BLANK && board[nextX][nextY].toDraw != APPLE))
+                    if (nextX < 0 || nextX >= BOARD_WIDTH || nextY < 0 || nextY >= BOARD_HEIGHT || (board[nextY][nextX].health != 0 && board[nextY][nextX].toDraw != BLANK && board[nextY][nextX].toDraw != APPLE))
                     {
                         killSnake(lookingAt.player);
                         (*deathCount)++;
@@ -200,8 +200,8 @@ void makeApple()
     unsigned int j = getNthEmpty(randBetween(0, boardSizeNoMargins - objects)); // no objects will be placed on edges on setting board.
     if (j < boardSizeNoMargins)
     { // No objects will be added if board is full.
-        board[0][j].toDraw = APPLE;
-        board[0][j].health = 1;
+        board[(int)(j / BOARD_WIDTH)][j % BOARD_WIDTH].toDraw = APPLE;
+        board[(int)(j / BOARD_WIDTH)][j % BOARD_WIDTH].health = 1;
     }
 }
 
@@ -210,9 +210,11 @@ unsigned int getNthEmpty(unsigned int n)
     unsigned int j;
     for (j = 0; j <= n && n < BOARD_SIZE_NO_MARGINS; j++)
     {
-        if ((board[0][j].toDraw == APPLE || board[0][j].toDraw == TAIL || !(board[0][j].health == 0 || (board[0][j].health == 1 && board[0][j].toDraw == BLANK)))) // inefficient to look through whole array. Also inefficient to ask for more random numbers if spot selected is occupied. This was chosen because our rng is not particularly random, so repeated calls not particularly good.
-            n++;                                                                                                                                                   // only advances position if there is not an object on the board. This serves to select the n-th empty tile
+        if ((board[(int)(j / BOARD_WIDTH)][j % BOARD_WIDTH].toDraw == APPLE || board[(int)(j / BOARD_WIDTH)][j % BOARD_WIDTH].toDraw == TAIL || !(board[(int)(j / BOARD_WIDTH)][j % BOARD_WIDTH].health == 0 || (board[(int)(j / BOARD_WIDTH)][j % BOARD_WIDTH].health == 1 && board[(int)(j / BOARD_WIDTH)][j % BOARD_WIDTH].toDraw == BLANK)))) // inefficient to look through whole array. Also inefficient to ask for more random numbers if spot selected is occupied. This was chosen because our rng is not particularly random, so repeated calls not particularly good.
+            n++;                                                                                                                                                                                                                                                                                                                                  // only advances position if there is not an object on the board. This serves to select the n-th empty tile
     }
+    if (j > BOARD_SIZE)
+        return BOARD_SIZE - 1;
     return j - 1;
 }
 char isHead(tile t)

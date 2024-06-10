@@ -1,14 +1,14 @@
 #include "painter.h"
 #define LINE_START_MAX 20
-#define X_LINE_END (((int)(w / (size * TRUE_LETTER_WIDTH))) * size * TRUE_LETTER_WIDTH)
+#define X_LINE_END (((int)(width / (size * TRUE_LETTER_WIDTH))) * size * TRUE_LETTER_WIDTH)
 static double size = 1.0;
-static uint64_t w, h, xPointer = 0, yPointer = TRUE_LETTER_HEIGHT;
+static uint64_t width, height, xPointer = 0, yPointer = TRUE_LETTER_HEIGHT;
 static Window stamp;
 
-void startPainter(uint64_t width, uint64_t height)
+void startPainter(uint64_t w, uint64_t h)
 {
-    w = width;
-    h = height;
+    width = w;
+    height = h;
     stamp = getWindow(TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, malloc(TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH * sizeof(HexColor)));
 }
 void setSize(double s)
@@ -60,9 +60,9 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
         }
         return 1;
     }
-    if ((xPointer + TRUE_LETTER_WIDTH * size) > w || c == '\n')
+    if ((xPointer + TRUE_LETTER_WIDTH * size) > width || c == '\n')
     {
-        if ((yPointer + TRUE_LETTER_HEIGHT * size * 2) > h) // *2 because letters are drawn from cursor downwards and to the right, so otherwise last line would have its top on the bottom of the screen
+        if ((yPointer + TRUE_LETTER_HEIGHT * size * 2) > height) // *2 because letters are drawn from cursor downwards and to the right, so otherwise last line would have its top on the bottom of the screen
             return 0;
         else
         {
@@ -71,8 +71,17 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
                 return 1;
         }
     }
-    drawCharAt(c, letterColor, highlightColor, xPointer, yPointer);
-    moveCursor();
+
+    if (c == '\t')
+    {
+        for (int i = 0; i < SPACES_IN_TAB; i++)
+            paintChar(' ', letterColor, highlightColor);
+    }
+    else
+    {
+        drawCharAt(c, letterColor, highlightColor, xPointer, yPointer);
+        moveCursor();
+    }
     return 1;
 }
 char paintString(const char *c, HexColor letterColor, HexColor highlightColor)
@@ -97,15 +106,15 @@ void drawStringAt(char *c, HexColor letterColor, HexColor highlightColor, uint64
 }
 uint64_t maxYPointer()
 {
-    return h - 2 * size * TRUE_LETTER_HEIGHT;
+    return height - 2 * size * TRUE_LETTER_HEIGHT;
 }
 uint64_t maxXPointer()
 {
-    return w - TRUE_LETTER_WIDTH * size;
+    return width - TRUE_LETTER_WIDTH * size;
 }
 char willFit(const char *s)
 {
-    double xP = 0, yP = 0, maxX = w - TRUE_LETTER_WIDTH * size, maxY = h - 2 * TRUE_LETTER_HEIGHT * size;
+    double xP = 0, yP = 0, maxX = width - TRUE_LETTER_WIDTH * size, maxY = height - 2 * TRUE_LETTER_HEIGHT * size;
     while (*s)
     {
         if (*s == '\n' || xP > maxX)
@@ -126,7 +135,7 @@ char willFit(const char *s)
 
 uint64_t getCharPerLine()
 {
-    return (uint64_t)(w / TRUE_LETTER_WIDTH / size);
+    return (uint64_t)(width / TRUE_LETTER_WIDTH / size);
 }
 
 void blank()

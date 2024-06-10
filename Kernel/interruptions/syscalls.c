@@ -74,9 +74,9 @@ static syscall syscall_handlers[SYSCALL_COUNT] = {
     (syscall)setpriority,
     (syscall)sem_open,
     (syscall)sem_close,
-    (syscall)sem_wait,
-    (syscall)sem_post,
     (syscall)sem_unlink,
+    (syscall)sem_post,
+    (syscall)sem_wait,
     (syscall)sbrk,
     (syscall)memory_state,
 };

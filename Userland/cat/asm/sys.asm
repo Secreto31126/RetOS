@@ -25,8 +25,11 @@
     global flush
     global getpriority
     global setpriority
-    global sbrk
-    global memory_state
+    global sem_open
+    global sem_close
+    global sem_unlink
+    global sem_post
+    global sem_wait
 
 ; ssize_t read(int fd, void *buf, size_t count);
 read:
@@ -80,6 +83,12 @@ beep:
 get_tick:
     mov rax, 8
     int 80h
+    ret
+
+; 
+    get_dump:
+    mov rax, 9
+    int 80h,
     ret
 
 ; int ps();
@@ -178,14 +187,38 @@ getpriority:
     int 80h
     ret
 
-; void *sbrk(intptr_t increment);
-sbrk:
-    mov rax, 0x20
+; int setpriority(int which, unsigned int who, int prio);
+setpriority:
+    mov rax, 0x1A
     int 80h
     ret
 
-; int memory_state(char *output, size_t length);
-memory_state:
-    mov rax, 0x21
+; sem_t *sem_open(const char *name, unsigned int value);
+sem_open:
+    mov rax, 0x1B
+    int 80h
+    ret
+
+; int sem_close(sem_t *sem)
+sem_close:
+    mov rax, 0x1C
+    int 80h
+    ret
+
+; int sem_unlink(const char *name)
+sem_unlink:
+    mov rax, 0x1D
+    int 80h
+    ret
+
+; int sem_post(sem_t *sem)
+sem_post:
+    mov rax, 0x1E
+    int 80h
+    ret
+
+; int sem_wait(sem_t *sem)
+sem_wait:
+    mov rax, 0x1F
     int 80h
     ret

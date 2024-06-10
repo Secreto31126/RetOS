@@ -39,9 +39,9 @@ char *mem_end;
 char *map_start;
 char *map_end;
 
-void cascade_state(char *x, size_t_m i, states s);
+void cascade_state(char *x, size_t_k i, states s);
 
-size_t_m round_to_power_of_two(size_t_m s)
+size_t_k round_to_power_of_two(size_t_k s)
 {
     if (!s)
         return 0;
@@ -51,9 +51,9 @@ size_t_m round_to_power_of_two(size_t_m s)
     return i;
 }
 
-void set_node_state(char *x, size_t_m i, states s)
+void set_node_state(char *x, size_t_k i, states s)
 {
-    size_t_m bit_index = (i << 1);
+    size_t_k bit_index = (i << 1);
     switch (s)
     {
     case EMPTY:
@@ -80,7 +80,7 @@ void set_node_state(char *x, size_t_m i, states s)
         cascade_state(x, i, s);
 }
 
-states read_state(char *x, size_t_m i)
+states read_state(char *x, size_t_k i)
 {
     if (IS_BIT_SET(x, i << 1))
     {
@@ -95,7 +95,7 @@ states read_state(char *x, size_t_m i)
     return EMPTY;
 }
 
-void cascade_state(char *x, size_t_m i, states s)
+void cascade_state(char *x, size_t_k i, states s)
 {
     states aux;
     switch (s)
@@ -124,11 +124,11 @@ void cascade_state(char *x, size_t_m i, states s)
     }
 }
 
-void malloc_init(void *start, size_t_m size)
+void malloc_init(void *start, size_t_k size)
 {
     // A complete binary tree has (2*LEAVES)-1 nodes
     // Unit represents the number of MEMORY_BLOCK-NODE pairs that can fit into the given heap
-    size_t_m unit = size / (BLOCK + HEAD_SIZE * 2 - 1);
+    size_t_k unit = size / (BLOCK + HEAD_SIZE * 2 - 1);
 
     mem_start = (char *)start;
     mem_end = mem_start + round_to_power_of_two(BLOCK * unit);
@@ -142,9 +142,9 @@ void malloc_init(void *start, size_t_m size)
         *((uint64_t *)i) = EMPTY;
 }
 
-size_t_m height(size_t_m index)
+size_t_k height(size_t_k index)
 {
-    size_t_m ans = 0;
+    size_t_k ans = 0;
     while (index)
     {
         ans++;
@@ -152,16 +152,16 @@ size_t_m height(size_t_m index)
     }
     return ans;
 }
-size_t_m mem_size(size_t_m index)
+size_t_k mem_size(size_t_k index)
 {
     return (mem_end - mem_start) >> height(index);
 }
 
 // TODO actually test these
-size_t_m map_index_to_mem_index(size_t_m index)
+size_t_k map_index_to_mem_index(size_t_k index)
 {
-    size_t_m result = 0;
-    size_t_m jump = mem_size(index);
+    size_t_k result = 0;
+    size_t_k jump = mem_size(index);
     while (index > 0)
     {
         if (!IS_LEFT(index))
@@ -172,11 +172,11 @@ size_t_m map_index_to_mem_index(size_t_m index)
     return result;
 }
 
-size_t_m mem_index_to_map_index(size_t_m index)
+size_t_k mem_index_to_map_index(size_t_k index)
 {
-    size_t_m probe = 0;
-    size_t_m jump = (mem_end - mem_start) >> 2;
-    size_t_m map_index = 0;
+    size_t_k probe = 0;
+    size_t_k jump = (mem_end - mem_start) >> 2;
+    size_t_k map_index = 0;
     while (probe < index && jump > 0)
     {
         if (probe + jump <= index)
@@ -202,13 +202,13 @@ size_t_m mem_index_to_map_index(size_t_m index)
     return map_index;
 }
 
-size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size);
+size_t_k find_buddy(size_t_k size, size_t_k index, size_t_k current_size);
 
-void *malloc_m(size_t_m size)
+void *malloc_m(size_t_k size)
 {
     if (size > mem_end - mem_start)
         return NULL;
-    size_t_m index = find_buddy(size, 0, mem_end - mem_start);
+    size_t_k index = find_buddy(size, 0, mem_end - mem_start);
     if (index == -1)
     {
         return NULL;
@@ -219,7 +219,7 @@ void *malloc_m(size_t_m size)
 /**
  * @brief dfs algorithm, searches for a node that represents the smallest unit of memory that can fit the request
  */
-size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size)
+size_t_k find_buddy(size_t_k size, size_t_k index, size_t_k current_size)
 {
     // if does not fit in the space denoted by the node, do not look further
     if (size > current_size)
@@ -243,14 +243,14 @@ size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size)
         return -1;
     }
     // dfs recursion: search left, if not found, return right search
-    size_t_m left = find_buddy(size, GET_LEFT(index), current_size / 2);
+    size_t_k left = find_buddy(size, GET_LEFT(index), current_size / 2);
     if (left == -1)
     {
         return find_buddy(size, GET_RIGHT(index), current_size / 2);
     }
     return left;
 }
-void *realloc_m(void *ptr, size_t_m size)
+void *realloc_m(void *ptr, size_t_k size)
 {
     return NULL;
 }
@@ -261,7 +261,7 @@ void free_m(void *ptr)
 }
 /*
 
-void print_m_rec(size_t_m i, size_t_m height, char avoid_empty);
+void print_m_rec(size_t_k i, size_t_k height, char avoid_empty);
 
 void print_m(char avoid_empty)
 {
@@ -292,7 +292,7 @@ Dif:%lu\n",
            (uint64_t)map_start, (uint64_t)map_end, (uint64_t)(map_end - map_start), (uint64_t)mem_start, (uint64_t)mem_end, (uint64_t)(mem_end - mem_start));
 }
 
-void print_m_rec(size_t_m i, size_t_m height, char avoid_empty)
+void print_m_rec(size_t_k i, size_t_k height, char avoid_empty)
 {
     if (i < 0 || i > (map_end - map_start) * 2)
         return;

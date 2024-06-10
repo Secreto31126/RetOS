@@ -37,13 +37,10 @@ typedef enum states
     ALLOCATED
 } states;
 
-enum pointers
-{
-    MEM_START = 0x18000000,
-    MEM_END = 0x1C000000,
-    MAP_START = MEM_END,
-    MAP_END = 0x1C100000
-};
+#define MEM_START ((char *)0x18000000)
+#define MEM_END ((char *)0x1C000000)
+#define MAP_START ((char *)MEM_END)
+#define MAP_END ((char *)0x1C100000)
 
 void cascade_state(char *x, size_t i, states s);
 size_t round_to_power_of_two(size_t s);

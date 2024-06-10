@@ -54,7 +54,7 @@ size_t mem_index_to_map_index(size_t index);
  */
 size_t find_buddy(size_t size, size_t index, size_t current_size);
 
-#endif
+#else
 
 #define MAP_SIZE HEAP_SIZE
 

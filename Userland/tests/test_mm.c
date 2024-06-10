@@ -20,11 +20,6 @@ uint64_t test_mm(uint64_t argc, char *argv[])
   uint32_t total;
   uint64_t max_memory;
 
-  /*
-  unsigned char count = 0;
-  char buffer[3];
-  */
-
   if (argc != 1 && argc != 2)
     return -2;
 
@@ -50,8 +45,6 @@ uint64_t test_mm(uint64_t argc, char *argv[])
       mm_rqs[rq].size = GetUniform(max_memory - total - 1) + 1;
       if (use_heap)
         mm_rqs[rq].address = malloc(mm_rqs[rq].size); // MODIFIED TO ENABLE USING HEAP MALLOC (CURRENTLY UNAVAILABLE)
-      else
-        mm_rqs[rq].address = malloc(mm_rqs[rq].size);
 
       if (mm_rqs[rq].address)
       {
@@ -81,13 +74,6 @@ uint64_t test_mm(uint64_t argc, char *argv[])
       {
         if (use_heap)
           free(mm_rqs[i].address); // MODIFIED TO ENABLE USING HEAP MALLOC (CURRENTLY UNAVAILABLE)
-        else
-          free(mm_rqs[i].address);
       }
-    /*
-    itoa(++count, buffer, 10);
-    puts(buffer);
-    puts(" ");
-    */
   }
 }

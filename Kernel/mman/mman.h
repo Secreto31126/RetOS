@@ -10,7 +10,7 @@
 typedef uint32_t map_entry;
 
 // 384 MB
-#define HEAP_START 0x18000000
+#define HEAP_START (unsigned int *)(0x18000000)
 // 128 MB
 #define HEAP_SIZE 0x8000000
 
@@ -58,7 +58,7 @@ size_t find_buddy(size_t size, size_t index, size_t current_size);
 #else
 
 // 256 MB
-#define MAP_START 0x10000000
+#define MAP_START (unsigned int *)(0x10000000)
 #define MAP_SIZE HEAP_SIZE
 
 /**

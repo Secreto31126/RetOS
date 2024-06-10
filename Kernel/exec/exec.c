@@ -21,47 +21,47 @@ Executable executables[EXECUTABLES] = {
     {
         .mod = 7,
         .filename = "cat",
-        .main = (EntryPoint)0x605000,
-    },
-    {
-        .mod = 7,
-        .filename = "wc",
         .main = (EntryPoint)0x610000,
     },
     {
         .mod = 7,
-        .filename = "filter",
-        .main = (EntryPoint)0x615000,
-    },
-    {
-        .mod = 7,
-        .filename = "loop",
+        .filename = "wc",
         .main = (EntryPoint)0x620000,
     },
     {
         .mod = 7,
-        .filename = "grep",
-        .main = (EntryPoint)0x625000,
-    },
-    {
-        .mod = 7,
-        .filename = "sing",
+        .filename = "filter",
         .main = (EntryPoint)0x630000,
     },
     {
         .mod = 7,
-        .filename = "less",
-        .main = (EntryPoint)0x635000,
-    },
-    {
-        .mod = 7,
-        .filename = "phylos",
+        .filename = "loop",
         .main = (EntryPoint)0x640000,
     },
     {
         .mod = 7,
+        .filename = "grep",
+        .main = (EntryPoint)0x650000,
+    },
+    {
+        .mod = 7,
+        .filename = "sing",
+        .main = (EntryPoint)0x660000,
+    },
+    {
+        .mod = 7,
+        .filename = "less",
+        .main = (EntryPoint)0x670000,
+    },
+    {
+        .mod = 7,
+        .filename = "phylos",
+        .main = (EntryPoint)0x680000,
+    },
+    {
+        .mod = 7,
         .filename = "tests",
-        .main = (EntryPoint)0x645000,
+        .main = (EntryPoint)0x690000,
     },
 };
 

@@ -25,7 +25,6 @@ uint64_t test_mm(uint64_t argc, char *argv[])
   unsigned char count = 0;
   char buffer[3];
   */
-  puts("Here");
 
   if (argc != 1 && argc != 2)
     return -2;

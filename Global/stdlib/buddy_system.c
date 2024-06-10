@@ -73,7 +73,7 @@ void malloc_init(void *start, size_t_m size)
 }
 void *get_heap_start()
 {
-    return NULL;
+    return sbrk(0);
 }
 
 void cascade_state(char *x, size_t_m i, states s);

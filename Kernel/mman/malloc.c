@@ -1,5 +1,21 @@
 #include "mman.h"
 
+#ifdef BUDDY_SYSTEM
+
+void *malloc(uint32_t size)
+{
+    if (size > MEM_END - MEM_START)
+        return NULL;
+    size_t index = find_buddy(size * 2, 0, MEM_END - MEM_START);
+    if (index == -1)
+    {
+        return NULL;
+    }
+    return (void *)(MEM_START + map_index_to_mem_index(index));
+}
+
+#else
+
 #define MEM_SCALE 1
 void *malloc(uint32_t size)
 {
@@ -35,3 +51,5 @@ void *malloc(uint32_t size)
 
     return NULL;
 }
+
+#endif

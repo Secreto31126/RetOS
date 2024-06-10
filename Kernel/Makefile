@@ -30,6 +30,10 @@ GCCFLAGS += -g
 ASMFLAGS += -g -F dwarf
 endif
 
+ifneq ($(BUDDY), 0)
+GCCFLAGS += -DBUDDY_SYSTEM
+endif
+
 %.o: %.c
 	$(GCC) $(GCCFLAGS) -I./include -I../Global/include -c $< -o $@
 

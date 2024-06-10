@@ -87,6 +87,12 @@ get_tick:
     int 80h
     ret
 
+; 
+    get_dump:
+    mov rax, 9
+    int 80h,
+    ret
+
 ; int ps();
 ps:
     mov rax, 0xA
@@ -183,6 +189,18 @@ getpriority:
     int 80h
     ret
 
+; void *sbrk(intptr_t increment);
+sbrk:
+    mov rax, 0x20
+    int 80h
+    ret
+
+; int memory_state(char *output, size_t length);
+memory_state:
+    mov rax, 0x21
+    int 80h
+    ret
+
 ; int setpriority(int which, unsigned int who, int prio);
 setpriority:
     mov rax, 0x1A
@@ -216,17 +234,5 @@ sem_post:
 ; int sem_wait(sem_t *sem)
 sem_wait:
     mov rax, 0x1F
-    int 80h
-    ret
-
-; void *sbrk(intptr_t increment);
-sbrk:
-    mov rax, 0x20
-    int 80h
-    ret
-
-; int memory_state(char *output, size_t length);
-memory_state:
-    mov rax, 0x21
     int 80h
     ret

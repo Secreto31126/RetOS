@@ -5,8 +5,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define BUDDY_SYSTEM
-
 typedef uint32_t map_entry;
 
 // 384 MB

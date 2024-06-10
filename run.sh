@@ -4,12 +4,14 @@ container="tpe-builder"
 
 if [ $# -eq 0 ] || [ "$1" = "-h" ]
 then
-    echo "Usage: $0 (build|debug|pvs|docs) [wsl]"
+    echo "Usage: $0 (build|debug|pvs|docs) [naive|buddy] [wsl]"
     echo
     echo "build: Build the image"
     echo "debug: Run the image in debug mode"
     echo "pvs: Run the image in PVS mode"
     echo "docs: Generate the documentation"
+    echo "naive: Run the image with naive memory system"
+    echo "buddy: Run the image with buddy memory system"
     exit 1
 fi
 
@@ -28,16 +30,34 @@ fi
 id=
 if [[ "$1" = b* ]]
 then
-    echo "BUILD mode"
-    id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all)
+    if [[ "$2" = b* ]]
+    then
+        echo "BUILD mode with buddy"
+        id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all BUDDY=1)
+    else
+        echo "BUILD mode"
+        id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all)
+    fi
 elif [[ "$1" = d* ]]
 then
-    echo "DEBUG mode"
-    id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all DEBUG=1)
+    if [[ "$2" = b* ]]
+    then
+        echo "DEBUG mode with buddy"
+        id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all DEBUG=1)
+    else
+        echo "DEBUG mode"
+        id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all DEBUG=1)
+    fi
 elif [[ "$1" = p* ]]
 then
-    echo "PVS mode"
-    id=$(docker run -d -v "/$path/Image:/root/Image" "$container" pvs)
+    if [["$2" = b* ]]
+    then
+        echo "PVS mode with buddy"
+        id=$(docker run -d -v "/$path/Image:/root/Image" "$container" pvs BUDDY=1)
+    else
+        echo "PVS mode"
+        id=$(docker run -d -v "/$path/Image:/root/Image" "$container" pvs)
+    fi
 else
     echo "Invalid mode"
     exit 1
@@ -52,7 +72,7 @@ docker image rm "$container" > /dev/null
 
 if [[ "$1" = b* ]]
 then
-    if [[ "$2" = w* ]]
+    if [[ "$3" = w* ]]
     then
         echo "Copying files to //wsl$/Ubuntu/tmp/retos"
         rm -rf "//wsl$/Ubuntu/tmp/retos"
@@ -75,7 +95,7 @@ then
     fi
 elif [[ "$1" = d* ]]
 then
-    if [[ "$2" = w* ]]
+    if [[ "$3" = w* ]]
     then
         echo "Copying files to //wsl$/Ubuntu/tmp/retos"
         rm -rf "//wsl$/Ubuntu/tmp/retos"

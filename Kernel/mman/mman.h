@@ -9,8 +9,6 @@
 
 typedef uint32_t map_entry;
 
-// 256 MB
-#define MAP_START 0x10000000
 // 384 MB
 #define HEAP_START 0x18000000
 // 128 MB
@@ -39,13 +37,17 @@ typedef enum states
     ALLOCATED
 } states;
 
-static char *mem_start = (char *)HEAP_START;
-static char *mem_end;
-static char *map_start;
-static char *map_end;
+enum pointers
+{
+    MEM_START = 0x18000000,
+    MEM_END = 0x1C000000,
+    MAP_START = MEM_END,
+    MAP_END = 0x1C100000
+};
 
 void cascade_state(char *x, size_t i, states s);
 size_t round_to_power_of_two(size_t s);
+void set_node_state(char *x, size_t i, states s);
 states read_state(char *x, size_t i);
 size_t height(size_t index);
 size_t mem_size(size_t index);
@@ -58,6 +60,8 @@ size_t find_buddy(size_t size, size_t index, size_t current_size);
 
 #else
 
+// 256 MB
+#define MAP_START 0x10000000
 #define MAP_SIZE HEAP_SIZE
 
 /**

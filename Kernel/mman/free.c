@@ -4,8 +4,8 @@
 
 void free(void *ptr)
 {
-    if (((char *)ptr) >= mem_start && ((char *)ptr) <= mem_end)
-        set_node_state(map_start, mem_index_to_map_index(((char *)ptr) - mem_start), EMPTY);
+    if (((char *)ptr) >= MEM_START && ((char *)ptr) <= MEM_END)
+        set_node_state(MAP_START, mem_index_to_map_index(((char *)ptr) - MEM_START), EMPTY);
 }
 
 #else

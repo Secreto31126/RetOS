@@ -14,18 +14,8 @@ size_t round_to_power_of_two(size_t s)
 
 void init_memory_manager()
 {
-    // A complete binary tree has (2*LEAVES)-1 nodes
-    // Unit represents the number of MEMORY_BLOCK-NODE pairs that can fit into the given heap
-    size_t unit = HEAP_SIZE / (BLOCK + HEAD_SIZE * 2 - 1);
-
-    mem_end = mem_start + round_to_power_of_two(BLOCK * unit);
-
-    map_start = mem_end;
-    // The binary tree must be complete to be properly mapped in an array
-    map_end = map_start + round_to_power_of_two((HEAD_SIZE * 2 - 1) * unit);
-
     // Initialize binary tree
-    for (char *i = map_start; i < map_end; i++)
+    for (char *i = MAP_START; i < MAP_END; i++)
     {
         *((uint64_t *)i) = EMPTY;
     }
@@ -118,7 +108,7 @@ size_t height(size_t index)
 
 size_t mem_size(size_t index)
 {
-    return (mem_end - mem_start) >> height(index);
+    return (MEM_END - MEM_START) >> height(index);
 }
 
 size_t map_index_to_mem_index(size_t index)
@@ -138,7 +128,7 @@ size_t map_index_to_mem_index(size_t index)
 size_t mem_index_to_map_index(size_t index)
 {
     size_t probe = 0;
-    size_t jump = (mem_end - mem_start) >> 2;
+    size_t jump = (MEM_END - MEM_START) >> 2;
     size_t map_index = 0;
     while (probe < index && jump > 0)
     {
@@ -158,7 +148,7 @@ size_t mem_index_to_map_index(size_t index)
     {
         return map_index;
     }
-    while (read_state(map_start, map_index) != ALLOCATED)
+    while (read_state(MAP_START, map_index) != ALLOCATED)
     {
         map_index = GET_LEFT(map_index);
     }
@@ -176,15 +166,15 @@ size_t find_buddy(size_t size, size_t index, size_t current_size)
     // If current_size is smaller than BLOCK, you have reached minimum allowed memory unit
     if (size > current_size / 2 || current_size / 2 <= BLOCK)
     {
-        if (read_state(map_start, index) == EMPTY)
+        if (read_state(MAP_START, index) == EMPTY)
         {
-            set_node_state(map_start, index, ALLOCATED);
+            set_node_state(MAP_START, index, ALLOCATED);
             return index;
         }
         return -1;
     }
     // If a node is full, the children are considered full as well
-    if (read_state(map_start, index) == FULL || read_state(map_start, index) == ALLOCATED)
+    if (read_state(MAP_START, index) == FULL || read_state(MAP_START, index) == ALLOCATED)
     {
         return -1;
     }
@@ -206,7 +196,7 @@ int memory_state(char *output, size_t length)
 
 void init_memory_manager()
 {
-    for (map_entry *map = map_start; map < map_end; map++)
+    for (map_entry *map = MAP_START; map < MAP_END; map++)
     {
         *map = 0;
     }
@@ -217,8 +207,8 @@ int memory_state(char *output, size_t length)
     char *start = output;
     *output = 0;
 
-    map_entry *map = map_start;
-    while (map < map_end)
+    map_entry *map = MAP_START;
+    while (map < MAP_END)
     {
         if (!*map)
         {

@@ -4,14 +4,14 @@
 
 void *malloc(uint32_t size)
 {
-    if (size > mem_end - mem_start)
+    if (size > MEM_END - MEM_START)
         return NULL;
-    size_t index = find_buddy(size, 0, mem_end - mem_start);
+    size_t index = find_buddy(size, 0, MEM_END - MEM_START);
     if (index == -1)
     {
         return NULL;
     }
-    return (void *)(mem_start + map_index_to_mem_index(index));
+    return (void *)(MEM_START + map_index_to_mem_index(index));
 }
 
 #else

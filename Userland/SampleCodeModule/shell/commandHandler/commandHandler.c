@@ -41,6 +41,14 @@ void addCommand(char *commandCode, char *help, action_t commandAction)
     commandCount++;
 }
 
+/**
+ * @brief Instantiates a component of a module
+ *
+ * @param command The input component in the module pairing
+ * @param params Parameters to be passed to the module component being created
+ * @param displayStyle Return parameter, how the module expects to be displayed
+ * @return The output component in the module pairing
+ */
 moduleData execute(moduleData command, char *params, displayStyles *displayStyle)
 {
     for (int i = 0; i < commandCount; i++)
@@ -63,30 +71,33 @@ moduleData execute(moduleData command, char *params, displayStyles *displayStyle
     return aux;
 }
 
+/**
+ * @brief Handles leftover file descriptors after connecting two components of a module
+ *
+ * @param toPipe The input component in the module pairing
+ * @param command The string representing the module component to be created
+ * @param displayStyle Return parameter, how the module expects to be displayed
+ * @return The output component in the module pairing
+ */
 moduleData wrapExecute(moduleData toPipe, char *command, displayStyles *displayStyle)
 {
-    if (toPipe.s != NULL)
-    {
-        moduleData aux = {command, toPipe.fd, toPipe.writeFd, toPipe.cPid};
-        toPipe = execute(aux, shiftToNextWord(aux.s), displayStyle);
-        if (aux.fd >= 0)
-            close(aux.fd);
-        if (aux.writeFd >= 0)
-            close(aux.writeFd);
-        return toPipe;
-    }
-    else
-    { // I have an open read fd, I hand it over to the executor, and close it once it is no longer in use
-        moduleData aux = {command, toPipe.fd, toPipe.writeFd, toPipe.writeFd};
-        toPipe = execute(aux, shiftToNextWord(aux.s), displayStyle);
-        if (aux.fd >= 0)
-            close(aux.fd);
-        if (aux.writeFd >= 0)
-            close(aux.writeFd);
-        return toPipe;
-    }
+    moduleData aux = {command, toPipe.fd, toPipe.writeFd, toPipe.cPid};
+    toPipe = execute(aux, shiftToNextWord(aux.s), displayStyle);
+    if (aux.fd >= 0)
+        close(aux.fd);
+    if (aux.writeFd >= 0)
+        close(aux.writeFd);
+    return toPipe;
 }
 
+/**
+ * @brief Initializes a module
+ *
+ * @param command The string representing the module
+ * @param displayStyle Return parameter, how the module expects to be displayed
+ * @param cPidBuffer Return parameter, an array of the process ids involved in the creation of the module
+ * @return commandData
+ */
 commandData handleCommand(char *command, displayStyles *displayStyle, int *cPidBuffer)
 {
 

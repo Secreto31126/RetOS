@@ -290,7 +290,6 @@ int kill_process(pid_t pid)
 
         if (!p->next_brother)
         {
-            Process *init = get_process(1);
             p->next_brother = init->next_child;
             init->next_child = man_im_dead->next_child;
             break;

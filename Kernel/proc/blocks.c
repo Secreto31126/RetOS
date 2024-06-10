@@ -14,6 +14,7 @@ Process *loop_blocked_and_unblock(Process *p)
     if (p->state != PROCESS_BLOCKED)
     {
         p->block_condition = no_condition;
+        p->block_list = NULL;
         p->next_blocked = NULL;
         return loop_blocked_and_unblock(next);
     }

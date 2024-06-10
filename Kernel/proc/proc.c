@@ -245,6 +245,8 @@ int kill_process(pid_t pid)
         man_im_dead->files[i] = -1;
     }
 
+    Process *init = get_process(1);
+
     /**
      * @brief Wether the stack should be freed or not (another process is using it as running stack)
      */
@@ -261,7 +263,11 @@ int kill_process(pid_t pid)
     Process *p = man_im_dead->next_child;
     while (p)
     {
-        p->ppid = 1;
+        p->ppid = init->pid;
+        if (p->state == PROCESS_ZOMBIE)
+        {
+            sem_post(&init->zombie_sem);
+        }
 
         // Stacks preservation (pseudo pagination)
         if (p->running_stack == man_im_dead->stack)

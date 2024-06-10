@@ -9,15 +9,26 @@ int execv(const char *pathname, char *const argv[])
             if (!(executables[i].mod & 1))
             {
                 // EPERM
-                return -1;
+                return 13;
             }
 
-            // HACK: If userland returns negative, ups
-            // Solution: ERRNO static variable to differentiate
-            return portal_to_userland(0, argv, executables[i].main, getStackBase());
+            int argc = check_args(argv);
+
+            if (argc < 0)
+            {
+                return -argc;
+            }
+
+            get_current_process()->name = executables[i].filename;
+
+            portal_to_userland(
+                argc,
+                backup_argv_somewhere(argc, argv),
+                get_current_process(),
+                executables[i].main);
         }
     }
 
     // ENOENT
-    return -2;
+    return 2;
 }

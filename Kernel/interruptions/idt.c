@@ -62,6 +62,4 @@ void initialize_idt()
     output_byte(0x21, 0xFC); // Only tick and keyboard interruptions enabled for now
     // Enable slave PIC
     output_byte(0xA1, 0xFF);
-
-    set_interrupt_flag();
 }

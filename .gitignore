@@ -9,6 +9,13 @@
 
 #Object files
 *.o
+*.mem
+
+# Elfos files
+*.elf
+
+# Sarif files
+*.sarif
 
 docs/
 

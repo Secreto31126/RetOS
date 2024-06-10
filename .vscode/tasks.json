@@ -10,10 +10,7 @@
             "args": [
                 "FAST_WSL"
             ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+            "group": "build"
         },
         {
             "label": "Execute",
@@ -31,19 +28,52 @@
                 "-serial",
                 "stdio"
             ],
-            "group": {
-                "kind": "test",
-                "isDefault": true
-            }
+            "group": "test"
         },
         {
-            "label": "Build and execute in debug mode",
+            "label": "Build in debug mode",
             "type": "shell",
             "command": "./run.sh",
             "args": [
                 "DEBUG"
             ],
-            "group": "build"
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Launch in debug mode",
+            "type": "shell",
+            "command": "qemu-system-x86_64",
+            "args": [
+                "-s",
+                "-S",
+                "-hda",
+                "\"/tmp/retos/x64BareBonesImage.qcow2\"",
+                "-m",
+                "512",
+                "-soundhw",
+                "pcspk",
+                "-serial",
+                "stdio"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(qemu-system-x86_64)",
+                    "line": 1,
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^(qemu-system-x86_64)",
+                    "endsPattern": "^(qemu-system-x86_64)"
+                }
+            }
         }
     ]
 }

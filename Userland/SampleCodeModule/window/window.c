@@ -130,6 +130,9 @@ Window rotateBy90(Window w)
     HexColor *source = w.pixels;
     HexColor *result = malloc(width * height * sizeof(HexColor));
 
+    if (result == NULL)
+        exit(1);
+
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
@@ -151,6 +154,9 @@ Window rotateBy270(Window w) // more efficient that three 90 rotations
     double ratio = (double)width / height;
     HexColor *source = w.pixels;
     HexColor *result = malloc(width * height * sizeof(HexColor));
+
+    if (result == NULL)
+        exit(1);
 
     for (int i = 0; i < height; i++)
     {

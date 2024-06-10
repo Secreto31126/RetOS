@@ -1,20 +1,24 @@
-	extern execv
 	extern initializeKernelBinary
+	extern idle
 
 	global loader
-
-	section .data
-userland	db "module", 0
-tomyland	db "tomyland", 0
 
 	section .text
 
 loader:
-	call	initializeKernelBinary	; Set up the kernel binary
-	; mov		rdi, userland
-	mov		rdi, tomyland
-	mov		rsi, 0
-	call 	execv
+	call	initializeKernelBinary
+
+	; Start using the idle stack
+	mov		rsp, rax
+	sti
+
+	; Fork the first process
+	mov		rax, 0xF
+	int		80h
+
+	mov		rdi, rax
+	call 	idle
+
 .hang:
 	cli
 	hlt

@@ -2,7 +2,15 @@
 #define STDIN_H
 
 #include <stdint.h>
+#include <stdbool.h>
+#include <semaphores.h>
 
+/**
+ * @brief Set up stdin
+ *
+ * @return int 0 on success, -1 on failure
+ */
+int init_stdin();
 /**
  * @brief Read from stdin
  *
@@ -19,5 +27,16 @@ uint16_t read_stdin(uint8_t *buf, uint16_t len);
  * @return uint16_t The number of bytes written
  */
 uint16_t write_stdin(uint8_t *buf, uint16_t len);
+/**
+ * @brief Wether or not stdin is empty
+ *
+ * @return true stdin is empty
+ * @return false stdin is not empty
+ */
+bool stdin_empty();
+/**
+ * @brief Flush stdin
+ */
+void flush_stdin();
 
 #endif

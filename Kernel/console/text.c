@@ -10,7 +10,7 @@ static uint32_t uintToBase(uint64_t value, char *buffer, uint32_t base);
 
 #define PORT_COM1 0x3F8
 
-static char buffer[64] = {'0'};
+static char buffer[64] = {'0', 0};
 static const uint32_t width = WIDTH;
 static const uint32_t height = 24;
 static uint8_t *const header = (uint8_t *)0xB8000;

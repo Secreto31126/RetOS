@@ -3,7 +3,7 @@
 
 typedef signed long int size_t_m;
 // Do not edit
-#define BLOCK 64
+#define BLOCK_M 64
 #define KB_129 132096
 #define KB_1 1024
 #define KB_128 131072

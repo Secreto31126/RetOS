@@ -50,10 +50,10 @@ void set_heap(void *start, size_t_m size)
 {
     // A complete binary tree has (2*LEAVES)-1 nodes
     // Unit represents the number of MEMORY_BLOCK-NODE pairs that can fit into the given heap
-    size_t_m unit = size / (BLOCK + HEAD_SIZE_M * 2 - 1);
+    size_t_m unit = size / (BLOCK_M + HEAD_SIZE_M * 2 - 1);
 
     mem_start = (char *)start;
-    mem_end = mem_start + round_to_power_of_two(BLOCK * unit);
+    mem_end = mem_start + round_to_power_of_two(BLOCK_M * unit);
 
     map_start = mem_end;
     // The binary tree must be complete to be properly mapped in an array
@@ -244,8 +244,8 @@ size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size)
         return -1;
     }
     // if does not fit in half the space of the node, you are in a smallest node that can fit it
-    // If current_size is smaller than BLOCK, you have reached minimum allowed memory unit
-    if (size > current_size / 2 || current_size / 2 <= BLOCK)
+    // If current_size is smaller than BLOCK_M, you have reached minimum allowed memory unit
+    if (size > current_size / 2 || current_size / 2 <= BLOCK_M)
     {
         if (read_state(MAP_START_M, index) == EMPTY)
         {

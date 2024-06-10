@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
-#include <malloc.h>
+#include <malloc_m.h>
 
 #define MAX_BLOCKS 128
 

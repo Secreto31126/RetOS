@@ -332,10 +332,7 @@ static int unblock(const sem_t *sem)
     }
 
     p->block_condition = semaphore_unlocked;
-    // p = s.blocked.pop()
-    s->blocked = p->next_blocked;
-    p->next_blocked = NULL;
-    loop_blocked_and_unblock(p);
+    s->blocked = loop_blocked_and_unblock(s->blocked);
 
     return 0;
 }

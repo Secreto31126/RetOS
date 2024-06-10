@@ -29,9 +29,6 @@
 #define MEM_START_M ((char *)sbrk(0))
 #define MEM_END_M (((char *)sbrk(0)) + MEM_SIZE_M)
 
-#include "stdint.h"
-#include <stdio.h>
-
 typedef enum states_m
 {
     EMPTY = 0,

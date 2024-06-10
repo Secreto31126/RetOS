@@ -608,6 +608,8 @@ moduleData tests(moduleData commandFd, displayStyles *displayStyle)
 moduleData getPs(moduleData commandFd, displayStyles *displayStyle)
 {
     moduleData toRet = {NULL, ps(), -1, -1};
+    if (toRet.fd < 0)
+        toRet.s = "Kernel could not assign an fd to this command.";
     return toRet;
 }
 moduleData getMem(moduleData commandFd, displayStyles *displayStyle)

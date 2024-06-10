@@ -4,11 +4,14 @@
 	global cpuVendor
 	global input_dword
 	global output_dword
+	global input_word
+	global output_word
 	global input_byte
 	global output_byte
 	global set_interrupt_flag
 	global unset_interrupt_flag
 	global halt_once
+	global exchange
 	global dump_regs
 	global dump_reg_string
 
@@ -53,6 +56,19 @@ output_dword:
 	out dx, eax
 	ret
 
+; uint16_t input_word(uint16_t port);
+input_word:
+	mov edx, edi
+	in	ax, dx
+	ret
+
+; void output_word(uint16_t port, uint16_t value);
+output_word:
+	mov edx, edi
+	mov eax, esi
+	out dx, ax
+	ret
+
 ; uint8_t input_byte(uint16_t port);
 input_byte:
 	mov edx, edi
@@ -76,8 +92,15 @@ unset_interrupt_flag:
 	cli
 	ret
 
+; void halt_once(void);
 halt_once:
 	hlt
+	ret
+
+; unsigned int exchange(unsigned int *src, unsigned int value);
+exchange:
+	mov		eax, esi
+	xchg	eax, [rdi]
 	ret
 
 %macro save_hex_in_string 0
@@ -98,6 +121,7 @@ halt_once:
 ; void dump_regs(void);
 dump_regs:
 	pushall
+	push rsp
 
 	mov rbp, rsp
 	mov rbx, 0		; stage
@@ -155,17 +179,18 @@ dump_regs:
 
 	mov byte [dump_reg_string + rcx], 0
 
+	pop rsp
 	popall
 	ret
 
-dump_reg_string00: db 'RAX:'
-dump_reg_string01: db 'RBX:'
-dump_reg_string02: db 'RCX:'
-dump_reg_string03: db 'RDX:'
-dump_reg_string04: db 'RSI:'
-dump_reg_string05: db 'RDI:'
-dump_reg_string06: db 'RBP:'
-dump_reg_string07: db 'RSP:'
+dump_reg_string00: db 'RSP:'
+dump_reg_string01: db 'RAX:'
+dump_reg_string02: db 'RBX:'
+dump_reg_string03: db 'RCX:'
+dump_reg_string04: db 'RDX:'
+dump_reg_string05: db 'RSI:'
+dump_reg_string06: db 'RDI:'
+dump_reg_string07: db 'RBP:'
 dump_reg_string08: db ' R8:'
 dump_reg_string09: db ' R9:'
 dump_reg_string0A: db 'R10:'

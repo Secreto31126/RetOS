@@ -136,7 +136,7 @@ char marioItem[BIG_DRAW_SIZE][BIG_DRAW_SIZE] = {{B, B, B, B, B, B, B, B, B, B, B
                                                 {B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B},
                                                 {B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B},
                                                 {B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B}};
-char pipe[BIG_DRAW_SIZE][BIG_DRAW_SIZE] = {{B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, 1, 1, 1, 1, 1},
+char tube[BIG_DRAW_SIZE][BIG_DRAW_SIZE] = {{B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, 1, 1, 1, 1, 1},
                                            {B, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2},
                                            {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2},
                                            {B, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2},

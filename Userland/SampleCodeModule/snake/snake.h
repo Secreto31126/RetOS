@@ -8,7 +8,7 @@
 #define BOARD_WIDTH 20        // ratio is 4:3
 #define BOARD_HEIGHT 15       // MUST SATISFY PLAYER_COUNT+APPLE_COUNT < (BOARD_WIDTH-2)*(BOARD_HEIGHT-2) && BOARD_WIDTH > 2 && BOARD_HEIGHT > 2. Game will 'work' anyways, but will not be particularly fun.
 #define START_PLAYER_LENGTH 3 // MUST BE GREATER THAN 1 (Will work anyways, but lone heads might render as tails, don't test it)
-#define MOVE_INTERVAL 2
+#define MOVE_INTERVAL 4
 #define MAX_SNAKE_COLORS 6
 #define APPLE_POINTS 15
 #define SCORE_COLOR (0xFF000000 | HEX_RED)

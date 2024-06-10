@@ -18,41 +18,69 @@ id=
 if [ "$1" = "DEBUG" ]
 then
     echo "Debug mode"
-    id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all EGCCFLAGS="-g -Wl,--oformat=elf64-x86-64" ELDFLAGS="--oformat=elf64-x86-64 -o kernel.elf")
+    id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all DEBUG=1)
+elif [ "$1" = "PVS" ]
+then
+    echo "PVS mode"
+    id=$(docker run -d -v "/$path/Image:/root/Image" "$container" pvs)
 else
     id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all)
 fi
 docker wait "$id"
 
-clear
+# clear
 docker logs "$id"
 docker rm "$id" > /dev/null
 
-if [ "$1" = "DEBUG" ]
+if [ "$1" = "PVS" ]
+then
+    exit 0
+elif [ "$1" = "DEBUG" ]
 then
     echo
     echo "Debug mode"
-    echo "Quick! Run the following command in another terminal:"
-    echo 'qemu-system-x86_64 -s -S -hda "./Image/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk'
+
+    if [ "$(whoami)" = "lucasl" ]
+    then
+        echo "Copying files to /tmp/retos"
+        rm -rf "/tmp/retos"
+        mkdir "/tmp/retos"
+        cp "$path/Image/"* "/tmp/retos"
+    else
+        echo "Copying files to //wsl$/Ubuntu/tmp/retos"
+        rm -rf "//wsl$/Ubuntu/tmp/retos"
+        mkdir "//wsl$/Ubuntu/tmp/retos"
+        echo $path
+        cp "$path/Image/"* "//wsl$/Ubuntu/tmp/retos"
+    fi
+
+    echo "Run the following command in another terminal:"
+    echo 'qemu-system-x86_64 -s -S -hda "/tmp/retos/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk'
+
+    read -p "Press enter to finish"
 elif [ "$1" = "FAST_WSL" ]
 then
     echo
     echo "Fast WSL mode"
 
-    if [ "$(whoami)" = "tomyr" ]
-    then
-        echo "Copying files to /mnt/c/Users/tomyr/Documents/C/RetOS/Image"
-        cp "$path/Image/"* "/mnt/c/Users/tomyr/Documents/C/RetOS/Image/"
-    else
-        echo "Copying files to /mnt/c/Users/Usuario/Documents/GitHub/RetOS/Image"
-        cp "$path/Image/"* "/mnt/c/Users/Usuario/Documents/GitHub/RetOS/Image/"
-    fi
+    echo "Copying files to //wsl$/Ubuntu/tmp/retos"
+    rm -rf "//wsl$/Ubuntu/tmp/retos"
+    mkdir "//wsl$/Ubuntu/tmp/retos"
+    cp "$path/Image/"* "//wsl$/Ubuntu/tmp/retos"
+
     echo "Done"
 
     make clean -CToolchain > /dev/null
     make clean > /dev/null
+
+    read -p "Press enter to finish"
 else
-    sudo qemu-system-x86_64 -hda "$path/Image/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk
+    echo "Copying files to /tmp/retos"
+    rm -rf "/tmp/retos"
+    mkdir "/tmp/retos"
+    cp "$path/Image/"* "/tmp/retos"
+
+    qemu-system-x86_64 -hda "/tmp/retos/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk -serial stdio
     make clean -CToolchain > /dev/null
     make clean > /dev/null
 fi

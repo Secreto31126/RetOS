@@ -3,6 +3,7 @@
 #include "window.h"
 #include "fontInterface.h"
 #include "./../nstdlib/nstdlib.h"
+#define SPACES_IN_TAB 4
 
 void startPainter(uint64_t width, uint64_t height);
 

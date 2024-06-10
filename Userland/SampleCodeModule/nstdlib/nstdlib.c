@@ -10,15 +10,12 @@ uint64_t replaceWith(char *startAddress, char *replacement, uint64_t eatThisMany
 uint64_t concatFrom(char *s1, char *s2);
 void addToAllocated(char *address);
 
-void wait()
-{
-    halt_user();
-}
-
 char *getDumpString()
 {
     uint64_t length = BIG_BLOCK;
     char *c = malloc(length * sizeof(char));
+    if (c == NULL)
+        return "";
     char lastAdded = 0;
     if ((lastAdded = get_dump(c + length - BIG_BLOCK, BIG_BLOCK)))
     {
@@ -42,6 +39,8 @@ char *getDumpString()
 void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize)
 {
     void *aux = malloc(newSize);
+    if (aux == NULL)
+        return NULL;
     oldSize = oldSize > newSize ? newSize : oldSize;
     for (uint64_t i = 0; i < oldSize; i++)
         *((char *)(aux + i)) = *((char *)(ptr + i));
@@ -49,60 +48,6 @@ void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize)
     return aux;
 }
 
-char *ultoa(unsigned long l, char *buffer, int radix)
-{
-    char *toRet = buffer;
-    while (l >= radix)
-    {
-        *buffer = (l % radix) + '0';
-        if (*buffer > '9')
-            *buffer += 'A' - '9' - 1;
-        buffer++;
-        l /= radix;
-    }
-
-    *buffer = l + '0';
-    if (*buffer > '9')
-        *buffer += 'A' - '9' - 1;
-    *(buffer + 1) = 0;
-    int halfLen = (buffer - toRet) / 2;
-    for (int i = 0; i <= halfLen; i++)
-    {
-        char aux = *(toRet + i);
-        *(toRet + i) = *(buffer - i);
-        *(buffer - i) = aux;
-    }
-    return toRet;
-}
-
-char *utoa(unsigned int n, char *buffer, int radix)
-{
-    return ultoa((unsigned long)n, buffer, radix);
-}
-
-char *itoa(int n, char *buffer, int radix)
-{
-    if (n < 0)
-    {
-        *buffer = '-';
-        buffer++;
-        n = -n;
-    }
-
-    return utoa((unsigned int)n, buffer, radix) - (n < 0);
-}
-
-uint64_t atoi(char *s)
-{
-    uint64_t ret = 0;
-    while (*s >= '0' && *s <= '9')
-    {
-        ret *= 10;
-        ret += *s - '0';
-        s++;
-    }
-    return ret;
-}
 uint64_t atoiHex(char *s)
 {
     char maxLength = 8; // max number of hex digits in a uint64_t
@@ -395,14 +340,6 @@ uint64_t concatFrom(char *sEnd, char *sAdd)
     return count;
 }
 
-uint64_t strlen(char *s)
-{
-    uint64_t len = 0;
-    while (*(s + len))
-        len++;
-    return len;
-}
-
 char readChar()
 {
     char c;
@@ -412,14 +349,8 @@ char readChar()
 char getChar()
 {
     char c;
-    while (!read_sys(0, &c, 1))
-        wait();
+    read_sys(0, &c, 1);
     return c;
-}
-
-int read(char *buffer, int count)
-{
-    return read_sys(0, buffer, count);
 }
 
 uint64_t pow(double base, uint64_t exponent)
@@ -439,16 +370,6 @@ char strCompare(char *a, char *b)
     }
     int dist = (int)(unsigned char)(*a) - (int)(unsigned char)(*b);
     return dist ? dist > 0 ? 1 : -1 : 0;
-}
-
-char strcmp(char *s1, char *s2)
-{
-    while (*s1 || *s2)
-    {
-        if (*(s1++) != *(s2++))
-            return 0;
-    }
-    return 1;
 }
 
 char isFirstWord(char *s1, char *firstWord)
@@ -532,6 +453,8 @@ char *sPrintf(char *format, ...)
     uint64_t allocated = BLOCK;
     uint64_t count = 1; // counts null termination
     char *toReturn = malloc(sizeof(char) * allocated);
+    if (toReturn == NULL)
+        return "";
     *toReturn = 0;
     while (*format != 0 && *format != EOF)
     {
@@ -608,10 +531,8 @@ uint64_t getHours()
 }
 
 // User should call freePrints() to free memory allocated for returned string
-char *getTimeString()
+char *getTimeString(char *buffer)
 {
-    char *buffer = malloc(6 * sizeof(char)); // return string format will be 6 chars long. defining a value for this is unnecessary and confusing
-    addToAllocated(buffer);
     uint64_t min = getMinutes(), hr = getHours();
     char addedZeroFlag = 0;
     if (hr < 10)
@@ -642,27 +563,6 @@ char isPrefix(char *prefix, char *word)
     return 1;
 }
 
-char *concatUnlimited(char *s1, char *s2)
-{
-    uint64_t index = 0;
-    char *toReturn = null;
-    while (*s1)
-    {
-        if (!(index % BLOCK))
-            toReturn = realloc(toReturn, index * sizeof(char), (index + BLOCK) * sizeof(char));
-        *(toReturn + index++) = *s1;
-    }
-    while (*s2)
-    {
-        if (!(index % BLOCK))
-            toReturn = realloc(toReturn, index * sizeof(char), (index + BLOCK) * sizeof(char));
-        *(toReturn + index++) = *s2;
-    }
-    *(toReturn + index) = 0;
-    addToAllocated(toReturn);
-    return toReturn;
-}
-
 char strcmpHandleWhitespace(char *s1, char *s2)
 {
     char wFlag = 0; //
@@ -679,8 +579,6 @@ char strcmpHandleWhitespace(char *s1, char *s2)
         }
         if (*(s1++) != *(s2++))
         {
-            printf("s1: \'%c\' ", *(s1 - 1));
-            printf("s2: \'%c\' \n", *(s2 - 1));
             return 0;
         }
     }
@@ -692,16 +590,54 @@ char *shiftToWord(char *s)
         s++;
     return s;
 }
+char *shiftToWhitespace(char *s)
+{
+    while (*s != ' ' && *s)
+        s++;
+    return s;
+}
+char *shiftToNextWord(char *s)
+{
+    return shiftToWord(shiftToWhitespace(s));
+}
+
+int readNFromFd(int fd, char *buffer, int n)
+{
+    if (fd < 0)
+        return 0;
+    int count = 1, aux; // count starts as 1, save space for the '\0'
+    while ((aux = read_sys(fd, buffer + count - 1, n - count)) > 0 && count < n)
+        count += aux;
+    buffer[count - 1] = 0;
+    return count;
+}
 
 char timeHasPassed(uint64_t start, uint64_t unit)
 {
     return (get_tick() - start) > unit;
 }
-void sleep(uint64_t ticks)
+void separateString(char *s, char **buffer, int bufferSize)
 {
-    uint64_t time = get_tick();
-    while (!timeHasPassed(time, ticks))
+    if (bufferSize <= 0)
+        return;
+    int i = 0;
+    while (*s && i < bufferSize - 1)
     {
-        wait();
+        buffer[i++] = s;
+        char *aux = shiftToWhitespace(s);
+        s = shiftToWord(aux);
+        *aux = 0;
+        if (*s)
+            *(s - 1) = 0;
     }
+    buffer[i] = (char *)NULL;
+}
+int isLastAlpha(const char *s, char alpha)
+{
+    for (int i = strlen(s) - 1; i >= 0 && (s[i] == ' ' || s[i] == '\n' || s[i] == '\t' || s[i] == alpha); i--)
+    {
+        if (s[i] == alpha)
+            return i;
+    }
+    return -1;
 }

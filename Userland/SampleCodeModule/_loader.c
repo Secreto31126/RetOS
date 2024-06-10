@@ -7,12 +7,15 @@ extern char endOfBinary;
 int main();
 
 void *memset(void *destiny, int32_t c, uint64_t length);
+extern void exit(int);
 
 int _start()
 {
 	// Clean BSS
 	memset(&bss, 0, &endOfBinary - &bss);
-	return main();
+	exit(main());
+	// Shut up, gcc
+	return 1;
 }
 
 void *memset(void *destiation, int32_t c, uint64_t length)

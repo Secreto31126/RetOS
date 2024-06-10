@@ -12,7 +12,7 @@
 // Haiku. I will do that now
 // Enjoy this journey
 
-#define HEAD_SIZE 2
+#define HEAD_SIZE_M 2
 
 #define IS_BIT_SET(x, i) (((x)[(i) >> 3] & (1 << ((i) & 7))) != 0)
 #define SET_BIT(x, i) (x)[(i) >> 3] |= (1 << ((i) & 7))
@@ -24,22 +24,21 @@
 #define GET_PARENT(i) ((i - 1) >> 1)
 #define GET_BROTHER(i) (IS_LEFT(i) ? GET_RIGHT(GET_PARENT(i)) : GET_LEFT(GET_PARENT(i)))
 
-void *get_heap_start();
-#define MAP_START (((char *)get_heap_start()) + MEM_SIZE)
-#define MAP_END (((char *)get_heap_start()) + HEAP_SIZE)
-#define MEM_START ((char *)get_heap_start())
-#define MEM_END (((char *)get_heap_start()) + MEM_SIZE)
+#define MAP_START_M (((char *)sbrk(0)) + MEM_SIZE_M)
+#define MAP_END_M (((char *)sbrk(0)) + HEAP_SIZE_M)
+#define MEM_START_M ((char *)sbrk(0))
+#define MEM_END_M (((char *)sbrk(0)) + MEM_SIZE_M)
 
 #include "stdint.h"
 #include <stdio.h>
 
-typedef enum states
+typedef enum states_m
 {
     EMPTY = 0,
     SPLIT,
     FULL,
     ALLOCATED
-} states;
+} states_m;
 
 /*
 char *mem_start;
@@ -51,14 +50,14 @@ void set_heap(void *start, size_t_m size)
 {
     // A complete binary tree has (2*LEAVES)-1 nodes
     // Unit represents the number of MEMORY_BLOCK-NODE pairs that can fit into the given heap
-    size_t_m unit = size / (BLOCK + HEAD_SIZE * 2 - 1);
+    size_t_m unit = size / (BLOCK + HEAD_SIZE_M * 2 - 1);
 
     mem_start = (char *)start;
     mem_end = mem_start + round_to_power_of_two(BLOCK * unit);
 
     map_start = mem_end;
     // The binary tree must be complete to be properly mapped in an array
-    map_end = map_start + round_to_power_of_two((HEAD_SIZE * 2 - 1) * unit);
+    map_end = map_start + round_to_power_of_two((HEAD_SIZE_M * 2 - 1) * unit);
 
     // Initialize binary tree
     for (char *i = map_start; i < map_end; i++)
@@ -68,15 +67,11 @@ void set_heap(void *start, size_t_m size)
 void malloc_init(void *start, size_t_m size)
 {
     // Initialize binary tree
-    for (char *i = MAP_START; i < MAP_END; i++)
+    for (char *i = MAP_START_M; i < MAP_END_M; i++)
         *((uint64_t *)i) = EMPTY;
 }
-void *get_heap_start()
-{
-    return sbrk(0);
-}
 
-void cascade_state(char *x, size_t_m i, states s);
+void cascade_state(char *x, size_t_m i, states_m s);
 
 size_t_m round_to_power_of_two(size_t_m s)
 {
@@ -88,7 +83,7 @@ size_t_m round_to_power_of_two(size_t_m s)
     return i;
 }
 
-void set_node_state(char *x, size_t_m i, states s)
+void set_node_state(char *x, size_t_m i, states_m s)
 {
     size_t_m bit_index = (i << 1);
     switch (s)
@@ -117,7 +112,7 @@ void set_node_state(char *x, size_t_m i, states s)
         cascade_state(x, i, s);
 }
 
-states read_state(char *x, size_t_m i)
+states_m read_state(char *x, size_t_m i)
 {
     if (IS_BIT_SET(x, i << 1))
     {
@@ -132,9 +127,9 @@ states read_state(char *x, size_t_m i)
     return EMPTY;
 }
 
-void cascade_state(char *x, size_t_m i, states s)
+void cascade_state(char *x, size_t_m i, states_m s)
 {
-    states aux;
+    states_m aux;
     switch (s)
     {
     case EMPTY:
@@ -177,7 +172,7 @@ size_t_m height(size_t_m index)
  */
 size_t_m mem_size(size_t_m index)
 {
-    return (MEM_SIZE) >> height(index);
+    return (MEM_SIZE_M) >> height(index);
 }
 
 size_t_m map_index_to_mem_index(size_t_m index)
@@ -197,7 +192,7 @@ size_t_m map_index_to_mem_index(size_t_m index)
 size_t_m mem_index_to_map_index(size_t_m index)
 {
     size_t_m probe = 0;
-    size_t_m jump = (MEM_SIZE) >> 2;
+    size_t_m jump = (MEM_SIZE_M) >> 2;
     size_t_m map_index = 0;
     while (probe < index && jump > 0)
     {
@@ -217,7 +212,7 @@ size_t_m mem_index_to_map_index(size_t_m index)
     {
         return map_index;
     }
-    while (read_state(MAP_START, map_index) != ALLOCATED)
+    while (read_state(MAP_START_M, map_index) != ALLOCATED)
     {
         map_index = GET_LEFT(map_index);
     }
@@ -228,14 +223,14 @@ size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size);
 
 void *malloc_m(size_t_m size)
 {
-    if (size > MEM_SIZE)
+    if (size > MEM_SIZE_M)
         return NULL;
-    size_t_m index = find_buddy(size, 0, MEM_SIZE);
+    size_t_m index = find_buddy(size, 0, MEM_SIZE_M);
     if (index == -1)
     {
         return NULL;
     }
-    return (void *)(MEM_START + map_index_to_mem_index(index));
+    return (void *)(MEM_START_M + map_index_to_mem_index(index));
 }
 
 /**
@@ -252,15 +247,15 @@ size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size)
     // If current_size is smaller than BLOCK, you have reached minimum allowed memory unit
     if (size > current_size / 2 || current_size / 2 <= BLOCK)
     {
-        if (read_state(MAP_START, index) == EMPTY)
+        if (read_state(MAP_START_M, index) == EMPTY)
         {
-            set_node_state(MAP_START, index, ALLOCATED);
+            set_node_state(MAP_START_M, index, ALLOCATED);
             return index;
         }
         return -1;
     }
     // If a node is full, the children are considered full as well
-    if (read_state(MAP_START, index) == FULL || read_state(MAP_START, index) == ALLOCATED)
+    if (read_state(MAP_START_M, index) == FULL || read_state(MAP_START_M, index) == ALLOCATED)
     {
         return -1;
     }
@@ -281,8 +276,8 @@ void *realloc_m(void *ptr, size_t_m size)
 
 void free_m(void *ptr)
 {
-    if (((char *)ptr) >= MEM_START && ((char *)ptr) <= MEM_END)
-        set_node_state(MAP_START, mem_index_to_map_index(((char *)ptr) - MEM_START), EMPTY);
+    if (((char *)ptr) >= MEM_START_M && ((char *)ptr) <= MEM_END_M)
+        set_node_state(MAP_START_M, mem_index_to_map_index(((char *)ptr) - MEM_START_M), EMPTY);
 }
 /*
 void print_m_rec(size_t_m i, size_t_m height, char avoid_empty);
@@ -295,9 +290,9 @@ void print_m(char avoid_empty)
     printf("-----------------------------------------------------\n");
     printf("Printing map as binary\n");
     printf("-----------------------------------------------------\n");
-    for (int i = 0; i < MAP_END - MAP_START; i++)
+    for (int i = 0; i < MAP_END_M - MAP_START_M; i++)
     {
-        printf("%d", IS_BIT_SET(((char *)MAP_START), i));
+        printf("%d", IS_BIT_SET(((char *)MAP_START_M), i));
         if (i % 2)
             printf(" ");
     }
@@ -313,15 +308,15 @@ Dif:%lu\n\
 Mem start:%lu\n\
 Mem end:%lu\n\
 Dif:%lu\n",
-           (uint64_t)MAP_START, (uint64_t)MAP_END, (uint64_t)(MAP_END - MAP_START), (uint64_t)MEM_START, (uint64_t)MEM_END, (uint64_t)(MEM_SIZE));
+           (uint64_t)MAP_START_M, (uint64_t)MAP_END_M, (uint64_t)(MAP_END_M - MAP_START_M), (uint64_t)MEM_START_M, (uint64_t)MEM_END_M, (uint64_t)(MEM_SIZE_M));
 }
 
 void print_m_rec(size_t_m i, size_t_m height, char avoid_empty)
 {
-    if (i < 0 || i > (MAP_END - MAP_START) * 2)
+    if (i < 0 || i > (MAP_END_M - MAP_START_M) * 2)
         return;
 
-    states s = read_state(MAP_START, i);
+    states_m s = read_state(MAP_START_M, i);
     // avoid empty branches
     if (s == EMPTY && avoid_empty)
         return;

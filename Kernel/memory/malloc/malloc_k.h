@@ -1,5 +1,5 @@
-#ifndef MLC_H
-#define MLC_H
+#ifndef MLCK_H
+#define MLCK_H
 
 // Set the minimum size of a memory block
 #define BLOCK 256

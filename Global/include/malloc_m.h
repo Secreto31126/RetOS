@@ -1,5 +1,5 @@
-#ifndef MLC_H
-#define MLC_H
+#ifndef MLCM_H
+#define MLCM_H
 
 typedef signed long int size_t_m;
 // Do not edit

@@ -2,6 +2,15 @@
 
 #ifdef BUDDY_SYSTEM
 
+void init_memory_manager()
+{
+    // Initialize binary tree
+    for (char *i = MAP_START; i < MAP_END; i++)
+    {
+        *((uint64_t *)i) = EMPTY;
+    }
+}
+
 size_t round_to_power_of_two(size_t s)
 {
     if (!s)
@@ -10,15 +19,6 @@ size_t round_to_power_of_two(size_t s)
     while ((i << 1) <= s)
         i <<= 1;
     return i;
-}
-
-void init_memory_manager()
-{
-    // Initialize binary tree
-    for (char *i = MAP_START; i < MAP_END; i++)
-    {
-        *((uint64_t *)i) = EMPTY;
-    }
 }
 
 void set_node_state(char *x, size_t i, states s)

@@ -50,7 +50,7 @@ then
     fi
 elif [[ "$1" = p* ]]
 then
-    if [["$2" = b* ]]
+    if [[ "$2" = b* ]]
     then
         echo "PVS mode with buddy"
         id=$(docker run -d -v "/$path/Image:/root/Image" "$container" pvs BUDDY=1)

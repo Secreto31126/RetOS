@@ -1,5 +1,5 @@
-#ifndef PMMAN_H
-#define PMMAN_H
+#ifndef PMMN_H
+#define PMMN_H
 
 #include <mman.h>
 #include <string.h>
@@ -89,4 +89,5 @@ static map_entry *const map_start = (map_entry *)MAP_START;
 static map_entry *const map_end = (map_entry *)(MAP_START + MAP_SIZE);
 
 #endif
+
 #endif

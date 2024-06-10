@@ -4,7 +4,6 @@
 
 void *malloc(uint32_t size)
 {
-    ncPrint("buddy\n");
     if (size > MEM_END - MEM_START)
         return NULL;
     size_t index = find_buddy(size * 2, 0, MEM_END - MEM_START);
@@ -20,7 +19,6 @@ void *malloc(uint32_t size)
 #define MEM_SCALE 1
 void *malloc(uint32_t size)
 {
-    ncPrint("naive\n");
     if (!size || size > heap_size)
     {
         return NULL;

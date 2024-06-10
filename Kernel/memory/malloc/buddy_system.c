@@ -51,7 +51,7 @@ size_t_m round_to_power_of_two(size_t_m s)
     return i;
 }
 
-void set_state(char *x, size_t_m i, states s)
+void set_node_state(char *x, size_t_m i, states s)
 {
     size_t_m bit_index = (i << 1);
     switch (s)
@@ -103,21 +103,21 @@ void cascade_state(char *x, size_t_m i, states s)
     case EMPTY:
         aux = read_state(x, GET_PARENT(i));
         if (aux == FULL)
-            set_state(x, GET_PARENT(i), SPLIT);
+            set_node_state(x, GET_PARENT(i), SPLIT);
         else if (aux == SPLIT && read_state(x, GET_BROTHER(i)) == EMPTY)
-            set_state(x, GET_PARENT(i), EMPTY);
+            set_node_state(x, GET_PARENT(i), EMPTY);
         break;
     case SPLIT:
         if (read_state(x, GET_PARENT(i)) != SPLIT)
-            set_state(x, GET_PARENT(i), SPLIT);
+            set_node_state(x, GET_PARENT(i), SPLIT);
         break;
     case FULL:
     case ALLOCATED:
         aux = read_state(x, GET_PARENT(i));
         if (aux == EMPTY)
-            set_state(x, GET_PARENT(i), SPLIT);
+            set_node_state(x, GET_PARENT(i), SPLIT);
         else if (aux == SPLIT && (read_state(x, GET_BROTHER(i)) == FULL || read_state(x, GET_BROTHER(i)) == ALLOCATED))
-            set_state(x, GET_PARENT(i), FULL);
+            set_node_state(x, GET_PARENT(i), FULL);
         break;
     default:
         break;
@@ -232,7 +232,7 @@ size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size)
     {
         if (read_state(map_start, index) == EMPTY)
         {
-            set_state(map_start, index, ALLOCATED);
+            set_node_state(map_start, index, ALLOCATED);
             return index;
         }
         return -1;
@@ -257,7 +257,7 @@ void *realloc_m(void *ptr, size_t_m size)
 void free_m(void *ptr)
 {
     if (((char *)ptr) >= mem_start && ((char *)ptr) <= mem_end)
-        set_state(map_start, mem_index_to_map_index(((char *)ptr) - mem_start), EMPTY);
+        set_node_state(map_start, mem_index_to_map_index(((char *)ptr) - mem_start), EMPTY);
 }
 /*
 

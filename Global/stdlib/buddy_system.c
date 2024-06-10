@@ -1,4 +1,5 @@
 #include "malloc.h"
+#include <unistd.h>
 // I have decided that the correct implementation for a buddy system's memory map is a binary tree
 // Of course, since a binary tree is traditionally just a two-tailed list there are two options
 // Use a naïve malloc to manage this binary tree
@@ -23,6 +24,7 @@
 #define GET_PARENT(i) ((i - 1) >> 1)
 #define GET_BROTHER(i) (IS_LEFT(i) ? GET_RIGHT(GET_PARENT(i)) : GET_LEFT(GET_PARENT(i)))
 
+void *get_heap_start();
 #define MAP_START (((char *)get_heap_start()) + MEM_SIZE)
 #define MAP_END (((char *)get_heap_start()) + HEAP_SIZE)
 #define MEM_START ((char *)get_heap_start())
@@ -63,18 +65,15 @@ void set_heap(void *start, size_t_m size)
         *((uint64_t *)i) = EMPTY;
 }
 */
-void *heap_start;
 void malloc_init(void *start, size_t_m size)
 {
-    heap_start = start;
-
     // Initialize binary tree
     for (char *i = MAP_START; i < MAP_END; i++)
         *((uint64_t *)i) = EMPTY;
 }
 void *get_heap_start()
 {
-    return heap_start;
+    return NULL;
 }
 
 void cascade_state(char *x, size_t_m i, states s);
@@ -89,7 +88,7 @@ size_t_m round_to_power_of_two(size_t_m s)
     return i;
 }
 
-void set_state(char *x, size_t_m i, states s)
+void set_node_state(char *x, size_t_m i, states s)
 {
     size_t_m bit_index = (i << 1);
     switch (s)
@@ -141,21 +140,21 @@ void cascade_state(char *x, size_t_m i, states s)
     case EMPTY:
         aux = read_state(x, GET_PARENT(i));
         if (aux == FULL)
-            set_state(x, GET_PARENT(i), SPLIT);
+            set_node_state(x, GET_PARENT(i), SPLIT);
         else if (aux == SPLIT && read_state(x, GET_BROTHER(i)) == EMPTY)
-            set_state(x, GET_PARENT(i), EMPTY);
+            set_node_state(x, GET_PARENT(i), EMPTY);
         break;
     case SPLIT:
         if (read_state(x, GET_PARENT(i)) != SPLIT)
-            set_state(x, GET_PARENT(i), SPLIT);
+            set_node_state(x, GET_PARENT(i), SPLIT);
         break;
     case FULL:
     case ALLOCATED:
         aux = read_state(x, GET_PARENT(i));
         if (aux == EMPTY)
-            set_state(x, GET_PARENT(i), SPLIT);
+            set_node_state(x, GET_PARENT(i), SPLIT);
         else if (aux == SPLIT && (read_state(x, GET_BROTHER(i)) == FULL || read_state(x, GET_BROTHER(i)) == ALLOCATED))
-            set_state(x, GET_PARENT(i), FULL);
+            set_node_state(x, GET_PARENT(i), FULL);
         break;
     default:
         break;
@@ -255,7 +254,7 @@ size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size)
     {
         if (read_state(MAP_START, index) == EMPTY)
         {
-            set_state(MAP_START, index, ALLOCATED);
+            set_node_state(MAP_START, index, ALLOCATED);
             return index;
         }
         return -1;
@@ -283,7 +282,7 @@ void *realloc_m(void *ptr, size_t_m size)
 void free_m(void *ptr)
 {
     if (((char *)ptr) >= MEM_START && ((char *)ptr) <= MEM_END)
-        set_state(MAP_START, mem_index_to_map_index(((char *)ptr) - MEM_START), EMPTY);
+        set_node_state(MAP_START, mem_index_to_map_index(((char *)ptr) - MEM_START), EMPTY);
 }
 /*
 void print_m_rec(size_t_m i, size_t_m height, char avoid_empty);

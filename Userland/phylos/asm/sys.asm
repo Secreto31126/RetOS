@@ -86,7 +86,7 @@ get_tick:
     ret
 
 ; 
-    get_dump:
+get_dump:
     mov rax, 9
     int 80h,
     ret

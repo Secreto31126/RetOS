@@ -196,7 +196,7 @@ int memory_state(char *output, size_t length)
 
 void init_memory_manager()
 {
-    for (map_entry *map = MAP_START; map < MAP_END; map++)
+    for (map_entry *map = MAP_START; map < map_end; map++)
     {
         *map = 0;
     }
@@ -208,7 +208,7 @@ int memory_state(char *output, size_t length)
     *output = 0;
 
     map_entry *map = MAP_START;
-    while (map < MAP_END)
+    while (map < map_end)
     {
         if (!*map)
         {

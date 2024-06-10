@@ -1,4 +1,4 @@
-#include "malloc.h"
+#include "malloc_k.h"
 // I have decided that the correct implementation for a buddy system's memory map is a binary tree
 // Of course, since a binary tree is traditionally just a two-tailed list there are two options
 // Use a naïve malloc to manage this binary tree

@@ -11,44 +11,6 @@ void power_off()
 	}
 }
 
-size_t strlen(const char *str)
-{
-	const char *s = str;
-	while (*s)
-		s++;
-	return s - str;
-}
-
-char *strncpy(char *dest, const char *src, size_t n)
-{
-	if (n)
-	{
-		char *d = dest;
-		const char *s = src;
-
-		do
-		{
-			if (!(*d++ = *s++))
-			{
-				/* NUL pad the remaining n-1 bytes */
-				while (--n)
-					*d++ = 0;
-				break;
-			}
-		} while (--n);
-	}
-
-	return dest;
-}
-
-char *strcpy(char *dest, const char *src)
-{
-	char *save = dest;
-	for (; (*dest = *src); ++src, ++dest)
-		;
-	return save;
-}
-
 void dump_regs_hex_magician(unsigned char *s, uint8_t r)
 {
 	unsigned char hextable[] = "0123456789ABCDEF";

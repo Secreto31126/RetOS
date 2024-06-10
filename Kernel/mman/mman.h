@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define BUDDY_SYSTEM
+
 typedef uint32_t map_entry;
 
 // 256 MB
@@ -87,4 +89,5 @@ static map_entry *const map_start = (map_entry *)MAP_START;
  */
 static map_entry *const map_end = (map_entry *)(MAP_START + MAP_SIZE);
 
+#endif
 #endif

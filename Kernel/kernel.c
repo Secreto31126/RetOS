@@ -1,13 +1,18 @@
 #include <stdint.h>
+#include <stdin.h>
+#include <stdout.h>
+#include <stderr.h>
+#include <stdkey.h>
 #include <lib.h>
 #include <interruptions.h>
 #include <modules.h>
 #include <console.h>
 #include <localization.h>
+#include <semaphores.h>
 #include <memory.h>
 #include <proc.h>
-#include <exec.h>
 #include <mman.h>
+#include <unistd.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -18,7 +23,16 @@ extern uint8_t endOfKernel;
 
 static void *const sampleCodeModuleAddress = (void *)0x400000;
 static void *const sampleDataModuleAddress = (void *)0x500000;
-static void *const tomyland = (void *)0x600000;
+static void *const init = (void *)0x600000;
+static void *const cat = (void *)0x605000;
+static void *const wc_module = (void *)0x610000;
+static void *const filter = (void *)0x615000;
+static void *const loop = (void *)0x620000;
+static void *const grep = (void *)0x625000;
+static void *const sing = (void *)0x630000;
+static void *const less = (void *)0x635000;
+static void *const phylos = (void *)0x640000;
+static void *const tests = (void *)0x645000;
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
@@ -41,7 +55,16 @@ void *initializeKernelBinary()
 	void *moduleAddresses[] = {
 		sampleCodeModuleAddress,
 		sampleDataModuleAddress,
-		tomyland,
+		init,
+		cat,
+		wc_module,
+		filter,
+		loop,
+		grep,
+		sing,
+		less,
+		phylos,
+		tests,
 	};
 
 	loadModules(&endOfKernelBinary, moduleAddresses);
@@ -62,9 +85,16 @@ void *initializeKernelBinary()
 
 	ncPrint("\n[Done]\n\n");
 
+	ncPrint("Initializing main files");
+	init_stdin();
+	init_stdout();
+	init_stderr();
+	init_stdkey();
+	ncPrint(" [Done]\n");
+
 	ncPrint("Setting OS's language to ES_AR");
 	set_language(ES_AR);
-	ncPrint(" [Done]\n");
+	ncPrint(" [Done]\n\n");
 
 	ncPrint("Initializing kernel's IDT");
 	initialize_idt();
@@ -83,11 +113,12 @@ void idle(pid_t child_pid)
 {
 	if (!child_pid)
 	{
-		ncPrintDec(get_pid());
-		ncPrint(": I will be init!\n");
+		ncPrintDec(getpid());
+		ncPrint(": I will be init!\n"); // 🥚
+		ncPrint(": Huh, I swear I used to be called something else\n");
 
 		char *argv[] = {"I'm in Userland!", "Hell yeah!", ":]", NULL};
-		ncPrintDec(execv("tomyland", argv));
+		ncPrintDec(execv("init", argv));
 		ncPrint(" error: Failed to start userland\n");
 	}
 	else
@@ -98,7 +129,7 @@ void idle(pid_t child_pid)
 			return;
 		}
 
-		ncPrintDec(get_pid());
+		ncPrintDec(getpid());
 		ncPrint(": I'm idle!\n");
 
 		while (1)

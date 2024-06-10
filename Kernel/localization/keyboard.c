@@ -59,7 +59,7 @@ static uint16_t const spanish_keyboard_layout[][3] = {
     {'l', 'L'},
     {'ñ', 'Ñ'},
     {'{', '[', '^'},
-    {0}, // IDK
+    {'|', '°', '¬'},
     {0}, // LShift
     {'}', ']', '`'},
     {'z', 'Z'},
@@ -140,7 +140,7 @@ static uint16_t const english_keyboard_layout[][3] = {
     {'l', 'L'},
     {'ñ', 'Ñ'},
     {'{', '['},
-    {0}, // IDK
+    {'|', '°', '¬'},
     {0}, // LShift
     {'}', ']', '`'},
     {'z', 'Z'},
@@ -178,8 +178,6 @@ void set_keyboard_language(Language lang)
     switch (lang)
     {
     case ES_AR:
-        keyboard_scancodes = spanish_keyboard_layout;
-        break;
     case FR_FR:
         // Nah, I'm too lazy to do France too
         keyboard_scancodes = spanish_keyboard_layout;

@@ -2,7 +2,15 @@
 #define STDK_H
 
 #include <stdint.h>
+#include <stdbool.h>
+#include <semaphores.h>
 
+/**
+ * @brief Set up stdkey
+ *
+ * @return int 0 on success, -1 on failure
+ */
+int init_stdkey();
 /**
  * @brief Read from stdkey
  *
@@ -25,5 +33,16 @@ uint16_t write_stdkey(uint8_t *buf, uint16_t len);
  * @param scancode The scancode of the key
  */
 void stdkey_keyevent(uint8_t scancode);
+/**
+ * @brief Wether or not stdkey is empty
+ *
+ * @return true stdkey is empty
+ * @return false stdkey is not empty
+ */
+bool stdkey_empty();
+/**
+ * @brief Flush stdkey
+ */
+void flush_stdkey();
 
 #endif

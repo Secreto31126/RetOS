@@ -14,6 +14,17 @@
 int strcmp(const char *p1, const char *p2);
 
 /**
+ * @brief Compare two strings up to n characters
+ * @see https://github.com/gcc-mirror/gcc/blob/master/libiberty/strncmp.c
+ *
+ * @param s1 The first string
+ * @param s2 The second string
+ * @param n The number of characters to compare
+ * @return int The distance between both strings
+ */
+int strncmp(const char *s1, const char *s2, register size_t n);
+
+/**
  * @brief Get the length of a string
  *
  * @param str The string
@@ -50,5 +61,15 @@ char *strcpy(char *dest, const char *src);
  * @return char* The destination buffer
  */
 char *strcat(char *dest, const char *src);
+
+/**
+ * @brief Find the index of a substring in a string
+ * @see https://android.googlesource.com/platform/bionic/+/ics-mr0/libc/string/strstr.c
+ *
+ * @param s The string to search in
+ * @param find The substring to search for
+ * @return char* The index of the substring in the string, NULL if not found
+ */
+char *strstr(const char *s, const char *find);
 
 #endif

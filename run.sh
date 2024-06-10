@@ -2,7 +2,18 @@
 path="${PWD}"
 container="tpe-builder"
 
-if [ "$1" = "DOCS" ]
+if [ $# -eq 0 ] || [ "$1" = "-h" ]
+then
+    echo "Usage: $0 (build|debug|pvs|docs) [wsl]"
+    echo
+    echo "build: Build the image"
+    echo "debug: Run the image in debug mode"
+    echo "pvs: Run the image in PVS mode"
+    echo "docs: Generate the documentation"
+    exit 1
+fi
+
+if [ "$1" = "docs" ]
 then
     doxygen Doxyfile
     exit 1
@@ -15,65 +26,71 @@ then
 fi
 
 id=
-if [ "$1" = "DEBUG" ]
+if [[ "$1" = b* ]]
 then
-    echo "Debug mode"
-    id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all DEBUG=1)
-else
+    echo "BUILD mode"
     id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all)
+elif [[ "$1" = d* ]]
+then
+    echo "DEBUG mode"
+    id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all DEBUG=1)
+elif [[ "$1" = p* ]]
+then
+    echo "PVS mode"
+    id=$(docker run -d -v "/$path/Image:/root/Image" "$container" pvs)
+else
+    echo "Invalid mode"
+    exit 1
 fi
+
 docker wait "$id"
 
 # clear
 docker logs "$id"
 docker rm "$id" > /dev/null
+docker image rm "$container" > /dev/null
 
-if [ "$1" = "DEBUG" ]
+if [[ "$1" = b* ]]
 then
-    echo
-    echo "Debug mode"
-
-    if [ "$(whoami)" = "lucasl" ]
+    if [[ "$2" = w* ]]
     then
+        echo "Copying files to //wsl$/Ubuntu/tmp/retos"
+        rm -rf "//wsl$/Ubuntu/tmp/retos"
+        mkdir "//wsl$/Ubuntu/tmp/retos"
+        cp "$path/Image/"* "//wsl$/Ubuntu/tmp/retos"
+
+        echo "Done"
+
+        make clean -CToolchain > /dev/null
+        make clean > /dev/null
+    else
         echo "Copying files to /tmp/retos"
         rm -rf "/tmp/retos"
         mkdir "/tmp/retos"
         cp "$path/Image/"* "/tmp/retos"
-    else
+
+        qemu-system-x86_64 -hda "/tmp/retos/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk -serial stdio
+        make clean -CToolchain > /dev/null
+        make clean > /dev/null
+    fi
+elif [[ "$1" = d* ]]
+then
+    if [[ "$2" = w* ]]
+    then
         echo "Copying files to //wsl$/Ubuntu/tmp/retos"
         rm -rf "//wsl$/Ubuntu/tmp/retos"
         mkdir "//wsl$/Ubuntu/tmp/retos"
         echo $path
         cp "$path/Image/"* "//wsl$/Ubuntu/tmp/retos"
+    else
+        echo "Copying files to /tmp/retos"
+        rm -rf "/tmp/retos"
+        mkdir "/tmp/retos"
+        cp "$path/Image/"* "/tmp/retos"
     fi
 
     echo "Run the following command in another terminal:"
     echo 'qemu-system-x86_64 -s -S -hda "/tmp/retos/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk'
-
-    read -p "Press enter to finish"
-elif [ "$1" = "FAST_WSL" ]
-then
-    echo
-    echo "Fast WSL mode"
-
-    echo "Copying files to //wsl$/Ubuntu/tmp/retos"
-    rm -rf "//wsl$/Ubuntu/tmp/retos"
-    mkdir "//wsl$/Ubuntu/tmp/retos"
-    cp "$path/Image/"* "//wsl$/Ubuntu/tmp/retos"
-
-    echo "Done"
-
-    make clean -CToolchain > /dev/null
-    make clean > /dev/null
-
-    read -p "Press enter to finish"
-else
-    echo "Copying files to /tmp/retos"
-    rm -rf "/tmp/retos"
-    mkdir "/tmp/retos"
-    cp "$path/Image/"* "/tmp/retos"
-
-    qemu-system-x86_64 -hda "/tmp/retos/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk -serial stdio
-    make clean -CToolchain > /dev/null
-    make clean > /dev/null
 fi
+
+exit 0

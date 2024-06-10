@@ -1,4 +1,5 @@
 #include "./piano.h"
+#include "sched.h"
 
 // static uint8_t exit = 0;
 static Songs *songs;
@@ -89,9 +90,9 @@ void startPiano()
 
         char tmp = note;
         while (tmp == (note = readChar()) && note != 0)
-            halt_user();
+            sched_yield();
 
-        halt_user();
+        sched_yield();
     }
     free(songs);
     blank();

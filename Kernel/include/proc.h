@@ -1,17 +1,36 @@
 #ifndef PRC_H
 #define PRC_H
 
+#include <sys/types.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <pipes.h>
+#include <semaphores.h>
 
-#define MAX_PROCESS_CHILDREN 2
-#define MAX_PROCESSES 10
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-/**
- * @brief An unique process identifier type
- * @note -1 indicates an invalid pid
- */
-typedef int pid_t;
+#define MAX_PROCESS_FILES 10
+#define MAX_PROCESSES 50
+
+#define O_FILE 0x0
+#define O_PIPE 0x8000
+
+/* Priority limits.  */
+#define PRIO_MIN -20 /* Minimum priority a process can have.  */
+#define PRIO_MAX 19  /* Maximum priority a process can have.  */
+
+/* The type of the WHICH argument to `getpriority' and `setpriority',
+   indicating what flavor of entity the WHO argument specifies.  */
+enum __priority_which
+{
+    PRIO_PROCESS = 0, /* WHO is a process ID.  */
+#define PRIO_PROCESS PRIO_PROCESS
+    PRIO_PGRP = 1, /* WHO is a process group ID.  */
+#define PRIO_PGRP PRIO_PGRP
+    PRIO_USER = 2 /* WHO is a user ID.  */
+#define PRIO_USER PRIO_USER
+};
 
 /**
  * @brief Enum of all the possible process' states
@@ -68,6 +87,10 @@ typedef struct Process
      */
     pid_t ppid;
     /**
+     * @brief The process name
+     */
+    char *name;
+    /**
      * @brief The process allocated stack
      */
     void *stack;
@@ -110,9 +133,13 @@ typedef struct Process
      */
     struct Process *next_robin;
     /**
-     * @brief The process' priority
+     * @brief The process' priority (ranged between -20 and 19, lower is higher priority)
      */
     signed char priority;
+    /**
+     * @brief The list head that holds the process blocked
+     */
+    struct Process **block_list;
     /**
      * @brief Points to the next blocked process
      *
@@ -127,6 +154,18 @@ typedef struct Process
      * @brief Any data required by the condition
      */
     void *condition_data[5];
+    /**
+     * @brief The children's death semaphore
+     */
+    sem_t zombie_sem;
+    /**
+     * @brief The process' death semaphore
+     */
+    sem_t exit_sem;
+    /**
+     * @brief Process open file descriptors
+     */
+    int files[MAX_PROCESS_FILES];
 } Process;
 
 /**
@@ -153,12 +192,6 @@ Process *get_current_process();
  */
 Process *get_process(pid_t pid);
 /**
- * @brief Get the currently executing pid
- *
- * @return pid_t The current pid
- */
-pid_t get_pid();
-/**
  * @brief Create a new process
  *
  * @note This function must ALWAYS be called from a interruption context.
@@ -177,25 +210,28 @@ pid_t create_process(void *rsp);
  */
 int kill_process(pid_t pid);
 /**
- * @brief Block the current process until the child pid dies
- */
-pid_t waitpid(pid_t pid, int *wstatus, int options);
-/**
- * @brief Block the current process for a number of ticks
+ * @brief Open a file in the current process
+ * @note Kernel only, the syscall open() won't exist (yet)
  *
- * @param ticks The number of ticks to sleep
- * @return unsigned int The number of ticks left to sleep (always 0 in RetOS)
+ * @param file The kernel file descriptor
+ * @param flags O_ flags
+ * @return int The process file descriptor, -1 if the file couldn't be opened
  */
-unsigned int sleep(unsigned int ticks);
-
+int open_file(int file, int flags);
 /**
- * @brief Skip remaining CPU time and give it to the next process
+ * @brief Close a file
+ * @note Kernel only, use the syscall close() for closing current process' files
+ *
+ * @param file The process file descriptor
+ * @return int 0 if the file was closed, -1 otherwise
  */
-extern void yield();
+int close_file(int file);
 /**
- * @brief Kill the current process and halt
- * @note This function should only be called from a syscall for "atomicity"
+ * @brief Iterate over a blocked process list and unblock the ones that satisfy the condition
+ *
+ * @param p The head of the blocked process list
+ * @return Process* The new head of the blocked process list
  */
-extern void exit();
+Process *loop_blocked_and_unblock(Process *p);
 
 #endif

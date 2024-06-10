@@ -6,6 +6,7 @@
 #include "./../window/window.h"
 #define MAX_SCORE_LENGTH 4
 #define MAX_LETTER_SIZE 5
+#define MAX_MOVES 500
 typedef struct frontSnake
 {
     DIRECTION nextMove;
@@ -54,10 +55,25 @@ int playSnake(uint16_t snakeCount)
     setBoard(snakeCount);
 
     frontSnake *snakes = malloc(snakeCount * sizeof(frontSnake)); // Still saves space for second snake. Simpler than checking snakeCount for every non-complex operation
+    if (snakes == NULL)
+    {
+        paintString("Painting failed", 0xFF000000 | HEX_RED, 0xFF | HEX_BLACK);
+        sleep(1);
+        goto end;
+    }
+
     for (int i = 0; i < snakeCount; i++)
     {
         snakes[i].nextMove = NONE;
         snakes[i].colorMap = malloc(MAX_SNAKE_COLORS * sizeof(HexColor));
+
+        if (snakes[i].colorMap == NULL)
+        {
+            paintString("Painting failed", 0xFF000000 | HEX_RED, 0xFF | HEX_BLACK);
+            sleep(1);
+            goto end;
+        }
+
         for (int j = 1; j < MAX_SNAKE_COLORS - 1; j++)
         {
             snakes[i].colorMap[j] = getHexColor();
@@ -71,13 +87,20 @@ int playSnake(uint16_t snakeCount)
     drawBoard(snakes);
     shut();
 
-    uint64_t time = get_tick();
     while (!gameOver)
     {
         drawScore(score);
         char c;
-        while ((c = readChar())) // readChar returns 0 when buffer is empty. All player inputs should be read before passing them to the game
+
+        usleep(MOVE_INTERVAL);
+
+        char buffer[MAX_MOVES];
+        print_sys(STD_IN, ".", 1);                   // This is completely illegal
+        int n = read_sys(STD_IN, buffer, MAX_MOVES); // yes, if no moves are made this blocks, we need a non-blocking read to fix it (or just write into STD_IN before reading, but that's illegal)
+
+        for (int i = 0; i < n; i++)
         {
+            c = buffer[i];
             uint64_t size;
             if (c == '+' && (size = (getSize() + 1)) < MAX_LETTER_SIZE)
             {
@@ -90,44 +113,39 @@ int playSnake(uint16_t snakeCount)
                 setSize(size);
             }
             doMovement(c, snakeCount, snakes);
-            wait();
         }
-        if (timeHasPassed(time, MOVE_INTERVAL))
+        shut(); // stops any noises that begun on previous update loop
+        for (int i = 0; i < snakeCount; i++)
+            if (snakes[i].nextMove != NONE)
+                setDirection(i, snakes[i].nextMove);
+        int deaths = 0;
+        int madeApple = 0;
+        if ((deadSnake = update(snakeCount, &deaths, &madeApple)))
         {
-            shut(); // stops any noises that begun on previous update loop
-            time = get_tick();
-            for (int i = 0; i < snakeCount; i++)
-                if (snakes[i].nextMove != NONE)
-                    setDirection(i, snakes[i].nextMove);
-            int deaths = 0;
-            int madeApple = 0;
-            if ((deadSnake = update(snakeCount, &deaths, &madeApple)))
-            {
-                putDeath(deadSnake);
-                deathCount += deaths;
-                if (deathCount >= snakeCount)
-                    gameOver = 1;
-            }
-            if (madeApple)
-            {
-                score += APPLE_POINTS * madeApple;
-                drawTextBackground(getSize(), MAX_SCORE_LENGTH);
-                play(330);
-            }
-            drawBoard(snakes);
+            putDeath(deadSnake);
+            deathCount += deaths;
+            if (deathCount >= snakeCount)
+                gameOver = 1;
         }
+        if (madeApple)
+        {
+            score += APPLE_POINTS * madeApple;
+            drawTextBackground(getSize(), MAX_SCORE_LENGTH);
+            play(330);
+        }
+        drawBoard(snakes);
     }
 
     play(440);
     blank();
+end:
     shut();
-
     // drawBackground();  // undecided between a blank background or the snake background.
-    while (readChar()) // empties out buffer, in case player pressed a key while background was being cleared (not necessary, just prevents skipping the game-over screen)
-        ;
+    flush(STD_IN);
     setSize(oldSize);
     paintString("Game Over. Press a key to return to shell.", 0xFF000000 | HEX_RED, 0xFF | HEX_BLACK);
     getChar();
+    blank();
     freeColorMaps(snakeCount, snakes);
     free(snakes);
     freeBack();

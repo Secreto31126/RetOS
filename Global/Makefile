@@ -25,6 +25,6 @@ endif
 	$(ASM) $(ASMFLAGS) -i ./asm/ $< -o $@
 
 clean:
-	@rm -rf *.o
+	@find . -name "*.o" -delete
 
 .PHONY: all clean

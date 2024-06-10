@@ -1,12 +1,12 @@
 	extern context_switch
 	extern yield_robin
 	extern set_exit_code
-	extern get_pid
+	extern getpid
 	extern kill_process
 
 	global scheduler
-	global yield
-	global exit
+	global sched_yield
+	global _exit
 	global swap_stacks
 
 	section .bss
@@ -34,29 +34,31 @@ scheduler:
 
 	ret
 
-; void yield();
-yield:
+; int sched_yield();
+sched_yield:
 	call	yield_robin
 	int		0x20
+	mov		rax, 0
 	ret
 
-; void exit(int status);
-exit:
+; void _exit(int status);
+_exit:
 	lea		rsp, [exit_running_stack + 0x800]
 	; Any last words?
 	call	set_exit_code
 
 .kill:
-	call	get_pid
+	call	getpid
 	mov		rdi, rax
 	call	kill_process
 
 	; Keep killing until it's dead dead or the scheduler stops you
 	cmp		rax, 0
+	sti
 	jne		.kill
 
 	; Let the scheduler pick your soul and die happily
-	call	yield
+	call	sched_yield
 
 	; Just in case
 .loop:

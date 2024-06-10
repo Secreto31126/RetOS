@@ -22,6 +22,7 @@ extern void output_byte(uint16_t port, uint8_t value);
 extern void set_interrupt_flag(void);
 extern void unset_interrupt_flag(void);
 extern void halt_once(void);
+extern unsigned int exchange(unsigned int *src, unsigned int value);
 
 extern unsigned char dump_reg_string[360];
 /**

@@ -4,10 +4,17 @@
 #include <lib.h>
 #include <proc.h>
 #include <mman.h>
+#include <files.h>
 #include <ticks.h>
+#include <sched.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 #include <memory.h>
+#include <signal.h>
 #include <console.h>
 #include <stdbool.h>
+#include <semaphores.h>
 
 #define MIN_STACK_SIZE 0x80000
 #define IDLE_STACK_SIZE 0x400
@@ -29,7 +36,7 @@ pid_t set_pid(pid_t p);
 /**
  * @brief Set the exit code to the current process
  *
- * @note Should only be used by exit()
+ * @note Should only be used by _exit()
  *
  * @param status The exit code
  */
@@ -45,31 +52,15 @@ void set_exit_code(int status);
 bool inherit_parents_house(Process *process);
 
 /**
- * @brief Await the death of a children
+ * @brief Wait for multiple fds to be read available
+ * @note The process' pointers will be invalid while checking because the running stack is not loaded
+ * Aka, you must allocate global memory to preserve the data
  *
  * @param pid The process' pid
- * @return true Condition met
- * @return false Condition not met
+ * @return true At least one file is available for reading or all files are closed
+ * @return false No file is available for reading
  */
-bool zombie_child(pid_t pid);
-/**
- * @brief Await a semaphore to be raised
- * @todo Implement semaphore logic
- *
- * @param pid The process' pid
- * @return true Condition met
- * @return false Condition not met
- */
-bool semaphore_raised(pid_t pid);
-/**
- * @brief Await for a read to be available
- * @todo Implement kernel read by fd logic
- *
- * @param pid The process' pid
- * @return true Condition met
- * @return false Condition not met
- */
-bool read_available(pid_t pid);
+bool multi_read_available(pid_t pid);
 /**
  * @brief Await for a sleep to finish
  *
@@ -85,13 +76,21 @@ bool sleep_finished(pid_t pid);
  * @return true Condition always met
  */
 bool no_condition(pid_t pid);
+/**
+ * @brief Keep the process blocked forever
+ *
+ * @param pid The process' pid
+ * @return false Condition never met
+ */
+bool whim_condition(pid_t pid);
 
 /**
  * @brief Loop all the blocked processes and unblock them if the condition is met
  */
-void check_blocked_processes();
+void check_tick_blocked_processes();
 /**
  * @brief Add a process to the blocked queue
+ * @note If the process is already blocked, it only updates the condition and data
  *
  * @note It could be a vaargs
  * @note ¯\_(ツ)_/¯
@@ -104,7 +103,7 @@ void check_blocked_processes();
  * @param data3 Condition data
  * @param data4 Condition data
  */
-void add_blocked(Process *p, ProcessBlockConditional condition, void *data0, void *data1, void *data2, void *data3, void *data4);
+void add_tick_blocked(Process *p, ProcessBlockConditional condition, void *data0, void *data1, void *data2, void *data3, void *data4);
 
 /**
  * @brief Add a process to the round robin queue
@@ -129,7 +128,7 @@ pid_t robin_next();
 void robin_remove(pid_t pid);
 /**
  * @brief Set the remainin ticks to 0
- * @note This function should only be called from yield()
+ * @note This function should only be called from sched_yield()
  */
 void yield_robin();
 

@@ -25,6 +25,7 @@ uint64_t test_mm(uint64_t argc, char *argv[])
 
   if ((max_memory = satoi(argv[0])) <= 0)
     return -2;
+  max_memory <<= 20; // TO MB
 
   // MODIFIED TO ENABLE USING HEAP MALLOC (INSTEAD OF SHM)
   int use_heap = 0;

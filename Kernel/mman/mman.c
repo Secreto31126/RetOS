@@ -187,9 +187,70 @@ size_t find_buddy(size_t size, size_t index, size_t current_size)
     return left;
 }
 
+typedef enum display_empties
+{
+    YES = 0,
+    NO,
+    JUST_ONE,
+} display_empties;
+
+char *print_rec(char *output, char *end, size_t i, size_t height, display_empties empties);
+
+int print_buddy(char *output, size_t length, char avoid_empty)
+{
+    return print_rec(output, output + length, 0, 0, avoid_empty) - output;
+}
+
+char *print_rec(char *output, char *end, size_t i, size_t height, display_empties empties)
+{
+    if (i < 0 || i > (MAP_END - MAP_START) * 2)
+        return output;
+
+    states s = read_state(MAP_START, i);
+    // avoid empty branches
+    if (s == EMPTY)
+    {
+        if (empties == NO)
+            return output;
+        if (empties == JUST_ONE)
+            empties = NO;
+    }
+
+    output = print_rec(output, end, GET_LEFT(i), height + 1, empties);
+    for (int i = 0; i < height && output < end - 2; i++)
+    {
+        output[0] = ' ';
+        output[1] = ' ';
+        output += 2;
+    }
+    if (output >= end - 2)
+        return output;
+
+    if (s == EMPTY)
+    {
+        output[0] = 'E';
+    }
+    else if (s == SPLIT)
+    {
+        output[0] = 'S';
+    }
+    else if (s == FULL)
+    {
+        output[0] = 'F';
+    }
+    else
+    {
+        output[0] = 'A';
+    }
+    output[1] = '\n';
+    output += 2;
+
+    return print_rec(output, end, GET_RIGHT(i), height + 1, empties);
+}
+
 int memory_state(char *output, size_t length)
 {
-    return 1;
+    return print_buddy(output, length, NO);
 }
 
 #else

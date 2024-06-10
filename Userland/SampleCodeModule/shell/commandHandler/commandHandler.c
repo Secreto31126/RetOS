@@ -367,6 +367,15 @@ char *getReadableString(moduleData source, char *buffer, int bufferSize)
     return buffer;
 }
 
+/**
+ * @brief Executes a module, producing the specified IPC elements
+ *
+ * @param moduleName The name of the module to create
+ * @param params The parameters to pass to the module as argv
+ * @param readFd A file descriptor to dup to the module's STD_IN
+ * @param routeMode How the module's file descriptors should be organized. FROM_FD if it will read a file descriptor from STD_IN. FROM_TERM if it will read user input from STD_IN. FROM_BOTH if it will read the former from STD_IN, the latter from STD_TERM
+ * @return Data from the process created. File descriptors and strings not initialized are -1 and NULL respectively
+ */
 moduleData pipeAndExec(char *moduleName, char *params, int readFd, routeModes routeMode)
 {
     int pipeFd[2] = {0};

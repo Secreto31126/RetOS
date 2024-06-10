@@ -43,7 +43,7 @@ then
     if [[ "$2" = b* ]]
     then
         echo "DEBUG mode with buddy"
-        id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all DEBUG=1)
+        id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all DEBUG=1 BUDDY=1)
     else
         echo "DEBUG mode"
         id=$(docker run -d -v "/$path/Image:/root/Image" "$container" all DEBUG=1)

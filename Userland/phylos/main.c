@@ -135,7 +135,7 @@ int make_mutexes()
 	data->printex[0] = sem_open("printex0", 1);
 	data->printex[1] = sem_open("printex1", 0);
 
-	if (data->mutex == NULL || data->childex == NULL || data->addex == NULL || data->printex[0] == NULL || data->printex[1] == NULL)
+	if (data->mutex == NULL || data->childex == NULL || data->addex == NULL || data->printex[0] == NULL || data->printex[1] == NULL || data->returnex == NULL)
 		return 1;
 	return 0;
 }
@@ -253,6 +253,7 @@ void leave()
 	kill(children[MAX_PHYLOS], SIGKILL);
 	waitpid(children[MAX_PHYLOS], NULL, 0);
 	sem_close(data->mutex);
+	sem_close(data->returnex);
 	sem_close(data->printex[0]);
 	sem_close(data->printex[1]);
 	free(data->printex);

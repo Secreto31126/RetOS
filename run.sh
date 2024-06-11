@@ -4,12 +4,13 @@ container="tpe-builder"
 
 if [ $# -eq 0 ] || [ "$1" = "-h" ]
 then
-    echo "Usage: $0 (build|debug|pvs|docs) [naive|buddy] [wsl]"
+    echo "Usage: $0 (build|debug|pvs|docs|format) [naive|buddy] [wsl]"
     echo
     echo "build: Build the image"
     echo "debug: Run the image in debug mode"
     echo "pvs: Run the image in PVS mode"
     echo "docs: Generate the documentation"
+    echo "format: Prettify the code"
     echo "naive: Run the image with naive memory system"
     echo "buddy: Run the image with buddy memory system"
     exit 1
@@ -19,6 +20,13 @@ if [ "$1" = "docs" ]
 then
     doxygen Doxyfile
     exit 1
+fi
+
+if [ "$1" = "format" ]
+then
+    find . -iname *.c -exec clang-format -i {} \;
+    find . -iname *.h -exec clang-format -i {} \;
+    exit 0
 fi
 
 docker build -t "$container" .

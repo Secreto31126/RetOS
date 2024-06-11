@@ -422,10 +422,13 @@ int handleStdKeys(moduleData data, displayStyles displayStyle)
     char ctrlZ[] = {LCTRL, 0x2C, 0};
     if (strstr(r_buffer, ctrlC) != NULL)
     {
+        addStringToBuffer("^c", 0);
+        flush(STD_IN);
         return 2;
     }
     if (strstr(r_buffer, ctrlZ) != NULL)
     {
+        flush(STD_IN);
         return 3;
     }
     if (strstr(r_buffer, ctrlD) != NULL && data.writeFd >= 0)

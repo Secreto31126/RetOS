@@ -20,6 +20,7 @@ extern void cascade_pic(void);
 extern void even_ports_handler(void);
 extern void odd_ports_handler(void);
 extern void usb_handler(void);
+extern void ethernet_handler(void);
 extern void syscall_handler(void);
 
 #endif

@@ -267,6 +267,14 @@ moduleData setSnakeTheme(moduleData commandFd, displayStyles *displayStyle)
         setDrawOptions(1, 1, 1, 1);
         matchFlag = 1;
     }
+    else if (!strcmp(commandParameters, "doom"))
+    {
+        setBackgroundArray((char *)doomArray);
+        setBackgroundColorMap((HexColor *)doomColorMap);
+        setSnakeDrawing(DRAW_SIZE, (char *)demonHead, (char *)demonOther, (char *)demonTail, (char *)demonTurn, (char *)doomGuy, (HexColor *)doomGuyColorMap);
+        setDrawOptions(0, 0, 1, 0);
+        matchFlag = 1;
+    }
     if (matchFlag)
     {
         moduleData aux = {"Theme set.", -1, -1, -1};

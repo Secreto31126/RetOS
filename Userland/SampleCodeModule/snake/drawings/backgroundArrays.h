@@ -16,5 +16,7 @@ extern HexColor camelotColorMap[];
 extern char camelotArray[BACKGROUND_HEIGHT][BACKGROUND_WIDTH];
 extern HexColor idyllicColorMap[];
 extern char idyllicArray[BACKGROUND_HEIGHT][BACKGROUND_WIDTH];
+extern HexColor doomColorMap[];
+extern char doomArray[BACKGROUND_HEIGHT][BACKGROUND_WIDTH];
 
 #endif

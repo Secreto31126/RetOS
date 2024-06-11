@@ -44,5 +44,11 @@ extern char wyvTail[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 extern char wyvTurn[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 extern char guide[BIG_DRAW_SIZE][BIG_DRAW_SIZE];
 extern HexColor guideColorMap[];
+extern char demonHead[DRAW_SIZE][DRAW_SIZE];
+extern char demonOther[DRAW_SIZE][DRAW_SIZE];
+extern char demonTurn[DRAW_SIZE][DRAW_SIZE];
+extern char demonTail[DRAW_SIZE][DRAW_SIZE];
+extern char doomGuy[DRAW_SIZE][DRAW_SIZE];
+extern HexColor doomGuyColorMap[];
 
 #endif

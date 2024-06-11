@@ -37,12 +37,22 @@ static char fromLastEnter = 0;
 static commandData activeReads[MAX_ACTIVE] = {{{NULL, STD_IN, -1, -1}, NULL, 0}};
 static int activeReadsCount = 1;
 
+/**
+ * @brief Draws the current time in the top left of the screen
+ *
+ */
 void drawTime()
 {
     char buffer[6];
     drawStringAt(getTimeString(buffer), 0xFFFFFFFF, 0xFF000000, 0, 0);
 }
 
+/**
+ * @brief Adds a module to the list of modules monitored by the shell
+ *
+ * @param bgModule The module to be added
+ * @return 0 if succesful, 1 otherwise
+ */
 char addToActive(commandData bgModule)
 {
     if (activeReadsCount >= MAX_ACTIVE)
@@ -51,14 +61,11 @@ char addToActive(commandData bgModule)
     return 0;
 }
 
-int getFdIndex(int fd)
-{
-    int index = 0;
-    while (activeReads[index].data.fd != fd)
-        index++;
-    return index;
-}
-
+/**
+ * @brief Removes a module from the list of modules monitored by the shell
+ *
+ * @param index The index of the module to be removed in the list of modules monitored by the shell
+ */
 void removeFromActive(int index)
 {
     // do not remove STD_IN, do not remove beyond array
@@ -71,6 +78,28 @@ void removeFromActive(int index)
         activeReads[index] = activeReads[index + 1];
 }
 
+/**
+ * @brief Get the index of a read fd in the list of modules monitored by the shell
+ *
+ * @param fd The read fd to search for
+ * @return -1 if the fd could not be found, the index of the fd otherwise
+ */
+int getFdIndex(int fd)
+{
+    for (int i = 0; i < activeReadsCount; i++)
+    {
+        if (activeReads[i].data.fd == fd)
+            return i;
+    }
+    return -1;
+}
+
+/**
+ * @brief Get the index of a module referencing a process id
+ *
+ * @param pid The process id to be searched for
+ * @return -1 if not found, the index otherwise
+ */
 int getPidIndex(int pid)
 {
     for (int i = 1; i < activeReadsCount; i++)
@@ -86,6 +115,11 @@ int getPidIndex(int pid)
     return -1;
 }
 
+/**
+ * @brief Bring a module from the list of modules monitored by the shell to foreground
+ *
+ * @param pid Any process id directly referenced by the module
+ */
 void bringToFg(int pid)
 {
     int index;
@@ -102,6 +136,12 @@ void bringToFg(int pid)
     readUntilClose(toBring, APPEND);
 }
 
+/**
+ * @brief Reads a character as user input
+ *
+ * @param c The character to be read
+ * @return 0 if no additional actino must be taken, 1 if the user requested to exit the shell, 2 if the user requested to bring a module to foreground
+ */
 char readAsInput(char c)
 {
     if (c == '\n')
@@ -152,7 +192,13 @@ char readAsInput(char c)
     return 0;
 }
 
-// returns 1 if content was printed
+/**
+ * @brief Reads from a module in the list of modules monitored by the shell as if it were a background module
+ *
+ * @param index The index of the module in the list of modules monitored by the shell
+ * @param displayStyle How the module expects to be displayed
+ * @return 1 if any output was printed to the terminal, 0 otherwise
+ */
 int readAsBackground(int index, displayStyles displayStyle)
 {
     commandData cData = activeReads[index];
@@ -173,6 +219,11 @@ int readAsBackground(int index, displayStyles displayStyle)
     return 1;
 }
 
+/**
+ * @brief The basic loop executed by the shell
+ *
+ * @return 0 if the loop should run again, 1 otherwise
+ */
 char shellLoop()
 {
     drawTime();
@@ -231,6 +282,11 @@ char shellLoop()
     return 0;
 }
 
+/**
+ * @brief Initializes the shell
+ *
+ * @return 1 if an error occurred, 0 otherwise
+ */
 char shellStart()
 {
     uint32_t width = getScreenWidth();
@@ -257,12 +313,23 @@ char shellStart()
     return 0;
 }
 
+/**
+ * @brief Adds a character to the buffer
+ *
+ * @param c The character to add
+ */
 void addCharToBuffer(char c)
 {
     buffer[index++] = c;
     buffer[index] = 0;
     paintCharOrWarp(c);
 }
+/**
+ * @brief Adds a string to the buffer
+ *
+ * @param s The string to add
+ * @param ask Whether the user should be prompted before warping the screen if the buffer does not fit
+ */
 void addStringToBuffer(const char *s, char ask)
 {
     const char *aux = s;
@@ -271,6 +338,12 @@ void addStringToBuffer(const char *s, char ask)
     buffer[index] = 0;
     paintStringOrWarp(s, ask);
 }
+/**
+ * @brief Paints a string on the terminal
+ *
+ * @param s The string to paint
+ * @param ask Whether the user should be prompted before warping the screen if the buffer does not fit
+ */
 void paintStringOrWarp(const char *s, char ask)
 {
     if (!strcmp(s, ""))
@@ -318,12 +391,24 @@ void paintStringOrWarp(const char *s, char ask)
         }
     }
 }
+/**
+ * @brief Paints a character on the terminal
+ *
+ * @param c The character to paint
+ */
 void paintCharOrWarp(char c)
 {
     if (!paintChar(c, letterColor, highlightColor))
         warpAndRedraw();
 }
 
+/**
+ * @brief Interprets input from the STD_KEYS file descriptor, directs it to module when relevant
+ *
+ * @param data The module currently in foreground
+ * @param displayStyle How the module expects to be displayed
+ * @return 0 if no action needs to be taken, 1 if communication with the module failed or STD_KEYS, 2 if input requests the module be killed, 3 if input requests the module be sent to background
+ */
 int handleStdKeys(moduleData data, displayStyles displayStyle)
 {
     char r_buffer[BLOCK];
@@ -351,6 +436,13 @@ int handleStdKeys(moduleData data, displayStyles displayStyle)
     return 0;
 }
 
+/**
+ * @brief Interprets output from a module's read file descriptor, reproduces it in the CLI
+ *
+ * @param data The module to interpret
+ * @param displayStyle How the module expects to be displayed
+ * @return 0 if no action needs to be taken, 1 if communication with the module failed, 2 if the module is dead
+ */
 int handleReadFd(moduleData data, displayStyles displayStyle)
 {
     char r_buffer[READ_BLOCK];
@@ -374,6 +466,13 @@ int handleReadFd(moduleData data, displayStyles displayStyle)
     return 0;
 }
 
+/**
+ * @brief Interprets input from the STD_IN file descriptor, directs it to the module when relevant, reproduces it on the CLI when relevant
+ *
+ * @param data The module currently in foreground
+ * @param displayStyle How the module expects to be displayed
+ * @return 0 if no action needs to be taken, 1 if communication with the module or STD_IN failed
+ */
 int handleWriteFd(moduleData data, displayStyles displayStyle)
 {
     char r_buffer[BLOCK];
@@ -393,6 +492,12 @@ int handleWriteFd(moduleData data, displayStyles displayStyle)
     return 0;
 }
 
+/**
+ * @brief Sends SIGKILL to all process ids associated with a module, waits on all these process ids, closes all open file descriptors associated with the module
+ *
+ * @param cData The module to be killed
+ * @param message A message to display in the CLI once the module is dead
+ */
 void killModule(commandData cData, char *message)
 {
     moduleData data = cData.data;
@@ -413,6 +518,12 @@ void killModule(commandData cData, char *message)
     shut();
 }
 
+/**
+ * @brief Read from a module as foreground until it is closed or otherwise stopped
+ *
+ * @param cData The module to be read
+ * @param displayStyle How the module expects to be displayed
+ */
 void readUntilClose(commandData cData, displayStyles displayStyle)
 {
     flush(STD_KEYS);
@@ -500,6 +611,12 @@ void readUntilClose(commandData cData, displayStyles displayStyle)
     free(cData.cPid);
 }
 
+/**
+ * @brief Pass a command to the commandHandler
+ *
+ * @param toPass The command to be passed
+ * @return A string to display in the CLI
+ */
 char *passCommand(char *toPass)
 {
     displayStyles displayStyle = 0;
@@ -566,29 +683,56 @@ char *passCommand(char *toPass)
     }
     return sPrintf("\n%s\n%s", toPaint, lineStart);
 }
+
+/**
+ * @brief Warps the CLI by one line
+ *
+ */
 void warpOneLine()
 {
     warpNLines(1);
 }
+/**
+ * @brief Warps the CLI by one line, then redraws the buffer
+ *
+ */
 void warpAndRedraw()
 {
     warpOneLine();
     blank();
     paintString(buffer, letterColor, highlightColor);
 }
+/**
+ * @brief Changes the letter color of the CLI
+ *
+ * @param color The new letter color
+ */
 void setLetterColor(HexColor color) // command handler is responsible for setting displayStyle to REDRAW_ONCE
 {
     letterColor = 0xFF000000 | color; // Letters cannot be transparent
 }
+/**
+ * @brief Changes the highlight color of the CLI
+ *
+ * @param color The new highlight color
+ */
 void setHighlightColor(HexColor color) // command handler is responsible for setting displayStyle to REDRAW_ONCE
 {
     highlightColor = color; // highlights can be transparent
 }
+/**
+ * @brief Changes the size of text in the CLI
+ *
+ * @param size The new size
+ */
 void resize(double size) // command handler is responsible for setting displayStyle to REDRAW_ONCE
 {
     setSize(size);
 }
-
+/**
+ * @brief Clears the CLI and erases the buffer
+ *
+ */
 void clearShell()
 {
     blank();
@@ -598,6 +742,11 @@ void clearShell()
     commandBuffer[commandIndex] = 0;
     fromLastEnter = 0;
 }
+/**
+ * @brief Warps the CLI by n lines
+ *
+ * @param n
+ */
 void warpNLines(uint64_t n) // char or char* you want to add must be in buffer already. This shortens the buffer from the start so that it fits, then repaints it.
 {
     if (!n)
@@ -623,6 +772,13 @@ void warpNLines(uint64_t n) // char or char* you want to add must be in buffer a
     index = j - k;
     buffer[index] = 0;
 }
+/**
+ * @deprecated
+ *
+ *
+ * @brief Paints the command prompt
+ *
+ */
 void paintLineStart()
 {
     paintString(lineStart, letterColor, highlightColor);

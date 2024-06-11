@@ -1,5 +1,12 @@
 #include "shell.h"
 #include "commandHandler/commandHandler.h"
+#include "./../window/painter.h"
+#include "./../snake/random.h"
+#include "./../snake/snake.h"
+#include "./../snake/drawings/backgroundArrays.h"
+#include "./../snake/drawings/snakeDrawings.h"
+#include "./../nstdlib/nstdlib.h"
+#include "./../piano/sound.h"
 #include <stdint.h>
 #include <string.h>
 

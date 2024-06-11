@@ -10,7 +10,6 @@
 #include "./../snake/snake.h"
 #include "./../snake/drawings/backgroundArrays.h"
 #include "./../snake/drawings/snakeDrawings.h"
-#include "./../piano/piano.h"
 
 #define MAX_COMMAND_LENGTH 900
 

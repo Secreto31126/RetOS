@@ -28,6 +28,7 @@ void check_adding(unsigned int i)
         sem_post(data->addex);
         sem_wait(data->mutex);
         sem_post(data->mutex);
+        sem_post(data->returnex);
     }
 }
 

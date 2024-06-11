@@ -92,6 +92,7 @@ int add_philo(int use_addex)
 	{
 		data->adding = -1;
 		sem_post(data->mutex);
+		sem_wait(data->returnex);
 	}
 
 	return 0;
@@ -100,7 +101,6 @@ int add_philo(int use_addex)
 int remove_phylo()
 {
 	int i = data->phylo_count;
-
 	sem_wait(data->mutex); // acquire mutex
 	data->adding = i - 2;  // notify last philo that will remain that you will remove its neighbour
 	sem_wait(data->addex); // wait for philo that must be notified to be in right state
@@ -114,19 +114,22 @@ int remove_phylo()
 
 	data->adding = -1;
 	sem_post(data->mutex); // One of the processes blocked on this is dead, so I only need to post it once
+	sem_wait(data->returnex);
 
 	return 0;
 }
 
 int make_mutexes()
 {
-	sem_unlink("mutex");   // mutex para controlar el acceso a los estados de los filósofos
-	sem_unlink("childex"); // mutex para controlar la inicialización de un nuevo filósofo
-	sem_unlink("addex");   // mutex para controlar el acceso al último tenedor al añadir un filosofo
+	sem_unlink("mutex");	// mutex para controlar el acceso a los estados de los filósofos
+	sem_unlink("returnex"); // mutex para asegurar que se retornaron los tenedores antes de intentar sacar otro filósofo
+	sem_unlink("childex");	// mutex para controlar la inicialización de un nuevo filósofo
+	sem_unlink("addex");	// mutex para controlar el acceso al último tenedor al añadir un filosofo
 	sem_unlink("printex0");
 	sem_unlink("printex1");
 
 	data->mutex = sem_open("mutex", 1);
+	data->returnex = sem_open("returnex", 0);
 	data->childex = sem_open("childex", 0);
 	data->addex = sem_open("addex", 0);
 	data->printex[0] = sem_open("printex0", 1);
@@ -152,8 +155,6 @@ int main_loop()
 			if (add_philo(1))
 				return 1;
 			sem_post(data->childex); // wake up the philo
-			flush(STD_IN);
-
 			break;
 		}
 		puts("Limit reached\n");
@@ -169,7 +170,6 @@ int main_loop()
 		}
 		puts("Removing\n");
 		remove_phylo();
-		flush(STD_IN);
 		break;
 	}
 	case 'q':

@@ -152,6 +152,8 @@ int main_loop()
 			if (add_philo(1))
 				return 1;
 			sem_post(data->childex); // wake up the philo
+			flush(STD_IN);
+
 			break;
 		}
 		puts("Limit reached\n");
@@ -167,6 +169,7 @@ int main_loop()
 		}
 		puts("Removing\n");
 		remove_phylo();
+		flush(STD_IN);
 		break;
 	}
 	case 'q':

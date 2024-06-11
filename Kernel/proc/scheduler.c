@@ -35,7 +35,6 @@ void *context_switch(void *rsp)
     else if (old_process->state == PROCESS_BLOCKED)
     {
         old_process->rsp = rsp;
-        robin_remove(old_process->pid);
     }
 
     check_tick_blocked_processes();
@@ -169,7 +168,9 @@ pid_t robin_next()
         return idle->pid;
     }
 
-    if (first->state == PROCESS_DEAD || first->state == PROCESS_ZOMBIE)
+    pid_t pid = first->pid;
+
+    if (first->state == PROCESS_DEAD || first->state == PROCESS_ZOMBIE || first->state == PROCESS_BLOCKED)
     {
         robin_remove(first->pid);
         return robin_next();
@@ -180,8 +181,22 @@ pid_t robin_next()
         return first->pid;
     }
 
-    robin_remove(first->pid);
-    robin_add(first->pid);
+    robin_remove(pid);
+    robin_add(pid);
+    // Sorry PVS, but this is a global variable that
+    // might have changed after calling remove and add
+    first = idle->next_robin;
+
+    if (!first)
+    {
+        return idle->pid;
+    }
+
+    if (first->state == PROCESS_DEAD || first->state == PROCESS_ZOMBIE || first->state == PROCESS_BLOCKED)
+    {
+        robin_remove(first->pid);
+        return robin_next();
+    }
 
     return first->pid;
 }

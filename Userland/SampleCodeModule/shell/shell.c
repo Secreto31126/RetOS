@@ -86,10 +86,12 @@ void removeFromActive(int index)
  */
 int getFdIndex(int fd)
 {
-    int index = 0;
-    while (activeReads[index].data.fd != fd && index < activeReadsCount)
-        index++;
-    return index < activeReadsCount ? index : -1;
+    for (int i = 0; i < activeReadsCount; i++)
+    {
+        if (activeReads[i].data.fd == fd)
+            return i;
+    }
+    return -1;
 }
 
 /**

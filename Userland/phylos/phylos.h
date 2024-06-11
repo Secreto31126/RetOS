@@ -25,6 +25,7 @@ typedef struct
 typedef struct Data
 {
     sem_t *mutex;
+    sem_t *returnex;
     sem_t **printex;
     sem_t *childex;
     sem_t *addex;

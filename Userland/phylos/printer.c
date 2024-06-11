@@ -15,9 +15,14 @@ void print_state()
             {
                 puts("T ");
             }
-            else
+            else if (data->phylos[i].state == HUNGRY)
             {
                 puts(". ");
+            }
+            else
+            {
+                char c[] = {data->phylos[i].state, 0};
+                puts(c);
             }
         }
         puts("\n");

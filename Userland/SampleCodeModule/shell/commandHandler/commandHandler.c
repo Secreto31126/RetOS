@@ -6,8 +6,6 @@
 #include "./../../snake/drawings/backgroundArrays.h"
 #include "./../../snake/drawings/snakeDrawings.h"
 #include "./../shell.h"
-#include "./../../piano/piano.h"
-#include "./../../piano/sound.h"
 #include <sys/resource.h>
 #define BLOCK 5
 #define MAX_LETTER_SIZE 4
@@ -41,6 +39,14 @@ void addCommand(char *commandCode, char *help, action_t commandAction)
     commandCount++;
 }
 
+/**
+ * @brief Instantiates a component of a module
+ *
+ * @param command The input component in the module pairing
+ * @param params Parameters to be passed to the module component being created
+ * @param displayStyle Return parameter, how the module expects to be displayed
+ * @return The output component in the module pairing
+ */
 moduleData execute(moduleData command, char *params, displayStyles *displayStyle)
 {
     for (int i = 0; i < commandCount; i++)
@@ -63,30 +69,33 @@ moduleData execute(moduleData command, char *params, displayStyles *displayStyle
     return aux;
 }
 
+/**
+ * @brief Handles leftover file descriptors after connecting two components of a module
+ *
+ * @param toPipe The input component in the module pairing
+ * @param command The string representing the module component to be created
+ * @param displayStyle Return parameter, how the module expects to be displayed
+ * @return The output component in the module pairing
+ */
 moduleData wrapExecute(moduleData toPipe, char *command, displayStyles *displayStyle)
 {
-    if (toPipe.s != NULL)
-    {
-        moduleData aux = {command, toPipe.fd, toPipe.writeFd, toPipe.cPid};
-        toPipe = execute(aux, shiftToNextWord(aux.s), displayStyle);
-        if (aux.fd >= 0)
-            close(aux.fd);
-        if (aux.writeFd >= 0)
-            close(aux.writeFd);
-        return toPipe;
-    }
-    else
-    { // I have an open read fd, I hand it over to the executor, and close it once it is no longer in use
-        moduleData aux = {command, toPipe.fd, toPipe.writeFd, toPipe.writeFd};
-        toPipe = execute(aux, shiftToNextWord(aux.s), displayStyle);
-        if (aux.fd >= 0)
-            close(aux.fd);
-        if (aux.writeFd >= 0)
-            close(aux.writeFd);
-        return toPipe;
-    }
+    moduleData aux = {command, toPipe.fd, toPipe.writeFd, toPipe.cPid};
+    toPipe = execute(aux, shiftToNextWord(aux.s), displayStyle);
+    if (aux.fd >= 0)
+        close(aux.fd);
+    if (aux.writeFd >= 0)
+        close(aux.writeFd);
+    return toPipe;
 }
 
+/**
+ * @brief Initializes a module
+ *
+ * @param command The string representing the module
+ * @param displayStyle Return parameter, how the module expects to be displayed
+ * @param cPidBuffer Return parameter, an array of the process ids involved in the creation of the module
+ * @return commandData
+ */
 commandData handleCommand(char *command, displayStyles *displayStyle, int *cPidBuffer)
 {
 
@@ -117,7 +126,10 @@ commandData handleCommand(char *command, displayStyles *displayStyle, int *cPidB
     commandData toRet = {toPipe, cPidBuffer, cPidCount};
     return toRet;
 }
-
+/**
+ * @brief Produces a file descriptor with the help display requested
+ *
+ */
 moduleData getHelp(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
@@ -157,6 +169,10 @@ moduleData getHelp(moduleData commandFd, displayStyles *displayStyle)
     return aux;
 }
 
+/**
+ * @brief Initializes the snake built-in
+ *
+ */
 moduleData startSnake(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
@@ -193,6 +209,10 @@ moduleData startSnake(moduleData commandFd, displayStyles *displayStyle)
     return toRet;
 }
 
+/**
+ * @brief Changes the theme of the snake built-in
+ *
+ */
 moduleData setSnakeTheme(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
@@ -256,6 +276,10 @@ moduleData setSnakeTheme(moduleData commandFd, displayStyles *displayStyle)
     return aux;
 }
 
+/**
+ * @brief Changes the highlight color of the shell
+ *
+ */
 moduleData changehighlightColor(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
@@ -271,6 +295,11 @@ moduleData changehighlightColor(moduleData commandFd, displayStyles *displayStyl
     moduleData aux = {"Highlight color set", -1, -1, -1};
     return aux;
 }
+
+/**
+ * @brief Changes the letter color of the shell
+ *
+ */
 moduleData changeLetterColor(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
@@ -287,6 +316,11 @@ moduleData changeLetterColor(moduleData commandFd, displayStyles *displayStyle)
     moduleData aux = {"Letter color set", -1, -1, -1};
     return aux;
 }
+
+/**
+ * @brief Changes the letter size of the shell
+ *
+ */
 moduleData changeLetterSize(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
@@ -306,6 +340,11 @@ moduleData changeLetterSize(moduleData commandFd, displayStyles *displayStyle)
     moduleData aux = {"Size set", -1, -1, -1};
     return aux;
 }
+
+/**
+ * @brief Clears the shell
+ *
+ */
 moduleData clearTheShell(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
@@ -322,6 +361,11 @@ moduleData clearTheShell(moduleData commandFd, displayStyles *displayStyle)
     moduleData aux = {"", -1, -1, -1};
     return aux;
 }
+
+/**
+ * @brief Produces a string containing a memory dump
+ *
+ */
 moduleData readMeTheDump(moduleData commandFd, displayStyles *displayStyle)
 {
     char *c = getDumpString();
@@ -333,13 +377,11 @@ moduleData readMeTheDump(moduleData commandFd, displayStyles *displayStyle)
     moduleData aux = {sPrintf("The dump generated:\n%s", c), -1, -1, -1};
     return aux;
 }
-moduleData playThePiano(moduleData commandFd, displayStyles *displayStyle)
-{
-    *displayStyle = 1;
-    startPiano();
-    moduleData aux = {"Now exiting the yellow submarine.", -1, -1, -1};
-    return aux;
-}
+
+/**
+ * @brief echo built-in
+ *
+ */
 moduleData repeat(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
@@ -359,6 +401,14 @@ moduleData repeat(moduleData commandFd, displayStyles *displayStyle)
     return toRet;
 }
 
+/**
+ * @brief Produces a simple string from a module's output
+ *
+ * @param source The module to obtain the string from
+ * @param buffer Where to place the string if the module communicates via file descriptor
+ * @param bufferSize The size of the buffer
+ * @return Where the string was placed (Either the buffer or in the moduleData object)
+ */
 char *getReadableString(moduleData source, char *buffer, int bufferSize)
 {
     if (source.s != NULL && *source.s)
@@ -367,6 +417,15 @@ char *getReadableString(moduleData source, char *buffer, int bufferSize)
     return buffer;
 }
 
+/**
+ * @brief Executes a module, producing the specified IPC elements
+ *
+ * @param moduleName The name of the module to create
+ * @param params The parameters to pass to the module as argv
+ * @param readFd A file descriptor to dup to the module's STD_IN
+ * @param routeMode How the module's file descriptors should be organized. FROM_FD if it will read a file descriptor from STD_IN. FROM_TERM if it will read user input from STD_IN. FROM_BOTH if it will read the former from STD_IN, the latter from STD_TERM
+ * @return Data from the process created. File descriptors and strings not initialized are -1 and NULL respectively
+ */
 moduleData pipeAndExec(char *moduleName, char *params, int readFd, routeModes routeMode)
 {
     int pipeFd[2] = {0};
@@ -466,6 +525,13 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, routeModes ro
     return aux;
 }
 
+/**
+ * @brief Sends a signal to all process ids referenced directly by a module
+ *
+ * @param commandFd The module referencing the process ids
+ * @param signal The signal to send
+ * @return 1 if no process ids were referenced by the module, 0 otherwise
+ */
 int signalAll(moduleData commandFd, int signal)
 {
     char savedSpace[READ_BLOCK];
@@ -508,6 +574,10 @@ int signalAll(moduleData commandFd, int signal)
     return 0;
 }
 
+/**
+ * @brief Sends SIGKILL to all process ids referenced
+ *
+ */
 moduleData killer(moduleData commandFd, displayStyles *displayStyle)
 {
 
@@ -518,6 +588,10 @@ moduleData killer(moduleData commandFd, displayStyles *displayStyle)
     return toRet;
 }
 
+/**
+ * @brief Sends SIGSTOP to all process ids referenced
+ *
+ */
 moduleData blocker(moduleData commandFd, displayStyles *displayStyle)
 {
     moduleData toRet = {"Blocked.", -1, -1, -1};
@@ -527,6 +601,10 @@ moduleData blocker(moduleData commandFd, displayStyles *displayStyle)
     return toRet;
 }
 
+/**
+ * @brief Sends SIGCONT to all process ids referenced
+ *
+ */
 moduleData unblocker(moduleData commandFd, displayStyles *displayStyle)
 {
 
@@ -537,6 +615,10 @@ moduleData unblocker(moduleData commandFd, displayStyles *displayStyle)
     return toRet;
 }
 
+/**
+ * @brief Changes the priority of a process
+ *
+ */
 moduleData doNice(moduleData commandFd, displayStyles *displayStyle)
 {
     char savedSpace[READ_BLOCK];
@@ -560,6 +642,10 @@ moduleData doNice(moduleData commandFd, displayStyles *displayStyle)
     return toRet;
 }
 
+/**
+ * @brief Reads out the content of a file descriptor
+ *
+ */
 moduleData cat(moduleData commandFd, displayStyles *displayStyle)
 {
     // no params received, no fd to read from, use terminal as fd
@@ -568,31 +654,59 @@ moduleData cat(moduleData commandFd, displayStyles *displayStyle)
     // params/fd received, normal cat
     return pipeAndExec("cat", commandFd.s, commandFd.fd, FROM_FD);
 }
+/**
+ * @brief Counts the number of lines in a file descriptor
+ *
+ */
 moduleData wc(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("wc", commandFd.s, commandFd.fd, FROM_FD);
 }
+/**
+ * @brief Reads out the content of a file descriptor, vowels removed
+ *
+ */
 moduleData filter(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("filter", commandFd.s, commandFd.fd, FROM_FD);
 }
+/**
+ * @brief Outputs a message on a set interval
+ *
+ */
 moduleData loop(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("loop", commandFd.s, commandFd.fd, FROM_FD);
 }
+/**
+ * @brief Reads out the content of a file descriptor, keeping only the lines that match a given string
+ *
+ */
 moduleData grep(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("grep", commandFd.s, commandFd.fd, FROM_FD);
 }
+/**
+ * @brief Plays a song
+ *
+ */
 moduleData singToMe(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("sing", commandFd.s, commandFd.fd, FROM_FD);
 }
+/**
+ * @brief Reads out the content of a file descriptor on input from the terminal
+ *
+ */
 moduleData less(moduleData commandFd, displayStyles *displayStyle)
 {
     *displayStyle = NO_STDIN;
     return pipeAndExec("less", commandFd.s, commandFd.fd, FROM_BOTH);
 }
+/**
+ * @brief Initializes the philosopher problem module
+ *
+ */
 moduleData phylos(moduleData commandFd, displayStyles *displayStyle)
 {
     if (strstr(commandFd.s, "-l") != NULL)
@@ -601,10 +715,18 @@ moduleData phylos(moduleData commandFd, displayStyles *displayStyle)
         *displayStyle = NO_STDIN;
     return pipeAndExec("phylos", commandFd.s, commandFd.fd, FROM_TERM);
 }
+/**
+ * @brief Instantiates tests
+ *
+ */
 moduleData tests(moduleData commandFd, displayStyles *displayStyle)
 {
     return pipeAndExec("tests", commandFd.s, commandFd.fd, FROM_FD);
 }
+/**
+ * @brief Reports a snapshot of current processes. Note, this is a shell built-in and thus not directly reflected in the snapshot
+ *
+ */
 moduleData getPs(moduleData commandFd, displayStyles *displayStyle)
 {
     moduleData toRet = {NULL, ps(), -1, -1};
@@ -612,6 +734,10 @@ moduleData getPs(moduleData commandFd, displayStyles *displayStyle)
         toRet.s = "Kernel could not assign an fd to this command.";
     return toRet;
 }
+/**
+ * @brief Reads out a report on the state of memory
+ *
+ */
 moduleData getMem(moduleData commandFd, displayStyles *displayStyle)
 {
     char buffer[MAX_READ_BLOCK];
@@ -630,7 +756,6 @@ void initializeCommands()
     addCommand("set-highlight-color", "Help display for set highlight color.\nFormat: 'set-highlight-color [HEX_COLOR]'\nSets the highlight color of the shell to the specified integer.", changehighlightColor);
     addCommand("clear", "Help display for clear module. \nFormat(s): 'clear' | 'clear [LINES]'\nClears the shell or the number or shifts up the number of lines indicated.", clearTheShell);
     addCommand("dump", "Help display for dump module.\nFormat: 'dump'\nDisplays a dump if one has been generated by pressing the 'alt' key. Indicates no dump has been generated otherwise.", readMeTheDump);
-    addCommand("piano", "Help display for piano module.\nFormat: 'piano'\nStarts the piano module.\nPiano keys: z = Do, s = Do#, x = Re, d = Re#, c = mi, v = Fa, g = Fa#, b = Sol, h = Sol#, n = La, j = La#, m = Si", playThePiano);
     addCommand("sing", "Help display for sing module.\nFormat: 'sing [SONG_NAME]'\nSings a song. Currently recognized songs are:\n'imperial-march' 'hes-a-pirate' 'outer-wilds' 'do-i-wanna-know' 'sports-center' 'here-comes-the-sun'.", singToMe);
     addCommand("echo", "Help display for the echo module.\nFormat: 'echo [TO_ECHO]'\nIt repeats what you input.", repeat);
     addCommand("cat", "Help display for the cat module.\nFormat(s): 'cat [text] | cat [fd]'\nEchoes given text or outputs content of fd received via pipe.", cat);

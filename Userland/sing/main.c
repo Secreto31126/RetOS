@@ -10,7 +10,6 @@ extern char endOfBinary;
 void play(uint32_t freq);
 void shut();
 void playFor(uint32_t freq, uint32_t ticks);
-void switchSounds(uint32_t *freq, uint16_t cant, uint32_t ticks);
 void imperial_march();
 void hes_a_pirate();
 void outer_wilds();

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
+#include <malloc_m.h>
 
 #define MAX_BLOCKS 128
 
@@ -47,8 +48,9 @@ uint64_t test_mm(uint64_t argc, char *argv[])
     {
       mm_rqs[rq].size = GetUniform(max_memory - total - 1) + 1;
       if (use_heap)
-        mm_rqs[rq].address = malloc(mm_rqs[rq].size); // MODIFIED TO ENABLE USING HEAP MALLOC (CURRENTLY UNAVAILABLE)
-
+        mm_rqs[rq].address = malloc_m(mm_rqs[rq].size); // MODIFIED TO ENABLE USING HEAP MALLOC
+      else
+        mm_rqs[rq].address = malloc(mm_rqs[rq].size);
       if (mm_rqs[rq].address)
       {
         total += mm_rqs[rq].size;
@@ -76,7 +78,9 @@ uint64_t test_mm(uint64_t argc, char *argv[])
       if (mm_rqs[i].address)
       {
         if (use_heap)
-          free(mm_rqs[i].address); // MODIFIED TO ENABLE USING HEAP MALLOC (CURRENTLY UNAVAILABLE)
+          free_m(mm_rqs[i].address); // MODIFIED TO ENABLE USING HEAP MALLOC
+        else
+          free(mm_rqs[i].address);
       }
   }
 }

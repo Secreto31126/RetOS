@@ -1,6 +1,6 @@
 #include "fonts.h"
 
-char Classic[][TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH] = {
+const char Classic[][TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH] = {
     {
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0},

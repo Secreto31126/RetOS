@@ -7,6 +7,6 @@
 #define TRUE_LETTER_HEIGHT ((LETTER_HEIGHT) + (BORDER_THICKNESS))
 #define LETTER_HEIGHT 13
 
-extern char Classic[][TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH];
+extern const char Classic[][TRUE_LETTER_HEIGHT][TRUE_LETTER_WIDTH];
 
 #endif

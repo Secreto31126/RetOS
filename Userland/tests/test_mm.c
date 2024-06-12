@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
-#include <malloc_m.h>
 
 #define MAX_BLOCKS 128
 
@@ -21,16 +20,12 @@ uint64_t test_mm(uint64_t argc, char *argv[])
   uint32_t total;
   uint64_t max_memory;
 
-  /*
-  unsigned char count = 0;
-  char buffer[3];
-  */
-
   if (argc != 1 && argc != 2)
     return -2;
 
   if ((max_memory = satoi(argv[0])) <= 0)
     return -2;
+  max_memory <<= 20; // TO MB
 
   // MODIFIED TO ENABLE USING HEAP MALLOC (INSTEAD OF SHM)
   int use_heap = 0;
@@ -50,9 +45,7 @@ uint64_t test_mm(uint64_t argc, char *argv[])
     {
       mm_rqs[rq].size = GetUniform(max_memory - total - 1) + 1;
       if (use_heap)
-        mm_rqs[rq].address = malloc_m(mm_rqs[rq].size); // MODIFIED TO ENABLE USING HEAP MALLOC
-      else
-        mm_rqs[rq].address = malloc(mm_rqs[rq].size);
+        mm_rqs[rq].address = malloc(mm_rqs[rq].size); // MODIFIED TO ENABLE USING HEAP MALLOC (CURRENTLY UNAVAILABLE)
 
       if (mm_rqs[rq].address)
       {
@@ -81,14 +74,7 @@ uint64_t test_mm(uint64_t argc, char *argv[])
       if (mm_rqs[i].address)
       {
         if (use_heap)
-          free_m(mm_rqs[i].address); // MODIFIED TO ENABLE USING HEAP MALLOC
-        else
-          free(mm_rqs[i].address);
+          free(mm_rqs[i].address); // MODIFIED TO ENABLE USING HEAP MALLOC (CURRENTLY UNAVAILABLE)
       }
-    /*
-    itoa(++count, buffer, 10);
-    puts(buffer);
-    puts(" ");
-    */
   }
 }

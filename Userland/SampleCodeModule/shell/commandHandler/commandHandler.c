@@ -269,8 +269,8 @@ moduleData setSnakeTheme(moduleData commandFd, displayStyles *displayStyle)
     }
     else if (!strcmp(commandParameters, "doom"))
     {
-        setBackgroundArray((char *)idyllicColorMap);
-        setBackgroundColorMap((HexColor *)idyllicColorMap);
+        setBackgroundArray((char *)doomArray);
+        setBackgroundColorMap((HexColor *)doomColorMap);
         setSnakeDrawing(DRAW_SIZE, (char *)demonHead, (char *)demonOther, (char *)demonTail, (char *)demonTurn, (char *)doomGuy, (HexColor *)doomGuyColorMap);
         setDrawOptions(0, 0, 1, 0);
         matchFlag = 1;

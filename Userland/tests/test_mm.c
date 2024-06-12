@@ -32,7 +32,9 @@ uint64_t test_mm(uint64_t argc, char *argv[])
   if (argc == 2 && satoi(argv[1]))
   {
     use_heap = 1;
-    puts("Enabled heap for memory allocation\n");
+    puts("Will use process heap for memory allocation\n");
+  }else{
+    puts("Will use Kernel heap for memory allocation\n");
   }
   // END OF MODIFICATION
   while (1)

@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <semaphores.h>
 
-#define MAX_PIPES 10
+#define MAX_PIPES 100
 #define PIPE_SIZE 0x8000
 
 typedef struct Pipe

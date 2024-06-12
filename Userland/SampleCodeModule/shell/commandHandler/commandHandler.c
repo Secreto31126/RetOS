@@ -461,7 +461,7 @@ moduleData pipeAndExec(char *moduleName, char *params, int readFd, routeModes ro
         // close the read end of the pipe
         close(pipeFd[READ_END]);
         // redirect stdout to the write end of the pipe
-        if (dup2(pipeFd[WRITE_END], 1) < 0)
+        if (dup2(pipeFd[WRITE_END], STD_OUT) < 0)
         {
             exit(1);
         }

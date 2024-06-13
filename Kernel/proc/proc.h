@@ -125,7 +125,7 @@ pid_t robin_next();
  *
  * @param pid The process' pid
  */
-void robin_remove(pid_t pid);
+pid_t robin_remove(pid_t pid);
 /**
  * @brief Set the remainin ticks to 0
  * @note This function should only be called from sched_yield()

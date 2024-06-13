@@ -161,10 +161,14 @@ int get_weight(int priority)
 {
     return weights[priority - PRIO_MIN];
 }
-iterableList get_il(int index)
+iterableList get_proc_list_entry(int index)
 {
     iterableList il = process_lists[index - PRIO_MIN];
     return il ? il : NULL;
+}
+void set_proc_list_entry(int index, iterableList entry)
+{
+    process_lists[index - PRIO_MIN] = entry;
 }
 void set_schedule_entry(int index, int entry)
 {
@@ -180,7 +184,7 @@ void set_schedule()
     schedule_index = 0;
     for (int i = PRIO_MIN; i < PRIO_MAX; i++)
     {
-        iterableList il = get_il(i);
+        iterableList il = get_proc_list_entry(i);
         if (get_il(i) == NULL || il->size <= 0)
         {
             set_schedule_entry(i, 0);
@@ -200,7 +204,15 @@ void robin_add(pid_t pid)
 {
     Process *p = get_process(pid);
     int priority = p->priority;
-    if (add_il(get_il(priority), pid))
+    iterableList il = get_proc_list_entry(priority);
+    if (!il || il == NULL)
+    {
+        il = get_il();
+        if (il == NULL)
+            return;
+        set_proc_list_entry(priority, il);
+    }
+    if (add_il(il, pid))
         ready_count++;
 }
 
@@ -209,7 +221,7 @@ pid_t robin_remove(pid_t pid)
     Process *p = get_process(pid);
     int priority = p->priority;
     // Look for it where you expect it to be first (In the list defined by its priority)
-    if (remove_il(get_il(priority), pid))
+    if (remove_il(get_proc_list_entry(priority), pid))
     {
         ready_count--;
         return;
@@ -218,7 +230,7 @@ pid_t robin_remove(pid_t pid)
     // If it is not found, it still could be in another list, as priorities can change without warning the scheduler
     for (int i = PRIO_MIN; i < PRIO_MAX; i++)
     {
-        if (i != priority && remove_il(get_il(i), pid))
+        if (i != priority && remove_il(get_proc_list_entry(i), pid))
         {
             ready_count--;
             return pid;
@@ -233,7 +245,7 @@ int next_schedule()
         return -1;
     schedule_index = (schedule_index + 1) % PRIO_MAX;
     int entry = get_schedule_entry(schedule_index);
-    if (entry<=0)
+    if (entry <= 0)
         return (next_schedule());
     set_schedule_entry(schedule_index, entry - 1);
     return schedule_index;
@@ -250,7 +262,7 @@ pid_t robin_next()
     if (scheduled_priority < 0)
         return 0;
 
-    pid_t to_ret = next_il(get_il(scheduled_priority));
+    pid_t to_ret = next_il(get_proc_list_entry(scheduled_priority));
     if (!to_ret)
         return robin_next();
     Process *p_to_ret = get_process(to_ret);

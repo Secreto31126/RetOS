@@ -129,7 +129,15 @@ pid_t remove_il(iterableList il, pid_t pid)
 {
     if (il == NULL || !il->size || il->first == NULL)
         return 0;
-    int to_ret = remove_il_rec(il->first, il->current, pid);
+    if (il->first->pid == pid)
+    {
+        pNode *to_free = il->first;
+        il->first = il->first->next;
+        il->size--;
+        free(to_free);
+        return pid;
+    }
+    int to_ret = remove_il_rec(il->first, il, pid);
     if (to_ret)
         il->size--;
     return to_ret;

@@ -267,6 +267,7 @@ int next_schedule()
 
 pid_t robin_next()
 {
+    ncPrint("Next called\n");
     if (!ready_count)
         return 0;
     if (!schedule_remaining)
@@ -277,7 +278,10 @@ pid_t robin_next()
     pid_t to_ret = next_il(get_proc_list_entry(scheduled_priority));
     if (!to_ret)
         return robin_next();
+    ncPrint("Here");
+    ncPrintHex(to_ret);
     Process *p_to_ret = get_process(to_ret);
+    ncPrint("Here\n");
 
     if (p_to_ret->state == PROCESS_DEAD || p_to_ret->state == PROCESS_ZOMBIE || p_to_ret->state == PROCESS_BLOCKED)
     {

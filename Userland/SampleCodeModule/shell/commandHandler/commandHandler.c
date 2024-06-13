@@ -562,7 +562,7 @@ int signalAll(moduleData commandFd, int signal)
     for (; args[i] != NULL; i++)
     {
         int aux = atoi(args[i]);
-        if (aux)
+        if (aux>0)
         {
             kill(aux, signal);
             if (signal == SIGKILL)

@@ -124,7 +124,7 @@ int add_il(iterableList il, pid_t pid)
     il->size++;
     return 0;
 }
-pid_t remove_il_rec(pNode *p, pNode *current, pid_t pid);
+pid_t remove_il_rec(pNode *p, iterableList il, pid_t pid);
 pid_t remove_il(iterableList il, pid_t pid)
 {
     if (il == NULL || !il->size || il->first == NULL)
@@ -132,6 +132,8 @@ pid_t remove_il(iterableList il, pid_t pid)
     if (il->first->pid == pid)
     {
         pNode *to_free = il->first;
+        if (il->current == il->first)
+            il->current = il->first->next;
         il->first = il->first->next;
         il->size--;
         free(to_free);
@@ -142,20 +144,20 @@ pid_t remove_il(iterableList il, pid_t pid)
         il->size--;
     return to_ret;
 }
-pid_t remove_il_rec(pNode *p, pNode *current, pid_t pid)
+pid_t remove_il_rec(pNode *p, iterableList il, pid_t pid)
 {
     if (p->next == NULL)
         return 0;
     if (p->next->pid == pid)
     {
         pNode *to_free = p->next;
-        if (current == p->next)
-            current = p->next->next;
+        if (il->current == p->next)
+            il->current = il->first;
         p->next = p->next->next;
         free(to_free);
         return pid;
     }
-    return remove_il_rec(p->next, current, pid);
+    return remove_il_rec(p->next, il, pid);
 }
 
 static const char weights[PRIO_MAX - PRIO_MIN + 1] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};

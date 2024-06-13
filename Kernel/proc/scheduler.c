@@ -78,8 +78,75 @@ void *context_switch(void *rsp)
 }
 
 // Priority based round Robin
+// =========================================================================================================================================================
+typedef struct pNode
+{
+    struct pNode *next;
+    pid_t pid;
+} pNode;
+typedef struct iterableListHeader
+{
+    pNode *first;
+    pNode *current;
+    int size;
+} iterableListHeader;
+typedef iterableListHeader *iterableList;
+
+iterableList get_il()
+{
+    iterableList to_ret = malloc(sizeof(iterableListHeader));
+    to_ret->first = NULL;
+    to_ret->current = NULL;
+    to_ret->size = 0;
+    return to_ret;
+}
+pid_t next_il(iterableList il)
+{
+    if (!il->size || il->first == NULL)
+        return 0;
+    pid_t to_ret = il->current->pid;
+    il->current = il->current->next;
+    if (il->current == NULL)
+        il->current = il->first;
+    return to_ret;
+}
+void add_il(iterableList il, pid_t pid)
+{
+    pNode *to_add = malloc(sizeof(pNode));
+    to_add->next = il->first;
+    to_add->pid = pid;
+    
+    if (!il->size || il->current == NULL)
+        il->current = to_add;
+    il->first = to_add;
+}
+pid_t remove_il_rec(pNode *p, pid_t pid);
+pid_t remove_il(iterableList il, pid_t pid)
+{
+    if (!il->size || il->first == NULL)
+        return 0;
+    return remove_il_rec(il->first, pid);
+}
+pid_t remove_il_rec(pNode *p, pid_t pid)
+{
+    if (p->next == NULL)
+        return 0;
+    if (p->next->pid == pid)
+    {
+        p->next = p->next->next;
+        return pid;
+    }
+    return remove_il_rec(p->next, pid);
+}
+
 static Process *last = NULL;
-static signed char remaining = 20;
+static const char weights[PRIO_MAX - PRIO_MIN] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
+static char schedule[PRIO_MAX - PRIO_MIN] = {0};
+static iterableList *processes[PRIO_MAX - PRIO_MIN] = {0};
+
+void setSchedule()
+{
+}
 
 void robin_add(pid_t pid)
 {

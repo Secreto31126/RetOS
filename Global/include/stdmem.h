@@ -13,13 +13,13 @@ typedef signed long int size_t_m;
 #define HEAP_SIZE_M KB_129
 
 // Syscall to detect the start of the heap for the running process
-void malloc_init(void *start, size_t_m size);
+void malloc_init();
 
 typedef signed long int size_t_m;
 
-void *malloc_m(size_t_m size);
-void *realloc_m(void *ptr, size_t_m size);
-void free_m(void *ptr);
+void *malloc(size_t_m size);
+void *realloc(void *ptr, size_t_m size);
+void free(void *ptr);
 
 // void print_m(char avoid_empty);
 // void print_m_data();

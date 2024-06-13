@@ -9,6 +9,7 @@
 #include "./../piano/sound.h"
 #include <stdint.h>
 #include <string.h>
+#include <stdmem.h>
 
 #define BLOCK 50
 #define READ_BLOCK 500

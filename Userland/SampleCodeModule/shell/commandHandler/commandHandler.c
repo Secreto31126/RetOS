@@ -7,6 +7,7 @@
 #include "./../../snake/drawings/snakeDrawings.h"
 #include "./../shell.h"
 #include <sys/resource.h>
+#include <stdmem.h>
 #define BLOCK 5
 #define MAX_LETTER_SIZE 4
 #define READ_BLOCK 500      // Any command parameters that exceed this will be ignored. Just don't write commands exceeding 500 letters in terminal/don't feed longer than BLOCK letter input to shell built-ins
@@ -32,7 +33,7 @@ void freeCommands()
 void addCommand(char *commandCode, char *help, action_t commandAction)
 {
     if (!(commandCount % BLOCK))
-        commands = realloc(commands, commandCount * sizeof(command), (commandCount + BLOCK) * sizeof(command));
+        commands = realloc(commands, (commandCount + BLOCK) * sizeof(command));
     commands[commandCount].code = commandCode;
     commands[commandCount].action = commandAction;
     commands[commandCount].help = help;

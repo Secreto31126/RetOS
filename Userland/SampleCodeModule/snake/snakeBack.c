@@ -1,6 +1,7 @@
 #include "snake.h"
 #include "snakePrivate.h"
 #include "random.h"
+#include <stdmem.h>
 
 #define EMPTY 0
 #define BOARD_SIZE (BOARD_HEIGHT * BOARD_WIDTH)

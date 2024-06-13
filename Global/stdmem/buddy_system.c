@@ -1,4 +1,4 @@
-#include <malloc_m.h>
+#include <stdmem.h>
 #include <unistd.h>
 // I have decided that the correct implementation for a buddy system's memory map is a binary tree
 // Of course, since a binary tree is traditionally just a two-tailed list there are two options
@@ -61,7 +61,7 @@ void set_heap(void *start, size_t_m size)
         *((uint64_t *)i) = EMPTY;
 }
 */
-void malloc_init(void *start, size_t_m size)
+void malloc_init()
 {
     // Initialize binary tree
     for (char *i = MAP_START_M; i < MAP_END_M; i++)
@@ -218,11 +218,11 @@ size_t_m mem_index_to_map_index(size_t_m index)
 
 size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size);
 
-void *malloc_m(size_t_m size)
+void *malloc(size_t_m size)
 {
     if (size > MEM_SIZE_M)
         return NULL;
-    size_t_m index = find_buddy(size, 0, MEM_SIZE_M);
+    size_t_m index = find_buddy(size*2, 0, MEM_SIZE_M);
     if (index == -1)
     {
         return NULL;
@@ -265,13 +265,13 @@ size_t_m find_buddy(size_t_m size, size_t_m index, size_t_m current_size)
     return left;
 }
 
-void *realloc_m(void *ptr, size_t_m size)
+void *realloc(void *ptr, size_t_m size)
 {
-    free_m(ptr);
-    return malloc_m(size);
+    free(ptr);
+    return malloc(size);
 }
 
-void free_m(void *ptr)
+void free(void *ptr)
 {
     if (((char *)ptr) >= MEM_START_M && ((char *)ptr) <= MEM_END_M)
         set_node_state(MAP_START_M, mem_index_to_map_index(((char *)ptr) - MEM_START_M), EMPTY);

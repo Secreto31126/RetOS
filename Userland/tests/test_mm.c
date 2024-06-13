@@ -14,7 +14,6 @@ typedef struct MM_rq
 
 uint64_t test_mm(uint64_t argc, char *argv[])
 {
-
   mm_rq mm_rqs[MAX_BLOCKS];
   uint8_t rq;
   uint32_t total;
@@ -39,13 +38,11 @@ uint64_t test_mm(uint64_t argc, char *argv[])
   {
     rq = 0;
     total = 0;
-
     // Request as many blocks as we can
     while (rq < MAX_BLOCKS && total < max_memory)
     {
       mm_rqs[rq].size = GetUniform(max_memory - total - 1) + 1;
-      if (use_heap)
-        mm_rqs[rq].address = malloc(mm_rqs[rq].size); // MODIFIED TO ENABLE USING HEAP MALLOC (CURRENTLY UNAVAILABLE)
+      mm_rqs[rq].address = malloc(mm_rqs[rq].size); // MODIFIED TO ENABLE USING HEAP MALLOC (CURRENTLY UNAVAILABLE)
 
       if (mm_rqs[rq].address)
       {
@@ -53,7 +50,6 @@ uint64_t test_mm(uint64_t argc, char *argv[])
         rq++;
       }
     }
-
     // Set
     uint32_t i;
     for (i = 0; i < rq; i++)
@@ -73,8 +69,7 @@ uint64_t test_mm(uint64_t argc, char *argv[])
     for (i = 0; i < rq; i++)
       if (mm_rqs[i].address)
       {
-        if (use_heap)
-          free(mm_rqs[i].address); // MODIFIED TO ENABLE USING HEAP MALLOC (CURRENTLY UNAVAILABLE)
+        free(mm_rqs[i].address); // MODIFIED TO ENABLE USING HEAP MALLOC (CURRENTLY UNAVAILABLE)
       }
   }
 }

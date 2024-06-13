@@ -104,7 +104,7 @@ iterableList get_il()
 }
 pid_t next_il(iterableList il)
 {
-    if (!il->size || il->first == NULL)
+    if (il == NULL || !il->size || il->first == NULL)
         return 0;
     if (il->current == NULL)
         il->current = il->first;
@@ -127,7 +127,7 @@ int add_il(iterableList il, pid_t pid)
 pid_t remove_il_rec(pNode *p, pNode *current, pid_t pid);
 pid_t remove_il(iterableList il, pid_t pid)
 {
-    if (!il->size || il->first == NULL)
+    if (il == NULL || !il->size || il->first == NULL)
         return 0;
     int to_ret = remove_il_rec(il->first, il->current, pid);
     if (to_ret)
@@ -191,8 +191,8 @@ void set_schedule()
         }
         else
         {
-            int entry = process_lists[i]->size * get_weight(i) / ready_count; // A simple equation to assign time to each priority based on weights
-            if (entry <= current->size)                                       // Ensure that every process gets at least one turn in the schedule
+            int entry = current->size * get_weight(i) / ready_count; // A simple equation to assign time to each priority based on weights
+            if (entry <= current->size)                              // Ensure that every process gets at least one turn in the schedule
                 entry = current->size;
             schedule_remaining += entry; // Record how many rounds are scheduled
             set_schedule_entry(i, entry);
@@ -202,31 +202,44 @@ void set_schedule()
 
 void robin_add(pid_t pid)
 {
+    ncPrint("\nadd called, pid:\n");
+    ncPrintHex(pid);
+    ncPrint("\n\n");
     Process *p = get_process(pid);
     int priority = p->priority;
     iterableList il = get_proc_list_entry(priority);
-    if (!il || il == NULL)
+    if (il == NULL)
     {
         il = get_il();
         if (il == NULL)
             return;
         set_proc_list_entry(priority, il);
     }
+    ncPrint("Added at:\n");
+    ncPrintHex(priority);
+    ncPrint("\n");
     if (!add_il(il, pid))
         ready_count++;
 }
 
 pid_t robin_remove(pid_t pid)
 {
+    ncPrint("\nRemove called pid:\n");
+    ncPrintHex(pid);
+    ncPrint("\n");
+
     Process *p = get_process(pid);
+    ncPrint("HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE\n\n\n\n");
     int priority = p->priority;
     // Look for it where you expect it to be first (In the list defined by its priority)
+    ncPrint("Looking in prio\n");
+
     if (remove_il(get_proc_list_entry(priority), pid))
     {
         ready_count--;
         return pid;
     }
-
+    ncPrint("Looked, did not find\n");
     // If it is not found, it still could be in another list, as priorities can change without warning the scheduler
     for (int i = PRIO_MIN; i <= PRIO_MAX; i++)
     {
@@ -236,6 +249,7 @@ pid_t robin_remove(pid_t pid)
             return pid;
         }
     }
+    ncPrint("Returned 0");
     return 0;
 }
 
@@ -243,7 +257,7 @@ int next_schedule()
 {
     if (!schedule_remaining)
         return -1;
-    schedule_index = (schedule_index + 1) % (PRIO_MAX-PRIO_MIN + 1);
+    schedule_index = (schedule_index + 1) % (PRIO_MAX - PRIO_MIN + 1);
     int entry = get_schedule_entry(schedule_index);
     if (entry <= 0)
         return (next_schedule());
@@ -257,7 +271,6 @@ pid_t robin_next()
         return 0;
     if (!schedule_remaining)
         set_schedule();
-
     int scheduled_priority = next_schedule();
     if (scheduled_priority < 0)
         return 0;
@@ -268,12 +281,17 @@ pid_t robin_next()
 
     if (p_to_ret->state == PROCESS_DEAD || p_to_ret->state == PROCESS_ZOMBIE || p_to_ret->state == PROCESS_BLOCKED)
     {
+        ncPrint("\nRemoving myself state: \n");
+        ncPrintHex(p_to_ret->state);
+        ncPrint("\n");
         robin_remove(to_ret);
+        ncPrint("\nDone removing\n");
         return robin_next();
     }
 
     if (p_to_ret->priority != scheduled_priority) // Its priority has changed, move it to the correct list
     {
+        ncPrint("\nPrio changed\n");
         robin_remove(to_ret);
         robin_add(to_ret);
     }

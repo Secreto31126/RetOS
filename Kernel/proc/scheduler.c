@@ -212,9 +212,6 @@ void set_schedule()
 
 void robin_add(pid_t pid)
 {
-    ncPrint("\nadd called, pid:\n");
-    ncPrintHex(pid);
-    ncPrint("\n\n");
     Process *p = get_process(pid);
     int priority = p->priority;
     iterableList il = get_proc_list_entry(priority);
@@ -225,31 +222,21 @@ void robin_add(pid_t pid)
             return;
         set_proc_list_entry(priority, il);
     }
-    ncPrint("Added at:\n");
-    ncPrintHex(priority);
-    ncPrint("\n");
     if (!add_il(il, pid))
         ready_count++;
 }
 
 pid_t robin_remove(pid_t pid)
 {
-    ncPrint("\nRemove called pid:\n");
-    ncPrintHex(pid);
-    ncPrint("\n");
-
     Process *p = get_process(pid);
-    ncPrint("HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE\n\n\n\n");
     int priority = p->priority;
     // Look for it where you expect it to be first (In the list defined by its priority)
-    ncPrint("Looking in prio\n");
 
     if (remove_il(get_proc_list_entry(priority), pid))
     {
         ready_count--;
         return pid;
     }
-    ncPrint("Looked, did not find\n");
     // If it is not found, it still could be in another list, as priorities can change without warning the scheduler
     for (int i = PRIO_MIN; i <= PRIO_MAX; i++)
     {
@@ -259,7 +246,6 @@ pid_t robin_remove(pid_t pid)
             return pid;
         }
     }
-    ncPrint("Returned 0");
     return 0;
 }
 
@@ -277,7 +263,6 @@ int next_schedule()
 
 pid_t robin_next()
 {
-    ncPrint("Next called\n");
     if (!ready_count)
         return 0;
     if (!schedule_remaining)
@@ -288,30 +273,20 @@ pid_t robin_next()
     pid_t to_ret = next_il(get_proc_list_entry(scheduled_priority));
     if (!to_ret)
         return robin_next();
-    ncPrint("Here");
-    ncPrintHex(to_ret);
     Process *p_to_ret = get_process(to_ret);
-    ncPrint("Here\n");
 
     if (p_to_ret->state == PROCESS_DEAD || p_to_ret->state == PROCESS_ZOMBIE || p_to_ret->state == PROCESS_BLOCKED)
     {
-        ncPrint("\nRemoving myself state: \n");
-        ncPrintHex(p_to_ret->state);
-        ncPrint("\n");
+
         robin_remove(to_ret);
-        ncPrint("\nDone removing\n");
         return robin_next();
     }
 
     if (p_to_ret->priority != scheduled_priority) // Its priority has changed, move it to the correct list
     {
-        ncPrint("\nPrio changed\n");
         robin_remove(to_ret);
         robin_add(to_ret);
     }
-    ncPrint("\nto_ret:\n");
-    ncPrintHex(to_ret);
-    ncPrint("\n\n");
     return to_ret;
 }
 

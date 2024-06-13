@@ -35,6 +35,7 @@ void *context_switch(void *rsp)
     else if (old_process->state == PROCESS_BLOCKED)
     {
         old_process->rsp = rsp;
+        robin_remove(old_process->pid);
     }
 
     check_tick_blocked_processes();

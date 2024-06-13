@@ -133,6 +133,8 @@ pid_t remove_il(iterableList il, pid_t pid)
     if (il->first->pid == pid)
     {
         pNode *to_free = il->first;
+        if (il->current == il->first)
+            il->current = il->first->next;
         il->first = il->first->next;
         il->size--;
         free(to_free);
@@ -201,6 +203,7 @@ pid_t robin_next()
     pid_t to_ret = robin_next_aux();
     if (!to_ret)
         return to_ret;
+
     Process *p_to_ret = get_process(to_ret);
 
     if (p_to_ret->state == PROCESS_DEAD || p_to_ret->state == PROCESS_ZOMBIE || p_to_ret->state == PROCESS_BLOCKED)
@@ -208,11 +211,7 @@ pid_t robin_next()
         robin_remove(to_ret);
         return robin_next();
     }
-    if (to_ret)
-    {
-        ncPrintHex(to_ret);
-        ncPrint(" ");
-    }
+
     return to_ret;
 }
 

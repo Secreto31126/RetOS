@@ -150,12 +150,12 @@ pid_t remove_il_rec(pNode *p, pNode *current, pid_t pid)
     return remove_il_rec(p->next, current, pid);
 }
 
-static const char weights[PRIO_MAX - PRIO_MIN] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
-static int schedule[PRIO_MAX - PRIO_MIN] = {0};
+static const char weights[PRIO_MAX - PRIO_MIN + 1] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
+static int schedule[PRIO_MAX - PRIO_MIN + 1] = {0};
 static int schedule_index = 0;
 static int schedule_remaining = 0;
 static int ready_count = 0;
-static iterableList process_lists[PRIO_MAX - PRIO_MIN] = {0};
+static iterableList process_lists[PRIO_MAX - PRIO_MIN + 1] = {0};
 
 int get_weight(int priority)
 {
@@ -182,18 +182,18 @@ void set_schedule()
 {
     schedule_remaining = 0;
     schedule_index = 0;
-    for (int i = PRIO_MIN; i < PRIO_MAX; i++)
+    for (int i = PRIO_MIN; i <= PRIO_MAX; i++)
     {
-        iterableList il = get_proc_list_entry(i);
-        if (get_il(i) == NULL || il->size <= 0)
+        iterableList current = get_proc_list_entry(i);
+        if (current == NULL || current->size <= 0)
         {
             set_schedule_entry(i, 0);
         }
         else
         {
             int entry = process_lists[i]->size * get_weight(i) / ready_count; // A simple equation to assign time to each priority based on weights
-            if (entry <= il->size)                                            // Ensure that every process gets at least one turn in the schedule
-                entry = il->size;
+            if (entry <= current->size)                                       // Ensure that every process gets at least one turn in the schedule
+                entry = current->size;
             schedule_remaining += entry; // Record how many rounds are scheduled
             set_schedule_entry(i, entry);
         }
@@ -212,7 +212,7 @@ void robin_add(pid_t pid)
             return;
         set_proc_list_entry(priority, il);
     }
-    if (add_il(il, pid))
+    if (!add_il(il, pid))
         ready_count++;
 }
 
@@ -224,11 +224,11 @@ pid_t robin_remove(pid_t pid)
     if (remove_il(get_proc_list_entry(priority), pid))
     {
         ready_count--;
-        return;
+        return pid;
     }
 
     // If it is not found, it still could be in another list, as priorities can change without warning the scheduler
-    for (int i = PRIO_MIN; i < PRIO_MAX; i++)
+    for (int i = PRIO_MIN; i <= PRIO_MAX; i++)
     {
         if (i != priority && remove_il(get_proc_list_entry(i), pid))
         {
@@ -243,7 +243,7 @@ int next_schedule()
 {
     if (!schedule_remaining)
         return -1;
-    schedule_index = (schedule_index + 1) % PRIO_MAX;
+    schedule_index = (schedule_index + 1) % (PRIO_MAX-PRIO_MIN + 1);
     int entry = get_schedule_entry(schedule_index);
     if (entry <= 0)
         return (next_schedule());
@@ -261,7 +261,6 @@ pid_t robin_next()
     int scheduled_priority = next_schedule();
     if (scheduled_priority < 0)
         return 0;
-
     pid_t to_ret = next_il(get_proc_list_entry(scheduled_priority));
     if (!to_ret)
         return robin_next();
@@ -278,7 +277,9 @@ pid_t robin_next()
         robin_remove(to_ret);
         robin_add(to_ret);
     }
-
+    ncPrint("\nto_ret:\n");
+    ncPrintHex(to_ret);
+    ncPrint("\n\n");
     return to_ret;
 }
 

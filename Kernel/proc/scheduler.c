@@ -38,7 +38,9 @@ void *context_switch(void *rsp)
     }
 
     check_tick_blocked_processes();
+    ncPrint("Calling");
     set_pid(robin_next());
+    ncPrint("Returned");
 
     Process *new_process = get_current_process();
 
@@ -212,14 +214,55 @@ void set_schedule()
 
 int next_schedule()
 {
-    if (!schedule_remaining)
-        return -1;
+    if (schedule_remaining <= 0)
+        set_schedule();
     schedule_index = (schedule_index + 1) % (PRIO_MAX - PRIO_MIN + 1);
     int entry = get_schedule_entry(schedule_index);
     if (entry <= 0)
         return (next_schedule());
     set_schedule_entry(schedule_index, entry - 1);
+    schedule_remaining--;
     return schedule_index;
+}
+
+void print_il(iterableList il)
+{
+    if (!il || il->first == NULL || !il->size)
+    {
+        !il ? ncPrint(" 0") : il->first == NULL ? ncPrint(" F")
+                                                : ncPrint(" S");
+        return;
+    }
+    pNode *c = il->first;
+    while (c != NULL)
+    {
+        ncPrintHex(c->pid);
+        if (c == il->current)
+            ncPrint("*");
+        ncPrint("->");
+        c = c->next;
+    }
+}
+void print_scheduler()
+{
+    for (int i = PRIO_MIN; i <= PRIO_MAX; i++)
+    {
+        iterableList il = get_proc_list_entry(i);
+        if (i >= 0)
+        {
+            ncPrintDec(i);
+        }
+        else
+        {
+            ncPrint("-");
+            ncPrintDec(-i);
+        }
+        ncPrint(";");
+        ncPrintDec(get_schedule_entry(i));
+        ncPrint(": ");
+        print_il(il);
+        ncPrint("\n");
+    }
 }
 
 void robin_add(pid_t pid)
@@ -236,6 +279,9 @@ void robin_add(pid_t pid)
     }
     if (!add_il(il, pid))
         ready_count++;
+    ncPrint("\n: ");
+    print_il(il);
+    ncPrint("\n");
 }
 
 pid_t robin_remove(pid_t pid)
@@ -247,6 +293,9 @@ pid_t robin_remove(pid_t pid)
     if (remove_il(get_proc_list_entry(priority), pid))
     {
         ready_count--;
+        ncPrint("\n2: ");
+        print_il(get_proc_list_entry(priority));
+        ncPrint("\n");
         return pid;
     }
     // If it is not found, it still could be in another list, as priorities can change without warning the scheduler
@@ -263,21 +312,23 @@ pid_t robin_remove(pid_t pid)
 
 pid_t robin_next()
 {
+    // print_scheduler();
     if (!ready_count)
         return 0;
-    if (!schedule_remaining)
-        set_schedule();
     int scheduled_priority = next_schedule();
     if (scheduled_priority < 0)
         return 0;
     pid_t to_ret = next_il(get_proc_list_entry(scheduled_priority));
     if (!to_ret)
+    {
+        print_scheduler();
+        return to_ret;
         return robin_next();
-    Process *p_to_ret = get_process(to_ret);
+    }
 
+    Process *p_to_ret = get_process(to_ret);
     if (p_to_ret->state == PROCESS_DEAD || p_to_ret->state == PROCESS_ZOMBIE || p_to_ret->state == PROCESS_BLOCKED)
     {
-
         robin_remove(to_ret);
         return robin_next();
     }

@@ -15,7 +15,6 @@ typedef struct MM_rq
 
 uint64_t test_mm(uint64_t argc, char *argv[])
 {
-
   mm_rq mm_rqs[MAX_BLOCKS];
   uint8_t rq;
   uint32_t total;
@@ -34,7 +33,9 @@ uint64_t test_mm(uint64_t argc, char *argv[])
   {
     use_heap = 1;
     puts("Will use process heap for memory allocation\n");
-  }else{
+  }
+  else
+  {
     puts("Will use Kernel heap for memory allocation\n");
   }
   // END OF MODIFICATION
@@ -42,7 +43,6 @@ uint64_t test_mm(uint64_t argc, char *argv[])
   {
     rq = 0;
     total = 0;
-
     // Request as many blocks as we can
     while (rq < MAX_BLOCKS && total < max_memory)
     {
@@ -57,7 +57,6 @@ uint64_t test_mm(uint64_t argc, char *argv[])
         rq++;
       }
     }
-
     // Set
     uint32_t i;
     for (i = 0; i < rq; i++)

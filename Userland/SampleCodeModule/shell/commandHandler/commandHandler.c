@@ -547,7 +547,7 @@ int signalAll(moduleData commandFd, int signal)
     for (; args[i] != NULL; i++)
     {
         int aux = atoi(args[i]);
-        if (aux>0)
+        if (aux > 0)
         {
             kill(aux, signal);
             if (signal == SIGKILL)
@@ -756,5 +756,5 @@ void initializeCommands()
     addCommand("ps", "Help display for the ps module.\nFormat: 'ps'\nDisplays data about current running processes.", getPs);
     addCommand("nice", "Help display for the nice module.\nFormat: 'nice [process id] [new priority]'\nSets the priority of the process. Priority can range between -20 and 19, any values not in this range will be clamped to the range.\nNote: A lower priority correlates to greater time in execution.", doNice);
     addCommand("mem", "Help display for the mem module.\nFormat: 'mem'\nOutputs a report on the memory state.", getMem);
-    addCommand("tests", "Help display for the tests module.\nFormat: 'tests [test name] [test parameters]' \nThis module accepts the following tests:\ntestmm [max_memory in MB]\ntestsync [inc] [use_sem]\ntestprocesses [max_processes]\ntestprio\ntestprio [long_wait]\ntestprio [long_wait] [short_wait]", tests);
+    addCommand("tests", "Help display for the tests module.\nFormat: 'tests [test name] [test parameters]' \nThis module accepts the following tests:\ntestmm [max_memory in MB]\ntestmm [max_memory in MB] [use process heap]\ntestsync [inc] [use_sem]\ntestprocesses [max_processes]\ntestprio\ntestprio [long_wait]\ntestprio [long_wait] [short_wait]", tests);
 }

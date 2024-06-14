@@ -4,6 +4,7 @@
 #include "./drawings/backgroundArrays.h"
 #include "drawings/snakeDrawings.h"
 #include "./../window/window.h"
+#include <stdmem.h>
 #define MAX_SCORE_LENGTH 4
 #define MAX_LETTER_SIZE 5
 #define MAX_MOVES 500

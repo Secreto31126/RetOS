@@ -1,4 +1,5 @@
 #include "painter.h"
+#include <stdmem.h>
 #define LINE_START_MAX 20
 #define X_LINE_END (((int)(width / (size * TRUE_LETTER_WIDTH))) * size * TRUE_LETTER_WIDTH)
 static double size = 1.0;

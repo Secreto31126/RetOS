@@ -5,6 +5,7 @@
 #include "tests.h"
 #include "test_util.h"
 #include "syscall.h"
+#include <stdmem.h>
 
 extern char bss;
 extern char endOfBinary;
@@ -14,6 +15,7 @@ extern char endOfBinary;
 
 int main(int argc, char *argv[])
 {
+	malloc_init();
 	if (argc < 1)
 	{
 		puts("No test specified");

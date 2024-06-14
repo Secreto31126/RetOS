@@ -7,6 +7,7 @@
 #include "./../../snake/drawings/snakeDrawings.h"
 #include "./../shell.h"
 #include <sys/resource.h>
+#include <stdmem.h>
 #define BLOCK 5
 #define MAX_LETTER_SIZE 4
 #define READ_BLOCK 500      // Any command parameters that exceed this will be ignored. Just don't write commands exceeding 500 letters in terminal/don't feed longer than BLOCK letter input to shell built-ins
@@ -32,7 +33,7 @@ void freeCommands()
 void addCommand(char *commandCode, char *help, action_t commandAction)
 {
     if (!(commandCount % BLOCK))
-        commands = realloc(commands, commandCount * sizeof(command), (commandCount + BLOCK) * sizeof(command));
+        commands = realloc(commands, (commandCount + BLOCK) * sizeof(command));
     commands[commandCount].code = commandCode;
     commands[commandCount].action = commandAction;
     commands[commandCount].help = help;
@@ -235,28 +236,12 @@ moduleData setSnakeTheme(moduleData commandFd, displayStyles *displayStyle)
         setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }
-    else if (!strcmp(commandParameters, "pong"))
-    {
-        setBackgroundArray((char *)pongArray);
-        setBackgroundColorMap((HexColor *)pongColorMap);
-        setSnakeDrawing(DRAW_SIZE, (char *)classicHeadUp, (char *)classicOther, (char *)classicTail, (char *)classicTurn, (char *)classicApple, (HexColor *)appleColorMap);
-        setDrawOptions(0, 0, 1, 0);
-        matchFlag = 1;
-    }
     else if (!strcmp(commandParameters, "creation"))
     {
         setBackgroundArray((char *)creationArray);
         setBackgroundColorMap((HexColor *)creationColorMap);
         setSnakeDrawing(DRAW_SIZE, (char *)classicHeadUp, (char *)classicOther, (char *)classicTail, (char *)classicTurn, (char *)classicApple, (HexColor *)appleColorMap);
         setDrawOptions(0, 0, 1, 0);
-        matchFlag = 1;
-    }
-    else if (!strcmp(commandParameters, "camelot"))
-    {
-        setBackgroundArray((char *)camelotArray);
-        setBackgroundColorMap((HexColor *)camelotColorMap);
-        setSnakeDrawing(BIG_DRAW_SIZE, (char *)stone, (char *)stone, (char *)stone, (char *)catapult, (char *)excalibur, (HexColor *)excaliburColorMap);
-        setDrawOptions(1, 0, 1, 1);
         matchFlag = 1;
     }
     else if (!strcmp(commandParameters, "idyllic"))
@@ -750,7 +735,7 @@ void initializeCommands()
 {
     addCommand("help", "Help display for help module.\nFormat(s): 'help' | 'help' [MODULE_NAME]\nDisplays the help displays for all modules or the module specified.", getHelp);
     addCommand("snake", "Help display for snake module.\nFormat(s): 'snake' | 'snake [PLAYERS]'\nStarts the snake module. If PLAYERS is greater than three, game will be initialized with three players. If no PLAYERS parameter is given, game will be initialized with one player. Players are controlled by 'wasd', 'ijkl', and 'v/spacebar b' key combinations.", startSnake);
-    addCommand("set-theme", "Help display for set theme module.\nFormat: 'set-theme [THEME]'\nSets the theme of the snake game to the specified theme.\nCurrently supported themes are:\nmario windows camelot creation pong idyllic", setSnakeTheme);
+    addCommand("set-theme", "Help display for set theme module.\nFormat: 'set-theme [THEME]'\nSets the theme of the snake game to the specified theme.\nCurrently supported themes are:\nmario windows creation idyllic", setSnakeTheme);
     addCommand("set-size", "Help display for set size module.\nFormat: 'set-size [NUMBER]'\nSets the size of the shell to the specified integer. Maximum accepted size is 4, anything larger is illegible. Only positive integer sizes are accepted. Size 0 will set the size to 0.5", changeLetterSize);
     addCommand("set-letter-color", "Help display for set letter color module.\nFormat: 'set-letter-color [HEX_COLOR]'\nSets the letter color of the shell to the specified integer.", changeLetterColor);
     addCommand("set-highlight-color", "Help display for set highlight color.\nFormat: 'set-highlight-color [HEX_COLOR]'\nSets the highlight color of the shell to the specified integer.", changehighlightColor);
@@ -771,5 +756,5 @@ void initializeCommands()
     addCommand("ps", "Help display for the ps module.\nFormat: 'ps'\nDisplays data about current running processes.", getPs);
     addCommand("nice", "Help display for the nice module.\nFormat: 'nice [process id] [new priority]'\nSets the priority of the process. Priority can range between -20 and 19, any values not in this range will be clamped to the range.\nNote: A greater priority correlates to greater time in execution.", doNice);
     addCommand("mem", "Help display for the mem module.\nFormat: 'mem'\nOutputs a report on the memory state.", getMem);
-    addCommand("tests", "Help display for the tests module.\nFormat: 'tests [test name] [test parameters]' \nThis module accepts the following tests:\ntestmm [max_memory in MB]\ntestsync [inc] [use_sem]\ntestprocesses [max_processes]\ntestprio\ntestprio [long_wait]\ntestprio [long_wait] [short_wait]", tests);
+    addCommand("tests", "Help display for the tests module.\nFormat: 'tests [test name] [test parameters]' \nThis module accepts the following tests:\ntestmm [max_memory in MB]\ntestmm [max_memory in MB] [use process heap]\ntestsync [inc] [use_sem]\ntestprocesses [max_processes]\ntestprio\ntestprio [long_wait]\ntestprio [long_wait] [short_wait]", tests);
 }

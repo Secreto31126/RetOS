@@ -36,7 +36,7 @@ uint64_t test_mm(uint64_t argc, char *argv[])
   }
   else
   {
-    puts("Will use Kernel heap for memory allocation\n");
+    puts("Will use global heap for memory allocation\n");
   }
   // END OF MODIFICATION
   while (1)

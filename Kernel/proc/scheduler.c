@@ -267,6 +267,17 @@ pid_t robin_remove(pid_t pid)
     return 0;
 }
 
+iterableList find_valid_entry()
+{
+    for (int i = PRIO_MIN; i <= PRIO_MAX; i++)
+    {
+        iterableList il = get_proc_list_entry(i);
+        if (il != NULL && il->size > 0)
+            return il;
+    }
+    return NULL;
+}
+
 pid_t robin_next()
 {
     if (!ready_count)
@@ -275,7 +286,7 @@ pid_t robin_next()
     if (scheduled_priority < 0)
         return 0;
     pid_t to_ret = next_il(get_proc_list_entry(scheduled_priority));
-    if (!to_ret)
+    if (!to_ret && !(to_ret = next_il(find_valid_entry())))
     {
         ncPrint("|");
         return to_ret;

@@ -238,7 +238,6 @@ void robin_add(pid_t pid)
     if (!add_il(il, pid))
     {
         ready_count++;
-        set_schedule();
     }
 }
 
@@ -251,7 +250,6 @@ pid_t robin_remove(pid_t pid)
     if (remove_il(get_proc_list_entry(priority), pid))
     {
         ready_count--;
-        set_schedule();
         return pid;
     }
     // If it is not found, it still could be in another list, as priorities can change without warning the scheduler
@@ -260,7 +258,6 @@ pid_t robin_remove(pid_t pid)
         if (i != priority && remove_il(get_proc_list_entry(i), pid))
         {
             ready_count--;
-            set_schedule();
             return pid;
         }
     }

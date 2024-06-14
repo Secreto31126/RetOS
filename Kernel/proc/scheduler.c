@@ -285,8 +285,7 @@ pid_t robin_next()
     pid_t to_ret = next_il(get_proc_list_entry(scheduled_priority));
     if (!to_ret && !(to_ret = next_il(find_valid_entry())))
     {
-        ncPrint("|");
-        return to_ret;
+        return 0;
     }
 
     Process *p_to_ret = get_process(to_ret);

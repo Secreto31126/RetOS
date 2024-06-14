@@ -210,6 +210,17 @@ void set_schedule()
     }
 }
 
+int next_schedule()
+{
+    if (!schedule_remaining)
+        return -1;
+    schedule_index = (schedule_index + 1) % (PRIO_MAX - PRIO_MIN + 1);
+    int entry = get_schedule_entry(schedule_index);
+    if (entry <= 0)
+        return (next_schedule());
+    set_schedule_entry(schedule_index, entry - 1);
+    return schedule_index;
+}
 void robin_add(pid_t pid)
 {
     Process *p = get_process(pid);
@@ -247,18 +258,6 @@ pid_t robin_remove(pid_t pid)
         }
     }
     return 0;
-}
-
-int next_schedule()
-{
-    if (!schedule_remaining)
-        return -1;
-    schedule_index = (schedule_index + 1) % (PRIO_MAX - PRIO_MIN + 1);
-    int entry = get_schedule_entry(schedule_index);
-    if (entry <= 0)
-        return (next_schedule());
-    set_schedule_entry(schedule_index, entry - 1);
-    return schedule_index;
 }
 
 pid_t robin_next()

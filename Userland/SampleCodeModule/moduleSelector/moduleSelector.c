@@ -7,12 +7,14 @@
 #include "./../nstdlib/nstdlib.h"
 #include "./../piano/sound.h"
 #include <sys/resource.h>
+#include <stdmem.h>
 
 static const char prompt[] = "You are now in the module selector.\nPress 1 to continue to shell.\nPress 2 to get the current time.\nPress 3 to dump all registers.\nPress 4 to test exceptions.\nPress 5 to end program (shut down).\n";
 void setEnvironment();
 
 void startModules()
 {
+    malloc_init();
     setpriority(PRIO_PROC, getpid(), -20); // Shell is usually very I/O bound, this prevents modules that are not I/O bound from producing more input than the shell can print.
     startPainter(getScreenWidth(), getScreenHeight());
     // sports_center(); // por ahora no :D

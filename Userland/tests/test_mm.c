@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
+#include <stdmem.h>
 
 #define MAX_BLOCKS 128
 
@@ -31,7 +32,11 @@ uint64_t test_mm(uint64_t argc, char *argv[])
   if (argc == 2 && satoi(argv[1]))
   {
     use_heap = 1;
-    puts("Enabled heap for memory allocation\n");
+    puts("Will use process heap for memory allocation\n");
+  }
+  else
+  {
+    puts("Will use global heap for memory allocation\n");
   }
   // END OF MODIFICATION
   while (1)
@@ -42,8 +47,10 @@ uint64_t test_mm(uint64_t argc, char *argv[])
     while (rq < MAX_BLOCKS && total < max_memory)
     {
       mm_rqs[rq].size = GetUniform(max_memory - total - 1) + 1;
-      mm_rqs[rq].address = malloc(mm_rqs[rq].size); // MODIFIED TO ENABLE USING HEAP MALLOC (CURRENTLY UNAVAILABLE)
-
+      if (use_heap)
+        mm_rqs[rq].address = malloc(mm_rqs[rq].size); // MODIFIED TO ENABLE USING PROCESS HEAP
+      else
+        mm_rqs[rq].address = pshm(mm_rqs[rq].size);
       if (mm_rqs[rq].address)
       {
         total += mm_rqs[rq].size;
@@ -69,7 +76,10 @@ uint64_t test_mm(uint64_t argc, char *argv[])
     for (i = 0; i < rq; i++)
       if (mm_rqs[i].address)
       {
-        free(mm_rqs[i].address); // MODIFIED TO ENABLE USING HEAP MALLOC (CURRENTLY UNAVAILABLE)
+        if (use_heap)
+          free(mm_rqs[i].address); // MODIFIED TO ENABLE USING PROCESS HEAP
+        else
+          free_shm(mm_rqs[i].address);
       }
   }
 }

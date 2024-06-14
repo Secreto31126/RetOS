@@ -188,16 +188,16 @@ int main(int argc, char *argv[])
 {
 	puts("Creating pseudo-shm\n");
 
-	data = malloc(sizeof(Data)); // cumple la función de pseudo shm
+	data = pshm(sizeof(Data)); // cumple la función de pseudo shm
 	if (data == NULL)
 	{
 		puts("Failed to allocate memory\n");
 		return 1;
 	}
-	data->printex = malloc(sizeof(sem_t *) * 2);
+	data->printex = pshm(sizeof(sem_t *) * 2);
 	if (data->printex == NULL)
 	{
-		free(data);
+		free_shm(data);
 		puts("Failed to allocate memory\n");
 		return 1;
 	}
@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
 	if (make_mutexes())
 	{
 		puts("Failed to open semaphore\n");
-		free(data);
+		free_shm(data);
 		return 1;
 	}
 
@@ -256,7 +256,7 @@ void leave()
 	sem_close(data->returnex);
 	sem_close(data->printex[0]);
 	sem_close(data->printex[1]);
-	free(data->printex);
-	free(data);
+	free_shm(data->printex);
+	free_shm(data);
 	puts("byee!\n");
 }

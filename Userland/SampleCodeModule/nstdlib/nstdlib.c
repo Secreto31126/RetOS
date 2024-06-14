@@ -1,4 +1,5 @@
 #include "nstdlib.h"
+#include <stdmem.h>
 #define MAX_DIGITS_IN_LONG 20
 #define MAX_STDIN_STRING 256
 #define BLOCK 10
@@ -21,11 +22,11 @@ char *getDumpString()
     {
         if (lastAdded >= length)
         {
-            c = realloc(c, length, length + BIG_BLOCK);
+            c = realloc(c, length + BIG_BLOCK);
             length += BIG_BLOCK;
             while ((lastAdded = get_dump(c + length - BIG_BLOCK, BIG_BLOCK)) == BIG_BLOCK) // adds BLOCK characters to the end of c until get_dump no longer has BLOCK characters to add
             {
-                c = realloc(c, length, length + BIG_BLOCK);
+                c = realloc(c, length + BIG_BLOCK);
                 length += BIG_BLOCK;
             }
         }
@@ -34,18 +35,6 @@ char *getDumpString()
     }
     free(c);
     return "";
-}
-
-void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize)
-{
-    void *aux = malloc(newSize);
-    if (aux == NULL)
-        return NULL;
-    oldSize = oldSize > newSize ? newSize : oldSize;
-    for (uint64_t i = 0; i < oldSize; i++)
-        *((char *)(aux + i)) = *((char *)(ptr + i));
-    free(ptr);
-    return aux;
 }
 
 uint64_t atoiHex(char *s)
@@ -414,7 +403,7 @@ uint64_t addString(char **receiver, uint64_t *length, char *source, uint64_t *al
     if ((*length + len) >= *allocated)
     {
         uint64_t toAdd = ((*length + len - *allocated) / BLOCK) * BLOCK + BLOCK; // space that must be added, rounded to nearest block
-        *receiver = realloc(*receiver, *allocated, (*allocated + toAdd) * sizeof(char));
+        *receiver = realloc(*receiver, (*allocated + toAdd) * sizeof(char));
         *allocated += toAdd;
     }
     sPuts(*receiver + *length - 1, source);
@@ -428,7 +417,7 @@ void addToAllocated(char *address)
 {
     if (!(allocatedPrintCount % BLOCK))
     {
-        allocatedPrints = realloc(allocatedPrints, allocatedPrintCount * sizeof(char *), (allocatedPrintCount + BLOCK) * sizeof(char *));
+        allocatedPrints = realloc(allocatedPrints, (allocatedPrintCount + BLOCK) * sizeof(char *));
     }
     allocatedPrints[allocatedPrintCount++] = address;
 }
@@ -460,7 +449,7 @@ char *sPrintf(char *format, ...)
     {
         if (count == allocated) // Always checks if resize is necessary before checking to add any characters. Prevents copying code in every single-character edition.
         {
-            toReturn = realloc(toReturn, allocated, (allocated + BLOCK) * sizeof(char));
+            toReturn = realloc(toReturn, (allocated + BLOCK) * sizeof(char));
             allocated += BLOCK;
         }
         if (*format == '%')
@@ -513,7 +502,7 @@ char *sPrintf(char *format, ...)
         format++;
     }
     va_end(argp);
-    toReturn = realloc(toReturn, allocated, count);
+    toReturn = realloc(toReturn, count);
     addToAllocated(toReturn);
     return toReturn;
 }

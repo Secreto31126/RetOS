@@ -19,15 +19,14 @@
 #define print_sys write
 extern uint64_t get_tick();
 extern unsigned long long get_unix_time(void);
-extern void *malloc(uint64_t size);
-extern void free(void *ptr);
+extern void *pshm(uint64_t size);
+extern void free_shm(void *ptr);
 extern void beep(uint32_t freq);
 extern int fork();
 extern int flush(int fd);
 extern int memory_state(char *output, size_t length);
 
 // library
-void *realloc(void *ptr, uint64_t oldSize, uint64_t newSize);
 uint64_t atoiHex(char *s);
 char putChar(char c);
 char readChar();

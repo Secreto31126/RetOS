@@ -2,6 +2,7 @@
 #include "painter.h"
 // #include "figures.h" //no longer used
 #include <stdarg.h>
+#include <stdmem.h>
 
 #define GET_HEX(a, r, g, b) (((a) << 24) + ((r) << 16) + ((g) << 8) + (b))
 #define GET_OPACITY(x) (((x) >> 24) & 0xFF)

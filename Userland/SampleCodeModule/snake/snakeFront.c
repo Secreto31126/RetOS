@@ -67,7 +67,6 @@ int playSnake(uint16_t snakeCount)
     {
         snakes[i].nextMove = NONE;
         snakes[i].colorMap = malloc(MAX_SNAKE_COLORS * sizeof(HexColor));
-
         if (snakes[i].colorMap == NULL)
         {
             paintString("Painting failed", 0xFF000000 | HEX_RED, 0xFF | HEX_BLACK);
@@ -211,6 +210,8 @@ void drawBoard(frontSnake *snakes)
     uint64_t tileWidth = w / BOARD_WIDTH, tileHeight = h / BOARD_HEIGHT;
     uint64_t xLimit = w - tileWidth, yLimit = h - tileHeight; // since tiles are drawn from top left
     Window stamp = getWindow(tileWidth, tileHeight, malloc(tileWidth * tileHeight * sizeof(HexColor)));
+    if (stamp.pixels == NULL)
+        return;
     tile *board = getBoard();
     // snake *backSnakes = getSnakes();
     char *source;
@@ -291,10 +292,12 @@ void drawBoard(frontSnake *snakes)
 void drawBackground()
 {
     uint64_t h = getScreenHeight(), w = getScreenWidth();
-    Window wholeScreen = getWindow(w, h, malloc(h * w * sizeof(HexColor)));
+    Window wholeScreen = getWindow(w, h, pshm(h * w * sizeof(HexColor))); // uses pshm, as the image does not fit in ~128 kb for memory assignation
+    if (wholeScreen.pixels == NULL)
+        return;
     overlayFromCharArray(wholeScreen, backgroundArray, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, backgroundColorMap, 0, 0, OPAQUE);
     quickDraw(wholeScreen);
-    freeWindow(wholeScreen);
+    free_shm(wholeScreen.pixels);
 }
 
 void setBackgroundArray(char *newBackground)
@@ -340,6 +343,8 @@ void drawTextBackground(uint64_t size, uint64_t textLength)
 {
     uint64_t widthSpan = TRUE_LETTER_WIDTH * size * textLength, heightSpan = TRUE_LETTER_HEIGHT * size, tileWidth = getScreenWidth() / BOARD_WIDTH, tileHeight = getScreenHeight() / BOARD_HEIGHT;
     Window stamp = getWindow(tileWidth, tileHeight, malloc(sizeof(HexColor) * tileWidth * tileHeight));
+    if (stamp.pixels == NULL)
+        return;
     for (int i = 0; i <= heightSpan; i += tileHeight)
     {
         for (int j = 0; j <= widthSpan; j += tileWidth)

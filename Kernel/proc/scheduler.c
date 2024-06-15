@@ -84,17 +84,22 @@ typedef struct p_node
     struct p_node *next;
     pid_t pid;
 } p_node;
-typedef struct iterable_listHeader
+typedef struct round_iterable_listHeader
 {
     p_node *first;
     p_node *current;
     int size;
-} iterable_listHeader;
-typedef iterable_listHeader *iterable_list;
+} round_iterable_listHeader;
+typedef round_iterable_listHeader *round_iterable_list;
 
-iterable_list get_il()
+/**
+ * @brief Produces an round_iterable_list object
+ *
+ * @return round_iterable_list, NULL if memory could not be allocated
+ */
+round_iterable_list get_il()
 {
-    iterable_list to_ret = malloc(sizeof(iterable_listHeader));
+    round_iterable_list to_ret = malloc(sizeof(round_iterable_listHeader));
     if (to_ret == NULL)
         return NULL;
     to_ret->first = NULL;
@@ -102,7 +107,14 @@ iterable_list get_il()
     to_ret->size = 0;
     return to_ret;
 }
-pid_t next_il(iterable_list il)
+
+/**
+ * @brief Provides the next element in the round_iterable_list, loops to the beginning if in the end of the list
+ *
+ * @param il The list
+ * @return The next element
+ */
+pid_t next_il(round_iterable_list il)
 {
     if (il == NULL || !il->size || il->first == NULL)
         return 0;
@@ -112,7 +124,15 @@ pid_t next_il(iterable_list il)
     il->current = il->current->next;
     return to_ret;
 }
-int add_il(iterable_list il, pid_t pid)
+
+/**
+ * @brief Adds an element to the list
+ *
+ * @param il The list
+ * @param pid The element to add
+ * @return 0 if successfully added, 1 otherwise
+ */
+int add_il(round_iterable_list il, pid_t pid)
 {
     p_node *to_add = malloc(sizeof(p_node));
     if (to_add == NULL)
@@ -124,8 +144,16 @@ int add_il(iterable_list il, pid_t pid)
     il->size++;
     return 0;
 }
-pid_t remove_il_rec(p_node *p, iterable_list il, pid_t pid);
-pid_t remove_il(iterable_list il, pid_t pid)
+
+pid_t remove_il_rec(p_node *p, round_iterable_list il, pid_t pid);
+/**
+ * @brief Removes and element from the list
+ *
+ * @param il The list
+ * @param pid The element to remove
+ * @return The element removed, 0 if not found
+ */
+pid_t remove_il(round_iterable_list il, pid_t pid)
 {
     if (il == NULL || !il->size || il->first == NULL)
         return 0;
@@ -144,7 +172,7 @@ pid_t remove_il(iterable_list il, pid_t pid)
         il->size--;
     return to_ret;
 }
-pid_t remove_il_rec(p_node *p, iterable_list il, pid_t pid)
+pid_t remove_il_rec(p_node *p, round_iterable_list il, pid_t pid)
 {
     if (p->next == NULL)
         return 0;
@@ -167,6 +195,13 @@ unsigned int rand()
     bit = ((seed >> 0) ^ (seed >> 2) ^ (seed >> 3) ^ (seed >> 5)) & 1;
     return (seed = (seed >> 1) | (bit << 15));
 }
+/**
+ * @brief Returns a random positive number between min and max following an uniform distribution
+ *
+ * @param min
+ * @param max
+ * @return The number returned
+ */
 unsigned int rand_between(unsigned int min, unsigned int max)
 {
     if (min >= max)
@@ -177,31 +212,64 @@ unsigned int rand_between(unsigned int min, unsigned int max)
 static const char weights[PRIO_MAX - PRIO_MIN + 1] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
 static const int weights_sum = 820;
 static int ready_count = 0;
-static iterable_list process_lists[PRIO_MAX - PRIO_MIN + 1] = {0};
+static round_iterable_list process_lists[PRIO_MAX - PRIO_MIN + 1] = {0};
 
+/**
+ * @brief Returns the weight assigned to a priority group
+ *
+ * @param priority The priority group
+ * @return The weight
+ */
 int get_weight(int priority)
 {
     return weights[priority - PRIO_MIN];
 }
-iterable_list get_proc_list_entry(int index)
+
+/**
+ * @brief Returns the round_iterable_list assigned to a priority group
+ *
+ * @param priority The priority group
+ * @return The list assigned, NULL if none assigned
+ */
+round_iterable_list get_proc_list_entry(int priority)
 {
-    iterable_list il = process_lists[index - PRIO_MIN];
+    round_iterable_list il = process_lists[priority - PRIO_MIN];
     return il ? il : NULL;
 }
-void set_proc_list_entry(int index, iterable_list entry)
+
+/**
+ * @brief Assigns a round_iterable_list to a priority group
+ *
+ * @param priority The priority group
+ * @param entry The round_iterable_list
+ */
+void set_proc_list_entry(int priority, round_iterable_list entry)
 {
-    process_lists[index - PRIO_MIN] = entry;
+    process_lists[priority - PRIO_MIN] = entry;
 }
 
-char is_valid_entry(iterable_list il)
+/**
+ * @brief Returns whether an element can be obtained from a list
+ *
+ * @param il The list
+ * @return 1 if can be obtained, 0 otherwise
+ */
+char is_valid_entry(round_iterable_list il)
 {
     return il != NULL && il->first != NULL && il->size > 0;
 }
 
-static iterable_list current_priority = NULL;
+static round_iterable_list current_priority = NULL;
 static int current_priority_index = 0;
 static int remaining = 0;
-iterable_list next_schedule(int *priority)
+
+/**
+ * @brief Finds the list corresponding to the next priority group on the schedule, based on the existing processes and weights assigned
+ *
+ * @param priority Return variable, the priority group on the schedule, -1 if no priority group is on the schedule (scheduler is empty)
+ * @return The list, NULL if no priority group is on the schedule
+ */
+round_iterable_list next_schedule(int *priority)
 {
     if (remaining > 0 && is_valid_entry(current_priority))
     {
@@ -212,10 +280,10 @@ iterable_list next_schedule(int *priority)
     remaining = 0;
 
     int index = rand_between(0, weights_sum), i;
-    iterable_list last_valid = NULL;
+    round_iterable_list last_valid = NULL;
     for (i = PRIO_MAX; i >= PRIO_MIN; i--)
     {
-        iterable_list aux = get_proc_list_entry(i);
+        round_iterable_list aux = get_proc_list_entry(i);
         if (is_valid_entry(aux))
         {
             *priority = i;
@@ -234,7 +302,7 @@ iterable_list next_schedule(int *priority)
     }
     for (; i >= PRIO_MIN; i--)
     {
-        iterable_list aux = get_proc_list_entry(i);
+        round_iterable_list aux = get_proc_list_entry(i);
         if (is_valid_entry(aux))
         {
             *priority = i;
@@ -248,11 +316,16 @@ iterable_list next_schedule(int *priority)
     return NULL;
 }
 
+/**
+ * @brief Adds a process to the scheduler
+ *
+ * @param pid The id representing the process
+ */
 void robin_add(pid_t pid)
 {
     Process *p = get_process(pid);
     int priority = p->priority;
-    iterable_list il = get_proc_list_entry(priority);
+    round_iterable_list il = get_proc_list_entry(priority);
     if (il == NULL)
     {
         il = get_il();
@@ -266,6 +339,12 @@ void robin_add(pid_t pid)
     }
 }
 
+/**
+ * @brief Removes a process from the scheduler
+ *
+ * @param pid The id representing the process
+ * @return The id representing the process, 0 if not found
+ */
 pid_t robin_remove(pid_t pid)
 {
     Process *p = get_process(pid);
@@ -289,13 +368,18 @@ pid_t robin_remove(pid_t pid)
     return 0;
 }
 
+/**
+ * @brief Finds the next process on the schedule
+ *
+ * @return The id representing the next process on the schedule
+ */
 pid_t robin_next()
 {
     if (!ready_count)
         return 0;
 
     int priority;
-    iterable_list scheduled_priority = next_schedule(&priority);
+    round_iterable_list scheduled_priority = next_schedule(&priority);
     if (scheduled_priority == NULL)
         return 0;
 

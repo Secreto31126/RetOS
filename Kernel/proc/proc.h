@@ -129,6 +129,7 @@ pid_t robin_remove(pid_t pid);
 /**
  * @brief Set the remainin ticks to 0
  * @note This function should only be called from sched_yield()
+ * @note For the current implementation of the scheduler, this function is a noop
  */
 void yield_robin();
 

@@ -210,7 +210,7 @@ unsigned int rand_between(unsigned int min, unsigned int max)
 }
 
 static const char weights[PRIO_MAX - PRIO_MIN + 1] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
-static const int weights_sum = 820;
+static const int weights_sum = 820; // This can be calculated on the spot, but a context switch should be reasonably fast, so this avoids an unnecessary inefficiency
 static int ready_count = 0;
 static round_iterable_list process_lists[PRIO_MAX - PRIO_MIN + 1] = {0};
 
@@ -316,11 +316,6 @@ round_iterable_list next_schedule(int *priority)
     return NULL;
 }
 
-/**
- * @brief Adds a process to the scheduler
- *
- * @param pid The id representing the process
- */
 void robin_add(pid_t pid)
 {
     Process *p = get_process(pid);
@@ -339,12 +334,6 @@ void robin_add(pid_t pid)
     }
 }
 
-/**
- * @brief Removes a process from the scheduler
- *
- * @param pid The id representing the process
- * @return The id representing the process, 0 if not found
- */
 pid_t robin_remove(pid_t pid)
 {
     Process *p = get_process(pid);
@@ -368,11 +357,6 @@ pid_t robin_remove(pid_t pid)
     return 0;
 }
 
-/**
- * @brief Finds the next process on the schedule
- *
- * @return The id representing the next process on the schedule
- */
 pid_t robin_next()
 {
     if (!ready_count)

@@ -22,11 +22,17 @@ char *getDumpString()
     {
         if (lastAdded >= length)
         {
-            c = realloc(c, length + BIG_BLOCK);
+            char *aux = realloc(c, length + BIG_BLOCK);
+            if (aux == NULL)
+                return "";
+            c = aux;
             length += BIG_BLOCK;
             while ((lastAdded = get_dump(c + length - BIG_BLOCK, BIG_BLOCK)) == BIG_BLOCK) // adds BLOCK characters to the end of c until get_dump no longer has BLOCK characters to add
             {
-                c = realloc(c, length + BIG_BLOCK);
+                aux = realloc(c, length + BIG_BLOCK);
+                if (aux == NULL)
+                    return "";
+                c = aux;
                 length += BIG_BLOCK;
             }
         }
@@ -403,7 +409,10 @@ uint64_t addString(char **receiver, uint64_t *length, char *source, uint64_t *al
     if ((*length + len) >= *allocated)
     {
         uint64_t toAdd = ((*length + len - *allocated) / BLOCK) * BLOCK + BLOCK; // space that must be added, rounded to nearest block
-        *receiver = realloc(*receiver, (*allocated + toAdd) * sizeof(char));
+        char *aux = realloc(*receiver, (*allocated + toAdd) * sizeof(char));
+        if (aux == NULL)
+            return len;
+        *receiver = aux;
         *allocated += toAdd;
     }
     sPuts(*receiver + *length - 1, source);
@@ -417,7 +426,10 @@ void addToAllocated(char *address)
 {
     if (!(allocatedPrintCount % BLOCK))
     {
-        allocatedPrints = realloc(allocatedPrints, (allocatedPrintCount + BLOCK) * sizeof(char *));
+        char **aux = realloc(allocatedPrints, (allocatedPrintCount + BLOCK) * sizeof(char *));
+        if (aux == NULL)
+            return;
+        allocatedPrints = aux;
     }
     allocatedPrints[allocatedPrintCount++] = address;
 }
@@ -449,7 +461,10 @@ char *sPrintf(char *format, ...)
     {
         if (count == allocated) // Always checks if resize is necessary before checking to add any characters. Prevents copying code in every single-character edition.
         {
-            toReturn = realloc(toReturn, (allocated + BLOCK) * sizeof(char));
+            char *aux = realloc(toReturn, (allocated + BLOCK) * sizeof(char));
+            if (aux == NULL)
+                return "";
+            toReturn = aux;
             allocated += BLOCK;
         }
         if (*format == '%')
@@ -502,7 +517,10 @@ char *sPrintf(char *format, ...)
         format++;
     }
     va_end(argp);
-    toReturn = realloc(toReturn, count);
+    char *aux = realloc(toReturn, count);
+    if (aux == NULL)
+        return "";
+    toReturn = aux;
     addToAllocated(toReturn);
     return toReturn;
 }

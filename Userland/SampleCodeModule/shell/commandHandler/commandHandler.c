@@ -33,7 +33,12 @@ void freeCommands()
 void addCommand(char *commandCode, char *help, action_t commandAction)
 {
     if (!(commandCount % BLOCK))
-        commands = realloc(commands, (commandCount + BLOCK) * sizeof(command));
+    {
+        command *aux = realloc(commands, (commandCount + BLOCK) * sizeof(command));
+        if (aux == NULL)
+            exit(1);
+        commands = aux;
+    }
     commands[commandCount].code = commandCode;
     commands[commandCount].action = commandAction;
     commands[commandCount].help = help;

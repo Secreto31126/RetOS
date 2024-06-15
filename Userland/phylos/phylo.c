@@ -2,11 +2,6 @@
 #include "random.h"
 
 void check_adding(unsigned int i);
-/**
- * @brief Think, check in with the manager, nab the forks, eat, leave the forks, repeat
- *
- * @param i The philosopher's position on the table
- */
 void phylosopher(unsigned int i)
 {
     while (1)
@@ -48,11 +43,6 @@ void check_adding(unsigned int i)
     }
 }
 
-/**
- * @brief Waits on the forks until obtained
- *
- * @param i The philosopher's position on the table
- */
 void take_forks(unsigned int i)
 {
     set_state(i, HUNGRY);
@@ -70,11 +60,6 @@ void take_forks(unsigned int i)
     set_state(i, EATING);
 }
 
-/**
- * @brief Returns the forks
- *
- * @param i The philosopher's position on the table
- */
 void put_forks(unsigned int i)
 {
 

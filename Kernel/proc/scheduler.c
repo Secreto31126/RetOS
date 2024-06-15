@@ -79,22 +79,22 @@ void *context_switch(void *rsp)
 
 // Priority based round Robin
 // =========================================================================================================================================================
-typedef struct pNode
+typedef struct p_node
 {
-    struct pNode *next;
+    struct p_node *next;
     pid_t pid;
-} pNode;
-typedef struct iterableListHeader
+} p_node;
+typedef struct iterable_listHeader
 {
-    pNode *first;
-    pNode *current;
+    p_node *first;
+    p_node *current;
     int size;
-} iterableListHeader;
-typedef iterableListHeader *iterableList;
+} iterable_listHeader;
+typedef iterable_listHeader *iterable_list;
 
-iterableList get_il()
+iterable_list get_il()
 {
-    iterableList to_ret = malloc(sizeof(iterableListHeader));
+    iterable_list to_ret = malloc(sizeof(iterable_listHeader));
     if (to_ret == NULL)
         return NULL;
     to_ret->first = NULL;
@@ -102,7 +102,7 @@ iterableList get_il()
     to_ret->size = 0;
     return to_ret;
 }
-pid_t next_il(iterableList il)
+pid_t next_il(iterable_list il)
 {
     if (il == NULL || !il->size || il->first == NULL)
         return 0;
@@ -112,9 +112,9 @@ pid_t next_il(iterableList il)
     il->current = il->current->next;
     return to_ret;
 }
-int add_il(iterableList il, pid_t pid)
+int add_il(iterable_list il, pid_t pid)
 {
-    pNode *to_add = malloc(sizeof(pNode));
+    p_node *to_add = malloc(sizeof(p_node));
     if (to_add == NULL)
         return 1;
     to_add->next = il->first;
@@ -124,14 +124,14 @@ int add_il(iterableList il, pid_t pid)
     il->size++;
     return 0;
 }
-pid_t remove_il_rec(pNode *p, iterableList il, pid_t pid);
-pid_t remove_il(iterableList il, pid_t pid)
+pid_t remove_il_rec(p_node *p, iterable_list il, pid_t pid);
+pid_t remove_il(iterable_list il, pid_t pid)
 {
     if (il == NULL || !il->size || il->first == NULL)
         return 0;
     if (il->first->pid == pid)
     {
-        pNode *to_free = il->first;
+        p_node *to_free = il->first;
         if (il->current == il->first)
             il->current = il->first->next;
         il->first = il->first->next;
@@ -144,13 +144,13 @@ pid_t remove_il(iterableList il, pid_t pid)
         il->size--;
     return to_ret;
 }
-pid_t remove_il_rec(pNode *p, iterableList il, pid_t pid)
+pid_t remove_il_rec(p_node *p, iterable_list il, pid_t pid)
 {
     if (p->next == NULL)
         return 0;
     if (p->next->pid == pid)
     {
-        pNode *to_free = p->next;
+        p_node *to_free = p->next;
         if (il->current == p->next)
             il->current = il->first;
         p->next = p->next->next;
@@ -160,74 +160,77 @@ pid_t remove_il_rec(pNode *p, iterableList il, pid_t pid)
     return remove_il_rec(p->next, il, pid);
 }
 
+static unsigned int seed = 0x50;
+static unsigned int bit;
+unsigned int rand()
+{ // A linear-feedback shift register ('sourced' from wikipedia)
+    bit = ((seed >> 0) ^ (seed >> 2) ^ (seed >> 3) ^ (seed >> 5)) & 1;
+    return (seed = (seed >> 1) | (bit << 15));
+}
+unsigned int rand_between(unsigned int min, unsigned int max)
+{
+    if (min >= max)
+        return 0;
+    unsigned int got = rand();
+    return (got % (max - min)) + min;
+}
+
 static const char weights[PRIO_MAX - PRIO_MIN + 1] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
+static const int weights_sum = 820;
 static int schedule[PRIO_MAX - PRIO_MIN + 1] = {0};
 static int schedule_index = 0;
 static int schedule_remaining = 0;
 static int ready_count = 0;
-static iterableList process_lists[PRIO_MAX - PRIO_MIN + 1] = {0};
+static iterable_list process_lists[PRIO_MAX - PRIO_MIN + 1] = {0};
 
 int get_weight(int priority)
 {
     return weights[priority - PRIO_MIN];
 }
-iterableList get_proc_list_entry(int index)
+iterable_list get_proc_list_entry(int index)
 {
-    iterableList il = process_lists[index - PRIO_MIN];
+    iterable_list il = process_lists[index - PRIO_MIN];
     return il ? il : NULL;
 }
-void set_proc_list_entry(int index, iterableList entry)
+void set_proc_list_entry(int index, iterable_list entry)
 {
     process_lists[index - PRIO_MIN] = entry;
 }
-void set_schedule_entry(int index, int entry)
+
+char is_valid_entry(iterable_list il)
 {
-    schedule[index - PRIO_MIN] = entry;
-}
-int get_schedule_entry(int index)
-{
-    return schedule[index - PRIO_MIN];
-}
-void set_schedule()
-{
-    schedule_remaining = 0;
-    schedule_index = 0;
-    for (int i = PRIO_MIN; i <= PRIO_MAX; i++)
-    {
-        iterableList current = get_proc_list_entry(i);
-        if (current == NULL || current->size <= 0)
-        {
-            set_schedule_entry(i, 0);
-        }
-        else
-        {
-            int entry = current->size * get_weight(i) / ready_count; // A simple equation to assign time to each priority based on weights
-            if (entry <= current->size)                              // Ensure that every process gets at least one turn in the schedule
-                entry = current->size;
-            schedule_remaining += entry; // Record how many rounds are scheduled
-            set_schedule_entry(i, entry);
-        }
-    }
+    return il != NULL && il->first != NULL && il->size > 0;
 }
 
-int next_schedule()
+iterable_list next_schedule()
 {
-    if (schedule_remaining <= 0)
-        set_schedule();
-    schedule_index = (schedule_index + 1) % (PRIO_MAX - PRIO_MIN + 1);
-    int entry = get_schedule_entry(schedule_index);
-    if (entry <= 0)
-        return (next_schedule());
-    set_schedule_entry(schedule_index, entry - 1);
-    schedule_remaining--;
-    return schedule_index;
+    int index = rand_between(0, weights_sum), i;
+    iterable_list last_valid = NULL;
+    for (i = PRIO_MAX; i >= PRIO_MIN; i--)
+    {
+        iterable_list aux = get_proc_list_entry(i);
+        if (is_valid_entry(aux))
+            last_valid = aux;
+        index -= get_weight(i);
+        if (index <= 0)
+            break;
+    }
+    if (last_valid != NULL)
+        return last_valid;
+    for (; i >= PRIO_MIN; i--)
+    {
+        iterable_list aux = get_proc_list_entry(i);
+        if (is_valid_entry(aux))
+            return aux;
+    }
+    return NULL;
 }
 
 void robin_add(pid_t pid)
 {
     Process *p = get_process(pid);
     int priority = p->priority;
-    iterableList il = get_proc_list_entry(priority);
+    iterable_list il = get_proc_list_entry(priority);
     if (il == NULL)
     {
         il = get_il();
@@ -245,7 +248,7 @@ pid_t robin_remove(pid_t pid)
 {
     Process *p = get_process(pid);
     int priority = p->priority;
-    // Look for it where you expect it to be first (In the list defined by its priority)
+    // Look for it where you expect it to be first (in the list given by its priority)
 
     if (remove_il(get_proc_list_entry(priority), pid))
     {
@@ -264,26 +267,18 @@ pid_t robin_remove(pid_t pid)
     return 0;
 }
 
-iterableList find_valid_entry()
-{
-    for (int i = PRIO_MIN; i <= PRIO_MAX; i++)
-    {
-        iterableList il = get_proc_list_entry(i);
-        if (il != NULL && il->size > 0)
-            return il;
-    }
-    return NULL;
-}
-
 pid_t robin_next()
 {
     if (!ready_count)
         return 0;
-    int scheduled_priority = next_schedule();
-    if (scheduled_priority < 0)
+
+    iterable_list scheduled_priority = next_schedule();
+    if (scheduled_priority == NULL)
         return 0;
-    pid_t to_ret = next_il(get_proc_list_entry(scheduled_priority));
-    if (!to_ret && !(to_ret = next_il(find_valid_entry())))
+
+    pid_t to_ret = next_il(scheduled_priority);
+
+    if (to_ret <= 0)
     {
         return 0;
     }

@@ -39,6 +39,11 @@ void moveCursor()
 {
     xPointer += TRUE_LETTER_WIDTH * size;
 }
+
+/**
+ * @brief Moves the cursos back one character, paints a blank character, moves the cursor back again character
+ *
+ */
 void paintBackSpace()
 {
     if (xPointer <= 0)
@@ -50,11 +55,13 @@ void paintBackSpace()
     xPointer -= TRUE_LETTER_WIDTH * size;
     drawWindow(stamp, xPointer, yPointer);
 }
+
 void drawCharAt(char c, HexColor letterColor, HexColor highlightColor, uint64_t x, uint64_t y)
 {
     drawCharToWindow(stamp, c, letterColor, highlightColor);
     drawWindow(stamp, x, y);
 }
+
 char paintChar(char c, HexColor letterColor, HexColor highlightColor)
 {
     if (c == '\b')
@@ -89,6 +96,7 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
     }
     return 1;
 }
+
 char paintString(const char *c, HexColor letterColor, HexColor highlightColor)
 {
     while (*c && paintChar(*c, letterColor, highlightColor))
@@ -99,7 +107,7 @@ char paintString(const char *c, HexColor letterColor, HexColor highlightColor)
         return 0;
     return 1;
 }
-// This implementation is not beautiful modularization, it is simple, easy and doesn't repeat code instead.
+
 void drawStringAt(char *c, HexColor letterColor, HexColor highlightColor, uint64_t x, uint64_t y)
 {
     uint64_t auxX = xPointer, auxY = yPointer;
@@ -109,14 +117,17 @@ void drawStringAt(char *c, HexColor letterColor, HexColor highlightColor, uint64
     xPointer = auxX;
     yPointer = auxY;
 }
+
 uint64_t maxYPointer()
 {
     return height - 2 * size * TRUE_LETTER_HEIGHT;
 }
+
 uint64_t maxXPointer()
 {
     return width - TRUE_LETTER_WIDTH * size;
 }
+
 char willFit(const char *s)
 {
     double xP = 0, yP = 0, maxX = width - TRUE_LETTER_WIDTH * size, maxY = height - 2 * TRUE_LETTER_HEIGHT * size;

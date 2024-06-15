@@ -2,6 +2,11 @@
 #include "random.h"
 
 void check_adding(unsigned int i);
+/**
+ * @brief Think, check in with the manager, nab the forks, eat, leave the forks, repeat
+ *
+ * @param i The philosopher's position on the table
+ */
 void phylosopher(unsigned int i)
 {
     while (1)
@@ -14,13 +19,24 @@ void phylosopher(unsigned int i)
     }
 }
 
+/**
+ * @brief Wait on the state update mutex, record a change in the philosopher's state, and post the printer's semaphore
+ *
+ * @param i The philosopher's position on the table
+ * @param state The state
+ */
 void set_state(int i, int state)
 {
-    sem_wait(data->printex[0]);
+    sem_wait(data->printex[0]); // The state update mutex
     data->phylos[i].state = state;
     sem_post(data->printex[1]); // Tell printer that state has changed. Printer will lift printex once done
 }
 
+/**
+ * @brief Check whether the manager wants to add or remove a philosopher
+ *
+ * @param i The philosopher's position on the table
+ */
 void check_adding(unsigned int i)
 {
     if (data->adding == i)
@@ -32,6 +48,11 @@ void check_adding(unsigned int i)
     }
 }
 
+/**
+ * @brief Waits on the forks until obtained
+ *
+ * @param i The philosopher's position on the table
+ */
 void take_forks(unsigned int i)
 {
     set_state(i, HUNGRY);
@@ -49,6 +70,11 @@ void take_forks(unsigned int i)
     set_state(i, EATING);
 }
 
+/**
+ * @brief Returns the forks
+ *
+ * @param i The philosopher's position on the table
+ */
 void put_forks(unsigned int i)
 {
 

@@ -363,16 +363,14 @@ void paintStringOrWarp(const char *s, char ask)
         while (!willFit(buffer))
         {
             flag = 1;
-            blank();
-            paintString(buffer, letterColor, highlightColor);
+            blankAndRepaint(buffer, letterColor, highlightColor);
             drawStringAt(prompt, 0xFF000000, 0xFFFFFFFF, 0, 0);
             getChar();
             warpNLines(MOVE_BY);
         }
         if (flag)
         {
-            blank();
-            paintString(buffer, letterColor, highlightColor);
+            blankAndRepaint(buffer, letterColor, highlightColor);
             drawTime();
         }
         else
@@ -389,8 +387,7 @@ void paintStringOrWarp(const char *s, char ask)
         }
         if (flag)
         {
-            blank();
-            paintString(buffer, letterColor, highlightColor);
+            blankAndRepaint(buffer, letterColor, highlightColor);
             drawTime();
         }
         else

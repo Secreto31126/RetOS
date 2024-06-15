@@ -5,7 +5,6 @@
 static double size = 1.0;
 static uint64_t width, height, xPointer = 0, yPointer = TRUE_LETTER_HEIGHT;
 static Window stamp;
-static char justBlanked = 0;
 
 void startPainter(uint64_t w, uint64_t h)
 {
@@ -108,7 +107,6 @@ char paintCharOnWindow(Window w, char c, HexColor letterColor, HexColor highligh
 }
 char paintChar(char c, HexColor letterColor, HexColor highlightColor)
 {
-    justBlanked = 0;
     if (c == '\b')
     {
         if (!(xPointer <= 0 && yPointer <= 0)) // shouldn't be able to backspace through line starters, but shell should handle that.
@@ -141,33 +139,18 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor)
     }
     return 1;
 }
-char fastPaintString(const char *c, HexColor letterColor, HexColor highlightColor)
+char paintStringOnWindow(Window w, const char *c, HexColor letterColor, HexColor highlightColor)
 {
-    if (!justBlanked)
-        return 2;
-    uint64_t h = getScreenHeight(), w = getScreenWidth();
-    Window wholeScreen = getWindow(w, h, pshm(h * w * sizeof(HexColor))); // uses pshm, as the image does not fit in ~128 kb for memory assignation
-    if (wholeScreen.pixels == NULL)
-        return 2;
-    justBlanked = 0;
-
-    while (*c && paintCharOnWindow(wholeScreen, *c, letterColor, highlightColor))
+    while (*c && paintCharOnWindow(w, *c, letterColor, highlightColor))
     {
         c++;
     }
-    quickDraw(wholeScreen);
-    free_shm(wholeScreen.pixels);
     if (*c)
         return 0;
     return 1;
 }
 char paintString(const char *c, HexColor letterColor, HexColor highlightColor)
 {
-    char aux = fastPaintString(c, letterColor, highlightColor);
-    if (!aux)
-        return 0;
-    if (aux == 1)
-        return 1;
     while (*c && paintChar(*c, letterColor, highlightColor))
     {
         c++;
@@ -224,9 +207,29 @@ void blank()
 {
     xPointer = 0;
     yPointer = TRUE_LETTER_HEIGHT * size;
-    justBlanked = 1;
     clear();
 }
+char blankAndRepaint(const char *c, HexColor letterColor, HexColor highlightColor)
+{
+    uint64_t h = getScreenHeight(), w = getScreenWidth();
+    Window wholeScreen = getWindow(w, h, pshm(h * w * sizeof(HexColor))); // uses pshm, as the image does not fit in ~128 kb for memory assignation
+    if (wholeScreen.pixels == NULL)
+    {
+        blank();
+        return paintString(c, letterColor, highlightColor);
+    }
+    int len = h * w;
+    for (int i = 0; i < h * w; i++)
+        wholeScreen.pixels[i] = 0;
+    xPointer = 0;
+    yPointer = TRUE_LETTER_HEIGHT * size;
+    char aux = paintStringOnWindow(wholeScreen, c, letterColor, highlightColor);
+    clear();
+    quickDraw(wholeScreen);
+    free_shm(wholeScreen.pixels);
+    return aux;
+}
+
 void endPainter()
 {
     freeWindow(stamp);

@@ -86,7 +86,7 @@ static map_entry *const map_start = (map_entry *)MAP_START;
 /**
  * @brief End of the heap's map memory (excluded).
  */
-static map_entry *const map_end = (map_entry *)(MAP_START + MAP_SIZE);
+static map_entry *const map_end = (map_entry *)(((char *)MAP_START) + MAP_SIZE);
 
 #endif
 

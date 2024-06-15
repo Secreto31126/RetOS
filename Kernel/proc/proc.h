@@ -124,6 +124,8 @@ pid_t robin_next();
  * calling robin_next will check its state and delete it if necessary
  *
  * @param pid The process' pid
+ *
+ * @return pid_t The process' pid, 0 if not found
  */
 pid_t robin_remove(pid_t pid);
 /**

@@ -1,4 +1,4 @@
-#include "random.h"
+#include <random.h>
 static unsigned int seed = 0x50;
 static unsigned int bit;
 void setSeed(unsigned int newSeed)

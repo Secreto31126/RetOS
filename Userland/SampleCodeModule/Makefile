@@ -8,7 +8,7 @@ OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
 LOADERSRC=_loader.c
 
 LOADEROBJECT=$(LOADERSRC:.c=.o)
-STATICLIBS=$(wildcard ../../Global/stdlib/*.o) $(wildcard ../../Global/string/*.o) $(wildcard ../../Global/stdmem/*.o)
+STATICLIBS=$(wildcard ../../Global/stdlib/*.o) $(wildcard ../../Global/string/*.o) $(wildcard ../../Global/stdmem/*.o) $(wildcard ../../Global/math/*.o)
 
 all: log $(MODULE)
 

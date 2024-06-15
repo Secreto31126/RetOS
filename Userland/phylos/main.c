@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "lib/my_lib.h"
 #include "phylos.h"
-#include "random.h"
+#include <random.h>
 
 extern char bss;
 extern char endOfBinary;

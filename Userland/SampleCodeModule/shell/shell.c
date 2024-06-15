@@ -1,7 +1,7 @@
 #include "shell.h"
 #include "commandHandler/commandHandler.h"
 #include "./../window/painter.h"
-#include "./../snake/random.h"
+#include <random.h>
 #include "./../snake/snake.h"
 #include "./../snake/drawings/backgroundArrays.h"
 #include "./../snake/drawings/snakeDrawings.h"

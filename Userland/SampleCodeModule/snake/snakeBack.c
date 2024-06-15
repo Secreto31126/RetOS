@@ -1,6 +1,6 @@
 #include "snake.h"
 #include "snakePrivate.h"
-#include "random.h"
+#include <random.h>
 #include <stdmem.h>
 
 #define EMPTY 0

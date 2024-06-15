@@ -1,5 +1,5 @@
 #include "phylos.h"
-#include "random.h"
+#include <random.h>
 
 void check_adding(unsigned int i);
 void phylosopher(unsigned int i)

@@ -127,12 +127,6 @@ typedef struct Process
      */
     int exit_code;
     /**
-     * @brief The next process in the round-robin list
-     *
-     * @note The list head is always stored in the idle process (pid 0)
-     */
-    struct Process *next_robin;
-    /**
      * @brief The process' priority (ranged between -20 and 19, lower is higher priority)
      */
     signed char priority;

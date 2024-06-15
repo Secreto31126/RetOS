@@ -124,11 +124,14 @@ pid_t robin_next();
  * calling robin_next will check its state and delete it if necessary
  *
  * @param pid The process' pid
+ *
+ * @return pid_t The process' pid, 0 if not found
  */
-void robin_remove(pid_t pid);
+pid_t robin_remove(pid_t pid);
 /**
  * @brief Set the remainin ticks to 0
  * @note This function should only be called from sched_yield()
+ * @note For the current implementation of the scheduler, this function is a noop
  */
 void yield_robin();
 

@@ -86,12 +86,7 @@ void drawFromHexArray(Window w, HexColor *source, int sourceWidth, int sourceHei
         yIndex++;
     }
 }
-/**
- * Automatically scales source to result
- * To make a color in the result be 'transparent' in later operations, set its HexColor opacity to 0.
- * This function is for translating bitmap-equivalents to HexColor arrays. Not for creating Windows.
- * Chars set to 0 will be copied to result as color 1, set to 1 copied as color 2, etc.
- **/
+
 HexColor *toHexArray(char *source, HexColor *result, int sourceWidth, int sourceHeight, int resultWidth, int resultHeight, int colorCount, ...) // Requiring the number of colors isn't a particularly good implementation, but it is a particularly easy one.
 {
     HexColor replacement;
@@ -267,7 +262,7 @@ Window overlayFromCharArray(Window w, char *source, uint64_t sourceWidth, uint64
     return w;
 }
 
-Window fromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sourceHeight, HexColor *map, uint64_t xOffset, uint64_t yOffset, OVERLAY_MODE m)
+Window fromCharArray(Window w, char *source, uint64_t sourceWidth, uint64_t sourceHeight, HexColor *map, OVERLAY_MODE m)
 {
     uint64_t width = w.width, height = w.height;
     HexColor *result = w.pixels;

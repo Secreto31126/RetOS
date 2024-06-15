@@ -266,7 +266,7 @@ void drawBoard(frontSnake *snakes)
                 continue;
                 break;
             }
-            fromCharArray(stamp, source, drawSize, drawSize, colorMap, 0, 0, OPAQUE);
+            fromCharArray(stamp, source, drawSize, drawSize, colorMap, OPAQUE);
             if (board[address].toDraw != APPLE && board[i].toDraw != BLANK) // don't want spinning apples or backgrounds.
                 switch (board[address].drawDirection)
                 {

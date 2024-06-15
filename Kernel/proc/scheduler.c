@@ -227,7 +227,8 @@ iterable_list next_schedule(int *priority)
     }
     if (last_valid != NULL)
     {
-        remaining = last_valid->size;
+        remaining = last_valid->size - 1;
+        current_priority = last_valid;
         current_priority_index = *priority; // I set it myself, may as well use it
         return last_valid;
     }
@@ -238,6 +239,7 @@ iterable_list next_schedule(int *priority)
         {
             *priority = i;
             current_priority_index = i;
+            current_priority = aux;
             remaining = aux->size;
             return aux;
         }
@@ -315,14 +317,6 @@ pid_t robin_next()
     {
         robin_remove(to_ret);
         robin_add(to_ret);
-    }
-    if (to_ret > 2)
-    {
-        ncPrint(" ");
-        ncPrintDec(to_ret);
-        ncPrint(";");
-        ncPrintDec(p_to_ret->priority);
-        ncPrint(" ");
     }
     return to_ret;
 }

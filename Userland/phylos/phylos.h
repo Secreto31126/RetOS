@@ -36,8 +36,31 @@ typedef struct Data
 
 extern Data *data;
 
+/**
+ * @brief Outputs the current state of the table to STD_OUT
+ *
+ */
 void print_state();
+/**
+ * @brief Think, check in with the manager, nab the forks, eat, leave the forks, repeat
+ *
+ * @param i The philosopher's position on the table
+ */
 void phylosopher(unsigned int i);
+/**
+ * @brief Waits on the forks until obtained
+ *
+ * @param i The philosopher's position on the table
+ */
 void take_forks(unsigned int i);
+/**
+ * @brief Returns the forks
+ *
+ * @param i The philosopher's position on the table
+ */
 void put_forks(unsigned int i);
+/**
+ * @brief Kills all philosophers, unlinks semaphores, frees shared memories
+ *
+ */
 void leave();

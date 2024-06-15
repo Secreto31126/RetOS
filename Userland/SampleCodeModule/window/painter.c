@@ -11,6 +11,8 @@ void startPainter(uint64_t w, uint64_t h)
     width = w;
     height = h;
     stamp = getWindow(TRUE_LETTER_WIDTH, TRUE_LETTER_HEIGHT, malloc(TRUE_LETTER_HEIGHT * TRUE_LETTER_WIDTH * sizeof(HexColor)));
+    if (stamp.pixels == NULL)
+        exit(1);
 }
 void setSize(double s)
 {
@@ -21,6 +23,8 @@ void setSize(double s)
     stamp.height = TRUE_LETTER_HEIGHT * size;
     free(stamp.pixels);
     stamp.pixels = malloc(((int)(TRUE_LETTER_HEIGHT * size)) * ((int)(TRUE_LETTER_WIDTH * size)) * sizeof(HexColor)); // realloc unnecessary, as all characters are only temporarily stamped
+    if (stamp.pixels == NULL)
+        exit(1);
 }
 uint64_t getSize()
 {

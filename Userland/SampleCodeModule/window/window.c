@@ -132,7 +132,7 @@ Window rotateBy90(Window w)
     HexColor *result = malloc(width * height * sizeof(HexColor));
 
     if (result == NULL)
-        exit(1);
+        return w;
 
     for (int i = 0; i < height; i++)
     {
@@ -157,7 +157,7 @@ Window rotateBy270(Window w) // more efficient that three 90 rotations
     HexColor *result = malloc(width * height * sizeof(HexColor));
 
     if (result == NULL)
-        exit(1);
+        return w;
 
     for (int i = 0; i < height; i++)
     {

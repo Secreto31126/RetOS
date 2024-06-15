@@ -66,6 +66,14 @@ int make_philo(int i)
 	return 0;
 }
 
+/**
+ * @brief Takes the right-most fork to avoid a philosopher having a fork that iwll be moved, then adds a philospher to the right
+ *
+ * @param use_addex Whether to take the fork before adding a philosopher
+ * @note If philosophers have been initialized, use_addex should always be true
+ *
+ * @return int 0 if successful, 1 otherwise
+ */
 int add_philo(int use_addex)
 {
 	int i = data->phylo_count;
@@ -98,7 +106,11 @@ int add_philo(int use_addex)
 	return 0;
 }
 
-int remove_phylo()
+/**
+ * @brief Takes the two right-most forks to avoid a philosopher having a fork that will be removed/moved, then removes the right-most philosopher
+ *
+ */
+void remove_phylo()
 {
 	int i = data->phylo_count;
 	sem_wait(data->mutex); // acquire mutex
@@ -115,8 +127,6 @@ int remove_phylo()
 	data->adding = -1;
 	sem_post(data->mutex); // One of the processes blocked on this is dead, so I only need to post it once
 	sem_wait(data->returnex);
-
-	return 0;
 }
 
 int make_mutexes()

@@ -35,7 +35,6 @@ int main(int argc, char *argv[])
 	}
 	if (!strcmp(test, "endless_loop_print"))
 	{
-		my_nice(my_getpid(), 19); // Since I'm not too eager to give extra cpu time to a process stuck in a busy wait
 		uint64_t aux = 0;
 		if (argc <= 1 || (aux = satoi(argv[1])) <= MIN_WAIT)
 			endless_loop_print(MIN_WAIT);

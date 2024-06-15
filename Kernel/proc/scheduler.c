@@ -171,15 +171,11 @@ unsigned int rand_between(unsigned int min, unsigned int max)
 {
     if (min >= max)
         return 0;
-    unsigned int got = rand();
-    return (got % (max - min)) + min;
+    return (rand() % (max - min)) + min;
 }
 
 static const char weights[PRIO_MAX - PRIO_MIN + 1] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
 static const int weights_sum = 820;
-static int schedule[PRIO_MAX - PRIO_MIN + 1] = {0};
-static int schedule_index = 0;
-static int schedule_remaining = 0;
 static int ready_count = 0;
 static iterable_list process_lists[PRIO_MAX - PRIO_MIN + 1] = {0};
 
@@ -202,27 +198,51 @@ char is_valid_entry(iterable_list il)
     return il != NULL && il->first != NULL && il->size > 0;
 }
 
-iterable_list next_schedule()
+static iterable_list current_priority = NULL;
+static int current_priority_index = 0;
+static int remaining = 0;
+iterable_list next_schedule(int *priority)
 {
+    if (remaining > 0 && is_valid_entry(current_priority))
+    {
+        remaining--;
+        *priority = current_priority_index;
+        return current_priority;
+    }
+    remaining = 0;
+
     int index = rand_between(0, weights_sum), i;
     iterable_list last_valid = NULL;
     for (i = PRIO_MAX; i >= PRIO_MIN; i--)
     {
         iterable_list aux = get_proc_list_entry(i);
         if (is_valid_entry(aux))
+        {
+            *priority = i;
             last_valid = aux;
+        }
         index -= get_weight(i);
         if (index <= 0)
             break;
     }
     if (last_valid != NULL)
+    {
+        remaining = last_valid->size;
+        current_priority_index = *priority; // I set it myself, may as well use it
         return last_valid;
+    }
     for (; i >= PRIO_MIN; i--)
     {
         iterable_list aux = get_proc_list_entry(i);
         if (is_valid_entry(aux))
+        {
+            *priority = i;
+            current_priority_index = i;
+            remaining = aux->size;
             return aux;
+        }
     }
+    *priority = -1;
     return NULL;
 }
 
@@ -272,7 +292,8 @@ pid_t robin_next()
     if (!ready_count)
         return 0;
 
-    iterable_list scheduled_priority = next_schedule();
+    int priority;
+    iterable_list scheduled_priority = next_schedule(&priority);
     if (scheduled_priority == NULL)
         return 0;
 
@@ -290,10 +311,18 @@ pid_t robin_next()
         return robin_next();
     }
 
-    if (p_to_ret->priority != scheduled_priority) // Its priority has changed, move it to the correct list
+    if (p_to_ret->priority != priority) // Its priority has changed, move it to the correct list
     {
         robin_remove(to_ret);
         robin_add(to_ret);
+    }
+    if (to_ret > 2)
+    {
+        ncPrint(" ");
+        ncPrintDec(to_ret);
+        ncPrint(";");
+        ncPrintDec(p_to_ret->priority);
+        ncPrint(" ");
     }
     return to_ret;
 }

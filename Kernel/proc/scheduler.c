@@ -191,7 +191,7 @@ pid_t remove_il_rec(p_node *p, round_iterable_list il, pid_t pid)
 static unsigned int seed = 0x50;
 static unsigned int bit;
 unsigned int rand()
-{ // A linear-feedback shift register ('sourced' from wikipedia)
+{ // A linear-feedback shift register
     bit = ((seed >> 0) ^ (seed >> 2) ^ (seed >> 3) ^ (seed >> 5)) & 1;
     return (seed = (seed >> 1) | (bit << 15));
 }

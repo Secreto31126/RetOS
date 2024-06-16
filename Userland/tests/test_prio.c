@@ -3,12 +3,12 @@
 #include "test_util.h"
 
 #define MINOR_WAIT "5000000" // TODO: Change this value to prevent a process from flooding the screen
-#define WAIT 100000000       // TODO: Change this value to make the wait long enough to see these processes beeing run at least twice
+#define WAIT 300000000       // TODO: Change this value to make the wait long enough to see these processes beeing run at least twice
 
 #define TOTAL_PROCESSES 3
-#define LOWEST -20 // TODO: Change as required
-#define MEDIUM 0   // TODO: Change as required
-#define HIGHEST 19 // TODO: Change as required
+#define LOWEST -10 // Note: Not the actual minimum priority. That is -19, with which the process would run too infrequently
+#define MEDIUM 0   // to-done
+#define HIGHEST 19 // to-done
 
 int64_t prio[TOTAL_PROCESSES] = {LOWEST, MEDIUM, HIGHEST};
 

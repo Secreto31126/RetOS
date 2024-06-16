@@ -97,6 +97,11 @@ int close_pipe(int file)
         if (!--pipe->write_ends)
         {
             sem_destroy(&pipe->write_sem);
+
+            for (size_t i = 0; i < pipe->read_ends; i++)
+            {
+                sem_post(&pipe->read_sem);
+            }
         }
     }
     else

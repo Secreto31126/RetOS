@@ -13,6 +13,8 @@
 #include <proc.h>
 #include <mman.h>
 #include <unistd.h>
+#include <ethernet.h>
+#include <pci.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -50,6 +52,14 @@ void *initializeKernelBinary()
 	ncPrint("Loading memory manager");
 	init_memory_manager();
 	ncPrint(" [Done]\n");
+
+	ncPrint("[Loading ethernet device]\n");
+	scan_PCI_devices();
+	// print_RTL_data();
+	init_dma();
+	ncPrint("\tMAC (backwards): ");
+	ncPrintHex(init_ethernet());
+	ncPrint("\n[Done]\n");
 
 	ncPrint("[Loading modules]\n");
 	void *moduleAddresses[] = {

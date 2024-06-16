@@ -56,10 +56,12 @@ void initialize_idt()
     set_idt_entry(0x06, invalid_opcode_exception_handler, ACS_INT);
     set_idt_entry(0x20, tick_handler, ACS_INT);
     set_idt_entry(0x21, keyboard_handler, ACS_INT);
+    set_idt_entry(0x2B, ethernet_handler, ACS_INT);
     set_idt_entry(0x80, syscall_handler, ACS_INT);
 
     // Enable master PIC
-    output_byte(0x21, 0xFC); // Only tick and keyboard interruptions enabled for now
+    output_byte(0x21, 0xF8); // Only tick, keyboard and slave interruptions enabled for now
     // Enable slave PIC
-    output_byte(0xA1, 0xFF);
+    // output_byte(0xA1, 0xFF);
+    output_byte(0xA1, 0xF7); // Only ethernet interruption enabled for now
 }

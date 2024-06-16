@@ -9,15 +9,27 @@
 
 static void tick_handler();
 static void keyboard_handler();
+static void ethernet_handler();
 
-static void (*pic_handlers[2])(void) = {
+#define PIC_HANDLERS_COUNT 12
+static void (*pic_handlers[PIC_HANDLERS_COUNT])(void) = {
     tick_handler,
     keyboard_handler,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    noop,
+    ethernet_handler,
 };
 
 void pic_manager(uint8_t interrupt)
 {
-    if (interrupt < 2)
+    if (interrupt < PIC_HANDLERS_COUNT)
     {
         pic_handlers[interrupt]();
     }
@@ -124,4 +136,9 @@ static void keyboard_handler()
     uint16_t letter = get_scancode_utf16(scancode, modifier);
     if (letter)
         write_stdin((uint8_t *)&letter, 1);
+}
+
+static void ethernet_handler()
+{
+    ethernet_manager();
 }

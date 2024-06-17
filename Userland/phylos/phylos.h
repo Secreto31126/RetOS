@@ -7,8 +7,8 @@
 
 #define MAX_PHYLOS 15
 #define INITIAL_PHYLOS 5
-#define LEFT(i, p) (i)
-#define RIGHT(i, p) ((i + 1) % p)
+#define LEFT(i, p) i
+#define RIGHT(i, p) (((i) + 1) % (p))
 #define THINKING 0
 #define HUNGRY 1
 #define EATING 2

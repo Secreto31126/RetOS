@@ -3,7 +3,9 @@
 
 #include <unistd.h>
 
-#define ISSPACE(c) ((c) == ' ' || (c) == '\t' || (c) == '\n' || (c) == '\v' || (c) == '\f' || (c) == '\r')
+#define ISSPACE(c)                                                             \
+  ((c) == ' ' || (c) == '\t' || (c) == '\n' || (c) == '\v' || (c) == '\f' ||   \
+   (c) == '\r')
 #define ISDIGIT(c) ((c) >= '0' && (c) <= '9')
 #define ISALPHA(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
 #define ISUPPER(c) ((c) >= 'A' && (c) <= 'Z')

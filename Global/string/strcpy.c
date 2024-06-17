@@ -1,9 +1,8 @@
 #include <string.h>
 
-char *strcpy(char *dest, const char *src)
-{
-    char *save = dest;
-    for (; (*dest = *src); ++src, ++dest)
-        ;
-    return save;
+char *strcpy(char *dest, const char *src) {
+  char *save = dest;
+  for (; (*dest = *src); ++src, ++dest)
+    ;
+  return save;
 }

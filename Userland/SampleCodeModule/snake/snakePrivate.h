@@ -6,47 +6,43 @@
 #define SCORE_BOARD_TILES_Y 2
 
 #include "./../window/fontInterface.h"
-#include "./../window/window.h"
 #include "./../window/painter.h"
+#include "./../window/window.h"
 // #include "./../window/figures.h" // no longer used
 #include "random.h"
 
-typedef enum DIRECTION
-{
-    LEFT,
-    UP,
-    RIGHT,
-    DOWN,
-    NUMBER_OF_DIRECTIONS,
-    NONE,
+typedef enum DIRECTION {
+  LEFT,
+  UP,
+  RIGHT,
+  DOWN,
+  NUMBER_OF_DIRECTIONS,
+  NONE,
 } DIRECTION;
-typedef enum TO_DRAW
-{
-    NO_DRAW,
-    BLANK,
-    HEAD,
-    BODY,
-    TAIL,
-    TURN,
-    APPLE, // apple was taken
+typedef enum TO_DRAW {
+  NO_DRAW,
+  BLANK,
+  HEAD,
+  BODY,
+  TAIL,
+  TURN,
+  APPLE, // apple was taken
 } TO_DRAW;
 
-typedef struct
-{
-    unsigned int length;
-    DIRECTION direction;
-    uint64_t color;
-    char alive;
-    unsigned char nextHeadCoordinates[2];
+typedef struct {
+  unsigned int length;
+  DIRECTION direction;
+  uint64_t color;
+  char alive;
+  unsigned char nextHeadCoordinates[2];
 } snake;
 
-typedef struct tile
-{
-    unsigned int player;
-    unsigned int health;
-    TO_DRAW toDraw;
-    DIRECTION trueDirection;
-    DIRECTION drawDirection;
+typedef struct tile {
+  unsigned int player;
+  unsigned int health;
+  TO_DRAW toDraw;
+  DIRECTION trueDirection;
+  DIRECTION drawDirection;
 } tile;
 
 void setBoard(int snakeCount);

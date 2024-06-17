@@ -1,11 +1,11 @@
 #ifndef PRC_H
 #define PRC_H
 
-#include <sys/types.h>
-#include <stddef.h>
-#include <stdbool.h>
 #include <pipes.h>
 #include <semaphores.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <sys/types.h>
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -22,47 +22,45 @@
 
 /* The type of the WHICH argument to `getpriority' and `setpriority',
    indicating what flavor of entity the WHO argument specifies.  */
-enum __priority_which
-{
-    PRIO_PROCESS = 0, /* WHO is a process ID.  */
+enum __priority_which {
+  PRIO_PROCESS = 0, /* WHO is a process ID.  */
 #define PRIO_PROCESS PRIO_PROCESS
-    PRIO_PGRP = 1, /* WHO is a process group ID.  */
+  PRIO_PGRP = 1, /* WHO is a process group ID.  */
 #define PRIO_PGRP PRIO_PGRP
-    PRIO_USER = 2 /* WHO is a user ID.  */
+  PRIO_USER = 2 /* WHO is a user ID.  */
 #define PRIO_USER PRIO_USER
 };
 
 /**
  * @brief Enum of all the possible process' states
  */
-typedef enum ProcessStateEnum
-{
-    /**
-     * @brief Empty state
-     */
-    NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR = '\0',
-    /**
-     * @brief Running
-     */
-    PROCESS_RUNNING = 'R',
-    /**
-     * @brief Ready/Waiting
-     */
-    PROCESS_READY = 'W',
-    /**
-     * @brief Blocked
-     * TODO: Implement this state
-     */
-    PROCESS_BLOCKED = 'B',
-    /**
-     * @brief Zombie
-     * TODO: Implement this state
-     */
-    PROCESS_ZOMBIE = 'Z',
-    /**
-     * @brief Caput
-     */
-    PROCESS_DEAD = 'D',
+typedef enum ProcessStateEnum {
+  /**
+   * @brief Empty state
+   */
+  NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR = '\0',
+  /**
+   * @brief Running
+   */
+  PROCESS_RUNNING = 'R',
+  /**
+   * @brief Ready/Waiting
+   */
+  PROCESS_READY = 'W',
+  /**
+   * @brief Blocked
+   * TODO: Implement this state
+   */
+  PROCESS_BLOCKED = 'B',
+  /**
+   * @brief Zombie
+   * TODO: Implement this state
+   */
+  PROCESS_ZOMBIE = 'Z',
+  /**
+   * @brief Caput
+   */
+  PROCESS_DEAD = 'D',
 } ProcessState;
 
 /**
@@ -76,90 +74,91 @@ typedef bool (*ProcessBlockConditional)(pid_t);
 /**
  * @brief The Process structure
  */
-typedef struct Process
-{
-    /**
-     * @brief The process id
-     */
-    pid_t pid;
-    /**
-     * @brief The parent process id
-     */
-    pid_t ppid;
-    /**
-     * @brief The process name
-     */
-    char *name;
-    /**
-     * @brief The process allocated stack
-     */
-    void *stack;
-    /**
-     * @brief Where the stack should be placed to run the process, inherited from the parent
-     */
-    void *running_stack;
-    /**
-     * @brief The process' stack size, in bytes
-     */
-    size_t stack_size;
-    /**
-     * @brief The process' running stack size, in bytes, inherited from the parent
-     */
-    size_t running_stack_size;
-    /**
-     * @brief The process rsp
-     */
-    void *rsp;
-    /**
-     * @brief The process state, configured by the scheduler in context_switch()
-     */
-    ProcessState state;
-    /**
-     * @brief The process' children head of the list
-     */
-    struct Process *next_child;
-    /**
-     * @brief The process' next brother
-     */
-    struct Process *next_brother;
-    /**
-     * @brief The process' exit code
-     */
-    int exit_code;
-    /**
-     * @brief The process' priority (ranged between -20 and 19, lower is higher priority)
-     */
-    signed char priority;
-    /**
-     * @brief The list head that holds the process blocked
-     */
-    struct Process **block_list;
-    /**
-     * @brief Points to the next blocked process
-     *
-     * @note The list head is always stored in the idle process (pid 0)
-     */
-    struct Process *next_blocked;
-    /**
-     * @brief The condition needed to be satisfied to unblock the process
-     */
-    ProcessBlockConditional block_condition;
-    /**
-     * @brief Any data required by the condition
-     */
-    void *condition_data[5];
-    /**
-     * @brief The children's death semaphore
-     */
-    sem_t zombie_sem;
-    /**
-     * @brief The process' death semaphore
-     */
-    sem_t exit_sem;
-    /**
-     * @brief Process open file descriptors
-     */
-    int files[MAX_PROCESS_FILES];
+typedef struct Process {
+  /**
+   * @brief The process id
+   */
+  pid_t pid;
+  /**
+   * @brief The parent process id
+   */
+  pid_t ppid;
+  /**
+   * @brief The process name
+   */
+  char *name;
+  /**
+   * @brief The process allocated stack
+   */
+  void *stack;
+  /**
+   * @brief Where the stack should be placed to run the process, inherited from
+   * the parent
+   */
+  void *running_stack;
+  /**
+   * @brief The process' stack size, in bytes
+   */
+  size_t stack_size;
+  /**
+   * @brief The process' running stack size, in bytes, inherited from the parent
+   */
+  size_t running_stack_size;
+  /**
+   * @brief The process rsp
+   */
+  void *rsp;
+  /**
+   * @brief The process state, configured by the scheduler in context_switch()
+   */
+  ProcessState state;
+  /**
+   * @brief The process' children head of the list
+   */
+  struct Process *next_child;
+  /**
+   * @brief The process' next brother
+   */
+  struct Process *next_brother;
+  /**
+   * @brief The process' exit code
+   */
+  int exit_code;
+  /**
+   * @brief The process' priority (ranged between -20 and 19, lower is higher
+   * priority)
+   */
+  signed char priority;
+  /**
+   * @brief The list head that holds the process blocked
+   */
+  struct Process **block_list;
+  /**
+   * @brief Points to the next blocked process
+   *
+   * @note The list head is always stored in the idle process (pid 0)
+   */
+  struct Process *next_blocked;
+  /**
+   * @brief The condition needed to be satisfied to unblock the process
+   */
+  ProcessBlockConditional block_condition;
+  /**
+   * @brief Any data required by the condition
+   */
+  void *condition_data[5];
+  /**
+   * @brief The children's death semaphore
+   */
+  sem_t zombie_sem;
+  /**
+   * @brief The process' death semaphore
+   */
+  sem_t exit_sem;
+  /**
+   * @brief Process open file descriptors
+   */
+  int files[MAX_PROCESS_FILES];
 } Process;
 
 /**
@@ -221,7 +220,8 @@ int open_file(int file, int flags);
  */
 int close_file(int file);
 /**
- * @brief Iterate over a blocked process list and unblock the ones that satisfy the condition
+ * @brief Iterate over a blocked process list and unblock the ones that satisfy
+ * the condition
  *
  * @param p The head of the blocked process list
  * @return Process* The new head of the blocked process list

@@ -35,9 +35,9 @@
 // GCC cries if I comment you...
 // I guess I can keep you around...
 // Just promise you won't bring any issues, okay?
-#define MEEP(f, d) \
-    beep(f);       \
-    sleep_ticks(d);
+#define MEEP(f, d)                                                             \
+  beep(f);                                                                     \
+  sleep_ticks(d);
 
 // /**
 //  * @see https://github.com/gabszzz/The-Imperial-March

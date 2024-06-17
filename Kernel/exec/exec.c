@@ -65,72 +65,64 @@ Executable executables[EXECUTABLES] = {
     },
 };
 
-int check_args(char *const argv[])
-{
-    /**
-     * @brief The number of arguments, does not include the NULL terminator
-     */
-    int argc = 0;
+int check_args(char *const argv[]) {
+  /**
+   * @brief The number of arguments, does not include the NULL terminator
+   */
+  int argc = 0;
 
-    if (!argv)
-    {
-        return argc;
-    }
-
-    while (argv[argc] && argc + 1 < MAX_ARGS)
-    {
-        if (strlen(argv[argc++]) >= MAX_ARG_LEN - 1)
-        {
-            // E2BIG
-            return -7;
-        }
-    }
-
-    if (argc >= MAX_ARGS)
-    {
-        // E2BIG
-        return -7;
-    }
-
+  if (!argv) {
     return argc;
+  }
+
+  while (argv[argc] && argc + 1 < MAX_ARGS) {
+    if (strlen(argv[argc++]) >= MAX_ARG_LEN - 1) {
+      // E2BIG
+      return -7;
+    }
+  }
+
+  if (argc >= MAX_ARGS) {
+    // E2BIG
+    return -7;
+  }
+
+  return argc;
 }
 
-RSP set_process_args(int argc, char const argv[MAX_ARGS][MAX_ARG_LEN], Process *process)
-{
-    RSP *rsp = (RSP *)&process->rsp;
-    Stack args = (Stack)((uintptr_t)(process->stack + process->stack_size) / 2);
+RSP set_process_args(int argc, char const argv[MAX_ARGS][MAX_ARG_LEN],
+                     Process *process) {
+  RSP *rsp = (RSP *)&process->rsp;
+  Stack args = (Stack)((uintptr_t)(process->stack + process->stack_size) / 2);
 
-    *rsp = process->stack + process->stack_size;
+  *rsp = process->stack + process->stack_size;
 
-    PUSH(*rsp, NULL);
+  PUSH(*rsp, NULL);
 
-    for (int i = argc - 1; i >= 0; i--)
-    {
-        char const *arg = argv[i];
+  for (int i = argc - 1; i >= 0; i--) {
+    char const *arg = argv[i];
 
-        char *copy = args;
-        args += strlen(arg) + 1;
+    char *copy = args;
+    args += strlen(arg) + 1;
 
-        strcpy(copy, arg);
-        PUSH(*rsp, copy);
-    }
+    strcpy(copy, arg);
+    PUSH(*rsp, copy);
+  }
 
-    // "initialization of 'void *' from 'int' makes pointer from integer without a cast"
-    // Take that, GCC. Hope you are happy with this monstrosity.
-    PUSH(*rsp, NULL + argc);
+  // "initialization of 'void *' from 'int' makes pointer from integer without a
+  // cast" Take that, GCC. Hope you are happy with this monstrosity.
+  PUSH(*rsp, NULL + argc);
 
-    return *rsp;
+  return *rsp;
 }
 
 char argv_backup[MAX_ARGS][MAX_ARG_LEN];
 
-void *backup_argv_somewhere(int argc, char *const argv[])
-{
-    for (int i = 0; i < argc; i++)
-    {
-        strncpy(argv_backup[i], argv[i], MAX_ARG_LEN - 1);
-        argv_backup[i][MAX_ARG_LEN - 1] = '\0';
-    }
+void *backup_argv_somewhere(int argc, char *const argv[]) {
+  for (int i = 0; i < argc; i++) {
+    strncpy(argv_backup[i], argv[i], MAX_ARG_LEN - 1);
+    argv_backup[i][MAX_ARG_LEN - 1] = '\0';
+  }
 
-    return argv_backup;
+  return argv_backup;
 }

@@ -1,8 +1,8 @@
 #ifndef PNT_H
 #define PNT_H
-#include "window.h"
-#include "fontInterface.h"
 #include "./../nstdlib/nstdlib.h"
+#include "fontInterface.h"
+#include "window.h"
 #define SPACES_IN_TAB 4
 
 /**
@@ -30,7 +30,8 @@ char paintChar(char c, HexColor letterColor, HexColor highlightColor);
 /**
  * @brief Paints a string starting on the cursor, moves the cursor
  *
- * @note String is still painted partially if can't fit. Recommended action is call to blank(), then paint again.
+ * @note String is still painted partially if can't fit. Recommended action is
+ * call to blank(), then paint again.
  *
  * @param s The string to paint
  * @param letterColor
@@ -49,7 +50,8 @@ char paintString(const char *s, HexColor letterColor, HexColor highlightColor);
  * @param x x-coordinate for the character
  * @param y y-coordinate for the character
  */
-void drawCharAt(char c, HexColor letterColor, HexColor highlightColor, uint64_t x, uint64_t y);
+void drawCharAt(char c, HexColor letterColor, HexColor highlightColor,
+                uint64_t x, uint64_t y);
 /**
  * @brief draw the given string
  *
@@ -61,7 +63,8 @@ void drawCharAt(char c, HexColor letterColor, HexColor highlightColor, uint64_t 
  * @param x x-coordinate for the string
  * @param y y-coordinate for the string
  */
-void drawStringAt(char *c, HexColor letterColor, HexColor highlightColor, uint64_t x, uint64_t y);
+void drawStringAt(char *c, HexColor letterColor, HexColor highlightColor,
+                  uint64_t x, uint64_t y);
 /**
  * @brief Set the size of characters drawn by the painter
  *
@@ -80,7 +83,8 @@ void endPainter();
  */
 uint64_t getCharPerLine();
 /**
- * @brief Find whether a string will fit in the screen given the cursor's current position
+ * @brief Find whether a string will fit in the screen given the cursor's
+ * current position
  *
  * @param s The string
  * @return char 0 if the character will not fit, 1 otherwise

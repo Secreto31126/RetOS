@@ -1,9 +1,9 @@
 #ifndef SHL_H
 #define SHL_H
-#include <stdint.h>
-#include "shell.h"
 #include "./../window/fontInterface.h"
 #include "./../window/window.h"
+#include "shell.h"
+#include <stdint.h>
 
 #define MAX_COMMAND_LENGTH 900
 

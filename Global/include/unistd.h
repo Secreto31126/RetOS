@@ -1,8 +1,8 @@
 #ifndef GUNI_H
 #define GUNI_H
 
-#include <sys/types.h>
 #include <stdint.h>
+#include <sys/types.h>
 
 /**
  * @brief Read from a file descriptor
@@ -48,7 +48,8 @@ extern int dup2(int oldfd, int newfd);
  * @brief Starts an executable file overwriting the current process
  *
  * @param pathname The executable's pathname
- * @param argv The arguments to start the executable with, it must be null terminated, it may be null
+ * @param argv The arguments to start the executable with, it must be null
+ * terminated, it may be null
  * @return int error code, does not return if success
  */
 extern int execv(const char *pathname, char *const argv[]);
@@ -60,11 +61,13 @@ extern int execv(const char *pathname, char *const argv[]);
 extern pid_t getpid();
 /**
  * @brief sbrk() increments the program's data space by increment bytes.
- * Calling sbrk() with an increment of 0 can be used to find the current location of the program break.
+ * Calling sbrk() with an increment of 0 can be used to find the current
+ * location of the program break.
  * @note In RetOS, there's no such thing as increasing the data segment.
  * The only valid value for increment is 0, which returns the top of the stack.
  *
- * @param increment The number of bytes to increment the data segment by (0 in RetOS)
+ * @param increment The number of bytes to increment the data segment by (0 in
+ * RetOS)
  * @return void* The new top of the stack, or -1 on error
  */
 extern void *sbrk(intptr_t increment);

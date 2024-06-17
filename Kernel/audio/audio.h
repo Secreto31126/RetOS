@@ -1,9 +1,9 @@
 #ifndef PAIO_H
 #define PAIO_H
 
-#include <lib.h>
-#include <ticks.h>
 #include <audio.h>
+#include <lib.h>
 #include <stdint.h>
+#include <ticks.h>
 
 #endif

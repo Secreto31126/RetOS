@@ -2,13 +2,13 @@
 #define SYS_H
 
 #include <sched.h>
-#include <stdint.h>
 #include <stddef.h>
-#include <unistd.h>
+#include <stdint.h>
 #include <stdlib.h>
-#include <sys/wait.h>
 #include <sys/pselect.h>
 #include <sys/resource.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 // uint64_t draw(HexColor *figure, uint64_t dimensions, uint64_t position);
 extern void *pshm(uint32_t size);

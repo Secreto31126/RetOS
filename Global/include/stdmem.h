@@ -7,7 +7,8 @@ typedef signed long int size_t_m;
 #define KB_129 132096
 #define KB_1 1024
 #define KB_128 131072
-// This has been hardcoded, all processes are expected to have a heap of 129kb, with BLOCK of 64 bytes, and a resulting memory map of 128kb in 1kb
+// This has been hardcoded, all processes are expected to have a heap of 129kb,
+// with BLOCK of 64 bytes, and a resulting memory map of 128kb in 1kb
 #define MAP_SIZE_M KB_1
 #define MEM_SIZE_M KB_128
 #define HEAP_SIZE_M KB_129

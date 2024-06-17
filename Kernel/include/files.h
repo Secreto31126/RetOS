@@ -1,8 +1,8 @@
 #ifndef FLE_H
 #define FLE_H
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 /**
  * @brief Flush a file descriptor

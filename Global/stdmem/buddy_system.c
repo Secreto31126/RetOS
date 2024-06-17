@@ -21,7 +21,7 @@
 #define IS_LEFT(i) ((i) % 2)
 #define GET_LEFT(i) (((i) << 1) + 1)
 #define GET_RIGHT(i) (((i) << 1) + 2)
-#define GET_PARENT(i) ((i - 1) >> 1)
+#define GET_PARENT(i) (((i) - 1) >> 1)
 #define GET_BROTHER(i) (IS_LEFT(i) ? GET_RIGHT(GET_PARENT(i)) : GET_LEFT(GET_PARENT(i)))
 
 #define MAP_START_M (((char *)sbrk(0)) + MEM_SIZE_M)
@@ -222,7 +222,7 @@ void *malloc(size_t_m size)
 {
     if (size > MEM_SIZE_M)
         return NULL;
-    size_t_m index = find_buddy(size*2, 0, MEM_SIZE_M);
+    size_t_m index = find_buddy(size * 2, 0, MEM_SIZE_M);
     if (index == -1)
     {
         return NULL;

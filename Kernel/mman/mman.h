@@ -24,7 +24,7 @@ typedef uint32_t map_entry;
 #define IS_LEFT(i) ((i) % 2)
 #define GET_LEFT(i) (((i) << 1) + 1)
 #define GET_RIGHT(i) (((i) << 1) + 2)
-#define GET_PARENT(i) ((i - 1) >> 1)
+#define GET_PARENT(i) (((i) - 1) >> 1)
 #define GET_BROTHER(i) (IS_LEFT(i) ? GET_RIGHT(GET_PARENT(i)) : GET_LEFT(GET_PARENT(i)))
 
 typedef enum states

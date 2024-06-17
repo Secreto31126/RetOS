@@ -42,7 +42,7 @@ uint16_t get_hour_offset(uint16_t hour)
 
         hour += step;
 
-        if (!((0 <= hour && hour < 0xA) || (0x10 <= hour && hour < 0x1A) || (0x20 <= hour && hour < 0x2A)))
+        if (!(hour < 0xA || (0x10 <= hour && hour < 0x1A) || (0x20 <= hour && hour < 0x2A)))
             hour += 6 * step;
     }
 

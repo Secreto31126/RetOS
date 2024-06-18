@@ -3,14 +3,14 @@
 #define MAX_DOUBLE_LENGTH 100
 #define DOUBLE_RESOLUTION 3
 
-#include <stdint.h>
+#include <signal.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
-#include <unistd.h>
-#include <sys/wait.h>
 #include <sys/pselect.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #define EOF ((char)-1)
 #define LCTRL ((char)0x1D)
 
@@ -38,7 +38,9 @@ char *sPrintf(char *format, ...);
 uint64_t sPuts(char *receiver, const char *source);
 char sPutChar(char *receiver, char c);
 static const double pi = 3.14159265359;
-uint64_t pow(double base, uint64_t exponent); // can't return doubles in userland because SSE registers aren't usable
+uint64_t pow(double base,
+             uint64_t exponent); // can't return doubles in userland because SSE
+                                 // registers aren't usable
 char isPrefix(char *prefix, char *word);
 char isFirstWord(char *s1, char *firstWord);
 uint64_t getHours();

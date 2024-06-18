@@ -2,8 +2,8 @@
 #define PMMN_H
 
 #include <mman.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef uint32_t map_entry;
 
@@ -17,23 +17,18 @@ typedef uint32_t map_entry;
 #define HEAD_SIZE 2
 #define BLOCK 256
 
-#define IS_BIT_SET(x, i) (((x)[(i) >> 3] & (1 << ((i) & 7))) != 0)
-#define SET_BIT(x, i) (x)[(i) >> 3] |= (1 << ((i) & 7))
-#define CLEAR_BIT(x, i) (x)[(i) >> 3] &= (1 << ((i) & 7)) ^ 0xFF
+#define IS_BIT_SET(x, i) (((x)[(i) >> 3] & (1 << ((i)&7))) != 0)
+#define SET_BIT(x, i) (x)[(i) >> 3] |= (1 << ((i)&7))
+#define CLEAR_BIT(x, i) (x)[(i) >> 3] &= (1 << ((i)&7)) ^ 0xFF
 
 #define IS_LEFT(i) ((i) % 2)
 #define GET_LEFT(i) (((i) << 1) + 1)
 #define GET_RIGHT(i) (((i) << 1) + 2)
-#define GET_PARENT(i) (((i) - 1) >> 1)
-#define GET_BROTHER(i) (IS_LEFT(i) ? GET_RIGHT(GET_PARENT(i)) : GET_LEFT(GET_PARENT(i)))
+#define GET_PARENT(i) (((i)-1) >> 1)
+#define GET_BROTHER(i)                                                         \
+  (IS_LEFT(i) ? GET_RIGHT(GET_PARENT(i)) : GET_LEFT(GET_PARENT(i)))
 
-typedef enum states
-{
-    EMPTY = 0,
-    SPLIT,
-    FULL,
-    ALLOCATED
-} states;
+typedef enum states { EMPTY = 0, SPLIT, FULL, ALLOCATED } states;
 
 #define MEM_START ((char *)0x18000000)
 #define MEM_END ((char *)0x1C000000)
@@ -49,7 +44,8 @@ size_t mem_size(size_t index);
 size_t map_index_to_mem_index(size_t index);
 size_t mem_index_to_map_index(size_t index);
 /**
- * @brief dfs algorithm, searches for a node that represents the smallest unit of memory that can fit the request
+ * @brief dfs algorithm, searches for a node that represents the smallest unit
+ * of memory that can fit the request
  */
 size_t find_buddy(size_t size, size_t index, size_t current_size);
 

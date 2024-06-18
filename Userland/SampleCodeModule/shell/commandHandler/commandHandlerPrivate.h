@@ -13,11 +13,10 @@ typedef moduleData (*action_t)(moduleData, displayStyles *);
  * @brief For referencing a module's wrapper
  *
  */
-typedef struct command
-{
-    char *code;
-    char *help;
-    action_t action;
+typedef struct command {
+  char *code;
+  char *help;
+  action_t action;
 } command;
 /**
  * @brief Adds a command to the list of commands stored in the commandHandler

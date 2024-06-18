@@ -1,9 +1,9 @@
 #ifndef STDOUT_H
 #define STDOUT_H
 
-#include <stdint.h>
-#include <stdbool.h>
 #include <semaphores.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 /**
  * @brief Set up stdout

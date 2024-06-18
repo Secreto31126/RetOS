@@ -5,15 +5,14 @@
 #define TEXT_BOARD_WIDTH 36
 #define TEXT_BOARD_HEIGHT 24
 #include "./../../window/window.h"
-typedef struct snakeDrawing
-{
-    int drawSize;
-    char *headDrawing;
-    char *bodyDrawing;
-    char *tailDrawing;
-    char *turnDrawing;
-    char *growItemDrawing;
-    HexColor *growItemColorMap;
+typedef struct snakeDrawing {
+  int drawSize;
+  char *headDrawing;
+  char *bodyDrawing;
+  char *tailDrawing;
+  char *turnDrawing;
+  char *growItemDrawing;
+  HexColor *growItemColorMap;
 } snakeDrawing;
 
 // cycles through currentDrawing

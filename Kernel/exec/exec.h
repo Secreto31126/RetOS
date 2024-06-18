@@ -1,12 +1,12 @@
 #ifndef PEXE_H
 #define PEXE_H
 
+#include <memory.h>
 #include <mman.h>
 #include <proc.h>
-#include <ticks.h>
-#include <string.h>
 #include <stdint.h>
-#include <memory.h>
+#include <string.h>
+#include <ticks.h>
 
 #define EXECUTABLES 12
 #define MAX_ARGS 32
@@ -24,20 +24,19 @@ typedef void (*EntryPoint)(void);
 /**
  * @brief Executable file
  */
-typedef struct
-{
-    /**
-     * @brief Executable filename
-     */
-    char *filename;
-    /**
-     * @brief Execute Permission (Bit wise RWX)
-     */
-    int mod;
-    /**
-     * @brief Executable code
-     */
-    EntryPoint main;
+typedef struct {
+  /**
+   * @brief Executable filename
+   */
+  char *filename;
+  /**
+   * @brief Execute Permission (Bit wise RWX)
+   */
+  int mod;
+  /**
+   * @brief Executable code
+   */
+  EntryPoint main;
 } Executable;
 
 /**
@@ -55,7 +54,8 @@ typedef char *Stack;
 extern Executable executables[EXECUTABLES];
 
 /**
- * @brief Validate the arguments and count them (not including the NULL terminator)
+ * @brief Validate the arguments and count them (not including the NULL
+ * terminator)
  *
  * @param argv The argument values, NULL terminated, it may be NULL and return 0
  * @return int argc if success, negative if error
@@ -63,23 +63,28 @@ extern Executable executables[EXECUTABLES];
 int check_args(char *const argv[]);
 /**
  * @brief Set the process' new arguments
- * @note Resets the process' RSP to the bottom of the stack and pushes the arguments there
+ * @note Resets the process' RSP to the bottom of the stack and pushes the
+ * arguments there
  *
  * @param argc The number of arguments
  * @param argv The argument values, NULL terminated
  * @param process The process to set the arguments to
  * @return RSP The new rsp pointer
  */
-RSP set_process_args(int argc, char const argv[MAX_ARGS][MAX_ARG_LEN], Process *process);
+RSP set_process_args(int argc, char const argv[MAX_ARGS][MAX_ARG_LEN],
+                     Process *process);
 /**
- * @brief Save the arguments somewhere, as long as it's not in the constantly moving stack
+ * @brief Save the arguments somewhere, as long as it's not in the constantly
+ * moving stack
  *
- * @param argc The number of arguments (asumes it was validated with check_args())
+ * @param argc The number of arguments (asumes it was validated with
+ * check_args())
  * @param argv The argument values, NULL terminated
  * @return void* The backup pointer
  */
 void *backup_argv_somewhere(int argc, char *const argv[]);
 
-extern void portal_to_userland(int argc, char *const argv[], Process *process, EntryPoint code);
+extern void portal_to_userland(int argc, char *const argv[], Process *process,
+                               EntryPoint code);
 
 #endif

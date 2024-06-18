@@ -1,20 +1,20 @@
 #ifndef PPRC_H
 #define PPRC_H
 
-#include <lib.h>
-#include <proc.h>
-#include <mman.h>
+#include <console.h>
 #include <files.h>
-#include <ticks.h>
+#include <lib.h>
+#include <memory.h>
+#include <mman.h>
+#include <proc.h>
 #include <sched.h>
-#include <unistd.h>
+#include <semaphores.h>
+#include <signal.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <memory.h>
-#include <signal.h>
-#include <console.h>
-#include <stdbool.h>
-#include <semaphores.h>
+#include <ticks.h>
+#include <unistd.h>
 
 #define MIN_STACK_SIZE 0x80000
 #define IDLE_STACK_SIZE 0x400
@@ -53,11 +53,13 @@ bool inherit_parents_house(Process *process);
 
 /**
  * @brief Wait for multiple fds to be read available
- * @note The process' pointers will be invalid while checking because the running stack is not loaded
- * Aka, you must allocate global memory to preserve the data
+ * @note The process' pointers will be invalid while checking because the
+ * running stack is not loaded Aka, you must allocate global memory to preserve
+ * the data
  *
  * @param pid The process' pid
- * @return true At least one file is available for reading or all files are closed
+ * @return true At least one file is available for reading or all files are
+ * closed
  * @return false No file is available for reading
  */
 bool multi_read_available(pid_t pid);
@@ -85,12 +87,14 @@ bool no_condition(pid_t pid);
 bool whim_condition(pid_t pid);
 
 /**
- * @brief Loop all the blocked processes and unblock them if the condition is met
+ * @brief Loop all the blocked processes and unblock them if the condition is
+ * met
  */
 void check_tick_blocked_processes();
 /**
  * @brief Add a process to the blocked queue
- * @note If the process is already blocked, it only updates the condition and data
+ * @note If the process is already blocked, it only updates the condition and
+ * data
  *
  * @note It could be a vaargs
  * @note ¯\_(ツ)_/¯
@@ -103,7 +107,9 @@ void check_tick_blocked_processes();
  * @param data3 Condition data
  * @param data4 Condition data
  */
-void add_tick_blocked(Process *p, ProcessBlockConditional condition, void *data0, void *data1, void *data2, void *data3, void *data4);
+void add_tick_blocked(Process *p, ProcessBlockConditional condition,
+                      void *data0, void *data1, void *data2, void *data3,
+                      void *data4);
 
 /**
  * @brief Add a process to the round robin queue
@@ -131,7 +137,8 @@ pid_t robin_remove(pid_t pid);
 /**
  * @brief Set the remainin ticks to 0
  * @note This function should only be called from sched_yield()
- * @note For the current implementation of the scheduler, this function is a noop
+ * @note For the current implementation of the scheduler, this function is a
+ * noop
  */
 void yield_robin();
 

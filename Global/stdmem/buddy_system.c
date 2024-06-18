@@ -33,30 +33,7 @@
 
 typedef enum states_m { EMPTY = 0, SPLIT, FULL, ALLOCATED } states_m;
 
-/*
-char *mem_start;
-char *mem_end;
-char *map_start;
-char *map_end;
 
-void set_heap(void *start, size_t_m size)
-{
-    // A complete binary tree has (2*LEAVES)-1 nodes
-    // Unit represents the number of MEMORY_BLOCK-NODE pairs that can fit into
-the given heap size_t_m unit = size / (BLOCK_M + HEAD_SIZE_M * 2 - 1);
-
-    mem_start = (char *)start;
-    mem_end = mem_start + round_to_power_of_two(BLOCK_M * unit);
-
-    map_start = mem_end;
-    // The binary tree must be complete to be properly mapped in an array
-    map_end = map_start + round_to_power_of_two((HEAD_SIZE_M * 2 - 1) * unit);
-
-    // Initialize binary tree
-    for (char *i = map_start; i < map_end; i++)
-        *((uint64_t *)i) = EMPTY;
-}
-*/
 void malloc_init() {
   // Initialize binary tree
   for (char *i = MAP_START_M; i < MAP_END_M; i++)
@@ -245,67 +222,3 @@ void free(void *ptr) {
     set_node_state(MAP_START_M,
                    mem_index_to_map_index(((char *)ptr) - MEM_START_M), EMPTY);
 }
-/*
-void print_m_rec(size_t_m i, size_t_m height, char avoid_empty);
-
-void print_m(char avoid_empty)
-{
-    printf("Printing memory-map tree\n");
-    printf("-----------------------------------------------------\n");
-    print_m_rec(0, 0, avoid_empty);
-    printf("-----------------------------------------------------\n");
-    printf("Printing map as binary\n");
-    printf("-----------------------------------------------------\n");
-    for (int i = 0; i < MAP_END_M - MAP_START_M; i++)
-    {
-        printf("%d", IS_BIT_SET(((char *)MAP_START_M), i));
-        if (i % 2)
-            printf(" ");
-    }
-    printf("\n");
-    printf("-----------------------------------------------------\n");
-}
-
-void print_m_data()
-{
-    printf("Map start:%lu\n\
-Map end:%lu\n\
-Dif:%lu\n\
-Mem start:%lu\n\
-Mem end:%lu\n\
-Dif:%lu\n",
-           (uint64_t)MAP_START_M, (uint64_t)MAP_END_M, (uint64_t)(MAP_END_M -
-MAP_START_M), (uint64_t)MEM_START_M, (uint64_t)MEM_END_M,
-(uint64_t)(MEM_SIZE_M));
-}
-
-void print_m_rec(size_t_m i, size_t_m height, char avoid_empty)
-{
-    if (i < 0 || i > (MAP_END_M - MAP_START_M) * 2)
-        return;
-
-    states_m s = read_state(MAP_START_M, i);
-    // avoid empty branches
-    if (s == EMPTY && avoid_empty)
-        return;
-
-    print_m_rec(GET_LEFT(i), height + 1, avoid_empty);
-    for (int i = 0; i < height; i++)
-        printf("  ");
-
-    if (s == EMPTY)
-        printf("E\n");
-    else if (s == SPLIT)
-        printf("S\n");
-    else if (s == FULL)
-        printf("F\n");
-    else
-        printf("A\n");
-
-    print_m_rec(GET_RIGHT(i), height + 1, avoid_empty);
-}
-*/
-
-// Damn, this project works
-// It is slightly beautiful
-// I am slightly proud

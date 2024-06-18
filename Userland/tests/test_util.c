@@ -79,6 +79,3 @@ void endless_loop_print(uint64_t wait) {
     bussy_wait(wait);
   }
 }
-
-// ours
-int puts(char *s) { return write(1, s, strlen(s)); }

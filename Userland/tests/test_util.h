@@ -1,5 +1,8 @@
 #include <stdint.h>
+#include <string.h>
 #include <sys.h>
+
+#define puts(str) write(1, (str), strlen(str))
 
 uint32_t GetUint();
 uint32_t GetUniform(uint32_t max);

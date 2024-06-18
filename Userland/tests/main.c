@@ -11,8 +11,6 @@ extern char bss;
 extern char endOfBinary;
 #define MIN_WAIT 10
 
-#define puts(str) write(1, (str), strlen(str))
-
 int main(int argc, char *argv[]) {
   malloc_init();
   if (argc < 1) {

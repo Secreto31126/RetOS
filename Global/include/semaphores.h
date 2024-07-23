@@ -1,10 +1,9 @@
 #ifndef GSEM_H
 #define GSEM_H
 
-typedef struct
-{
-    char name[32];
-    unsigned int value;
+typedef struct {
+  char name[32];
+  unsigned int value;
 } sem_t;
 
 /**

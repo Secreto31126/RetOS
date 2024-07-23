@@ -1,9 +1,9 @@
 #ifndef STDIN_H
 #define STDIN_H
 
-#include <stdint.h>
-#include <stdbool.h>
 #include <semaphores.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 /**
  * @brief Set up stdin

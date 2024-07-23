@@ -1,8 +1,8 @@
     global read
     global write
     global draw
-    global malloc
-    global free
+    global pshm
+    global free_shm
 	global get_unix_time
     global get_screen_size
     global beep
@@ -51,14 +51,14 @@ draw:
     int 80h
     ret
 
-; uint64_t malloc(uint32_t size);
-malloc:
+; uint64_t pshm(uint32_t size);
+pshm:
     mov rax, 3
     int 80h
     ret
 
-; void free(uint64_t ptr);
-free:
+; void free_shm(uint64_t ptr);
+free_shm:
     mov rax, 4
     int 80h
     ret

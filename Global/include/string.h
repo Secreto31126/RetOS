@@ -34,7 +34,8 @@ size_t strlen(const char *str);
 
 /**
  * @brief Copy src to dst, truncating or null-padding to always copy n bytes.
- * @see https://android.googlesource.com/platform/bionic/+/a27d2baa/libc/string/strncpy.c
+ * @see
+ * https://android.googlesource.com/platform/bionic/+/a27d2baa/libc/string/strncpy.c
  *
  * @param dest The destination buffer
  * @param src The source buffer
@@ -45,7 +46,8 @@ char *strncpy(char *dest, const char *src, size_t n);
 
 /**
  * @brief Copy src to dest, including the terminating '\0' character.
- * @see https://android.googlesource.com/platform/bionic/+/a27d2baa/libc/string/strcpy.c
+ * @see
+ * https://android.googlesource.com/platform/bionic/+/a27d2baa/libc/string/strcpy.c
  *
  * @param dest The destination buffer
  * @param src The source buffer
@@ -64,7 +66,8 @@ char *strcat(char *dest, const char *src);
 
 /**
  * @brief Find the index of a substring in a string
- * @see https://android.googlesource.com/platform/bionic/+/ics-mr0/libc/string/strstr.c
+ * @see
+ * https://android.googlesource.com/platform/bionic/+/ics-mr0/libc/string/strstr.c
  *
  * @param s The string to search in
  * @param find The substring to search for

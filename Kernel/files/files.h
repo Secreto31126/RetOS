@@ -3,15 +3,15 @@
 
 #include <files.h>
 
-#include <sys/types.h>
 #include <console.h>
-#include <stddef.h>
-#include <stdin.h>
-#include <stdout.h>
-#include <stderr.h>
-#include <stdkey.h>
 #include <pipes.h>
 #include <proc.h>
+#include <stddef.h>
+#include <stderr.h>
+#include <stdin.h>
+#include <stdkey.h>
+#include <stdout.h>
+#include <sys/types.h>
 
 typedef bool (*FileEmpty)();
 typedef void (*FileFlusher)();

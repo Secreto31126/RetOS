@@ -1,11 +1,11 @@
 #ifndef PIP_H
 #define PIP_H
 
-#include <stddef.h>
-#include <stdbool.h>
 #include <proc.h>
+#include <stdbool.h>
+#include <stddef.h>
 
-#define IS_PIPE(x) ((x) & O_PIPE)
+#define IS_PIPE(x) ((x)&O_PIPE)
 
 /**
  * @brief Add an end to a pipe

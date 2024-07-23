@@ -1,9 +1,9 @@
 #ifndef LIB_H
 #define LIB_H
 
-#include <stdint.h>
-#include <stddef.h>
 #include <memory.h>
+#include <stddef.h>
+#include <stdint.h>
 
 /**
  * @brief Send QEMU a shutdown signal, or halt the CPU if failed

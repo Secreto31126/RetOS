@@ -7,91 +7,71 @@ static sem_t sem;
 
 #define INC(x) ((x) = ((x) + 1) % BUF_SIZE)
 
-int init_stderr()
-{
-    return sem_init(&sem, 1, 0);
+int init_stderr() { return sem_init(&sem, 1, 0); }
+
+static char getc() {
+  char c = buffer[reader];
+  INC(reader);
+  on_your_left = 0;
+  return c;
 }
 
-static char getc()
-{
-    char c = buffer[reader];
+static void putc(uint8_t c) {
+  buffer[writer] = c;
+  INC(writer);
+
+  if (on_your_left) {
     INC(reader);
-    on_your_left = 0;
-    return c;
+  } else if (reader == writer) {
+    on_your_left = 1;
+  }
 }
 
-static void putc(uint8_t c)
-{
-    buffer[writer] = c;
-    INC(writer);
+uint16_t read_stderr(uint8_t *buf, uint16_t len) {
+  __label__ read;
 
-    if (on_your_left)
-    {
-        INC(reader);
-    }
-    else if (reader == writer)
-    {
-        on_your_left = 1;
-    }
-}
+  if (!len) {
+    return 0;
+  }
 
-uint16_t read_stderr(uint8_t *buf, uint16_t len)
-{
-    __label__ read;
-
-    if (!len)
-    {
-        return 0;
-    }
-
-    int i = 0;
+  int i = 0;
 read:
-    while (i < len)
-    {
-        if (stderr_empty())
-        {
-            break;
-        }
-
-        buf[i++] = getc();
+  while (i < len) {
+    if (stderr_empty()) {
+      break;
     }
 
-    if (!i)
-    {
-        sem_wait(&sem);
-        goto read;
-    }
+    buf[i++] = getc();
+  }
 
-    return i;
+  if (!i) {
+    sem_wait(&sem);
+    goto read;
+  }
+
+  return i;
 }
 
-uint16_t write_stderr(uint8_t *buf, uint16_t len)
-{
-    // Only read the latest message (dump)
-    reader = writer;
+uint16_t write_stderr(uint8_t *buf, uint16_t len) {
+  // Only read the latest message (dump)
+  reader = writer;
 
-    int i = 0;
-    while (i < len)
-    {
-        putc(buf[i++]);
-    }
+  int i = 0;
+  while (i < len) {
+    putc(buf[i++]);
+  }
 
-    int value;
-    if (!sem_getvalue(&sem, &value) && !value)
-    {
-        sem_post(&sem);
-    }
+  int value;
+  if (!sem_getvalue(&sem, &value) && !value) {
+    sem_post(&sem);
+  }
 
-    return i;
+  return i;
 }
 
-bool stderr_empty()
-{
-    return reader == writer && !on_your_left;
-}
+bool stderr_empty() { return reader == writer && !on_your_left; }
 
-void flush_stderr()
-{
-    reader = writer;
-    on_your_left = 0;
+void flush_stderr() {
+  reader = writer;
+  on_your_left = 0;
 }

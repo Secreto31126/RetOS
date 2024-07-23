@@ -8,8 +8,8 @@
  * @brief A table of conversion from scancode to UTF16 code for the selected
  * keyboard layout
  *
- * @details keyboard_scancodes[scaned_code][modifier], where modifier is 0 for no
- * modifier, 1 for shift and 2 for alt gr
+ * @details keyboard_scancodes[scaned_code][modifier], where modifier is 0 for
+ * no modifier, 1 for shift and 2 for alt gr
  */
 static uint16_t const (*keyboard_scancodes)[3];
 
@@ -173,28 +173,25 @@ static uint16_t const english_keyboard_layout[][3] = {
     // F12
 };
 
-void set_keyboard_language(Language lang)
-{
-    switch (lang)
-    {
-    case ES_AR:
-    case FR_FR:
-        // Nah, I'm too lazy to do France too
-        keyboard_scancodes = spanish_keyboard_layout;
-        break;
-    case EN_US_4:
-        keyboard_scancodes = english_keyboard_layout;
-        break;
-    default:
-        break;
-    }
+void set_keyboard_language(Language lang) {
+  switch (lang) {
+  case ES_AR:
+  case FR_FR:
+    // Nah, I'm too lazy to do France too
+    keyboard_scancodes = spanish_keyboard_layout;
+    break;
+  case EN_US_4:
+    keyboard_scancodes = english_keyboard_layout;
+    break;
+  default:
+    break;
+  }
 }
 
-uint16_t get_scancode_utf16(uint8_t scancode, uint8_t modifier)
-{
-    if (scancode > LAZY_KEYBOARD_LAYOUT_LIMIT)
-        return 0;
-    if (modifier > 2)
-        return 0;
-    return keyboard_scancodes[scancode][modifier];
+uint16_t get_scancode_utf16(uint8_t scancode, uint8_t modifier) {
+  if (scancode > LAZY_KEYBOARD_LAYOUT_LIMIT)
+    return 0;
+  if (modifier > 2)
+    return 0;
+  return keyboard_scancodes[scancode][modifier];
 }

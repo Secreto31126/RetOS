@@ -7,15 +7,13 @@ static FileFlusher readers[] = {
     flush_stdkey,
 };
 
-int flush(int fd)
-{
-    int file = get_current_process()->files[fd];
+int flush(int fd) {
+  int file = get_current_process()->files[fd];
 
-    if (0 <= file && file < 4)
-    {
-        readers[file]();
-        return 0;
-    }
+  if (0 <= file && file < 4) {
+    readers[file]();
+    return 0;
+  }
 
-    return -1;
+  return -1;
 }

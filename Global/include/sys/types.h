@@ -1,8 +1,8 @@
 #ifndef GTPE_H
 #define GTPE_H
 
-#include <stddef.h>
 #include <limits.h>
+#include <stddef.h>
 
 /**
  * @brief Used for a count of bytes or an error indication.

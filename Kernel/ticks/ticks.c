@@ -1,5 +1,5 @@
-#include <ticks.h>
 #include <lib.h>
+#include <ticks.h>
 
 static uint64_t current_tick = 0;
 
@@ -13,43 +13,38 @@ static uint64_t current_tick = 0;
 // static uint8_t active_tasks = 0;
 // static Task shedule[MAX_TASKS];
 
-uint64_t get_tick()
-{
-    return current_tick;
+uint64_t get_tick() { return current_tick; }
+
+void update_tick() {
+  // Every second
+  // if (!(current_tick % 18))
+  // {
+  //     update_header();
+  // }
+
+  current_tick++;
+
+  // uint8_t counted = 0;
+  // for (uint8_t i = 0; counted < active_tasks && i < MAX_TASKS; i++)
+  // {
+  //     if (!shedule[i].task)
+  //         continue;
+
+  //     if (shedule[i].tick <= current_tick)
+  //     {
+  //         shedule[i].task();
+  //         shedule[i].task = 0;
+  //         active_tasks--;
+  //     }
+  //     else
+  //         counted++;
+  // }
 }
 
-void update_tick()
-{
-    // Every second
-    // if (!(current_tick % 18))
-    // {
-    //     update_header();
-    // }
-
-    current_tick++;
-
-    // uint8_t counted = 0;
-    // for (uint8_t i = 0; counted < active_tasks && i < MAX_TASKS; i++)
-    // {
-    //     if (!shedule[i].task)
-    //         continue;
-
-    //     if (shedule[i].tick <= current_tick)
-    //     {
-    //         shedule[i].task();
-    //         shedule[i].task = 0;
-    //         active_tasks--;
-    //     }
-    //     else
-    //         counted++;
-    // }
-}
-
-void sleep_ticks(uint64_t ticks)
-{
-    uint64_t end = current_tick + ticks;
-    while (current_tick < end)
-        halt_once();
+void sleep_ticks(uint64_t ticks) {
+  uint64_t end = current_tick + ticks;
+  while (current_tick < end)
+    halt_once();
 }
 
 // void add_task(uint64_t ticks, Callback task)

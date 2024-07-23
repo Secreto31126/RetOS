@@ -1,8 +1,8 @@
 #ifndef MMN_H
 #define MMN_H
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #define NULL ((void *)0)
 
@@ -22,8 +22,10 @@ int memory_state(char *output, size_t length);
 /**
  * @brief Reserves a block of memory of the given size.
  *
- * @param size The size of the block to reserve. Returns NULL if size is 0 or over 0x8000.
- * @return void* A pointer to the reserved block of memory. Returns NULL if there is not enough memory.
+ * @param size The size of the block to reserve. Returns NULL if size is 0 or
+ * over 0x8000.
+ * @return void* A pointer to the reserved block of memory. Returns NULL if
+ * there is not enough memory.
  */
 void *malloc(uint32_t size);
 /**

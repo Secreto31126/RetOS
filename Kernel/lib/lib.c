@@ -11,6 +11,16 @@ void power_off()
     }
 }
 
+uint16_t endian_word(uint16_t val)
+{
+    return (val >> 8) | (val << 8);
+}
+
+uint32_t endian_dword(uint32_t val)
+{
+    return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val & 0xFF000000) >> 24);
+}
+
 void dump_regs_hex_magician(unsigned char *s, uint8_t r)
 {
     unsigned char hextable[] = "0123456789ABCDEF";

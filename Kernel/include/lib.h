@@ -9,6 +9,20 @@
  * @brief Send QEMU a shutdown signal, or halt the CPU if failed
  */
 void power_off(void);
+/**
+ * @brief Change the endianess of a 16 bit value
+ * 
+ * @param val The value to change
+ * @return uint16_t The changed value
+ */
+uint16_t endian_word(uint16_t val);
+/**
+ * @brief Change the endianess of a 32 bit value
+ * 
+ * @param val The value to change
+ * @return uint32_t The changed value
+ */
+uint32_t endian_dword(uint32_t val);
 
 extern char *cpuVendor(char *result);
 

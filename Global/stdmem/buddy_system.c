@@ -1,6 +1,6 @@
+#include <stdint.h>
 #include <stdmem.h>
 #include <unistd.h>
-#include <stdint.h>
 // I have decided that the correct implementation for a buddy system's memory
 // map is a binary tree Of course, since a binary tree is traditionally just a
 // two-tailed list there are two options Use a naïve malloc to manage this
@@ -33,7 +33,6 @@
 #define MEM_END_M (((char *)sbrk(0)) + MEM_SIZE_M)
 
 typedef enum states_m { EMPTY = 0, SPLIT, FULL, ALLOCATED } states_m;
-
 
 void malloc_init() {
   // Initialize binary tree

@@ -1,6 +1,6 @@
-#include <pci.h>
-#include <lib.h>
 #include <console.h>
+#include <lib.h>
+#include <pci.h>
 #include <stdbool.h>
 
 #define RTL_VENDOR_ID 0x10EC

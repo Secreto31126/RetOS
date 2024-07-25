@@ -12,6 +12,7 @@
 #include <stderr.h>
 #include <stdin.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdkey.h>
 #include <stdout.h>
 #include <tasker.h>
@@ -120,7 +121,24 @@ void *initializeKernelBinary()
 
     ncPrint("Enabling interruptions");
     set_interrupt_flag();
-    ncPrint(" [Done]\n");
+    ncPrint(" [Done]\n\n");
+
+    ncPrint("[Retrieving IP from Network]\n");
+
+    unsigned char ip[IPV4_LENGTH];
+    dhcp_discover();
+
+    while (!gethostaddr(ip))
+    {
+        halt_once();
+    }
+
+    char ip_str[20];
+    snprintf(ip_str, 20, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+
+    ncPrint("\tIPv4: ");
+    ncPrint(ip_str);
+    ncPrint("\n[Done]\n");
 
     ncClear();
 

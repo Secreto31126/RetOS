@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stdkey.h>
 #include <stdout.h>
+#include <tasker.h>
 #include <unistd.h>
 
 extern uint8_t text;
@@ -22,6 +23,8 @@ extern uint8_t data;
 extern uint8_t bss;
 extern uint8_t endOfKernelBinary;
 extern uint8_t endOfKernel;
+
+extern pid_t kfork(void);
 
 static void *const sampleCodeModuleAddress = (void *)0x400000;
 static void *const sampleDataModuleAddress = (void *)0x500000;
@@ -127,9 +130,26 @@ void idle(pid_t child_pid)
 {
     if (!child_pid)
     {
-        char *argv[] = {"I'm in Userland!", "Hell yeah!", ":]", NULL};
-        ncPrintDec(execv("init", argv));
-        ncPrint(" error: Failed to start userland\n");
+        pid_t daemon_pid = kfork();
+
+        if (!daemon_pid)
+        {
+            // I'm a kernel daemon :)
+            tasker_daemon();
+            // Should never reach here
+            _exit(0);
+        }
+
+        else
+        {
+            if (daemon_pid < 0)
+            {
+                ncPrint("Error: Failed to start the tasker daemon\n");
+            }
+
+            ncPrintDec(execv("init", NULL));
+            ncPrint(" error: Failed to start userland\n");
+        }
     }
     else
     {

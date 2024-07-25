@@ -25,6 +25,7 @@ extern uint8_t endOfKernelBinary;
 extern uint8_t endOfKernel;
 
 extern pid_t kfork(void);
+extern void daemon_init(void (*daemon)(void));
 
 static void *const sampleCodeModuleAddress = (void *)0x400000;
 static void *const sampleDataModuleAddress = (void *)0x500000;
@@ -135,11 +136,11 @@ void idle(pid_t child_pid)
         if (!daemon_pid)
         {
             // I'm a kernel daemon :)
+            // daemon_init(tasker_daemon);
             tasker_daemon();
             // Should never reach here
             _exit(0);
         }
-
         else
         {
             if (daemon_pid < 0)

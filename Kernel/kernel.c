@@ -114,6 +114,10 @@ void *initializeKernelBinary()
     void *rsp = create_process_idle();
     ncPrint(" [Done]\n");
 
+    ncPrint("Enabling interruptions");
+    set_interrupt_flag();
+    ncPrint(" [Done]\n");
+
     ncClear();
 
     return rsp;

@@ -10,7 +10,6 @@ loader:
 
 	; Start using the idle stack
 	mov		rsp, rax
-	sti
 
 	; Fork the first process
 	mov		rax, 0xF

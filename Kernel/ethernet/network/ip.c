@@ -29,21 +29,30 @@ void ip_handle_packet(IPPacket *packet, int length)
         get_ip_str(src_ip, packet->src_ip);
         ncPrint(src_ip);
 
+        ncPrint(" to ");
+
+        char dst_ip[20];
+        get_ip_str(dst_ip, packet->dst_ip);
+        ncPrint(dst_ip);
+
         ncPrint(" with protocol ");
 
         switch (packet->protocol)
         {
         case PROTOCOL_UDP:
             ncPrint("UDP\n");
+            ncPrintHex(*(uint32_t *)data_ptr);
+            ncNewline();
             udp_handle_packet(data_ptr, data_length, packet->src_ip, packet->dst_ip);
             break;
 
         case PROTOCOL_TCP:
             ncPrint("TCP\n");
-            // tcp_handle_packet(data_ptr, data_length, packet->src_ip);
+            // tcp_handle_packet(data_ptr, data_length, packet->src_ip, packet->dst_ip);
             break;
 
         default:
+            ncPrint("Unknown\n");
             break;
         }
     }
@@ -51,15 +60,17 @@ void ip_handle_packet(IPPacket *packet, int length)
 
 int ip_send_packet(uint8_t *dst_ip, void *data, int length, uint8_t protocol)
 {
-    IPPacket *packet = malloc(sizeof(IPPacket) + length);
+    int packet_length = sizeof(IPPacket) + length;
+
+    IPPacket *packet = malloc(packet_length);
     memset(packet, 0, sizeof(IPPacket));
 
     packet->version = IP_IPV4;
-    // 5 * 4 = 20 byte
+    // No options
     packet->ihl = 5;
     // Don't care, set to 0
     packet->tos = 0;
-    packet->length = sizeof(IPPacket) + length;
+    packet->length = endian_word(packet_length);
     // Used for ip fragmentation, don't care now
     packet->id = 0;
     // Tell router to not divide the packet, and this is packet is the last piece of the fragments.
@@ -67,19 +78,18 @@ int ip_send_packet(uint8_t *dst_ip, void *data, int length, uint8_t protocol)
     packet->fragment_offset_high = 0;
     packet->fragment_offset_low = 0;
 
-    packet->ttl = 64;
+    packet->ttl = 255;
     packet->protocol = protocol;
 
     gethostaddr(packet->src_ip);
     memcpy(packet->dst_ip, dst_ip, IPV4_LENGTH);
 
-    void *packet_data = (void *)packet + packet->ihl * 4;
+    void *packet_data = packet->data;
     memcpy(packet_data, data, length);
 
     // Fix packet data order
     *((uint8_t *)(&packet->version_ihl_ptr)) = htonb(*((uint8_t *)(&packet->version_ihl_ptr)), 4);
     *((uint8_t *)(packet->flags_fragment_ptr)) = htonb(*((uint8_t *)(packet->flags_fragment_ptr)), 3);
-    packet->length = endian_word(sizeof(IPPacket) + length);
 
     // Make sure checksum is 0 before checksum calculation
     packet->header_checksum = 0;
@@ -101,7 +111,7 @@ int ip_send_packet(uint8_t *dst_ip, void *data, int length, uint8_t protocol)
     }
 
     // Got the mac address! Now send an ethernet packet
-    int sent = transmit(dst_hardware_addr, packet, endian_word(packet->length), ETHERNET_TYPE_IPV4);
+    int sent = transmit(dst_hardware_addr, packet, packet_length, ETHERNET_TYPE_IPV4);
 
     free(packet);
 
@@ -110,11 +120,10 @@ int ip_send_packet(uint8_t *dst_ip, void *data, int length, uint8_t protocol)
 
 static int delayed_ip_send_packet(IPPacket *packet)
 {
-    int arp_sent = 3;
-
     uint8_t dst_ip[IPV4_LENGTH];
     memcpy(dst_ip, packet->dst_ip, IPV4_LENGTH);
 
+    int arp_sent = 3;
     while (arp_sent--)
     {
         // Send an arp request

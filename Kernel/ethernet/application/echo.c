@@ -28,11 +28,13 @@ void echo_handle_packet(void *packet, uint16_t length, uint8_t src_ip[IPV4_LENGT
     ncPrintDec(src_port);
     ncPrint(" - ");
 
-    char *data = malloc(length + 1);
-    snprintf(data, length, "%s", packet);
+    char *data = malloc(length + 2);
+    snprintf(data, length + 1, "%s\n", packet);
     ncPrint(data);
-
-    udp_send_packet(src_ip, dst_port, src_port, packet, length);
-
     free(data);
+
+    if (src_port)
+    {
+        udp_send_packet(src_ip, dst_port, 3876, packet, length);
+    }
 }

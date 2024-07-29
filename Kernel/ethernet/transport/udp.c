@@ -32,7 +32,7 @@ void udp_handle_packet(UDPPacket *packet, uint16_t length, uint8_t src_ip[IPV4_L
     uint16_t dst_port = endian_word(packet->dst_port);
 
     void *data_ptr = (void *)packet + sizeof(UDPPacket);
-    uint16_t data_length = endian_word(packet->length);
+    uint16_t data_length = endian_word(packet->length) - sizeof(UDPPacket);
 
     Port port = Ports[dst_port];
     if ((port.protocol & PROTOCOL_UDP) == PROTOCOL_UDP && port.handler != NULL)

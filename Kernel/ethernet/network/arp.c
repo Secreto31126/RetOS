@@ -1,5 +1,7 @@
 #include "arp.h"
 
+#include <stdio.h>
+
 #define ARP_REQUEST 1
 #define ARP_REPLY 2
 
@@ -11,7 +13,7 @@
  * @param mac_addr The MAC address
  * @param ip_addr The IP address
  */
-static void arp_lookup_add(uint8_t *mac_addr, uint8_t *ip_addr);
+static void arp_lookup_upsert(uint8_t *mac_addr, uint8_t *ip_addr);
 
 static ARPTableEntry arp_table[ARP_TABLE_SIZE];
 static signed int arp_table_size = 0;
@@ -26,21 +28,29 @@ void arp_handle_packet(ARPPacket *packet, int length)
     memcpy(dst_mac_addr, packet->src_hardware_addr, MAC_LENGTH);
     memcpy(dst_ip_addr, packet->src_protocol_addr, IPV4_LENGTH);
 
-    ncPrint("Got ARP\n");
-
     if (endian_word(packet->hardware_type) != HARDWARE_TYPE_ETHERNET || endian_word(packet->protocol) != ETHERNET_TYPE_IPV4)
     {
         return;
     }
 
+    char ip[IPV4_LENGTH * 4 + 1];
+    get_ip_str(ip, packet->dst_protocol_addr);
+    ncPrint(ip);
+
+    ncPrint(": ARP ");
+
     // Store the ip-mac address mapping relation
-    arp_lookup_add(dst_mac_addr, dst_ip_addr);
+    arp_lookup_upsert(dst_mac_addr, dst_ip_addr);
 
     // Reply arp request, if the ip address matches
     if (endian_word(packet->opcode) == ARP_REQUEST)
     {
+        ncPrint("REQUEST\n");
+
         uint8_t host_ip[IPV4_LENGTH];
-        gethostaddr(host_ip);
+        if (!gethostaddr(host_ip)) {
+            return;
+        }
 
         if (memcmp(packet->dst_protocol_addr, host_ip, IPV4_LENGTH))
         {
@@ -78,10 +88,17 @@ void arp_handle_packet(ARPPacket *packet, int length)
     {
         // May be we can handle the case where we get a reply after sending a request, but i don't think my os will ever need to do so...
         // But RetOS will
-        ncPrint("Got ARP REPLY......................\n");
+        ncPrint("REPLY\n");
+
+        char mac[MAC_LENGTH * 4 + 1];
+        snprintf(mac, MAC_LENGTH * 4 + 1, "%02x:%02x:%02x:%02x:%02x:%02x", dst_mac_addr[0], dst_mac_addr[1], dst_mac_addr[2], dst_mac_addr[3], dst_mac_addr[4], dst_mac_addr[5]);
+        ncPrint("\tMAC: ");
+        ncPrint(mac);
+        ncNewline();
     }
     else
     {
+        ncNewline();
         // qemu_printf("Got unknown ARP, opcode = %d\n", packet->opcode);
     }
 }
@@ -119,15 +136,38 @@ int arp_send_packet(uint8_t dst_protocol_addr[IPV4_LENGTH])
     return sent;
 }
 
-static void arp_lookup_add(uint8_t *mac_addr, uint8_t *ip_addr)
+static void arp_lookup_upsert(uint8_t *mac_addr, uint8_t *ip_addr)
 {
-    memcpy(&arp_table[arp_table_curr].mac_addr, mac_addr, MAC_LENGTH);
-    memcpy(&arp_table[arp_table_curr].ip_addr, ip_addr, IPV4_LENGTH);
+    // memcpy(&arp_table[arp_table_curr].mac_addr, mac_addr, MAC_LENGTH);
+    // memcpy(&arp_table[arp_table_curr].ip_addr, ip_addr, IPV4_LENGTH);
+
+    // if (arp_table_size < ARP_TABLE_SIZE)
+    // {
+    //     arp_table_size++;
+    // }
+
+    // // Wrap around
+    // if (arp_table_curr++ >= ARP_TABLE_SIZE)
+    // {
+    //     arp_table_curr = 0;
+    // }
+
+    for (int i = 0; i < arp_table_size; i++)
+    {
+        if (arp_table[i].ip_addr == *((uint32_t *)ip_addr))
+        {
+            memcpy(&arp_table[i].mac_addr, mac_addr, MAC_LENGTH);
+            return;
+        }
+    }
 
     if (arp_table_size < ARP_TABLE_SIZE)
     {
         arp_table_size++;
     }
+
+    memcpy(&arp_table[arp_table_curr].mac_addr, mac_addr, MAC_LENGTH);
+    memcpy(&arp_table[arp_table_curr].ip_addr, ip_addr, IPV4_LENGTH);
 
     // Wrap around
     if (arp_table_curr++ >= ARP_TABLE_SIZE)
@@ -138,25 +178,13 @@ static void arp_lookup_add(uint8_t *mac_addr, uint8_t *ip_addr)
 
 bool arp_lookup(uint8_t mac_addr[MAC_LENGTH], uint8_t ip_addr[IPV4_LENGTH])
 {
-    if (!arp_table_size)
-    {
-        return false;
-    }
-
     uint32_t ip = *((uint32_t *)(ip_addr));
-
-    int last_to_check = arp_table_curr ? arp_table_curr - 1 : arp_table_size - 1;
-    for (int i = arp_table_curr % arp_table_size;; i = (i + 1) % arp_table_size)
+    for (int i = 0; i < arp_table_size; i++)
     {
         if (arp_table[i].ip_addr == ip)
         {
             memcpy(mac_addr, &arp_table[i].mac_addr, MAC_LENGTH);
             return true;
-        }
-
-        if (i == last_to_check)
-        {
-            break;
         }
     }
 
@@ -171,5 +199,5 @@ void init_arp()
     memset(broadcast_mac, BROADCAST_MAC_PARTITION, MAC_LENGTH);
     memset(broadcast_ip, BROADCAST_IP_PARTITION, IPV4_LENGTH);
 
-    arp_lookup_add(broadcast_mac, broadcast_ip);
+    arp_lookup_upsert(broadcast_mac, broadcast_ip);
 }

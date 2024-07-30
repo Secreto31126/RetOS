@@ -41,8 +41,6 @@ void ip_handle_packet(IPPacket *packet, int length)
         {
         case PROTOCOL_UDP:
             ncPrint("UDP\n");
-            ncPrintHex(*(uint32_t *)data_ptr);
-            ncNewline();
             udp_handle_packet(data_ptr, data_length, packet->src_ip, packet->dst_ip);
             break;
 

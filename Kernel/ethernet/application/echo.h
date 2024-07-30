@@ -4,14 +4,9 @@
 #include "application.h"
 #include "../transport/transport.h"
 
-// typedef struct TLPPacket
-// {
-//     uint8_t data[25];
-// } __attribute__((packed)) TLPPacket;
-
 /**
  * @brief Broadcast a ECHO request (Application layer)
- * 
+ *
  * @param data The request data
  * @param length The length of the request
  * @param dst_ip The destination IP address
@@ -20,10 +15,9 @@
  * @return int The number of bytes sent, -1 if request failed
  */
 int echo_request(void *data, int length, uint8_t dst_ip[IPV4_LENGTH], uint16_t src_port, uint16_t dst_port);
-// int tlp_request(void *request_ip);
 /**
  * @brief Handle ECHO offer packet (Application layer)
- * 
+ *
  * @param packet The ECHO packet
  * @param length The length of the packet
  * @param src_ip The source IP address
@@ -31,7 +25,6 @@ int echo_request(void *data, int length, uint8_t dst_ip[IPV4_LENGTH], uint16_t s
  * @param src_port The source port
  * @param dst_port The destination port
  */
-// void tlp_handle_packet(void *packet, uint16_t length, uint8_t src_ip[IPV4_LENGTH], uint8_t dst_ip[IPV4_LENGTH], uint8_t src_port, uint8_t dst_port);
 void echo_handle_packet(void *packet, uint16_t length, uint8_t src_ip[IPV4_LENGTH], uint8_t dst_ip[IPV4_LENGTH], uint16_t src_port, uint16_t dst_port);
 
 #endif

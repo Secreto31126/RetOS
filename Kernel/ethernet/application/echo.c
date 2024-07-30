@@ -35,6 +35,6 @@ void echo_handle_packet(void *packet, uint16_t length, uint8_t src_ip[IPV4_LENGT
 
     if (src_port)
     {
-        udp_send_packet(src_ip, dst_port, 3876, packet, length);
+        udp_send_packet(src_ip, dst_port, src_port, packet, length);
     }
 }

@@ -4,7 +4,7 @@
 
 static uint16_t udp_calculate_checksum(UDPPacket *packet);
 
-int udp_send_packet(uint8_t *dst_ip, uint16_t src_port, uint16_t dst_port, void *data, int length)
+int udp_send_packet(uint8_t dst_ip[IPV4_LENGTH], uint16_t src_port, uint16_t dst_port, void *data, int length)
 {
     UDPPacket *packet = malloc(sizeof(UDPPacket) + length);
     memset(packet, 0, sizeof(UDPPacket));
@@ -31,7 +31,7 @@ void udp_handle_packet(UDPPacket *packet, uint16_t length, uint8_t src_ip[IPV4_L
     uint16_t src_port = endian_word(packet->src_port);
     uint16_t dst_port = endian_word(packet->dst_port);
 
-    void *data_ptr = (void *)packet + sizeof(UDPPacket);
+    void *data_ptr = packet->data;
     uint16_t data_length = endian_word(packet->length) - sizeof(UDPPacket);
 
     Port port = Ports[dst_port];
@@ -39,8 +39,6 @@ void udp_handle_packet(UDPPacket *packet, uint16_t length, uint8_t src_ip[IPV4_L
     {
         port.handler(data_ptr, data_length, src_ip, dst_ip, src_port, dst_port);
     }
-
-    return;
 }
 
 static uint16_t udp_calculate_checksum(UDPPacket *packet)

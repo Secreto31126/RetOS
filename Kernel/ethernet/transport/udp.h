@@ -21,7 +21,7 @@ typedef struct UDPPacket {
  * @param len The length of the data
  * @return int The number of bytes sent, -1 if request failed
  */
-int udp_send_packet(uint8_t *dst_ip, uint16_t src_port, uint16_t dst_port, void *data, int len);
+int udp_send_packet(uint8_t dst_ip[IPV4_LENGTH], uint16_t src_port, uint16_t dst_port, void *data, int len);
 /**
  * @brief Handle UDP packet (Transport layer)
  * 

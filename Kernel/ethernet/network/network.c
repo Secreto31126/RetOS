@@ -53,11 +53,11 @@ int transmit(uint8_t *dest, const void *data, int length, uint16_t protocol)
     frame->type = endian_word(protocol);
     memcpy(frame_data, data, length);
 
-    ncPrint("Transmitting packet to ");
-    char mac_str[20];
-    snprintf(mac_str, 20, "%02x:%02x:%02x:%02x:%02x:%02x", frame->dest[0], frame->dest[1], frame->dest[2], frame->dest[3], frame->dest[4], frame->dest[5]);
-    ncPrint(mac_str);
-    ncNewline();
+    // ncPrint("Transmitting packet to ");
+    // char mac_str[20];
+    // snprintf(mac_str, 20, "%02x:%02x:%02x:%02x:%02x:%02x", frame->dest[0], frame->dest[1], frame->dest[2], frame->dest[3], frame->dest[4], frame->dest[5]);
+    // ncPrint(mac_str);
+    // ncNewline();
 
     int sent = rtl8139_send_packet(frame, sizeof(EthernetFrame) + length);
 

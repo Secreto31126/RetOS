@@ -1,5 +1,5 @@
-#ifndef PETHTLP_H
-#define PETHTLP_H
+#ifndef PETHECH_H
+#define PETHECH_H
 
 #include "application.h"
 #include "../transport/transport.h"

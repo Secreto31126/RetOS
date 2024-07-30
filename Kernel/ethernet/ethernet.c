@@ -10,7 +10,7 @@ static void add_port_handler(uint16_t port, uint16_t protocol, PORT_HANDLER hand
     Ports[port].handler = handler;
 }
 
-Port Ports[65536] = {{0}};
+Port Ports[MAX_PORTS] = {{0}};
 
 uint64_t init_ethernet()
 {

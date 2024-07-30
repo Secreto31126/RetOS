@@ -8,6 +8,8 @@
 #include <string.h>
 #include <tasker.h>
 
+#define MAX_PORTS 65536
+
 /**
  * @brief A handler for a port (UDP or TCP)
  */
@@ -18,7 +20,7 @@ typedef struct Port {
     PORT_HANDLER handler;
 } Port;
 
-extern Port Ports[65536];
+extern Port Ports[MAX_PORTS];
 
 typedef enum WELL_KNOWN_PORTS
 {

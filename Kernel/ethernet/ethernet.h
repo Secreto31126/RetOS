@@ -15,7 +15,8 @@
  */
 typedef void (*PORT_HANDLER)(void *data, uint16_t length, uint8_t src_ip[IPV4_LENGTH], uint8_t dst_ip[IPV4_LENGTH], uint16_t src_port, uint16_t dst_port);
 
-typedef struct Port {
+typedef struct Port
+{
     uint16_t protocol;
     PORT_HANDLER handler;
 } Port;
@@ -46,5 +47,12 @@ typedef enum WELL_KNOWN_PORTS
  * @return int The number of characters written
  */
 int get_ip_str(char *ip_str, uint8_t *ip);
+/**
+ * @brief Debug function to dump memory
+ *
+ * @param ptr The data to print
+ * @param length The length of the data
+ */
+void memdump(void *ptr, int length);
 
 #endif

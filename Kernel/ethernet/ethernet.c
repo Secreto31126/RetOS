@@ -4,6 +4,8 @@
 #include "application/echo.h"
 #include "application/dhcp.h"
 
+#include <stdio.h>
+
 static void add_port_handler(uint16_t port, uint16_t protocol, PORT_HANDLER handler)
 {
     Ports[port].protocol = protocol;
@@ -46,4 +48,22 @@ uint64_t get_MAC_address_64()
 void ethernet_manager()
 {
     rtl8139_handle_interrupt();
+}
+
+void memdump(void *ptr, int length)
+{
+    uint8_t *data = (uint8_t *)ptr;
+    for (int i = 0; i < length; i++)
+    {
+        if (i && !(i % 8))
+        {
+            ncNewline();
+        }
+
+        char buf[4];
+        snprintf(buf, 4, "%02x ", data[i]);
+        ncPrint(buf);
+    }
+
+    ncNewline();
 }

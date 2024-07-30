@@ -16,7 +16,7 @@ int echo_request(void *data, int length, uint8_t dst_ip[IPV4_LENGTH], uint16_t s
     return sent;
 }
 
-void echo_handle_packet(void *packet, uint16_t length, uint8_t src_ip[IPV4_LENGTH], uint8_t dst_ip[IPV4_LENGTH], uint8_t src_port, uint8_t dst_port)
+void echo_handle_packet(void *packet, uint16_t length, uint8_t src_ip[IPV4_LENGTH], uint8_t dst_ip[IPV4_LENGTH], uint16_t src_port, uint16_t dst_port)
 {
     ncPrint("Received ECHO packet from ");
 

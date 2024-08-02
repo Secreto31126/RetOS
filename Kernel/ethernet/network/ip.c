@@ -141,6 +141,7 @@ static int delayed_ip_send_packet(IPPacket *packet)
         if (!arp_sent)
         {
             ncPrint("ARP request failed\n");
+            transmit(NULL, packet, endian_word(packet->length), ETHERNET_TYPE_IPV4);
         }
     }
 

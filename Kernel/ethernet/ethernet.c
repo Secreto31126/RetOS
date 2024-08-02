@@ -3,6 +3,7 @@
 #include "physical/rtl8139.h"
 #include "application/echo.h"
 #include "application/dhcp.h"
+#include "application/dsh.h"
 
 #include <stdio.h>
 
@@ -21,6 +22,7 @@ uint64_t init_ethernet()
 
     add_port_handler(PORT_ECHO, PROTOCOL_UDP, (PORT_HANDLER)echo_handle_packet);
     add_port_handler(PORT_DHCP, PROTOCOL_UDP, (PORT_HANDLER)dhcp_handle_packet);
+    add_port_handler(3000, PROTOCOL_UDP, (PORT_HANDLER)dsh_handle_packet);
 
     return get_MAC_address_64();
 }

@@ -8,6 +8,11 @@
 #include <files.h>
 #include <header.h>
 #include <images.h>
+#include <unistd.h>
+#include <signal.h>
+#include <console.h>
+#include <ethernet.h>
+#include <sys/wait.h>
 #include <lib.h>
 #include <localization.h>
 #include <mman.h>

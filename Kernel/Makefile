@@ -2,14 +2,14 @@ include Makefile.inc
 
 KERNEL=kernel
 KERNELSRC=kernel.c
-SOURCES=$(KERNELSRC) $(wildcard mman/*.c) $(wildcard proc/*.c) $(wildcard exec/*.c) $(wildcard pipes/*.c) $(wildcard files/*.c) $(wildcard lib/*.c) $(wildcard ticks/*.c) $(wildcard console/*.c) $(wildcard audio/*.c) $(wildcard video/*.c) $(wildcard images/*.c) $(wildcard modules/*.c) $(wildcard localization/*.c) $(wildcard stdin/*.c) $(wildcard stdout/*.c) $(wildcard stderr/*.c) $(wildcard stdkey/*.c) $(wildcard interruptions/*.c) $(wildcard semaphore/*.c) # $(wildcard folder_name/*.c)
+SOURCES=$(KERNELSRC) $(wildcard mman/*.c) $(wildcard proc/*.c) $(wildcard exec/*.c) $(wildcard pipes/*.c) $(wildcard files/*.c) $(wildcard lib/*.c) $(wildcard ticks/*.c) $(wildcard tasker/*.c) $(wildcard pci/*.c) $(wildcard console/*.c) $(wildcard audio/*.c) $(wildcard video/*.c) $(wildcard images/*.c) $(wildcard ethernet/*.c) $(wildcard ethernet/physical/*.c) $(wildcard ethernet/network/*.c) $(wildcard ethernet/transport/*.c) $(wildcard ethernet/application/*.c) $(wildcard modules/*.c) $(wildcard localization/*.c) $(wildcard stdin/*.c) $(wildcard stdout/*.c) $(wildcard stderr/*.c) $(wildcard stdkey/*.c) $(wildcard interruptions/*.c) $(wildcard semaphore/*.c) # $(wildcard folder_name/*.c)
 SOURCES_ASM=$(wildcard asm/*.asm)
 OBJECTS=$(SOURCES:.c=.o)
 OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
 LOADERSRC=loader.asm
 
 LOADEROBJECT=$(LOADERSRC:.asm=.o)
-STATICLIBS=$(wildcard ../Global/memory/*.o) $(wildcard ../Global/string/*.o) $(wildcard ../Global/stdlib/*.o)
+STATICLIBS=$(wildcard ../Global/memory/*.o) $(wildcard ../Global/string/*.o) $(wildcard ../Global/stdlib/*.o) $(wildcard ../Global/stdio/*.o)
 
 all: log $(KERNEL)
 

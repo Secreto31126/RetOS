@@ -2,7 +2,7 @@
 #define PSEM_H
 
 #include <lib.h>
-#include <malloc.h>
+#include <mman.h>
 #include <proc.h>
 #include <sched.h>
 #include <semaphores.h>

@@ -136,7 +136,23 @@ int add_il(round_iterable_list il, pid_t pid) {
   return 0;
 }
 
-pid_t remove_il_rec(p_node *p, round_iterable_list il, pid_t pid);
+/**
+ * @brief Returns whether an element is in the list
+ *
+ * @param il The list
+ * @param pid The element to look for
+ * @return true if found, false otherwise
+ */
+static bool contains_il(round_iterable_list il, pid_t pid) {
+  if (il == NULL)
+    return false;
+  for (p_node *n = il->first; n != NULL; n = n->next) {
+    if (n->pid == pid)
+      return true;
+  }
+  return false;
+}
+
 /**
  * @brief Removes and element from the list
  *
@@ -156,23 +172,18 @@ pid_t remove_il(round_iterable_list il, pid_t pid) {
     free(to_free);
     return pid;
   }
-  int to_ret = remove_il_rec(il->first, il, pid);
-  if (to_ret)
-    il->size--;
-  return to_ret;
-}
-pid_t remove_il_rec(p_node *p, round_iterable_list il, pid_t pid) {
-  if (p->next == NULL)
-    return 0;
-  if (p->next->pid == pid) {
-    p_node *to_free = p->next;
-    if (il->current == p->next)
-      il->current = il->first;
-    p->next = p->next->next;
-    free(to_free);
-    return pid;
+  for (p_node *prev = il->first; prev->next != NULL; prev = prev->next) {
+    if (prev->next->pid == pid) {
+      p_node *to_free = prev->next;
+      if (il->current == to_free)
+        il->current = il->first;
+      prev->next = to_free->next;
+      free(to_free);
+      il->size--;
+      return pid;
+    }
   }
-  return remove_il_rec(p->next, il, pid);
+  return 0;
 }
 
 static unsigned int seed = 0x50;
@@ -299,6 +310,11 @@ round_iterable_list next_schedule(int *priority) {
 }
 
 void robin_add(pid_t pid) {
+  for (int i = PRIO_MIN; i <= PRIO_MAX; i++) {
+    if (contains_il(get_proc_list_entry(i), pid))
+      return;
+  }
+
   Process *p = get_process(pid);
   int priority = p->priority;
   round_iterable_list il = get_proc_list_entry(priority);
@@ -335,34 +351,34 @@ pid_t robin_remove(pid_t pid) {
 }
 
 pid_t robin_next() {
-  if (!ready_count)
-    return 0;
+  while (ready_count) {
+    int priority;
+    round_iterable_list scheduled_priority = next_schedule(&priority);
+    if (scheduled_priority == NULL)
+      return 0;
 
-  int priority;
-  round_iterable_list scheduled_priority = next_schedule(&priority);
-  if (scheduled_priority == NULL)
-    return 0;
+    pid_t to_ret = next_il(scheduled_priority);
 
-  pid_t to_ret = next_il(scheduled_priority);
+    if (to_ret <= 0) {
+      return 0;
+    }
 
-  if (to_ret <= 0) {
-    return 0;
+    Process *p_to_ret = get_process(to_ret);
+    if (p_to_ret->state == PROCESS_DEAD || p_to_ret->state == PROCESS_ZOMBIE ||
+        p_to_ret->state == PROCESS_BLOCKED) {
+      robin_remove(to_ret);
+      continue;
+    }
+
+    if (p_to_ret->priority !=
+        priority) // Its priority has changed, move it to the correct list
+    {
+      robin_remove(to_ret);
+      robin_add(to_ret);
+    }
+    return to_ret;
   }
-
-  Process *p_to_ret = get_process(to_ret);
-  if (p_to_ret->state == PROCESS_DEAD || p_to_ret->state == PROCESS_ZOMBIE ||
-      p_to_ret->state == PROCESS_BLOCKED) {
-    robin_remove(to_ret);
-    return robin_next();
-  }
-
-  if (p_to_ret->priority !=
-      priority) // Its priority has changed, move it to the correct list
-  {
-    robin_remove(to_ret);
-    robin_add(to_ret);
-  }
-  return to_ret;
+  return 0;
 }
 
 void yield_robin() {

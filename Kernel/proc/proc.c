@@ -267,7 +267,7 @@ int kill_process(pid_t pid) {
 
   size_t count = active_processes_count;
   for (size_t i = 0;
-       i < MAX_PROCESS_FILES && count && (free_stack || free_running_stack);
+       i < MAX_PROCESSES && count && (free_stack || free_running_stack);
        i++) {
     Process *p = get_process(i);
 

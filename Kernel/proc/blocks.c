@@ -1,33 +1,33 @@
 #include "proc.h"
 
 Process *loop_blocked_and_unblock(Process *p) {
-  if (p == NULL) {
-    return p;
+  Process *head = p;
+  Process **link = &head;
+
+  while (*link) {
+    Process *curr = *link;
+    Process *next = curr->next_blocked;
+
+    // If for some reason the process is not blocked,
+    // Remove it silently from the blocked list
+    if (curr->state != PROCESS_BLOCKED) {
+      curr->block_condition = no_condition;
+      curr->block_list = NULL;
+      curr->next_blocked = NULL;
+      *link = next;
+    } else if (!(curr->block_condition(curr->pid))) {
+      link = &curr->next_blocked;
+    } else {
+      curr->state = PROCESS_READY;
+      curr->block_condition = no_condition;
+      curr->block_list = NULL;
+      curr->next_blocked = NULL;
+      *link = next;
+      robin_add(curr->pid);
+    }
   }
 
-  Process *next = p->next_blocked;
-
-  // If for some reason the process is not blocked,
-  // Remove it silently from the blocked list
-  if (p->state != PROCESS_BLOCKED) {
-    p->block_condition = no_condition;
-    p->block_list = NULL;
-    p->next_blocked = NULL;
-    return loop_blocked_and_unblock(next);
-  }
-
-  if (!(p->block_condition(p->pid))) {
-    p->next_blocked = loop_blocked_and_unblock(next);
-    return p;
-  }
-
-  p->state = PROCESS_READY;
-  p->block_condition = no_condition;
-  p->block_list = NULL;
-  p->next_blocked = NULL;
-  robin_add(p->pid);
-
-  return loop_blocked_and_unblock(next);
+  return head;
 }
 
 void check_tick_blocked_processes() {

@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
   if (!strcmp(test, "endless_loop")) {
-    my_nice(my_getpid(), 19); // Since I'm not too eager to give extra cpu time
+    my_nice(my_getpid(), -20); // Since I'm not too eager to give extra cpu time
                               // to a process stuck in a busy wait
     endless_loop();
     return 0;

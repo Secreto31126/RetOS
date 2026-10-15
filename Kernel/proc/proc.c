@@ -309,6 +309,9 @@ int kill_process(pid_t pid) {
   man_im_dead->state = PROCESS_ZOMBIE;
   man_im_dead->running_stack = NULL;
   active_processes_count--;
+  // Don't leave a stale entry behind: once the slot is recycled, its state
+  // no longer tells the scheduler to discard it
+  robin_remove(pid);
 
   // ncPrint("Process ");
   // ncPrintDec(pid);

@@ -364,7 +364,8 @@ pid_t robin_next() {
     }
 
     Process *p_to_ret = get_process(to_ret);
-    if (p_to_ret->state == PROCESS_DEAD || p_to_ret->state == PROCESS_ZOMBIE ||
+    if (p_to_ret->state == NOT_THE_PROCESS_YOU_ARE_LOOKING_FOR ||
+        p_to_ret->state == PROCESS_DEAD || p_to_ret->state == PROCESS_ZOMBIE ||
         p_to_ret->state == PROCESS_BLOCKED) {
       robin_remove(to_ret);
       continue;

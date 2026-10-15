@@ -4,7 +4,7 @@
 // However, managing more than this amount of processes in this test will almost
 // certainly affect performance enough to make reading its results next to
 // impossible
-
+#define LOW_PRIO -20
 enum State { RUNNING, BLOCKED, KILLED };
 
 typedef struct P_rq {
@@ -43,6 +43,7 @@ int64_t test_processes(uint64_t argc, char *argv[]) {
         puts("test_processes: ERROR creating process\n");
         return -1;
       } else {
+        my_nice(p_rqs[rq].pid, LOW_PRIO);
         p_rqs[rq].state = RUNNING;
         alive++;
       }

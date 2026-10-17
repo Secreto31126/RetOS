@@ -41,5 +41,14 @@ void init_arp();
 
 uint8_t ntohb(uint8_t byte, int num_bits);
 uint8_t htonb(uint8_t byte, int num_bits);
+/**
+ * @brief RFC 1071 internet checksum over big endian 16 bit words
+ *
+ * @param data The data to sum
+ * @param length The length of the data
+ * @param initial A partial sum to add (for example ~inet_checksum() of a pseudo-header)
+ * @return uint16_t The checksum in host order, store it with endian_word(); 0 if data includes a valid checksum
+ */
+uint16_t inet_checksum(const void *data, size_t length, uint32_t initial);
 
 #endif

@@ -81,3 +81,28 @@ uint8_t htonb(uint8_t byte, int num_bits)
 {
     return flip_byte(byte, num_bits);
 }
+
+uint16_t inet_checksum(const void *data, size_t length, uint32_t initial)
+{
+    const uint8_t *bytes = data;
+    uint32_t sum = initial;
+
+    while (length > 1)
+    {
+        sum += (bytes[0] << 8) | bytes[1];
+        bytes += 2;
+        length -= 2;
+    }
+
+    if (length)
+    {
+        sum += bytes[0] << 8;
+    }
+
+    while (sum >> 16)
+    {
+        sum = (sum & 0xFFFF) + (sum >> 16);
+    }
+
+    return ~sum;
+}

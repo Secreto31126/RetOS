@@ -7,10 +7,10 @@
 /**
  * @brief Search for the value of a type in options
  */
-static void *get_dhcp_options(DHCPPacket *packet, uint8_t type);
+static void *get_dhcp_options(DHCPPacket *packet, uint8_t type, const uint8_t *end);
 static void make_dhcp_packet(DHCPPacket *packet, DHCPMessageType msg_type, uint8_t *request_ip);
 
-static char ip_addr[IPV4_LENGTH] = {10, 3, 11, 26};
+static char ip_addr[IPV4_LENGTH] = {0};
 static bool is_ip_allocated;
 
 bool gethostaddr(uint8_t addr[IPV4_LENGTH])
@@ -58,11 +58,15 @@ int dhcp_request(uint8_t *request_ip)
 
 void dhcp_handle_packet(DHCPPacket *packet, uint16_t length)
 {
-    // uint8_t *options = packet->options + 4;
+    // Fixed header and magic cookie
+    if (length < offsetof(DHCPPacket, options) + 4 || packet->xid != endian_dword(DHCP_TRANSACTION_IDENTIFIER))
+    {
+        return;
+    }
 
     if (packet->op == DHCP_REPLY_OPERATION)
     {
-        uint8_t *type = get_dhcp_options(packet, 53);
+        uint8_t *type = get_dhcp_options(packet, 53, (uint8_t *)packet + length);
 
         if (!type)
         {
@@ -97,17 +101,40 @@ void dhcp_handle_packet(DHCPPacket *packet, uint16_t length)
     }
 }
 
-static void *get_dhcp_options(DHCPPacket *packet, uint8_t type)
+static void *get_dhcp_options(DHCPPacket *packet, uint8_t type, const uint8_t *end)
 {
     uint8_t *options = packet->options + 4;
-    uint8_t curr_type = *options;
 
-    while (curr_type != 0xFF)
+    while (options < end && *options != 0xFF)
     {
+        uint8_t curr_type = *options;
+
+        // Pad option, no length byte
+        if (curr_type == 0)
+        {
+            options++;
+            continue;
+        }
+
+        if (options + 2 > end)
+        {
+            break;
+        }
+
         uint8_t len = *(options + 1);
+
+        if (options + 2 + len > end)
+        {
+            break;
+        }
 
         if (curr_type == type)
         {
+            if (!len)
+            {
+                return NULL;
+            }
+
             // Found type, return value
             void *ret = malloc(len);
             if (ret)
@@ -131,12 +158,8 @@ static void make_dhcp_packet(DHCPPacket *packet, DHCPMessageType msg_type, uint8
     packet->hardware_addr_len = MAC_LENGTH;
     packet->hops = 0;
     packet->xid = endian_dword(DHCP_TRANSACTION_IDENTIFIER);
-    packet->flags = endian_dword(0x8000);
+    packet->flags = endian_word(0x8000);
     get_MAC_address(packet->client_hardware_addr);
-
-    // Send dhcp packet using UDP
-    uint8_t dst_ip[IPV4_LENGTH];
-    memset(dst_ip, BROADCAST_IP_PARTITION, IPV4_LENGTH);
 
     // Options specific to DHCP Discover (required)
 
@@ -160,16 +183,14 @@ static void make_dhcp_packet(DHCPPacket *packet, DHCPMessageType msg_type, uint8
     // Requested IP address
     *(options++) = 50;
     *(options++) = 0x04;
-    *((uint32_t *)(options)) = endian_dword(0xC0A8442A);
     memcpy((uint32_t *)(options), request_ip, IPV4_LENGTH);
     options += 4;
 
     // Host Name
     *(options++) = 12;
-    *(options++) = 0x09;
+    *(options++) = strlen("retos");
     memcpy(options, "retos", strlen("retos"));
     options += strlen("retos");
-    *(options++) = 0x00;
 
     // Parameter request list
     *(options++) = 55;

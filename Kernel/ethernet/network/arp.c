@@ -52,7 +52,7 @@ void arp_handle_packet(ARPPacket *packet, int length)
             return;
         }
 
-        if (memcmp(packet->dst_protocol_addr, host_ip, IPV4_LENGTH))
+        if (!memcmp(packet->dst_protocol_addr, host_ip, IPV4_LENGTH))
         {
             // Set source MAC address, IP address
             get_MAC_address(packet->src_hardware_addr);
@@ -106,6 +106,10 @@ void arp_handle_packet(ARPPacket *packet, int length)
 int arp_send_packet(uint8_t dst_protocol_addr[IPV4_LENGTH])
 {
     ARPPacket *packet = malloc(sizeof(ARPPacket));
+    if (!packet)
+    {
+        return -1;
+    }
 
     // Set source MAC address, IP address
     get_MAC_address(packet->src_hardware_addr);
@@ -138,20 +142,6 @@ int arp_send_packet(uint8_t dst_protocol_addr[IPV4_LENGTH])
 
 static void arp_lookup_upsert(uint8_t *mac_addr, uint8_t *ip_addr)
 {
-    // memcpy(&arp_table[arp_table_curr].mac_addr, mac_addr, MAC_LENGTH);
-    // memcpy(&arp_table[arp_table_curr].ip_addr, ip_addr, IPV4_LENGTH);
-
-    // if (arp_table_size < ARP_TABLE_SIZE)
-    // {
-    //     arp_table_size++;
-    // }
-
-    // // Wrap around
-    // if (arp_table_curr++ >= ARP_TABLE_SIZE)
-    // {
-    //     arp_table_curr = 0;
-    // }
-
     for (int i = 0; i < arp_table_size; i++)
     {
         if (arp_table[i].ip_addr == *((uint32_t *)ip_addr))
@@ -169,11 +159,7 @@ static void arp_lookup_upsert(uint8_t *mac_addr, uint8_t *ip_addr)
     memcpy(&arp_table[arp_table_curr].mac_addr, mac_addr, MAC_LENGTH);
     memcpy(&arp_table[arp_table_curr].ip_addr, ip_addr, IPV4_LENGTH);
 
-    // Wrap around
-    if (arp_table_curr++ >= ARP_TABLE_SIZE)
-    {
-        arp_table_curr = 0;
-    }
+    arp_table_curr = (arp_table_curr + 1) % ARP_TABLE_SIZE;
 }
 
 bool arp_lookup(uint8_t mac_addr[MAC_LENGTH], uint8_t ip_addr[IPV4_LENGTH])

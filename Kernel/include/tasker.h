@@ -12,6 +12,10 @@
 typedef int (*Callback)(void *);
 
 /**
+ * @brief Initialize the tasker
+ */
+void init_tasker();
+/**
  * @brief Patiently wait for a task to be executed
  */
 void tasker_daemon();

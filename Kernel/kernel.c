@@ -95,6 +95,7 @@ void *initializeKernelBinary()
     ncPrint("[Loading ethernet device]\n");
     scan_PCI_devices();
     // print_RTL_data();
+    init_tasker();
     init_dma();
     ncPrint("\tMAC: ");
     ncPrintHex(init_ethernet());
@@ -126,19 +127,26 @@ void *initializeKernelBinary()
     ncPrint("[Retrieving IP from Network]\n");
 
     unsigned char ip[IPV4_LENGTH];
-    dhcp_discover();
-
-    while (!gethostaddr(ip))
+    if (dhcp_discover() < 0)
     {
-        halt_once();
+        ncPrint("\tError: DHCP discover failed\n");
     }
+    else
+    {
+        while (!gethostaddr(ip))
+        {
+            halt_once();
+            // The network daemon isn't running yet
+            ethernet_poll();
+        }
 
-    char ip_str[20];
-    snprintf(ip_str, 20, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+        char ip_str[20];
+        snprintf(ip_str, 20, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
 
-    ncPrint("\tIPv4: ");
-    ncPrint(ip_str);
-    ncPrint("\n[Done]\n");
+        ncPrint("\tIPv4: ");
+        ncPrint(ip_str);
+        ncPrint("\n[Done]\n");
+    }
 
     ncClear();
 
@@ -164,6 +172,19 @@ void idle(pid_t child_pid)
             if (daemon_pid < 0)
             {
                 ncPrint("Error: Failed to start the tasker daemon\n");
+            }
+
+            pid_t ethernet_daemon_pid = kfork();
+
+            if (!ethernet_daemon_pid)
+            {
+                ethernet_daemon();
+                // Should never reach here
+                _exit(0);
+            }
+            else if (ethernet_daemon_pid < 0)
+            {
+                ncPrint("Error: Failed to start the network daemon\n");
             }
 
             ncPrintDec(execv("init", NULL));

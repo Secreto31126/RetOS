@@ -35,6 +35,18 @@ extern void output_byte(uint16_t port, uint8_t value);
 
 extern void set_interrupt_flag(void);
 extern void unset_interrupt_flag(void);
+/**
+ * @brief Disable interrupts, saving the previous state
+ *
+ * @return uint64_t The previous RFLAGS, to pass to interrupts_restore()
+ */
+extern uint64_t interrupts_disable(void);
+/**
+ * @brief Restore the interrupt state saved by interrupts_disable()
+ *
+ * @param flags The RFLAGS returned by interrupts_disable()
+ */
+extern void interrupts_restore(uint64_t flags);
 extern void halt_once(void);
 extern unsigned int exchange(unsigned int *src, unsigned int value);
 

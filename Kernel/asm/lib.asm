@@ -10,6 +10,8 @@
 	global output_byte
 	global set_interrupt_flag
 	global unset_interrupt_flag
+	global interrupts_disable
+	global interrupts_restore
 	global halt_once
 	global exchange
 	global dump_regs
@@ -90,6 +92,19 @@ set_interrupt_flag:
 ; void unset_interrupt_flag(void);
 unset_interrupt_flag:
 	cli
+	ret
+
+; uint64_t interrupts_disable(void);
+interrupts_disable:
+	pushfq
+	pop		rax
+	cli
+	ret
+
+; void interrupts_restore(uint64_t flags);
+interrupts_restore:
+	push	rdi
+	popfq
 	ret
 
 ; void halt_once(void);

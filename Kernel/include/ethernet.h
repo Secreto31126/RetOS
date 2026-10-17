@@ -17,6 +17,21 @@ uint64_t init_ethernet();
  * @brief Handles an ethernet interruption
  */
 void ethernet_manager();
+/**
+ * @brief Queue a received frame for the network daemon, dropped if the queue is full
+ *
+ * @param frame The ethernet frame, without CRC
+ * @param length The length of the frame
+ */
+void ethernet_enqueue(const void *frame, uint16_t length);
+/**
+ * @brief Process queued frames forever, run as a kernel daemon
+ */
+void ethernet_daemon();
+/**
+ * @brief Process every queued frame without blocking
+ */
+void ethernet_poll();
 
 /**
  * @brief Get the MAC address object

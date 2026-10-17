@@ -96,7 +96,6 @@ void *initializeKernelBinary()
     scan_PCI_devices();
     // print_RTL_data();
     init_tasker();
-    init_dma();
     ncPrint("\tMAC: ");
     ncPrintHex(init_ethernet());
     ncPrint("\n[Done]\n");

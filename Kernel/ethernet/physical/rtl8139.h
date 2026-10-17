@@ -21,11 +21,11 @@ void rtl8139_get_MAC_address(uint8_t mac[MAC_LENGTH]);
  *
  * @param data The data to send
  * @param length The length of the data
- * @return int The number of bytes sent, -1 if the buffer is full
+ * @return int The number of bytes sent, -1 if the buffer is full, the length is invalid or the device is missing
  */
 int rtl8139_send_packet(void *data, uint32_t len);
 /**
- * @brief Receive a packet (Physical layer)
+ * @brief Move every received packet to the ethernet RX queue (Physical layer)
  */
 void rtl8139_receive_packet();
 /**

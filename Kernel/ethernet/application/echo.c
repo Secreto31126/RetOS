@@ -29,9 +29,14 @@ void echo_handle_packet(void *packet, uint16_t length, uint8_t src_ip[IPV4_LENGT
     ncPrint(" - ");
 
     char *data = malloc(length + 2);
-    snprintf(data, length + 1, "%s\n", packet);
-    ncPrint(data);
-    free(data);
+    if (data)
+    {
+        memcpy(data, packet, length);
+        data[length] = '\n';
+        data[length + 1] = '\0';
+        ncPrint(data);
+        free(data);
+    }
 
     if (src_port)
     {

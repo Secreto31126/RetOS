@@ -62,7 +62,7 @@ void udp_handle_packet(UDPPacket *packet, uint16_t length, uint8_t src_ip[IPV4_L
     uint16_t data_length = udp_length - sizeof(UDPPacket);
 
     Port port = Ports[dst_port];
-    if (port.protocol == PROTOCOL_UDP && port.handler != NULL)
+    if ((port.protocol & PROTOCOL_UDP) == PROTOCOL_UDP && port.handler != NULL)
     {
         port.handler(data_ptr, data_length, src_ip, dst_ip, src_port, dst_port);
     }

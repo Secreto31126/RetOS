@@ -7,7 +7,7 @@
 /**
  * @brief Search for the value of a type in options
  */
-static void *get_dhcp_options(DHCPPacket *packet, uint8_t type, const uint8_t *end);
+static void *get_dhcp_options(DHCPPacket *packet, uint16_t length, uint8_t type);
 static void make_dhcp_packet(DHCPPacket *packet, DHCPMessageType msg_type, uint8_t *request_ip);
 
 static char ip_addr[IPV4_LENGTH] = {0};
@@ -66,7 +66,7 @@ void dhcp_handle_packet(DHCPPacket *packet, uint16_t length)
 
     if (packet->op == DHCP_REPLY_OPERATION)
     {
-        uint8_t *type = get_dhcp_options(packet, 53, (uint8_t *)packet + length);
+        uint8_t *type = get_dhcp_options(packet, length, 53);
 
         if (!type)
         {
@@ -101,9 +101,10 @@ void dhcp_handle_packet(DHCPPacket *packet, uint16_t length)
     }
 }
 
-static void *get_dhcp_options(DHCPPacket *packet, uint8_t type, const uint8_t *end)
+static void *get_dhcp_options(DHCPPacket *packet, uint16_t length, uint8_t type)
 {
     uint8_t *options = packet->options + 4;
+    const uint8_t *end = (uint8_t *)packet + length;
 
     while (options < end && *options != 0xFF)
     {

@@ -35,9 +35,15 @@ bool inherit_parents_house(Process *process) {
  * @note This function should only be called from execv in assembler
  * (which should be called from a syscall for "atomicity")
  *
- * @param process The process to expell from its parent's house
+ * @param process The process to expell from its parent's house,
+ * if null, the current process will be used
+ * @return void* The new stack pointer
  */
-void move_away_from_parents_house(Process *process) {
+void *move_away_from_parents_house(Process *process) {
+  if (!process) {
+    process = get_current_process();
+  }
+
   if (process->running_stack != process->stack) {
     swap_stacks(process->running_stack,
                 STACK_END(process->stack, process->stack_size) -
@@ -47,4 +53,6 @@ void move_away_from_parents_house(Process *process) {
     process->running_stack = process->stack;
     process->running_stack_size = process->stack_size;
   }
+
+  return process->running_stack;
 }

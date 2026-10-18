@@ -6,7 +6,7 @@ ASM=nasm
 
 DEBUG=0
 EGCCFLAGS=
-GCCFLAGS=-m64 -fno-exceptions -std=c99 -Wall -ffreestanding -nostdlib -fno-common -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -fno-builtin-malloc -fno-builtin-free -fno-builtin-realloc -fno-pic -fdiagnostics-color=always $(EGCCFLAGS)
+GCCFLAGS=-m64 -fno-exceptions -std=c99 -Wall -ffreestanding -nostdlib -fno-common -mno-red-zone -mno-mmx -fno-builtin-malloc -fno-builtin-free -fno-builtin-realloc -fno-pic -fdiagnostics-color=always $(EGCCFLAGS)
 ARFLAGS=rvs
 ASMFLAGS=-felf64
 ELDFLAGS=

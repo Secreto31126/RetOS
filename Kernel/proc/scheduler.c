@@ -21,11 +21,11 @@ void *context_switch(void *rsp) {
     if (rsp < old_process->running_stack ||
         STACK_END(old_process->running_stack, old_process->running_stack_size) <
             rsp) {
-      ncPrint("Possible Stack Overflow for PID ");
-      ncPrintDec(old_process->pid);
-      ncPrint(" (RSP: ");
-      ncPrintHex((uint64_t)rsp);
-      ncPrint(")\n");
+      // ncPrint("Possible Stack Overflow for PID ");
+      // ncPrintDec(old_process->pid);
+      // ncPrint(" (RSP: ");
+      // ncPrintHex((uint64_t)rsp);
+      // ncPrint(")\n");
     }
   }
 

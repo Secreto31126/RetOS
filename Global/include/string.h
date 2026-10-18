@@ -3,6 +3,21 @@
 
 #include <stddef.h>
 
+void *memset(void *dest, int c, size_t count);
+void *memmove(void *dest, const void *src, size_t count);
+void *memcpy(void *dest, const void *src, size_t count);
+
+/**
+ * @brief Compare memory
+ * @see https://android.googlesource.com/platform/bionic/+/a27d2baa/libc/string/memcmp.c
+ *
+ * @param s1 The first memory block
+ * @param s2 The second memory block
+ * @param n The number of bytes to compare
+ * @return int The distance between both memory blocks
+ */
+int memcmp(const void *s1, const void *s2, size_t n);
+
 /**
  * @brief Compare strings
  * @see https://codebrowser.dev/glibc/glibc/string/strcmp.c.html

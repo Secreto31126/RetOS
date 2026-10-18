@@ -97,7 +97,7 @@ then
         mkdir "/tmp/retos"
         cp "$path/Image/"* "/tmp/retos"
 
-        qemu-system-x86_64 -hda "/tmp/retos/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk -serial stdio
+        qemu-system-x86_64 -hda "/tmp/retos/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk -nic user,ipv6=off,model=rtl8139,mac=DE:00:40:AA:21:2E,hostfwd=udp::3126-:7,hostfwd=tcp::8080-:80,hostfwd=udp::3000-:3000 -machine kernel_irqchip=off -serial stdio
         make clean -CToolchain > /dev/null
         make clean > /dev/null
     fi
@@ -118,7 +118,7 @@ then
     fi
 
     echo "Run the following command in another terminal:"
-    echo 'qemu-system-x86_64 -s -S -hda "/tmp/retos/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk'
+    echo 'qemu-system-x86_64 -s -S -hda "/tmp/retos/x64BareBonesImage.qcow2" -m 512 -soundhw pcspk -nic user,ipv6=off,model=rtl8139,mac=DE:00:40:AA:21:2E,hostfwd=udp::3126-:7,hostfwd=tcp::8080-:80,hostfwd=udp::3000-:3000 -machine kernel_irqchip=off -serial stdio'
 fi
 
 exit 0

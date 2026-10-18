@@ -19,6 +19,8 @@
 	global odd_ports_handler
 	global usb_handler
 
+	global ethernet_handler
+
 	global syscall_handler
 
 	section .data
@@ -122,6 +124,9 @@ odd_ports_handler:
 ; void usb_handler(void);
 usb_handler:
 	master_pic_handler 5
+
+ethernet_handler:
+	slave_pic_handler 11
 
 ; uint64_t syscall_handler(void);
 syscall_handler:

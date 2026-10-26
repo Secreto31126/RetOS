@@ -212,9 +212,6 @@ static const char weights[PRIO_MAX - PRIO_MIN + 1] = {
     1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14,
     15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
     29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
-static const int weights_sum =
-    820; // This can be calculated on the spot, but a context switch should be
-         // reasonably fast, so this avoids an unnecessary inefficiency
 static int ready_count = 0;
 static round_iterable_list process_lists[PRIO_MAX - PRIO_MIN + 1] = {0};
 
@@ -277,31 +274,25 @@ round_iterable_list next_schedule(int *priority) {
   }
   remaining = 0;
 
-  int index = rand_between(0, weights_sum), i;
-  round_iterable_list last_valid = NULL;
+  // Only non-empty groups take part in the draw, otherwise an empty group's
+  // weight ends up handed to whichever neighbour the walk lands on
+  int ready_weight = 0, i;
+  for (i = PRIO_MAX; i >= PRIO_MIN; i--) {
+    if (is_valid_entry(get_proc_list_entry(i)))
+      ready_weight += get_weight(i);
+  }
+
+  int index = rand_between(0, ready_weight);
   for (i = PRIO_MAX; i >= PRIO_MIN; i--) {
     round_iterable_list aux = get_proc_list_entry(i);
-    if (is_valid_entry(aux)) {
-      *priority = i;
-      last_valid = aux;
-    }
+    if (!is_valid_entry(aux))
+      continue;
     index -= get_weight(i);
-    if (index <= 0)
-      break;
-  }
-  if (last_valid != NULL) {
-    remaining = last_valid->size - 1;
-    current_priority = last_valid;
-    current_priority_index = *priority; // I set it myself, may as well use it
-    return last_valid;
-  }
-  for (; i >= PRIO_MIN; i--) {
-    round_iterable_list aux = get_proc_list_entry(i);
-    if (is_valid_entry(aux)) {
+    if (index < 0) {
       *priority = i;
       current_priority_index = i;
       current_priority = aux;
-      remaining = aux->size;
+      remaining = aux->size - 1;
       return aux;
     }
   }

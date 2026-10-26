@@ -1,34 +1,33 @@
 # RetOS
 
-A preemptive, POSIX-flavoured multitasking kernel for x86-64, written from scratch in C and
-NASM assembly. No libc, no host OS, no runtime — it boots from its own disk image, brings up
-its own scheduler, memory manager and drivers, and runs a userland of twelve programs on top
-of a 34-call system interface.
+A preemptive multitasking kernel for x86-64, written in C and NASM assembly. It boots from its
+own disk image and runs a small userland (a shell with pipes, some Unix-style tools, dining
+philosophers and test programs) on top of 34 system calls. It doesn't use libc or any host OS
+code.
 
-**GPL-3.0 · C / x86-64 assembly · 21.4k lines · 34 syscalls**
+GPL-3.0 · C / x86-64 assembly · 21.4k lines · 34 syscalls
 
-RetOS was built at [ITBA](https://www.itba.edu.ar/) across two term-long systems projects
-(October 2023 – June 2024). See [Authorship](#authorship) for who wrote what.
+We wrote RetOS at [ITBA](https://www.itba.edu.ar/) for two systems courses, between October
+2023 and June 2024. The bootloader and the starting template aren't ours; see
+[Authorship](#authorship).
 
----
+## Overview
 
-## At a glance
-
-|                 |                                                                                        |
-| --------------- | -------------------------------------------------------------------------------------- |
-| **Target**      | x86-64 long mode, single core, flat identity-mapped physical memory                      |
-| **Kernel**      | ~7,100 lines, freestanding (`-ffreestanding -nostdlib -mno-red-zone -mno-sse`)           |
-| **Syscalls**    | 34, via `int 0x80`                                                                       |
-| **Scheduling**  | 40 priority bands, weighted lottery + round-robin, preemption at 18.2 Hz                 |
-| **Concurrency** | `fork` / `execv` / `waitpid`, pipes, POSIX named semaphores, `pselect`                   |
-| **Memory**      | two interchangeable heap allocators, selected at compile time                            |
-| **Graphics**    | 1024×768×24bpp VBE linear framebuffer with alpha blending                                |
-| **Userland**    | 12 flat binaries: pipeline shell, `grep`/`cat`/`wc`/`less`, dining philosophers, tests    |
-| **Image**       | 6 MiB BMFS disk, Pure64 bootloader, boots under QEMU                                     |
+|             |                                                                               |
+| ----------- | ----------------------------------------------------------------------------- |
+| Target      | x86-64 long mode, single core, flat identity-mapped physical memory           |
+| Kernel      | ~7,100 lines, freestanding (`-ffreestanding -nostdlib -mno-red-zone -mno-sse`) |
+| Syscalls    | 34, via `int 0x80`                                                            |
+| Scheduling  | 40 priority bands, weighted lottery + round-robin, preemption at 18.2 Hz      |
+| Concurrency | `fork` / `execv` / `waitpid`, pipes, POSIX named semaphores, `pselect`        |
+| Memory      | two heap allocators, selected at compile time                                 |
+| Graphics    | 1024×768×24bpp VBE linear framebuffer with alpha blending                     |
+| Userland    | 12 flat binaries: shell, `grep`/`cat`/`wc`/`less`, dining philosophers, tests |
+| Image       | 6 MiB BMFS disk, Pure64 bootloader, runs under QEMU                           |
 
 ## Quick start
 
-Everything builds inside a container, so the only host requirements are Docker and QEMU:
+The build runs inside a Docker container, so you only need Docker and QEMU on the host:
 
 ```sh
 git clone https://github.com/Secreto31126/RetOS.git
@@ -36,78 +35,72 @@ cd RetOS
 ./run.sh build          # build the image and boot it in QEMU
 ```
 
-`./run.sh build buddy` builds the same image against the buddy allocator instead of the
-default first-fit one. See [Building and running](#building-and-running) for the full matrix.
+`./run.sh build buddy` builds the same image with the buddy allocator instead of the default
+first-fit one. [Building and running](#building-and-running) lists the other options.
 
----
+## Design notes
 
-## Design highlights
+### Scheduler
 
-Four pieces are worth reading the source for. Each is described as *the constraint, the
-design, and what it costs* — with file references so the claims can be checked.
+`Kernel/proc/scheduler.c:211-375`
 
-### 1. Proportional-share priority scheduling
+Runnable processes are kept in 40 priority bands (`PRIO_MIN` = -20 to `PRIO_MAX` = 19), each
+one a circular list. Counting bands from 0 at `PRIO_MIN`, band *i* has weight `w_i = i + 1`, so
+weights go from 1 to 40.
 
-`Kernel/proc/scheduler.c:200-370`
+At the start of each round the scheduler adds up the weights of the non-empty bands (`S`),
+draws a random number in `[0, S)`, and walks the non-empty bands from the top, subtracting
+weights until the number goes negative. Band *i* is therefore picked with probability
+`w_i / S`. The chosen band then runs for `n_i` quanta in a row, where `n_i` is the number of
+processes in it, so each of them gets one quantum before the next draw.
 
-The scheduler keeps **40 priority bands** (`PRIO_MIN -20` … `PRIO_MAX 19`), each a circular
-list of runnable processes. Band *i* carries weight `w_i = i + 1`, so weights run 1…40 and sum
-to `W = 820` (precomputed — a context switch should not pay for a summation).
-
-Each scheduling round draws a uniform index in `[0, W)` from a 16-bit linear-feedback shift
-register and walks the bands downward, subtracting weights until the index is exhausted. Band
-*i* is therefore selected with probability `w_i / W`. The selected band is then **sticky for
-exactly `size` switches**, so every process in it takes one quantum before the next draw.
-
-That combination buys three properties.
-
-**Per-process CPU share is independent of crowding.** A round goes to band *i* with
-probability `w_i/W` and yields `n_i` quanta, so band *i* receives
+Over time, each process in band *i* gets this fraction of the CPU:
 
 ```
-       w_i · n_i                                             w_i
-   ───────────────────  of the CPU, and each process in it  ───────────────
-     Σ_j  w_j · n_j                                          Σ_j  w_j · n_j
+      w_i
+ ─────────────
+  Σ_j w_j · n_j
 ```
 
-A process's share is set by *its own* priority weight and does not depend on `n_i`. Spawning
-ten more processes at the same priority does not dilute the ones already there — the band
-simply runs longer when it wins. This is precisely what a conventional per-process lottery or
-a flat round-robin does not give you.
+Any two processes split the CPU in the ratio of their weights, however the other processes are
+distributed, and everyone's share goes down as more processes become runnable. This is the
+same expected split you get from lottery scheduling with `w_i` tickets per process (Waldspurger
+& Weihl, 1994). The difference is that we draw once per round instead of once per quantum, and
+processes in the same band always take turns.
 
-**No process starves.** Every weight is at least 1, so every non-empty band retains non-zero
-selection probability, `PRIO_MIN` included. There is no aging machinery because none is needed.
+Some consequences:
 
-**Switch overhead does not grow with the runnable count.** Band selection is `O(40)`, amortised
-over the `n_i` switches the band stays sticky for, and picking the next process inside a band
-is `O(1)` — one pointer step around a circular list.
+- No runnable process starves, since every weight is at least 1. A process at `PRIO_MIN` wins
+  on average at least one round out of every `S` (at most 820).
+- Picking a band takes two passes over the 40 bands (sum, then walk), and that cost is spread
+  over the `n_i` quanta the band then runs. Picking the next process inside a band is one
+  pointer step.
+- `robin_remove` is O(n) in the band's length. It only runs when a process dies, blocks or
+  changes priority.
+- The random numbers come from a 16-bit LFSR. Long-run frequencies are fine (modulo bias under
+  2%), but consecutive draws are correlated, because each state is the previous one shifted by
+  one bit.
 
-Two honest caveats. `robin_remove` is `O(n)` in the band's length, but it sits off the hot
-path: it runs only when a process dies or changes priority. And when the drawn band turns out
-to be empty, selection falls back to a deterministic downward scan, which biases slightly
-toward higher bands in sparsely populated configurations.
+Priorities go the opposite way from POSIX nice: a higher number means more weight and more
+CPU. The comment in `Kernel/include/proc.h` that says "lower is higher priority" is out of
+date.
 
-> **Note on direction.** Numeric priority here is **inverted relative to POSIX nice**: a
-> *higher* number means a *larger* weight and therefore more CPU. The comment in
-> `Kernel/include/proc.h` claiming "lower is higher priority" is stale and contradicts the
-> weight table.
-
-### 2. Context switching without virtual memory
+### fork without virtual memory
 
 `Kernel/proc/scheduler.c:14-73`, `Kernel/asm/proc.asm:70-102`
 
-Pure64 leaves the machine with a 2 MiB-page identity-mapped address space, and the kernel never
-touches `CR3`, installs no `#PF` handler, and builds no per-process page tables. Every process
-shares one flat address space.
+Pure64 sets up an identity-mapped address space with 2 MiB pages, and RetOS leaves it as is. It
+doesn't touch `CR3`, has no page-fault handler and no per-process page tables, so all
+processes share one flat address space.
 
-That creates a specific problem for `fork`. A child needs its own stack, but it has to keep
-executing at exactly the addresses its parent was running at — every saved pointer in the
-copied frame refers to them.
+That makes `fork` awkward. The child needs its own stack, but it has to keep running at the
+same addresses as its parent, because every pointer in the copied stack frame points into the
+parent's stack.
 
-RetOS resolves this by **physically swapping stack contents at context-switch time**. Each PCB
-carries two ranges: `stack`, the process's own 512 KiB allocation (`MIN_STACK_SIZE 0x80000`),
-and `running_stack`, the range it must actually execute at. `swap_stacks` — hand-written
-assembly, eight bytes per iteration with a byte-wise tail — exchanges them in place.
+We handle this by swapping stack contents during context switches. Each PCB has two ranges:
+`stack`, the 512 KiB the process owns (`MIN_STACK_SIZE 0x80000`), and `running_stack`, the
+range it actually runs at. `swap_stacks` (assembly, 8 bytes per iteration plus a byte-wise
+tail) exchanges the two in place.
 
 ```
 fork()   child allocates its own stack, but keeps executing at the parent's
@@ -124,160 +117,146 @@ execv()  move_away_from_parents_house() repoints the child at its own range
          child      0xB ---------------> 0xB        equal   -> never swaps again
 ```
 
-The detail that matters: **the copy only happens while `running_stack != stack`** — strictly
-inside the window between `fork` and `execv`. Once a process owns the stack it runs on,
-steady-state context switches copy nothing at all. The cost is bounded by `running_stack_size`
-and completely predictable, which is the property you actually want when there is no MMU to
-make isolation free.
+The copy only happens while `running_stack != stack`, which is between `fork` and `execv`.
+After `execv` the process runs on its own stack and context switches don't copy anything. The
+cost of a switch is bounded by `running_stack_size`.
 
-The design's consequences show up elsewhere in the kernel, and are worth naming rather than
-hiding:
+This shows up in other parts of the kernel:
 
-- `pselect` must copy its file-descriptor arrays onto the kernel heap before blocking, because
-  a userland pointer is meaningless while another process's stack is loaded
+- `pselect` copies its file-descriptor arrays to the kernel heap before blocking, because a
+  pointer into a user stack isn't valid while another process's stack is swapped in
   (`Kernel/proc/blocks.c:176-208`).
-- `fork` is an eager, full-stack `memcpy` with **no copy-on-write** — as the source puts it,
-  *"We aren't Linux, we must copy the stack at creation time"* (`Kernel/proc/proc.c:152`).
-- `sbrk` is consequently a stub; a process's heap cannot grow into a neighbour's address range.
+- `fork` copies the whole stack up front; there's no copy-on-write. From the comment in
+  `Kernel/proc/proc.c:152`: "We aren't Linux, we must copy the stack at creation time".
+- `sbrk` is a stub, since a process's heap can't grow into a neighbour's range.
 
-The scheduler reuses the two ranges for a cheap stack-overflow check, warning when a restored
-`rsp` falls outside `[running_stack, running_stack + running_stack_size]`.
+The scheduler also uses the two ranges as a cheap stack-overflow check: it prints a warning if
+a saved `rsp` is outside `[running_stack, running_stack + running_stack_size]`.
 
-### 3. Two allocators behind one interface
+### Memory allocators
 
 `Kernel/mman/`, `Global/stdmem/buddy_system.c`
 
-Both allocators implement the same four entry points — `malloc`, `free`,
-`init_memory_manager`, `memory_state` — and are selected at compile time with `-DBUDDY_SYSTEM`
-(`./run.sh build buddy`). The `#ifdef` split lives in `mman/malloc.c`, `mman/free.c` and
-`mman/mman.c`, so the two implementations never see each other.
+Both allocators implement `malloc`, `free`, `init_memory_manager` and `memory_state`. You pick
+one at compile time with `-DBUDDY_SYSTEM` (`./run.sh build buddy`); the `#ifdef`s are confined
+to `mman/malloc.c`, `mman/free.c` and `mman/mman.c`.
 
-|           | First-fit (default)                                       | Buddy (`BUDDY=1`)                                   |
-| --------- | --------------------------------------------------------- | --------------------------------------------------- |
-| Structure | run-length map, one `uint32_t` per 4 heap bytes            | implicit binary tree, 2 bits per node               |
-| Heap      | 128 MiB at `0x18000000`                                    | 64 MiB at `0x18000000`, 1 MiB bitmap                |
-| `malloc`  | `O(n)` linear scan; run length doubles as a skip pointer   | `O(log n)` depth-first descent, 256 B minimum block |
-| `free`    | `O(1)`; whole runs are stored, so no coalescing is needed  | `O(log n)`, collapsing SPLIT→EMPTY upward           |
-| Trade-off | no metadata overhead, external fragmentation               | bounded internal fragmentation, predictable timing  |
+|           | First-fit (default)                                      | Buddy (`BUDDY=1`)                                   |
+| --------- | -------------------------------------------------------- | --------------------------------------------------- |
+| Structure | run-length map, one `uint32_t` per 4 heap bytes          | implicit binary tree, 2 bits per node               |
+| Heap      | 128 MiB at `0x18000000`                                  | 64 MiB at `0x18000000`, 1 MiB bitmap                |
+| `malloc`  | O(n) linear scan; run length doubles as a skip pointer   | O(log n) depth-first descent, 256 B minimum block   |
+| `free`    | O(1); whole runs are stored, so no coalescing is needed  | O(log n), collapsing SPLIT→EMPTY upward             |
+| Trade-off | no metadata overhead, external fragmentation             | bounded internal fragmentation, predictable timing  |
 
-The buddy implementation is the more interesting of the two. It packs four node states
-(`EMPTY`, `SPLIT`, `FULL`, `ALLOCATED`) into two bits at indices `2i` and `2i+1`, navigating
-with `GET_LEFT` / `GET_RIGHT` / `GET_PARENT` / `GET_BROTHER` macros. A 64 MiB heap is tracked
-by a 1 MiB bitmap with **no per-allocation headers at all** — `free` takes only an address and
-recovers the block by walking the tree down to it, and state propagates back up so a freed
-block merges with its sibling automatically.
+The buddy allocator stores four node states (`EMPTY`, `SPLIT`, `FULL`, `ALLOCATED`) in two bits
+per node, at bit indices `2i` and `2i+1`, and moves around the tree with the `GET_LEFT`,
+`GET_RIGHT`, `GET_PARENT` and `GET_BROTHER` macros. The 64 MiB heap is tracked by a 1 MiB
+bitmap and blocks have no headers: `free` receives just an address, walks down the tree to find
+the block, and updates the state on the way back up, which merges freed siblings.
 
-A second, independently parameterised copy of the same allocator (`BLOCK 64`, a 129 KiB arena
-anchored at `sbrk(0)`) serves as the per-process userland heap, keeping kernel and userland
-allocation fully separate.
+Userland heaps use a second copy of the same allocator with different parameters (`BLOCK 64`, a
+129 KiB arena starting at `sbrk(0)`), so kernel and user allocations are kept apart.
 
-### 4. A `pselect`-driven pipeline shell
+### Shell
 
 `Userland/SampleCodeModule/shell/` (~1,600 lines)
 
-Included because it is the clearest demonstration that the kernel primitives actually compose.
-The shell registers **24 built-in commands**; `handleCommand` splits a line on `|`,
-NUL-terminating each stage in place, and threads a handle from stage to stage. `pipeAndExec`
-creates the pipe, `fork`s, `dup2`s the ends into position and `execv`s the stage.
+The shell has 24 built-in commands. `handleCommand` splits the input line on `|`
+(NUL-terminating each stage in place) and passes a handle from one stage to the next.
+`pipeAndExec` creates the pipe, forks, `dup2`s the ends into place and `execv`s the stage.
 
-The foreground loop then blocks in a **single `pselect`** over the current module's output,
-stdin, the raw scancode stream, and every backgrounded job — which is what makes `ps | grep …`,
-a trailing `&`, and Ctrl-C / Ctrl-D chord handling work without a polling loop anywhere.
+While a foreground job runs, the shell blocks in a single `pselect` over the job's output,
+stdin, the raw scancode stream and all background jobs. That's how `ps | grep …`, a trailing
+`&`, and Ctrl-C / Ctrl-D work without polling.
 
-Two details worth singling out:
+A few details:
 
-- **`ps` is implemented as a pipe.** Kernel-side it creates a pipe, writes the formatted process
-  table into the write end, closes it, and returns the *read* file descriptor
-  (`Kernel/proc/proc.c:410`). It composes with `grep` with no special-casing at all.
-- **`less` reads from two pipes.** Upstream data arrives on stdin while keystrokes arrive on a
-  separate pipe at fd 4, because there is no tty layer to multiplex the two.
+- `ps` returns a pipe. The kernel creates a pipe, writes the formatted process table into it,
+  closes the write end and returns the read end (`Kernel/proc/proc.c:410`), so `ps | grep`
+  needs no special handling.
+- `less` reads from two pipes: data on stdin and keystrokes on fd 4, since there's no tty
+  layer to combine them.
+- Unlike POSIX, reading from a closed stdin returns 0 right away. A pipeline stage with nothing
+  upstream relies on this to exit.
 
-The shell also documents where RetOS deliberately diverges from POSIX: closing stdin here makes
-reads return 0 immediately rather than invoking undefined behaviour, which is what lets a
-pipeline stage with no upstream terminate cleanly.
+## Kernel internals
 
----
+### System calls
 
-## Kernel tour
+Syscalls go through `int 0x80`, with the call number in `rax` and arguments in `rdi`, `rsi` and
+`rdx` (System V order). Dispatch is a bounds-checked jump table
+(`Kernel/interruptions/syscalls.c:85`). Handlers also receive the call number and a pointer to
+the saved context, which `fork` needs to get at the interrupt frame.
 
-### System call interface
+| Group      | Calls                                                                                                         |
+| ---------- | ------------------------------------------------------------------------------------------------------------- |
+| I/O        | `read` `write` `pipe` `close` `dup2` `pselect` `flush`                                                          |
+| Memory     | `malloc` `free` `sbrk` `memory_state`                                                                           |
+| Process    | `fork` `execv` `_exit` `kill` `waitpid` `getpid` `sched_yield` `sleep` `usleep` `getpriority` `setpriority` `ps` |
+| Semaphores | `sem_open` `sem_close` `sem_unlink` `sem_post` `sem_wait`                                                        |
+| Devices    | `draw` `get_screen_size` `beep` `get_time` `get_tick` `get_dump`                                                 |
 
-`int 0x80`, with the call number in `rax` and arguments in the System V registers
-(`rdi`, `rsi`, `rdx`). Dispatch is a bounds-checked jump table
-(`Kernel/interruptions/syscalls.c:85`); handlers additionally receive the call number and the
-saved context pointer, which is how `fork` reaches the interrupt frame.
-
-| Group           | Calls                                                                                                            |
-| --------------- | ---------------------------------------------------------------------------------------------------------------- |
-| **I/O**         | `read` `write` `pipe` `close` `dup2` `pselect` `flush`                                                             |
-| **Memory**      | `malloc` `free` `sbrk` `memory_state`                                                                              |
-| **Process**     | `fork` `execv` `_exit` `kill` `waitpid` `getpid` `sched_yield` `sleep` `usleep` `getpriority` `setpriority` `ps`    |
-| **Semaphores**  | `sem_open` `sem_close` `sem_unlink` `sem_post` `sem_wait`                                                           |
-| **Devices**     | `draw` `get_screen_size` `beep` `get_time` `get_tick` `get_dump`                                                    |
-
-`fork` is worth a note: the syscall stub pushes a zero into the child's saved-`rax` slot before
-dispatching, so the child returns 0 out of the same interrupt frame the parent returns a PID
-from.
+For `fork`, the syscall stub pushes a zero into the child's saved `rax` slot before
+dispatching, so the child gets 0 back from the same interrupt frame in which the parent gets
+the child's PID.
 
 ### Processes
 
-Processes live in a static table indexed directly by PID (`MAX_PROCESSES 50`), so
-`get_process(pid)` is pointer arithmetic. States are stored as ASCII characters (`R`, `W`, `B`,
-`Z`, `D`) so `ps` can print them without a lookup. Children hang off intrusive
-`next_child` / `next_brother` lists.
+The process table is a static array indexed by PID (`MAX_PROCESSES 50`). States are stored as
+the characters `R`, `W`, `B`, `Z` and `D` so `ps` can print them directly. Children are kept in
+intrusive `next_child` / `next_brother` lists.
 
-Lifecycle is conventional POSIX in shape: orphans are reparented to init, exit status is held
-in a zombie until reaped, and each process carries two semaphores — one signalling "this child
-exited", one counting "some child exited" — so `waitpid(-1, …)` and `waitpid(pid, …)` both
-block properly. `init` runs the canonical `while (1) waitpid(-1, NULL, 0)` reaper loop.
-Killing PID 1 powers the machine off.
+Orphans are reparented to init, and exited processes stay as zombies until they're reaped. Each
+process has two semaphores, one for "this child exited" and one counting "some child exited",
+which `waitpid(pid, …)` and `waitpid(-1, …)` block on. `init` just loops on
+`waitpid(-1, NULL, 0)`. Killing PID 1 shuts the machine down.
 
 ### IPC
 
-**Pipes** are 32 KiB buffers with reference-counted ends. A pipe descriptor is encoded as
-`(id * 2 + end) | 0x8000`, so the low bit distinguishes the read end from the write end and the
-high bit distinguishes pipes from the built-in streams. Closing the last write end wakes every
-blocked reader once, which is how EOF propagates.
+Pipes are 32 KiB buffers with reference-counted ends. A pipe descriptor is
+`(id * 2 + end) | 0x8000`: the low bit separates the read end from the write end, and bit 15
+marks it as a pipe rather than one of the built-in streams. When the last write end is closed,
+every blocked reader is woken once, which is how they see EOF.
 
-**Semaphores** are POSIX-named and refcounted (`MAX_SEMS 300`). The top bit of the counter word
-doubles as a spinlock, acquired with a test-and-set built on `xchg`; the remaining 31 bits hold
-the value. Each semaphore owns its own blocked-process list rather than sharing a global queue,
-so a wake touches only the waiters that care.
+Semaphores are named (POSIX-style) and reference counted, up to `MAX_SEMS 300`. The top bit of
+the counter is used as a spinlock, taken with an `xchg`-based test-and-set, and the other 31
+bits hold the value. Each semaphore has its own list of blocked processes, so `sem_post` only
+looks at its own waiters.
 
 ### Blocking
 
-Blocking is condition-callback based rather than queue based: a blocked process stores a
-predicate plus up to five words of state, and every timer tick re-evaluates the predicates and
-promotes the satisfied processes back to ready. Sleep, `pselect`, semaphore waits and `SIGSTOP`
-are all expressed as predicates over that one mechanism.
+A blocked process stores a predicate and up to five words of state. On every timer tick the
+kernel re-evaluates the predicates and moves the processes whose condition holds back to the
+ready list. Sleep, `pselect`, semaphore waits and `SIGSTOP` all work this way.
 
 ### I/O streams
 
-There is no filesystem. Descriptors 0–3 are four 64 KiB ring buffers — stdin, stdout, stderr,
-and **stdkey** — dispatched through function-pointer tables; anything else is a pipe.
+There's no filesystem. File descriptors 0–3 are four 64 KiB ring buffers (stdin, stdout,
+stderr and stdkey), accessed through function-pointer tables. Any other descriptor is a pipe.
 
-`stdkey` is the unusual one: it carries raw scancodes and re-emits the *entire currently-held
-key set* on every key event. That is what lets the shell detect Ctrl-C/Ctrl-D/Ctrl-Z chords and
-lets snake support three simultaneous players, with no kernel-side line discipline at all. Line
-editing and echo are done in userland.
+stdkey carries raw scancodes, and on every key event it re-sends the whole set of keys
+currently held down. The shell uses it to detect Ctrl-C, Ctrl-D and Ctrl-Z, and snake uses it to
+let three players share one keyboard. The kernel has no line discipline; line editing and echo
+are done in userland.
 
 ### Drivers
 
-- **Video** — 24-bit VBE linear framebuffer at 1024×768, with alpha blending and a fast path
-  that packs eight pixels into `uint64_t` batches for full-screen fills. Font rendering and
-  double buffering live in userland.
-- **Keyboard** — PS/2, with shift/caps/AltGr state tracking and three switchable layouts
-  (ES_AR, FR_FR, EN_US), cycled with Escape.
-- **Timer** — PIT at its default 18.2 Hz, which sets the scheduling quantum at ~55 ms.
-- **Audio** — PC speaker via PIT channel 2, square-wave mode.
-- **Console** — a VGA text-mode console used during boot and for panics, mirrored to serial
-  COM1 so the boot log lands in the terminal.
+- Video: 24-bit VBE linear framebuffer at 1024×768, with alpha blending. Full-screen fills
+  write eight pixels at a time as `uint64_t`s. Font rendering and double buffering are done in
+  userland.
+- Keyboard: PS/2, with shift/caps/AltGr state and three layouts (ES_AR, FR_FR, EN_US), switched
+  with Escape.
+- Timer: PIT at its default 18.2 Hz, so the scheduling quantum is about 55 ms.
+- Audio: PC speaker via PIT channel 2 in square-wave mode.
+- Console: VGA text mode, used during boot and for panics, and mirrored to serial COM1 so the
+  boot log shows up in the terminal.
 
-Exceptions are handled for divide-by-zero and invalid opcode: the register file is dumped to
-stderr (retrievable from userland, or on demand with the Alt key) and a full-screen bitmap is
-drawn before the machine halts.
+The kernel handles divide-by-zero and invalid-opcode exceptions. It dumps the registers to
+stderr (which userland can read, or you can trigger with the Alt key), draws a full-screen
+bitmap and halts.
 
-### Boot chain
+### Boot
 
 ```
 BMFS MBR ──► Pure64 ──► kernel @ 0x100000 ──► fork() ──► init (PID 1) ──► shell
@@ -285,44 +264,39 @@ BMFS MBR ──► Pure64 ──► kernel @ 0x100000 ──► fork() ──►
              identity map   idle process        int 0x80
 ```
 
-The kernel bootstraps userland by issuing a `fork` syscall *against itself*: the parent becomes
-the idle process, and the child `execv`s `init`. Modules are flat binaries copied to fixed load
-addresses — there is no ELF parsing and no relocation.
-
----
+The kernel starts userland by calling the `fork` syscall on itself: the parent becomes the idle
+process and the child `execv`s `init`. Modules are flat binaries copied to fixed addresses;
+there's no ELF loader and no relocation.
 
 ## Userland
 
-Twelve modules are packed into the image by `Toolchain/ModulePacker` and copied to fixed
+`Toolchain/ModulePacker` packs twelve modules into the image, and they're copied to fixed
 addresses at boot.
 
-| Module    | What it does                                                                        |
-| --------- | ------------------------------------------------------------------------------------ |
-| `module`  | The shell and desktop: module selector, command shell, snake                          |
-| `init`    | PID 1 — forks the shell, then reaps orphans forever                                   |
-| `cat`     | Copies stdin to stdout                                                                |
-| `wc`      | Counts lines                                                                          |
-| `grep`    | Echoes lines matching a substring                                                     |
-| `filter`  | Strips vowels from the stream                                                         |
-| `less`    | Pager — data on stdin, keystrokes on fd 4                                             |
-| `loop`    | Prints its PID on an interval                                                         |
-| `sing`    | PC-speaker jukebox, six tunes                                                         |
-| `phylos`  | Dining philosophers                                                                   |
-| `tests`   | Scheduler, memory and synchronisation stress tests                                    |
-| `data`    | Non-executable data blob                                                              |
+| Module   | What it does                                                 |
+| -------- | ------------------------------------------------------------ |
+| `module` | The shell and desktop: module selector, command shell, snake |
+| `init`   | PID 1: forks the shell, then reaps orphans forever           |
+| `cat`    | Copies stdin to stdout                                       |
+| `wc`     | Counts lines                                                 |
+| `grep`   | Prints lines matching a substring                            |
+| `filter` | Removes vowels from the stream                               |
+| `less`   | Pager; data on stdin, keystrokes on fd 4                     |
+| `loop`   | Prints its PID on an interval                                |
+| `sing`   | PC-speaker jukebox, six tunes                                |
+| `phylos` | Dining philosophers                                          |
+| `tests`  | Scheduler, memory and synchronisation stress tests           |
+| `data`   | Non-executable data blob                                     |
 
-Two of these exist to exercise the kernel rather than decorate it:
+`phylos` runs each philosopher as a separate process, plus one process for printing, all
+synchronised with named semaphores. Odd-numbered philosophers pick up their left fork first and
+even-numbered ones their right, which prevents deadlock. You can add and remove philosophers
+while it runs; a neighbour is only changed when it isn't holding any forks.
 
-**`phylos`** runs one process per philosopher plus a dedicated printer process, coordinating
-through the named-semaphore API. Deadlock is avoided by the classic asymmetry — odd-indexed
-philosophers take the left fork first, even-indexed take the right. Philosophers can be added
-and removed at runtime, guarded so that the affected neighbour is holding no forks when the
-table is resized.
-
-**`tests`** dispatches four suites: `testmm` (randomised allocate / write / verify / free
-against either heap), `testsync` (racing increments with and without a semaphore, with a
-deliberate yield between load and store), `testprio` (priority bands under load, exercising
-renice, block and unblock), and `testprocesses` (random kill/block/unblock across 32 processes).
+`tests` has four suites: `testmm` (random allocate / write / verify / free against either
+heap), `testsync` (racing increments with and without a semaphore, with a yield between the
+load and the store), `testprio` (priority changes, block and unblock under load) and
+`testprocesses` (random kill/block/unblock across 32 processes).
 
 ### Shell commands
 
@@ -333,20 +307,18 @@ filter      loop        grep        less        kill               block
 unblock     phylos      ps          nice        mem                tests
 ```
 
-Commands that spawn a process (`cat`, `wc`, `grep`, `filter`, `less`, `loop`, `sing`, `phylos`,
-`tests`, `ps`) compose with `|` and accept a trailing `&` to run in the background; the rest are
-handled in-shell. `snake` supports up to three simultaneous players (`wasd`, `ijkl`, and `v`/`b`)
-with themes `windows`, `mario`, `creation` and `idyllic`. `help [command]` lists everything.
+Commands that start a process (`cat`, `wc`, `grep`, `filter`, `less`, `loop`, `sing`,
+`phylos`, `tests`, `ps`) can be combined with `|` and run in the background with a trailing
+`&`; the rest run inside the shell. `snake` supports up to three players (`wasd`, `ijkl`, and
+`v`/`b`) and has the themes `windows`, `mario`, `creation` and `idyllic`. `help [command]`
+lists everything.
 
-The boot-time module selector also offers a clock, a register dump, an exception test harness,
-and shutdown.
-
----
+The module selector shown at boot also has a clock, a register dump, an exception test and
+shutdown.
 
 ## Building and running
 
-Requirements on the host: **Docker** and **QEMU**. The build container carries gcc, nasm and
-`qemu-img`.
+You need Docker and QEMU on the host. The build container has gcc, nasm and `qemu-img`.
 
 ```sh
 ./run.sh build [naive|buddy]     # build the image, then boot it
@@ -356,12 +328,11 @@ Requirements on the host: **Docker** and **QEMU**. The build container carries g
 ./run.sh format                  # clang-format the tree
 ```
 
-Append `wsl` as a third argument to stage the image into a WSL path instead of booting
-directly.
+Add `wsl` as a third argument to copy the image to a WSL path instead of booting it.
 
-Underneath, the flags are plain make variables — `make all BUDDY=1 DEBUG=1` works if you would
-rather drive the build yourself. `BUDDY=1` selects the buddy allocator; `DEBUG=1` adds debug
-info and additionally emits ELF copies of every binary for GDB.
+`run.sh` just passes make variables, so you can also run `make all BUDDY=1 DEBUG=1` yourself.
+`BUDDY=1` selects the buddy allocator, and `DEBUG=1` adds debug info and also produces ELF
+copies of every binary for GDB.
 
 To boot the image by hand:
 
@@ -370,12 +341,11 @@ qemu-system-x86_64 -hda Image/x64BareBonesImage.qcow2 -m 512 -serial stdio \
     -machine pcspk-audiodev=snd0 -audiodev none,id=snd0
 ```
 
-> The PC-speaker flags above are the modern spelling. `run.sh` still passes `-soundhw pcspk`,
-> which **QEMU removed in 6.0** — on a current QEMU, either patch that line or drop the sound
-> flags entirely.
+`run.sh` still uses `-soundhw pcspk`, which was removed in QEMU 6.0. On a newer QEMU, replace it
+with the flags above or remove the sound flags.
 
-For source-level debugging, build with `./run.sh debug`, then start QEMU with `-s -S` (gdbstub
-on `:1234`, halted at reset) and attach GDB to the `.elf` files in `Image/`.
+To debug, build with `./run.sh debug`, start QEMU with `-s -S` (GDB server on `:1234`, stopped
+at reset) and attach GDB to the `.elf` files in `Image/`.
 
 ## Repository layout
 
@@ -388,48 +358,46 @@ Kernel/         scheduler, memory managers, syscalls, IPC, drivers
   video/  console/  audio/  localization/  ticks/     drivers
 Global/         freestanding libc subset shared by kernel and userland
 Userland/       the 12 modules, including the shell under SampleCodeModule/
-Toolchain/      ModulePacker — concatenates kernel + modules into one payload
+Toolchain/      ModulePacker: concatenates kernel + modules into one payload
 Image/          image assembly (BMFS format, qcow2/vmdk conversion)
-Bootloader/     vendored: Pure64 + BMFS
+Bootloader/     vendored Pure64 + BMFS
 ```
 
 ## Authorship
 
-RetOS was written by four people across two ITBA course projects.
+RetOS was written by four people over two ITBA course projects.
 
-**Lucas Lonegro** — lead author of the scheduler and memory subsystems: 348 of 370 lines of
-`scheduler.c`, 228 of 263 of `mman.c`, all 225 of the buddy allocator, and 358 of 468 of
-`proc.c`. Also the shell and its pipeline engine (~96%) and `phylos`. Around 53% of kernel lines
-overall.
+- Lucas Lonegro: most of the scheduler and memory subsystems (348 of 370 lines of
+  `scheduler.c`, 228 of 263 of `mman.c`, all 225 of the buddy allocator, 358 of 468 of
+  `proc.c`), the shell and its pipeline code (~96%), and `phylos`. About 53% of the kernel
+  overall.
+- Tomás Raiti: co-author of the kernel and main author of the video driver, pipes and
+  semaphores. About 47% of the kernel.
+- Tobias Noceda: parts of `phylos`, the piano and snake modules, and early semaphore work.
+- Peter Seggi: repository maintenance and code review.
 
-**Tomás Raiti** — co-author of the kernel and primary author of the video driver, the pipe layer
-and the semaphore implementation. Around 47% of kernel lines.
-
-**Tobias Noceda** — contributions to `phylos`, the piano and snake modules, and early
-semaphore work. **Peter Seggi** — repository and review contributions.
-
-Not our work: `Bootloader/` vendors **Pure64** (Return Infinity, Ian Seyler) and **BMFS**,
-modified only to enable VESA. The repository was seeded from the **x64BareBones** ITBA course
-template by **Rodrigo Rearden**, with **Augusto Nizzo McIntosh**.
+Not written by us: `Bootloader/` contains Pure64 (Return Infinity, Ian Seyler) and BMFS, which
+we only modified to enable VESA. The repository started from ITBA's x64BareBones course
+template by Rodrigo Rearden and Augusto Nizzo McIntosh.
 
 ## Known limitations
 
-RetOS is a purpose-built kernel, it has several limitations for practical applications:
+RetOS was built for coursework, not for real use, and it has a number of limitations:
 
-- **No virtual memory.** One flat identity-mapped address space; isolation between processes is
-  by convention, not by hardware.
-- **No privilege separation.** "Userland" runs at CS `0x8` — ring 0. There is no user/kernel
-  boundary the CPU enforces.
-- **No copy-on-write.** `fork` eagerly copies the whole stack.
-- **No filesystem.** Programs are flat binaries at fixed load addresses, baked into the image;
-  adding one means editing four files.
-- **Single core.** Pure64 brings up the other cores and RetOS parks them.
-- Caps of 50 processes, 100 pipes, 300 semaphores, 10 descriptors per process.
-- Three signals (`SIGKILL`, `SIGSTOP`, `SIGCONT`), no handlers and no masks.
-- No CI; static analysis and formatting are run manually via `run.sh`.
+- No virtual memory. There is one flat identity-mapped address space, so processes are only
+  isolated by convention.
+- No privilege separation. Userland runs at CS `0x8`, which is ring 0, so the CPU doesn't
+  enforce a user/kernel boundary.
+- No copy-on-write. `fork` copies the whole stack.
+- No filesystem. Programs are flat binaries at fixed addresses built into the image, and adding
+  one means editing four files.
+- Single core. Pure64 starts the other cores and RetOS parks them.
+- At most 50 processes, 100 pipes, 300 semaphores and 10 descriptors per process.
+- Only three signals (`SIGKILL`, `SIGSTOP`, `SIGCONT`), with no handlers or masks.
+- No CI. Static analysis and formatting are run by hand through `run.sh`.
 
 ## Licence
 
-RetOS is released under the **GPL-3.0** (`LICENSE`). The inherited x64BareBones portion remains
-under its original **3-clause BSD** licence (`License.txt`). Pure64 and BMFS carry their own
-licences under `Bootloader/`.
+RetOS is released under the GPL-3.0 (`LICENSE`). The parts that come from x64BareBones keep
+their original 3-clause BSD licence (`License.txt`). Pure64 and BMFS have their own licences
+under `Bootloader/`.
